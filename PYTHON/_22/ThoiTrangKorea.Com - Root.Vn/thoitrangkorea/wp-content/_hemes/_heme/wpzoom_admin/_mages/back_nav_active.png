@@ -1,0 +1,3 @@
+import type {CodeKeywordDefinition, KeywordCxt, JSONSchemaType, Name} from "ajv"
+import {_} from "ajv/dist/compile/codegen"
+import {usePattern} f

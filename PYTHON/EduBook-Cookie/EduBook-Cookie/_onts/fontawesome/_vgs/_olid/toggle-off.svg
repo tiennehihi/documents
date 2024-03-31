@@ -1,0 +1,10 @@
+== 166 /* QualifiedName */ || node.kind === 80 /* Identifier */) {
+    node = node.parent;
+  }
+  return node.kind === 186 /* TypeQuery */;
+}
+function isNamespaceReexportDeclaration(node) {
+  return isNamespaceExport(node) && !!node.parent.moduleSpecifier;
+}
+function isExternalModuleImportEqualsDeclaration(node) {
+  return node.kind === 271 /* ImportEqualsDeclaration */ && node.moduleReference.kind === 283 /* Extern

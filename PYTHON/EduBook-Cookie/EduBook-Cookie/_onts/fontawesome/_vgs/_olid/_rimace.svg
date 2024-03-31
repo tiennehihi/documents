@@ -1,0 +1,23 @@
+var List = require('../common/List');
+
+function getFirstMatchNode(matchNode) {
+    if ('node' in matchNode) {
+        return matchNode.node;
+    }
+
+    return getFirstMatchNode(matchNode.match[0]);
+}
+
+function getLastMatchNode(matchNode) {
+    if ('node' in matchNode) {
+        return matchNode.node;
+    }
+
+    return getLastMatchNode(matchNode.match[matchNode.match.length - 1]);
+}
+
+function matchFragments(lexer, ast, match, type, name) {
+    function findFragments(matchNode) {
+        if (matchNode.syntax !== null &&
+            matchNode.syntax.type === type &&
+        

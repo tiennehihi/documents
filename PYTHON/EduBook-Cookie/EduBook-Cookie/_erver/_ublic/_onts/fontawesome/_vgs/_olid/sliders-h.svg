@@ -1,0 +1,45 @@
+   - 10f11e
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 5.7.0
+    - 5.10.1
+    - 6.0.0-beta1
+    - 6.2.0
+    - 6.2.1
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Flag Checkered
+  unicode: f11e
+  voted: false
+flag-usa:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f74d
+  changes:
+    - 5.5.0
+    - 6.0.0-beta1
+    - 6.2.0
+    - 6.2.1
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Flag Usa
+  unicode: f74d
+  voted: false
+flask:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f0c3
+  c

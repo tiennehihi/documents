@@ -1,0 +1,7 @@
+"use strict";
+
+const WebSocket = require("ws");
+const BaseServer = require("./BaseServer");
+
+/** @typedef {import("../Server").WebSocketServerConfiguration} WebSocketServerConfiguration */
+/** @typedef {import("../Server").ClientConnection} 

@@ -1,0 +1,15 @@
+var Tokenizer = require('./tokenizer');
+var TAB = 9;
+var N = 10;
+var F = 12;
+var R = 13;
+var SPACE = 32;
+var EXCLAMATIONMARK = 33;    // !
+var NUMBERSIGN = 35;         // #
+var AMPERSAND = 38;          // &
+var APOSTROPHE = 39;         // '
+var LEFTPARENTHESIS = 40;    // (
+var RIGHTPARENTHESIS = 41;   // )
+var ASTERISK = 42;           // *
+var PLUSSIGN = 43;           // +
+va

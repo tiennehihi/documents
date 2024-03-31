@@ -1,0 +1,17 @@
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+import { QueueableFn } from '../queueRunner';
+import type { AssertionErrorWithStack, Jasmine, Reporter, SpecDefinitionsFn, Spy } from '../types';
+import type { default as Spec } from './Spec';
+import type Suite from './Suite';
+export default function jasmineEnv(j$: Jasmine): {
+    new (): {
+        specFilter: (spec: Spec) => boolean;
+        catchExceptions: (value: unknown) => boolean;
+        throwOnExpectationFailure: (value: unknown) => void;
+        catchingExceptions: (

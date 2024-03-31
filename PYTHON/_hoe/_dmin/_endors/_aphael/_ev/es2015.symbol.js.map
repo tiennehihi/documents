@@ -1,0 +1,5 @@
+ void;
+      onClassStringDisjunctionLeave?: (node: ClassStringDisjunction) => void;
+      onClassSubtractionEnter?: (node: ClassSubtraction) => void;
+      onClassSubtractionLeave?: (node: ClassSubtraction) => void;
+      onExpressionCharacterCla

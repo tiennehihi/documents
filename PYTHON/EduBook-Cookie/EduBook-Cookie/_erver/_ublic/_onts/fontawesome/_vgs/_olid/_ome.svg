@@ -1,0 +1,19 @@
+var-folder-open: "\f07c";
+@fa-var-heart-circle-plus: "\e500";
+@fa-var-code-fork: "\e13b";
+@fa-var-city: "\f64f";
+@fa-var-microphone-lines: "\f3c9";
+@fa-var-microphone-alt: "\f3c9";
+@fa-var-pepper-hot: "\f816";
+@fa-var-unlock: "\f09c";
+@fa-var-colon-sign: "\e140";
+@fa-var-headset: "\f590";
+@fa-var-store-slash: "\e071";
+@fa-var-road-circle-xmark: "\e566";
+@fa-var-user-minus: "\f503";
+@fa-var-mars-stroke-up: "\f22a";
+@fa-var-mars-stroke-v: "\f22a";
+@fa-var-champagne-glasses: "\f79f";
+@fa-var-glass-cheers: "\f79f";
+@fa-var-clipboard: "\f328";
+@fa-var-house-circle

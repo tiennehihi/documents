@@ -1,0 +1,1 @@
+s||t.isClassPrivateProperty(node)||path.remove();node.accessibility&&(node.accessibility=null),node.abstract&&(node.abstract=null),node.readonly&&(node.readonly=null),node.optional&&(node.optional=null),node.typeAnnotation&&(node.typeAnnotation=

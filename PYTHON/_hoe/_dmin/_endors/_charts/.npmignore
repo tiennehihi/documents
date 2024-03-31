@@ -1,0 +1,2 @@
+var sourceMap = require('./sourceMap');
+var hasOwnProperty = Object.p

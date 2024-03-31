@@ -1,0 +1,20 @@
+ {
+      "unicodes": {
+        "composite": [
+          "6b"
+        ]
+      }
+    },
+    "changes": [
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "4b",
+    "label": "K",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321836,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 320 512\"><path d=\"M311 86.3c12.3-12.7 12-32.9-.7-45.2s-32.9-12-45.2 .7l-155.2 160L64 249V64c0-17.7-14.3-32-32-32S0 46.3 0 64V328 448c0 17.7 14.3 32 32 32s32-14.3 32-32V341l64.7-66.7 133 192c1

@@ -1,0 +1,162 @@
+ 2 < this.tokens.tokens.length &&
+      (this.tokens.matches1AtIndex(index + 2, tt.dot) ||
+        this.tokens.matches1AtIndex(index + 2, tt.bracketL) ||
+        this.tokens.matches1AtIndex(index + 2, tt.parenL))
+    ) {
+      return false;
+    }
+    const identifierName = this.tokens.identifierNameForToken(identifierToken);
+    const assignmentSnippet = this.importProcessor.resolveExportBinding(identifierName);
+    if (!assignmentSnippet) {
+      return false;
+    }
+    this.tokens.appendCode(`${assignmentSnippet} = `);
+    this.tokens.copyToken();
+    return true;
+  }
+
+  /**
+   * Process something like `a++`, where `a` might be an exported value.
+   * This starts at the `a`, not at the `++`.
+   */
+   processPostIncDec() {
+    const index = this.tokens.currentIndex();
+    const identifierToken = this.tokens.tokens[index];
+    const operatorToken = this.tokens.tokens[index + 1];
+    if (identifierToken.type !== tt.name) {
+      return false;
+    }
+    if (identifierToken.shadowsGlobal) {
+      return false;
+    }
+    if (index >= 1 && this.tokens.matches1AtIndex(index - 1, tt.dot)) {
+      return false;
+    }
+    const identifierName = this.tokens.identifierNameForToken(identifierToken);
+    const assignmentSnippet = this.importProcessor.resolveExportBinding(identifierName);
+    if (!assignmentSnippet) {
+      return false;
+    }
+    const operatorCode = this.tokens.rawCodeForToken(operatorToken);
+    // We might also replace the identifier with something like exports.x, so
+    // do that replacement here as well.
+    const base = this.importProcessor.getIdentifierReplacement(identifierName) || identifierName;
+    if (operatorCode === "++") {
+      this.tokens.replaceToken(`(${base} = ${assignmentSnippet} = ${base} + 1, ${base} - 1)`);
+    } else if (operatorCode === "--") {
+      this.tokens.replaceToken(`(${base} = ${assignmentSnippet} = ${base} - 1, ${base} + 1)`);
+    } else {
+      throw new Error(`Unexpected operator: ${operatorCode}`);
+    }
+    this.tokens.removeToken();
+    return true;
+  }
+
+   processExportDefault() {
+    let exportedRuntimeValue = true;
+    if (
+      this.tokens.matches4(tt._export, tt._default, tt._function, tt.name) ||
+      // export default async function
+      (this.tokens.matches5(tt._export, tt._default, tt.name, tt._function, tt.name) &&
+        this.tokens.matchesContextualAtIndex(
+          this.tokens.currentIndex() + 2,
+          ContextualKeyword._async,
+        ))
+    ) {
+      this.tokens.removeInitialToken();
+      this.tokens.removeToken();
+      // Named function export case: change it to a top-level function
+      // declaration followed by exports statement.
+      const name = this.processNamedFunction();
+      this.tokens.appendCode(` exports.default = ${name};`);
+    } else if (
+      this.tokens.matches4(tt._export, tt._default, tt._class, tt.name) ||
+      this.tokens.matches5(tt._export, tt._default, tt._abstract, tt._class, tt.name) ||
+      this.tokens.matches3(tt._export, tt._default, tt.at)
+    ) {
+      this.tokens.removeInitialToken();
+      this.tokens.removeToken();
+      this.copyDecorators();
+      if (this.tokens.matches1(tt._abstract)) {
+        this.tokens.removeToken();
+      }
+      const name = this.rootTransformer.processNamedClass();
+      this.tokens.appendCode(` exports.default = ${name};`);
+      // After this point, this is a plain "export default E" statement.
+    } else if (
+      shouldElideDefaultExport(
+        this.isTypeScriptTransformEnabled,
+        this.keepUnusedImports,
+        this.tokens,
+        this.declarationInfo,
+      )
+    ) {
+      // If the exported value is just an identifier and should be elided by TypeScript
+      // rules, then remove it entirely. It will always have the form `export default e`,
+      // where `e` is an identifier.
+      exportedRuntimeValue = false;
+      this.tokens.removeInitialToken();
+      this.tokens.removeToken();
+      this.tokens.removeToken();
+    } else if (this.reactHotLoaderTransformer) {
+      // We need to assign E to a variable. Change "export default E" to
+      // "let _default; exports.default = _default = E"
+      const defaultVarName = this.nameManager.claimFreeName("_default");
+      this.tokens.replaceToken(`let ${defaultVarName}; exports.`);
+      this.tokens.copyToken();
+      this.tokens.appendCode(` = ${defaultVarName} =`);
+      this.reactHotLoaderTransformer.setExtractedDefaultExportName(defaultVarName);
+    } else {
+      // Change "export default E" to "exports.default = E"
+      this.tokens.replaceToken("exports.");
+      this.tokens.copyToken();
+      this.tokens.appendCode(" =");
+    }
+    if (exportedRuntimeValue) {
+      this.hadDefaultExport = true;
+    }
+  }
+
+   copyDecorators() {
+    while (this.tokens.matches1(tt.at)) {
+      this.tokens.copyToken();
+      if (this.tokens.matches1(tt.parenL)) {
+        this.tokens.copyExpectedToken(tt.parenL);
+        this.rootTransformer.processBalancedCode();
+        this.tokens.copyExpectedToken(tt.parenR);
+      } else {
+        this.tokens.copyExpectedToken(tt.name);
+        while (this.tokens.matches1(tt.dot)) {
+          this.tokens.copyExpectedToken(tt.dot);
+          this.tokens.copyExpectedToken(tt.name);
+        }
+        if (this.tokens.matches1(tt.parenL)) {
+          this.tokens.copyExpectedToken(tt.parenL);
+          this.rootTransformer.processBalancedCode();
+          this.tokens.copyExpectedToken(tt.parenR);
+        }
+      }
+    }
+  }
+
+  /**
+   * Transform a declaration like `export var`, `export let`, or `export const`.
+   */
+   processExportVar() {
+    if (this.isSimpleExportVar()) {
+      this.processSimpleExportVar();
+    } else {
+      this.processComplexExportVar();
+    }
+  }
+
+  /**
+   * Determine if the export is of the form:
+   * export var/let/const [varName] = [expr];
+   * In other words, determine if function name inference might apply.
+   */
+   isSimpleExportVar() {
+    let tokenIndex = this.tokens.currentIndex();
+    // export
+    tokenIndex++;
+    // var/let/co

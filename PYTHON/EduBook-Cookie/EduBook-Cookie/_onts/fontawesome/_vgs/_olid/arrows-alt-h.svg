@@ -1,0 +1,8 @@
+       stopTracingIfNeeded(builderProgram);
+                                }, extensions);
+                                performance.markEnd('Create Watch Compiler Host');
+                                watchProgram = undefined;
+                            }
+                            // ensure watch program exists
+                            if (!watchProgram) {
+                                performance.

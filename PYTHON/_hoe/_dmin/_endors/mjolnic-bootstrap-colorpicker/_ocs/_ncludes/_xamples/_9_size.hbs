@@ -1,0 +1,24 @@
+ = parseModuleSpecifier();
+      }
+    }
+    const currentToken2 = token();
+    if (moduleSpecifier && (currentToken2 === 118 /* WithKeyword */ || currentToken2 === 132 /* AssertKeyword */) && !scanner.hasPrecedingLineBreak()) {
+      attributes = parseImportAttributes(currentToken2);
+    }
+    parseSemicolon();
+    setAwaitContext(savedAwaitContext);
+    const node = factory2.createExportDeclaration(modifiers, isTypeOnly, exportClause, moduleSpecifier, attributes);
+    return withJSDoc(finishNode(node, pos), hasJSDoc);
+  }
+  function parseExportAssignment(pos, hasJSDoc, modifiers) {
+    const savedAwaitContext = inAwaitContext();
+    setAwaitContext(
+      /*value*/
+      true
+    );
+    let isExportEquals;
+    if (parseOptional(64 /* EqualsToken */)) {
+      isExportEquals = true;
+    } else {
+      parseExpected(90 /* DefaultKeyword */);
+    

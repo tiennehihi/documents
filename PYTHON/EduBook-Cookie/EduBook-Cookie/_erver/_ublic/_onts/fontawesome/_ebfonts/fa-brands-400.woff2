@@ -1,0 +1,5495 @@
+nicodes:
+      secondary:
+        - 10f5bb
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Spa
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5bb
+  voted: false
+space-awesome:
+  changes:
+    - 6.1.2
+  label: Space Awesome
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: e5ac
+  voted: false
+spaghetti-monster-flying:
+  aliases:
+    names:
+      - pastafarianism
+    unicodes:
+      secondary:
+        - 10f67b
+  changes:
+    - 5.3.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Spaghetti monster flying
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f67b
+  voted: false
+speakap:
+  changes:
+    - 5.0.0
+    - 5.4.0
+    - 5.8.0
+  label: Speakap
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f3f3
+  voted: false
+speaker-deck:
+  changes:
+    - 5.8.0
+  label: Speaker Deck
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f83c
+  voted: false
+spell-check:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f891
+  changes:
+    - 5.9.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Spell Check
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f891
+  voted: false
+spider:
+  aliases:
+    unicodes:
+      composite:
+        - 1f577
+      secondary:
+        - 10f717
+  changes:
+    - 5.4.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Spider
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f717
+  voted: true
+spinner:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f110
+  changes:
+    - 3.0.0
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Spinner
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f110
+  voted: false
+splotch:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f5bc
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Splotch
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5bc
+  voted: false
+spoon:
+  aliases:
+    names:
+      - utensil-spoon
+    unicodes:
+      composite:
+        - 1f944
+        - f1b1
+      secondary:
+        - 10f2e5
+  changes:
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.2.0
+  label: Spoon
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f2e5
+  voted: false
+spotify:
+  changes:
+    - 4.1.0
+    - 5.0.0
+  label: Spotify
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1bc
+  voted: false
+spray-can:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f5bd
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Spray Can
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5bd
+  voted: false
+spray-can-sparkles:
+  aliases:
+    names:
+      - air-freshener
+    unicodes:
+      secondary:
+        - 10f5d0
+  changes:
+    - 5.2.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Spray Can Sparkles
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5d0
+  voted: false
+square:
+  aliases:
+    unicodes:
+      composite:
+        - 25a0
+        - 25fb
+        - 25fc
+        - f096
+      secondary:
+        - 10f0c8
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 5.10.1
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Square
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f0c8
+  voted: false
+square-arrow-up-right:
+  aliases:
+    names:
+      - external-link-square
+    unicodes:
+      secondary:
+        - 10f14c
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square arrow up right
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f14c
+  voted: false
+square-behance:
+  aliases:
+    names:
+      - behance-square
+  changes:
+    - 4.1.0
+    - 5.0.0
+    - 5.0.3
+    - 6.1.2
+  label: Behance Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1b5
+  voted: false
+square-caret-down:
+  aliases:
+    names:
+      - caret-square-down
+    unicodes:
+      secondary:
+        - 10f150
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square caret down
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f150
+  voted: false
+square-caret-left:
+  aliases:
+    names:
+      - caret-square-left
+    unicodes:
+      secondary:
+        - 10f191
+  changes:
+    - 4.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square caret left
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f191
+  voted: false
+square-caret-right:
+  aliases:
+    names:
+      - caret-square-right
+    unicodes:
+      secondary:
+        - 10f152
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square caret right
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f152
+  voted: false
+square-caret-up:
+  aliases:
+    names:
+      - caret-square-up
+    unicodes:
+      secondary:
+        - 10f151
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square caret up
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f151
+  voted: false
+square-check:
+  aliases:
+    names:
+      - check-square
+    unicodes:
+      composite:
+        - '2611'
+        - '2705'
+        - f046
+      secondary:
+        - 10f14a
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Square check
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f14a
+  voted: false
+square-dribbble:
+  aliases:
+    names:
+      - dribbble-square
+  changes:
+    - 5.0.0
+    - 6.1.2
+  label: Dribbble Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f397
+  voted: false
+square-envelope:
+  aliases:
+    names:
+      - envelope-square
+    unicodes:
+      secondary:
+        - 10f199
+  changes:
+    - 4.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square envelope
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f199
+  voted: false
+square-facebook:
+  aliases:
+    names:
+      - facebook-square
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.8.2
+    - 6.1.2
+  label: Facebook Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f082
+  voted: false
+square-font-awesome:
+  changes:
+    - 5.0.0
+    - 5.0.1
+    - 6.0.0-beta1
+    - 6.1.2
+  label: Font Awesome in Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: e5ad
+  voted: false
+square-font-awesome-stroke:
+  aliases:
+    names:
+      - font-awesome-alt
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+  label: Font Awesome in Square with Stroke Outline
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f35c
+  voted: false
+square-full:
+  aliases:
+    unicodes:
+      composite:
+        - 1f7e5
+        - 1f7e6
+        - 1f7e7
+        - 1f7e8
+        - 1f7e9
+        - 1f7ea
+        - 1f7eb
+        - 2b1b
+        - 2b1c
+      secondary:
+        - 10f45c
+  changes:
+    - 5.0.5
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Square Full
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f45c
+  voted: false
+square-git:
+  aliases:
+    names:
+      - git-square
+  changes:
+    - 4.1.0
+    - 5.0.0
+    - 5.8.2
+    - 6.1.2
+  label: Git Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1d2
+  voted: false
+square-github:
+  aliases:
+    names:
+      - github-square
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 6.1.2
+  label: GitHub Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f092
+  voted: false
+square-gitlab:
+  aliases:
+    names:
+      - gitlab-square
+  changes:
+    - 6.1.2
+  label: Square Gitlab
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: e5ae
+  voted: false
+square-google-plus:
+  aliases:
+    names:
+      - google-plus-square
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 6.1.2
+  label: Google Plus Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f0d4
+  voted: false
+square-h:
+  aliases:
+    names:
+      - h-square
+    unicodes:
+      secondary:
+        - 10f0fd
+  changes:
+    - 3.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square h
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0fd
+  voted: false
+square-hacker-news:
+  aliases:
+    names:
+      - hacker-news-square
+  changes:
+    - 5.0.0
+    - 6.1.2
+  label: Hacker News Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f3af
+  voted: false
+square-instagram:
+  aliases:
+    names:
+      - instagram-square
+  changes:
+    - 5.12.1
+    - 5.14.0
+    - 6.1.2
+  label: Instagram Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: e055
+  voted: true
+square-js:
+  aliases:
+    names:
+      - js-square
+  changes:
+    - 5.0.0
+    - 5.0.3
+    - 6.1.2
+  label: JavaScript (JS) Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f3b9
+  voted: false
+square-lastfm:
+  aliases:
+    names:
+      - lastfm-square
+  changes:
+    - 4.2.0
+    - 5.0.0
+    - 5.0.11
+    - 6.1.2
+  label: last.fm Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f203
+  voted: false
+square-minus:
+  aliases:
+    names:
+      - minus-square
+    unicodes:
+      composite:
+        - f147
+      secondary:
+        - 10f146
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Square minus
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f146
+  voted: false
+square-nfi:
+  changes:
+    - 6.1.0
+    - 6.1.2
+    - 6.2.0
+  label: Square Nfi
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e576
+  voted: false
+square-odnoklassniki:
+  aliases:
+    names:
+      - odnoklassniki-square
+  changes:
+    - 4.4.0
+    - 5.0.0
+    - 6.1.2
+  label: Odnoklassniki Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f264
+  voted: false
+square-parking:
+  aliases:
+    names:
+      - parking
+    unicodes:
+      composite:
+        - 1f17f
+      secondary:
+        - 10f540
+  changes:
+    - 5.0.13
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Square parking
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f540
+  voted: true
+square-pen:
+  aliases:
+    names:
+      - pen-square
+      - pencil-square
+    unicodes:
+      secondary:
+        - 10f14b
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Square pen
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f14b
+  voted: false
+square-person-confined:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Square Person-confined
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e577
+  voted: false
+square-phone:
+  aliases:
+    names:
+      - phone-square
+    unicodes:
+      secondary:
+        - 10f098
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square phone
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f098
+  voted: false
+square-phone-flip:
+  aliases:
+    names:
+      - phone-square-alt
+    unicodes:
+      secondary:
+        - 10f87b
+  changes:
+    - 5.9.0
+    - 5.10.1
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square phone flip
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f87b
+  voted: false
+square-pied-piper:
+  aliases:
+    names:
+      - pied-piper-square
+  changes:
+    - 5.12.0
+    - 5.14.0
+    - 6.1.2
+  label: Pied Piper Square Logo (Old)
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: e01e
+  voted: false
+square-pinterest:
+  aliases:
+    names:
+      - pinterest-square
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 6.1.2
+  label: Pinterest Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f0d3
+  voted: false
+square-plus:
+  aliases:
+    names:
+      - plus-square
+    unicodes:
+      composite:
+        - f196
+      secondary:
+        - 10f0fe
+  changes:
+    - 3.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Square plus
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f0fe
+  voted: false
+square-poll-horizontal:
+  aliases:
+    names:
+      - poll-h
+    unicodes:
+      secondary:
+        - 10f682
+  changes:
+    - 5.3.0
+    - 5.10.1
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Square poll horizontal
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f682
+  voted: false
+square-poll-vertical:
+  aliases:
+    names:
+      - poll
+    unicodes:
+      secondary:
+        - 10f681
+  changes:
+    - 5.3.0
+    - 5.10.1
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Square poll vertical
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f681
+  voted: false
+square-reddit:
+  aliases:
+    names:
+      - reddit-square
+  changes:
+    - 4.1.0
+    - 5.0.0
+    - 6.1.2
+  label: reddit Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1a2
+  voted: false
+square-root-variable:
+  aliases:
+    names:
+      - square-root-alt
+    unicodes:
+      secondary:
+        - 10f698
+  changes:
+    - 5.3.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square root variable
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f698
+  voted: false
+square-rss:
+  aliases:
+    names:
+      - rss-square
+    unicodes:
+      secondary:
+        - 10f143
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square rss
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f143
+  voted: false
+square-share-nodes:
+  aliases:
+    names:
+      - share-alt-square
+    unicodes:
+      secondary:
+        - 10f1e1
+  changes:
+    - 4.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Square share nodes
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f1e1
+  voted: false
+square-snapchat:
+  aliases:
+    names:
+      - snapchat-square
+  changes:
+    - 4.6.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.1.2
+  label: Snapchat Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f2ad
+  voted: false
+square-steam:
+  aliases:
+    names:
+      - steam-square
+  changes:
+    - 4.1.0
+    - 5.0.0
+    - 6.1.2
+  label: Steam Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1b7
+  voted: false
+square-tumblr:
+  aliases:
+    names:
+      - tumblr-square
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 6.1.2
+  label: Tumblr Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f174
+  voted: false
+square-twitter:
+  aliases:
+    names:
+      - twitter-square
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 6.1.2
+  label: Twitter Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f081
+  voted: false
+square-up-right:
+  aliases:
+    names:
+      - external-link-square-alt
+    unicodes:
+      composite:
+        - '2197'
+      secondary:
+        - 10f360
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square up right
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f360
+  voted: false
+square-viadeo:
+  aliases:
+    names:
+      - viadeo-square
+  changes:
+    - 4.6.0
+    - 5.0.0
+    - 5.7.0
+    - 6.1.2
+  label: Viadeo Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f2aa
+  voted: false
+square-vimeo:
+  aliases:
+    names:
+      - vimeo-square
+  changes:
+    - 4.0.0
+    - 5.0.0
+    - 6.1.2
+  label: Vimeo Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f194
+  voted: false
+square-virus:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Square Virus
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e578
+  voted: false
+square-whatsapp:
+  aliases:
+    names:
+      - whatsapp-square
+  changes:
+    - 5.0.0
+    - 6.1.2
+  label: What's App Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f40c
+  voted: false
+square-xing:
+  aliases:
+    names:
+      - xing-square
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 6.1.2
+  label: Xing Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f169
+  voted: false
+square-xmark:
+  aliases:
+    names:
+      - times-square
+      - xmark-square
+    unicodes:
+      composite:
+        - 274e
+      secondary:
+        - 10f2d3
+  changes:
+    - 4.7.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Square X Mark
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f2d3
+  voted: false
+square-youtube:
+  aliases:
+    names:
+      - youtube-square
+    unicodes:
+      composite:
+        - f166
+  changes:
+    - 5.0.3
+    - 6.1.2
+  label: YouTube Square
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f431
+  voted: false
+squarespace:
+  changes:
+    - 5.1.0
+  label: Squarespace
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f5be
+  voted: true
+stack-exchange:
+  changes:
+    - 4.0.0
+    - 5.0.0
+    - 5.0.3
+  label: Stack Exchange
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f18d
+  voted: false
+stack-overflow:
+  changes:
+    - 3.2.0
+    - 5.0.0
+  label: Stack Overflow
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f16c
+  voted: false
+stackpath:
+  changes:
+    - 5.8.2
+  label: Stackpath
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f842
+  voted: false
+staff-snake:
+  aliases:
+    names:
+      - rod-asclepius
+      - rod-snake
+      - staff-aesculapius
+  changes:
+    - 6.1.0
+    - 6.1.2
+    - 6.2.0
+  label: Staff Aesculapius
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e579
+  voted: false
+stairs:
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Stairs
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e289
+  voted: true
+stamp:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f5bf
+  changes:
+    - 5.1.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Stamp
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5bf
+  voted: false
+stapler:
+  changes:
+    - 6.1.2
+    - 6.2.0
+  label: Stapler
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e5af
+  voted: false
+star:
+  aliases:
+    unicodes:
+      composite:
+        - 2b50
+        - f006
+      secondary:
+        - 10f005
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Star
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f005
+  voted: false
+star-and-crescent:
+  aliases:
+    unicodes:
+      composite:
+        - 262a
+      secondary:
+        - 10f699
+  changes:
+    - 5.3.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Star and Crescent
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f699
+  voted: false
+star-half:
+  aliases:
+    unicodes:
+      composite:
+        - f123
+      secondary:
+        - 10f089
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: star-half
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f089
+  voted: false
+star-half-stroke:
+  aliases:
+    names:
+      - star-half-alt
+    unicodes:
+      secondary:
+        - 10f5c0
+  changes:
+    - 5.1.0
+    - 5.11.0
+    - 5.11.1
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Star half stroke
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f5c0
+  voted: true
+star-of-david:
+  aliases:
+    unicodes:
+      composite:
+        - '2721'
+      secondary:
+        - 10f69a
+  changes:
+    - 5.3.0
+    - 5.11.0
+    - 5.11.1
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Star of David
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f69a
+  voted: false
+star-of-life:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f621
+  changes:
+    - 5.2.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Star of Life
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f621
+  voted: false
+staylinked:
+  changes:
+    - 5.0.0
+  label: StayLinked
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f3f5
+  voted: false
+steam:
+  changes:
+    - 4.1.0
+    - 5.0.0
+  label: Steam
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1b6
+  voted: false
+steam-symbol:
+  changes:
+    - 5.0.0
+  label: Steam Symbol
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f3f6
+  voted: false
+sterling-sign:
+  aliases:
+    names:
+      - gbp
+      - pound-sign
+    unicodes:
+      composite:
+        - a3
+      secondary:
+        - 10f154
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Sterling sign
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f154
+  voted: false
+stethoscope:
+  aliases:
+    unicodes:
+      composite:
+        - 1fa7a
+      secondary:
+        - 10f0f1
+  changes:
+    - 3.0.0
+    - 5.0.0
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Stethoscope
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0f1
+  voted: false
+sticker-mule:
+  changes:
+    - 5.0.0
+    - 5.7.0
+  label: Sticker Mule
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f3f7
+  voted: false
+stop:
+  aliases:
+    unicodes:
+      composite:
+        - 23f9
+      secondary:
+        - 10f04d
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  label: stop
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f04d
+  voted: false
+stopwatch:
+  aliases:
+    unicodes:
+      composite:
+        - 23f1
+      secondary:
+        - 10f2f2
+  changes:
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Stopwatch
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f2f2
+  voted: false
+stopwatch-20:
+  aliases:
+    unicodes:
+      secondary:
+        - 10e06f
+  changes:
+    - 5.13.0
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Stopwatch 20
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e06f
+  voted: false
+store:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f54e
+  changes:
+    - 5.0.13
+    - 5.11.0
+    - 5.11.1
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Store
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f54e
+  voted: true
+store-slash:
+  aliases:
+    unicodes:
+      secondary:
+        - '10e071'
+  changes:
+    - 5.13.0
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Store Slash
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e071
+  voted: false
+strava:
+  changes:
+    - 5.0.0
+    - 5.0.1
+    - 5.7.0
+    - 5.8.0
+  label: Strava
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f428
+  voted: false
+street-view:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f21d
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 5.2.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Street View
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f21d
+  voted: false
+strikethrough:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f0cc
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 5.9.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Strikethrough
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0cc
+  voted: false
+stripe:
+  changes:
+    - 5.0.0
+    - 5.0.3
+  label: Stripe
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f429
+  voted: false
+stripe-s:
+  changes:
+    - 5.0.1
+    - 5.8.0
+  label: Stripe S
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f42a
+  voted: false
+stroopwafel:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f551
+  changes:
+    - 5.0.13
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Stroopwafel
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f551
+  voted: false
+studiovinari:
+  changes:
+    - 5.0.0
+  label: Studio Vinari
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f3f8
+  voted: false
+stumbleupon:
+  changes:
+    - 4.1.0
+    - 5.0.0
+  label: StumbleUpon Logo
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1a4
+  voted: false
+stumbleupon-circle:
+  changes:
+    - 4.1.0
+    - 5.0.0
+  label: StumbleUpon Circle
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1a3
+  voted: false
+subscript:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f12c
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 5.9.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  label: subscript
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f12c
+  voted: false
+suitcase:
+  aliases:
+    unicodes:
+      composite:
+        - 1f9f3
+      secondary:
+        - 10f0f2
+  changes:
+    - 3.0.0
+    - 5.0.0
+    - 5.0.9
+    - 6.0.0-beta1
+    - 6.1.2
+    - 6.2.0
+  label: Suitcase
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0f2
+  voted: false
+suitcase-medical:
+  aliases:
+    names:
+      - medkit
+    unicodes:
+      secondary:
+        - 10f0fa
+  changes:
+    - 3.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Suitcase medical
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0fa
+  voted: false
+suitcase-rolling:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f5c1
+  changes:
+    - 5.1.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Suitcase Rolling
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5c1
+  voted: false
+sun:
+  aliases:
+    unicodes:
+      composite:
+        - '2600'
+      secondary:
+        - 10f185
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 5.5.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Sun
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f185
+  voted: false
+sun-plant-wilt:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Sun Plant-wilt
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e57a
+  voted: false
+superpowers:
+  changes:
+    - 4.7.0
+    - 5.0.0
+  label: Superpowers
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f2dd
+  voted: false
+superscript:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f12b
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 5.9.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  label: superscript
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f12b
+  voted: false
+supple:
+  changes:
+    - 5.0.0
+  label: Supple
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f3f9
+  voted: false
+suse:
+  changes:
+    - 5.6.0
+    - 5.8.0
+  label: Suse
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f7d6
+  voted: true
+swatchbook:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f5c3
+  changes:
+    - 5.1.0
+    - 5.11.0
+    - 5.11.1
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Swatchbook
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5c3
+  voted: false
+swift:
+  changes:
+    - 5.11.0
+  label: Swift
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f8e1
+  voted: false
+symfony:
+  changes:
+    - 5.8.0
+  label: Symfony
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f83d
+  voted: false
+synagogue:
+  aliases:
+    unicodes:
+      composite:
+        - 1f54d
+      secondary:
+        - 10f69b
+  changes:
+    - 5.3.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Synagogue
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f69b
+  voted: false
+syringe:
+  aliases:
+    unicodes:
+      composite:
+        - 1f489
+      secondary:
+        - 10f48e
+  changes:
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Syringe
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f48e
+  voted: false
+t:
+  aliases:
+    unicodes:
+      composite:
+        - '74'
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  label: T
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: '54'
+  voted: false
+table:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f0ce
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: table
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0ce
+  voted: false
+table-cells:
+  aliases:
+    names:
+      - th
+    unicodes:
+      secondary:
+        - 10f00a
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.7.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Table cells
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f00a
+  voted: false
+table-cells-large:
+  aliases:
+    names:
+      - th-large
+    unicodes:
+      secondary:
+        - 10f009
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Table cells large
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f009
+  voted: false
+table-columns:
+  aliases:
+    names:
+      - columns
+    unicodes:
+      secondary:
+        - 10f0db
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Table columns
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0db
+  voted: false
+table-list:
+  aliases:
+    names:
+      - th-list
+    unicodes:
+      secondary:
+        - 10f00b
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Table list
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f00b
+  voted: false
+table-tennis-paddle-ball:
+  aliases:
+    names:
+      - ping-pong-paddle-ball
+      - table-tennis
+    unicodes:
+      composite:
+        - 1f3d3
+      secondary:
+        - 10f45d
+  changes:
+    - 5.0.5
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Table tennis paddle ball
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f45d
+  voted: false
+tablet:
+  aliases:
+    names:
+      - tablet-android
+    unicodes:
+      secondary:
+        - 10f3fb
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Tablet
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f3fb
+  voted: false
+tablet-button:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f10a
+  changes:
+    - 3.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Tablet button
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f10a
+  voted: false
+tablet-screen-button:
+  aliases:
+    names:
+      - tablet-alt
+    unicodes:
+      secondary:
+        - 10f3fa
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Tablet screen button
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f3fa
+  voted: false
+tablets:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f490
+  changes:
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Tablets
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f490
+  voted: false
+tachograph-digital:
+  aliases:
+    names:
+      - digital-tachograph
+    unicodes:
+      secondary:
+        - 10f566
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Tachograph digital
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f566
+  voted: true
+tag:
+  aliases:
+    unicodes:
+      composite:
+        - 1f3f7
+      secondary:
+        - 10f02b
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: tag
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f02b
+  voted: false
+tags:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f02c
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: tags
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f02c
+  voted: false
+tape:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f4db
+  changes:
+    - 5.0.9
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Tape
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f4db
+  voted: false
+tarp:
+  changes:
+    - 6.1.0
+    - 6.1.2
+    - 6.2.0
+  label: Tarp
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e57b
+  voted: false
+tarp-droplet:
+  changes:
+    - 6.1.0
+    - 6.1.2
+    - 6.2.0
+  label: Tarp Droplet
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e57c
+  voted: false
+taxi:
+  aliases:
+    names:
+      - cab
+    unicodes:
+      composite:
+        - 1f696
+      secondary:
+        - 10f1ba
+  changes:
+    - 4.1.0
+    - 5.0.0
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Taxi
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f1ba
+  voted: false
+teamspeak:
+  changes:
+    - 5.0.11
+    - 5.1.0
+    - 5.8.0
+  label: TeamSpeak
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f4f9
+  voted: true
+teeth:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f62e
+  changes:
+    - 5.2.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Teeth
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f62e
+  voted: false
+teeth-open:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f62f
+  changes:
+    - 5.2.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Teeth Open
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f62f
+  voted: false
+telegram:
+  aliases:
+    names:
+      - telegram-plane
+    unicodes:
+      composite:
+        - f3fe
+      secondary:
+        - 10f3fe
+  changes:
+    - 4.7.0
+    - 5.0.0
+    - 6.0.0-beta1
+  label: Telegram
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f2c6
+  voted: false
+temperature-arrow-down:
+  aliases:
+    names:
+      - temperature-down
+    unicodes:
+      secondary:
+        - 10e03f
+  changes:
+    - 5.12.0
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.1.0
+    - 6.2.0
+  label: Temperature arrow down
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e03f
+  voted: false
+temperature-arrow-up:
+  aliases:
+    names:
+      - temperature-up
+    unicodes:
+      secondary:
+        - '10e040'
+  changes:
+    - 5.12.0
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.1.0
+    - 6.2.0
+  label: Temperature arrow up
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e040
+  voted: false
+temperature-empty:
+  aliases:
+    names:
+      - temperature-0
+      - thermometer-0
+      - thermometer-empty
+    unicodes:
+      secondary:
+        - 10f2cb
+  changes:
+    - 4.7.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Temperature empty
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f2cb
+  voted: false
+temperature-full:
+  aliases:
+    names:
+      - temperature-4
+      - thermometer-4
+      - thermometer-full
+    unicodes:
+      secondary:
+        - 10f2c7
+  changes:
+    - 4.7.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Temperature full
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f2c7
+  voted: false
+temperature-half:
+  aliases:
+    names:
+      - temperature-2
+      - thermometer-2
+      - thermometer-half
+    unicodes:
+      composite:
+        - 1f321
+      secondary:
+        - 10f2c9
+  changes:
+    - 4.7.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Temperature half
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f2c9
+  voted: false
+temperature-high:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f769
+  changes:
+    - 5.5.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: High Temperature
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f769
+  voted: false
+temperature-low:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f76b
+  changes:
+    - 5.5.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Low Temperature
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f76b
+  voted: false
+temperature-quarter:
+  aliases:
+    names:
+      - temperature-1
+      - thermometer-1
+      - thermometer-quarter
+    unicodes:
+      secondary:
+        - 10f2ca
+  changes:
+    - 4.7.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Temperature quarter
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f2ca
+  voted: false
+temperature-three-quarters:
+  aliases:
+    names:
+      - temperature-3
+      - thermometer-3
+      - thermometer-three-quarters
+    unicodes:
+      secondary:
+        - 10f2c8
+  changes:
+    - 4.7.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Temperature three quarters
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f2c8
+  voted: false
+tencent-weibo:
+  changes:
+    - 4.1.0
+    - 5.0.0
+  label: Tencent Weibo
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1d5
+  voted: false
+tenge-sign:
+  aliases:
+    names:
+      - tenge
+    unicodes:
+      composite:
+        - 20b8
+      secondary:
+        - 10f7d7
+  changes:
+    - 5.6.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Tenge sign
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f7d7
+  voted: true
+tent:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Tent
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e57d
+  voted: false
+tent-arrow-down-to-line:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Tent Arrow-down-to-line
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e57e
+  voted: false
+tent-arrow-left-right:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Tent Arrow-left-right
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e57f
+  voted: false
+tent-arrow-turn-left:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Tent Arrow-turn-left
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e580
+  voted: false
+tent-arrows-down:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Tent Arrows-down
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e581
+  voted: false
+tents:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Tents
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e582
+  voted: false
+terminal:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f120
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Terminal
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f120
+  voted: false
+text-height:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f034
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.9.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  label: text-height
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f034
+  voted: false
+text-slash:
+  aliases:
+    names:
+      - remove-format
+    unicodes:
+      secondary:
+        - 10f87d
+  changes:
+    - 5.9.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Text slash
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f87d
+  voted: false
+text-width:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f035
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.9.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Text Width
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f035
+  voted: false
+the-red-yeti:
+  changes:
+    - 5.3.0
+    - 5.7.0
+    - 5.8.0
+  label: The Red Yeti
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f69d
+  voted: false
+themeco:
+  changes:
+    - 5.1.0
+    - 5.8.0
+  label: Themeco
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f5c6
+  voted: false
+themeisle:
+  changes:
+    - 4.6.0
+    - 5.0.0
+  label: ThemeIsle
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f2b2
+  voted: false
+thermometer:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f491
+  changes:
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Thermometer
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f491
+  voted: false
+think-peaks:
+  changes:
+    - 5.4.2
+    - 5.8.0
+  label: Think Peaks
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f731
+  voted: false
+thumbs-down:
+  aliases:
+    unicodes:
+      composite:
+        - 1f44e
+        - f088
+      secondary:
+        - 10f165
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  label: thumbs-down
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f165
+  voted: false
+thumbs-up:
+  aliases:
+    unicodes:
+      composite:
+        - 1f44d
+        - f087
+      secondary:
+        - 10f164
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  label: thumbs-up
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f164
+  voted: false
+thumbtack:
+  aliases:
+    names:
+      - thumb-tack
+    unicodes:
+      composite:
+        - 1f4cc
+        - 1f588
+      secondary:
+        - 10f08d
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Thumbtack
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f08d
+  voted: false
+ticket:
+  aliases:
+    unicodes:
+      composite:
+        - 1f39f
+      secondary:
+        - 10f145
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 5.10.1
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Ticket
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f145
+  voted: false
+ticket-simple:
+  aliases:
+    names:
+      - ticket-alt
+    unicodes:
+      secondary:
+        - 10f3ff
+  changes:
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Ticket simple
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f3ff
+  voted: false
+tiktok:
+  changes:
+    - 5.13.1
+    - 5.14.0
+  label: TikTok
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: e07b
+  voted: true
+timeline:
+  changes:
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Timeline
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e29c
+  voted: true
+toggle-off:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f204
+  changes:
+    - 4.2.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.1.2
+    - 6.2.0
+  label: Toggle Off
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f204
+  voted: false
+toggle-on:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f205
+  changes:
+    - 4.2.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.1.2
+    - 6.2.0
+  label: Toggle On
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f205
+  voted: false
+toilet:
+  aliases:
+    unicodes:
+      composite:
+        - 1f6bd
+      secondary:
+        - 10f7d8
+  changes:
+    - 5.6.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Toilet
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f7d8
+  voted: true
+toilet-paper:
+  aliases:
+    unicodes:
+      composite:
+        - 1f9fb
+      secondary:
+        - 10f71e
+  changes:
+    - 5.4.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Toilet Paper
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f71e
+  voted: false
+toilet-paper-slash:
+  aliases:
+    unicodes:
+      secondary:
+        - '10e072'
+  changes:
+    - 5.13.0
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Toilet Paper Slash
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e072
+  voted: false
+toilet-portable:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Toilet Portable
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e583
+  voted: false
+toilets-portable:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Toilets Portable
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e584
+  voted: false
+toolbox:
+  aliases:
+    unicodes:
+      composite:
+        - 1f9f0
+      secondary:
+        - 10f552
+  changes:
+    - 5.0.13
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Toolbox
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f552
+  voted: true
+tooth:
+  aliases:
+    unicodes:
+      composite:
+        - 1f9b7
+      secondary:
+        - 10f5c9
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Tooth
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5c9
+  voted: true
+torii-gate:
+  aliases:
+    unicodes:
+      composite:
+        - '26e9'
+      secondary:
+        - 10f6a1
+  changes:
+    - 5.3.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Torii Gate
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f6a1
+  voted: false
+tornado:
+  aliases:
+    unicodes:
+      composite:
+        - 1f32a
+      secondary:
+        - 10f76f
+  changes:
+    - 5.5.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.1.0
+    - 6.2.0
+  label: Tornado
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f76f
+  voted: false
+tower-broadcast:
+  aliases:
+    names:
+      - broadcast-tower
+    unicodes:
+      secondary:
+        - 10f519
+  changes:
+    - 5.0.13
+    - 6.0.0-beta1
+    - 6.2.0
+    - 6.2.1
+  label: Tower Broadcast
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f519
+  voted: true
+tower-cell:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Tower Cell
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e585
+  voted: false
+tower-observation:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Tower Observation
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e586
+  voted: false
+tractor:
+  aliases:
+    unicodes:
+      composite:
+        - 1f69c
+      secondary:
+        - 10f722
+  changes:
+    - 5.4.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Tractor
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f722
+  voted: false
+trade-federation:
+  changes:
+    - 5.0.12
+  label: Trade Federation
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f513
+  voted: false
+trademark:
+  aliases:
+    unicodes:
+      composite:
+        - '2122'
+      secondary:
+        - 10f25c
+  changes:
+    - 4.4.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Trademark
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f25c
+  voted: false
+traffic-light:
+  aliases:
+    unicodes:
+      composite:
+        - 1f6a6
+      secondary:
+        - 10f637
+  changes:
+    - 5.2.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Traffic Light
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f637
+  voted: false
+trailer:
+  aliases:
+    unicodes:
+      secondary:
+        - '10e041'
+  changes:
+    - 5.12.0
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Trailer
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e041
+  voted: true
+train:
+  aliases:
+    unicodes:
+      composite:
+        - 1f686
+      secondary:
+        - 10f238
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Train
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f238
+  voted: false
+train-subway:
+  aliases:
+    names:
+      - subway
+    unicodes:
+      secondary:
+        - 10f239
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Train subway
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f239
+  voted: false
+train-tram:
+  aliases:
+    unicodes:
+      composite:
+        - 1f68a
+  changes:
+    - 5.6.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.1.2
+    - 6.2.0
+  label: Train tram
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e5b4
+  voted: false
+transgender:
+  aliases:
+    names:
+      - transgender-alt
+    unicodes:
+      composite:
+        - 26a7
+      secondary:
+        - 10f225
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Transgender
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f225
+  voted: false
+trash:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f1f8
+  changes:
+    - 4.2.0
+    - 5.0.0
+    - 5.7.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Trash
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f1f8
+  voted: false
+trash-arrow-up:
+  aliases:
+    names:
+      - trash-restore
+    unicodes:
+      secondary:
+        - 10f829
+  changes:
+    - 5.7.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Trash arrow up
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f829
+  voted: true
+trash-can:
+  aliases:
+    names:
+      - trash-alt
+    unicodes:
+      composite:
+        - f014
+      secondary:
+        - 10f2ed
+  changes:
+    - 5.0.0
+    - 5.7.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Trash can
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f2ed
+  voted: false
+trash-can-arrow-up:
+  aliases:
+    names:
+      - trash-restore-alt
+    unicodes:
+      secondary:
+        - 10f82a
+  changes:
+    - 5.7.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Trash can arrow up
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f82a
+  voted: true
+tree:
+  aliases:
+    unicodes:
+      composite:
+        - 1f332
+      secondary:
+        - 10f1bb
+  changes:
+    - 4.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Tree
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f1bb
+  voted: false
+tree-city:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Tree City
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e587
+  voted: false
+trello:
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 5.6.0
+  label: Trello
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f181
+  voted: false
+triangle-exclamation:
+  aliases:
+    names:
+      - exclamation-triangle
+      - warning
+    unicodes:
+      composite:
+        - 26a0
+      secondary:
+        - 10f071
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.6.1
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Triangle exclamation
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f071
+  voted: false
+trophy:
+  aliases:
+    unicodes:
+      composite:
+        - 1f3c6
+      secondary:
+        - 10f091
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.11.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: trophy
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f091
+  voted: false
+trowel:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Trowel
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e589
+  voted: false
+trowel-bricks:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Trowel Bricks
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e58a
+  voted: false
+truck:
+  aliases:
+    unicodes:
+      composite:
+        - 1f69a
+        - 26df
+      secondary:
+        - 10f0d1
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.1.0
+    - 6.2.0
+  label: truck
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0d1
+  voted: false
+truck-arrow-right:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Truck Arrow-right
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e58b
+  voted: false
+truck-droplet:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Truck Droplet
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e58c
+  voted: false
+truck-fast:
+  aliases:
+    names:
+      - shipping-fast
+    unicodes:
+      secondary:
+        - 10f48b
+  changes:
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.1.0
+    - 6.2.0
+  label: Truck fast
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f48b
+  voted: false
+truck-field:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Truck Field
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e58d
+  voted: false
+truck-field-un:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Truck Field-un
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e58e
+  voted: false
+truck-front:
+  changes:
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.1.0
+    - 6.2.0
+  label: Truck Front
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e2b7
+  voted: false
+truck-medical:
+  aliases:
+    names:
+      - ambulance
+    unicodes:
+      composite:
+        - 1f691
+      secondary:
+        - 10f0f9
+  changes:
+    - 3.0.0
+    - 5.0.0
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Truck medical
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0f9
+  voted: false
+truck-monster:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f63b
+  changes:
+    - 5.2.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Truck Monster
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f63b
+  voted: false
+truck-moving:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f4df
+  changes:
+    - 5.0.9
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Truck Moving
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f4df
+  voted: false
+truck-pickup:
+  aliases:
+    unicodes:
+      composite:
+        - 1f6fb
+      secondary:
+        - 10f63c
+  changes:
+    - 5.2.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Truck Side
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f63c
+  voted: false
+truck-plane:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Truck Plane
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e58f
+  voted: false
+truck-ramp-box:
+  aliases:
+    names:
+      - truck-loading
+    unicodes:
+      secondary:
+        - 10f4de
+  changes:
+    - 5.0.9
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Truck ramp box
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f4de
+  voted: false
+tty:
+  aliases:
+    names:
+      - teletype
+    unicodes:
+      secondary:
+        - 10f1e4
+  changes:
+    - 4.2.0
+    - 5.0.0
+    - 5.7.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: TTY
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f1e4
+  voted: false
+tumblr:
+  changes:
+    - 3.2.0
+    - 5.0.0
+  label: Tumblr
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f173
+  voted: false
+turkish-lira-sign:
+  aliases:
+    names:
+      - try
+      - turkish-lira
+  changes:
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Turkish Lira-sign
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e2bb
+  voted: false
+turn-down:
+  aliases:
+    names:
+      - level-down-alt
+    unicodes:
+      composite:
+        - '2935'
+      secondary:
+        - 10f3be
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Turn down
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f3be
+  voted: false
+turn-up:
+  aliases:
+    names:
+      - level-up-alt
+    unicodes:
+      composite:
+        - '2934'
+      secondary:
+        - 10f3bf
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Turn up
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f3bf
+  voted: false
+tv:
+  aliases:
+    names:
+      - television
+      - tv-alt
+    unicodes:
+      composite:
+        - f8e5
+      primary:
+        - f8e5
+      secondary:
+        - 10f26c
+        - 10f8e5
+  changes:
+    - 4.4.0
+    - 5.0.0
+    - 5.11.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Television
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f26c
+  voted: false
+twitch:
+  changes:
+    - 4.2.0
+    - 5.0.0
+    - 5.12.0
+  label: Twitch
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1e8
+  voted: false
+twitter:
+  changes:
+    - 2.0.0
+    - 5.0.0
+  label: Twitter
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f099
+  voted: false
+typo3:
+  changes:
+    - 5.0.1
+    - 5.8.0
+  label: Typo3
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f42b
+  voted: false
+u:
+  aliases:
+    unicodes:
+      composite:
+        - '75'
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  label: U
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: '55'
+  voted: false
+uber:
+  changes:
+    - 5.0.0
+  label: Uber
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f402
+  voted: false
+ubuntu:
+  changes:
+    - 5.6.0
+  label: Ubuntu
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f7df
+  voted: true
+uikit:
+  changes:
+    - 5.0.0
+  label: UIkit
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f403
+  voted: false
+umbraco:
+  changes:
+    - 5.11.0
+  label: Umbraco
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f8e8
+  voted: false
+umbrella:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f0e9
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Umbrella
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0e9
+  voted: false
+umbrella-beach:
+  aliases:
+    unicodes:
+      composite:
+        - 1f3d6
+      secondary:
+        - 10f5ca
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Umbrella Beach
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5ca
+  voted: false
+uncharted:
+  changes:
+    - 5.15.0
+  label: Uncharted Software
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: e084
+  voted: false
+underline:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f0cd
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 5.9.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Underline
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0cd
+  voted: false
+uniregistry:
+  changes:
+    - 5.0.0
+  label: Uniregistry
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f404
+  voted: false
+unity:
+  changes:
+    - 5.12.0
+    - 5.14.0
+    - 6.0.0-beta3
+  label: Unity 3D
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: e049
+  voted: true
+universal-access:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f29a
+  changes:
+    - 4.6.0
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Universal Access
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f29a
+  voted: false
+unlock:
+  aliases:
+    unicodes:
+      composite:
+        - 1f513
+      secondary:
+        - 10f09c
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: unlock
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f09c
+  voted: false
+unlock-keyhole:
+  aliases:
+    names:
+      - unlock-alt
+    unicodes:
+      secondary:
+        - 10f13e
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Unlock keyhole
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f13e
+  voted: false
+unsplash:
+  changes:
+    - 5.13.1
+    - 5.14.0
+  label: Unsplash
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: e07c
+  voted: false
+untappd:
+  changes:
+    - 5.0.0
+  label: Untappd
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f405
+  voted: false
+up-down:
+  aliases:
+    names:
+      - arrows-alt-v
+    unicodes:
+      composite:
+        - '2195'
+        - 2b0d
+      secondary:
+        - 10f338
+  changes:
+    - 5.0.0
+    - 5.11.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Up down
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f338
+  voted: false
+up-down-left-right:
+  aliases:
+    names:
+      - arrows-alt
+    unicodes:
+      secondary:
+        - 10f0b2
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Up down left right
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0b2
+  voted: false
+up-long:
+  aliases:
+    names:
+      - long-arrow-alt-up
+    unicodes:
+      secondary:
+        - 10f30c
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Up long
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f30c
+  voted: false
+up-right-and-down-left-from-center:
+  aliases:
+    names:
+      - expand-alt
+    unicodes:
+      secondary:
+        - 10f424
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.12.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Up right and down left from center
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f424
+  voted: false
+up-right-from-square:
+  aliases:
+    names:
+      - external-link-alt
+    unicodes:
+      secondary:
+        - 10f35d
+  changes:
+    - 5.0.0
+    - 5.11.0
+    - 6.0.0-beta1
+    - 6.2.0
+    - 6.2.1
+  label: Up Right From Square
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f35d
+  voted: false
+upload:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f093
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Upload
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f093
+  voted: false
+ups:
+  changes:
+    - 5.6.0
+    - 5.8.0
+  label: UPS
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f7e0
+  voted: false
+usb:
+  changes:
+    - 4.5.0
+    - 5.0.0
+  label: USB
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f287
+  voted: false
+user:
+  aliases:
+    unicodes:
+      composite:
+        - 1f464
+        - f2c0
+      secondary:
+        - 10f007
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.0.3
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User
+  search:
+    terms: []
+  styles:
+    - solid
+    - regular
+  unicode: f007
+  voted: false
+user-astronaut:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f4fb
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Astronaut
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f4fb
+  voted: false
+user-check:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f4fc
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Check
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f4fc
+  voted: false
+user-clock:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f4fd
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Clock
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f4fd
+  voted: false
+user-doctor:
+  aliases:
+    names:
+      - user-md
+    unicodes:
+      secondary:
+        - 10f0f0
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 5.0.3
+    - 5.0.7
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.1.2
+    - 6.2.0
+  label: User doctor
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0f0
+  voted: false
+user-gear:
+  aliases:
+    names:
+      - user-cog
+    unicodes:
+      secondary:
+        - 10f4fe
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User gear
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f4fe
+  voted: false
+user-graduate:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f501
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Graduate
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f501
+  voted: false
+user-group:
+  aliases:
+    names:
+      - user-friends
+    unicodes:
+      composite:
+        - 1f465
+      secondary:
+        - 10f500
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User group
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f500
+  voted: false
+user-injured:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f728
+  changes:
+    - 5.4.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Injured
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f728
+  voted: false
+user-large:
+  aliases:
+    names:
+      - user-alt
+    unicodes:
+      secondary:
+        - 10f406
+  changes:
+    - 5.0.0
+    - 5.0.3
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User large
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f406
+  voted: false
+user-large-slash:
+  aliases:
+    names:
+      - user-alt-slash
+    unicodes:
+      secondary:
+        - 10f4fa
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User large slash
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f4fa
+  voted: false
+user-lock:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f502
+  changes:
+    - 5.0.11
+    - 5.9.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Lock
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f502
+  voted: false
+user-minus:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f503
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Minus
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f503
+  voted: false
+user-ninja:
+  aliases:
+    unicodes:
+      composite:
+        - 1f977
+      secondary:
+        - 10f504
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Ninja
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f504
+  voted: false
+user-nurse:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f82f
+  changes:
+    - 5.7.0
+    - 5.12.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Nurse
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f82f
+  voted: false
+user-pen:
+  aliases:
+    names:
+      - user-edit
+    unicodes:
+      secondary:
+        - 10f4ff
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User pen
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f4ff
+  voted: false
+user-plus:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f234
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 5.0.3
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Plus
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f234
+  voted: false
+user-secret:
+  aliases:
+    unicodes:
+      composite:
+        - 1f575
+      secondary:
+        - 10f21b
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 5.0.3
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Secret
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f21b
+  voted: false
+user-shield:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f505
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Shield
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f505
+  voted: false
+user-slash:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f506
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Slash
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f506
+  voted: false
+user-tag:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f507
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User Tag
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f507
+  voted: false
+user-tie:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f508
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.2.0
+  label: User Tie
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f508
+  voted: false
+user-xmark:
+  aliases:
+    names:
+      - user-times
+    unicodes:
+      secondary:
+        - 10f235
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 5.0.3
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: User X Mark
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f235
+  voted: false
+users:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f0c0
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 5.0.3
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Users
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0c0
+  voted: false
+users-between-lines:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Users Between-lines
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e591
+  voted: false
+users-gear:
+  aliases:
+    names:
+      - users-cog
+    unicodes:
+      secondary:
+        - 10f509
+  changes:
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Users gear
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f509
+  voted: false
+users-line:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Users Line
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e592
+  voted: false
+users-rays:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Users Rays
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e593
+  voted: false
+users-rectangle:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Users Rectangle
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e594
+  voted: false
+users-slash:
+  aliases:
+    unicodes:
+      secondary:
+        - '10e073'
+  changes:
+    - 5.13.0
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Users Slash
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e073
+  voted: false
+users-viewfinder:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Users Viewfinder
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e595
+  voted: false
+usps:
+  changes:
+    - 5.6.0
+    - 5.8.0
+  label: United States Postal Service
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f7e1
+  voted: false
+ussunnah:
+  changes:
+    - 5.0.0
+  label: us-Sunnah Foundation
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f407
+  voted: false
+utensils:
+  aliases:
+    names:
+      - cutlery
+    unicodes:
+      composite:
+        - 1f374
+        - f0f5
+      secondary:
+        - 10f2e7
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.2.0
+  label: Utensils
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f2e7
+  voted: false
+v:
+  aliases:
+    unicodes:
+      composite:
+        - '76'
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  label: V
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: '56'
+  voted: false
+vaadin:
+  changes:
+    - 5.0.0
+  label: Vaadin
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f408
+  voted: false
+van-shuttle:
+  aliases:
+    names:
+      - shuttle-van
+    unicodes:
+      composite:
+        - 1f690
+      secondary:
+        - 10f5b6
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Van shuttle
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5b6
+  voted: false
+vault:
+  changes:
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Vault
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e2c5
+  voted: false
+vector-square:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f5cb
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Vector Square
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5cb
+  voted: false
+venus:
+  aliases:
+    unicodes:
+      composite:
+        - '2640'
+      secondary:
+        - 10f221
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 5.11.0
+    - 5.11.1
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Venus
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f221
+  voted: false
+venus-double:
+  aliases:
+    unicodes:
+      composite:
+        - 26a2
+      secondary:
+        - 10f226
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Venus Double
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f226
+  voted: false
+venus-mars:
+  aliases:
+    unicodes:
+      composite:
+        - 26a4
+      secondary:
+        - 10f228
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Venus Mars
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f228
+  voted: false
+vest:
+  aliases:
+    unicodes:
+      secondary:
+        - '10e085'
+  changes:
+    - 5.15.0
+    - 5.15.1
+    - 6.0.0-beta1
+    - 6.2.0
+  label: vest
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e085
+  voted: false
+vest-patches:
+  aliases:
+    unicodes:
+      secondary:
+        - '10e086'
+  changes:
+    - 5.15.0
+    - 5.15.1
+    - 6.0.0-beta1
+    - 6.2.0
+  label: vest-patches
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e086
+  voted: false
+viacoin:
+  changes:
+    - 4.3.0
+    - 5.0.0
+  label: Viacoin
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f237
+  voted: false
+viadeo:
+  changes:
+    - 4.6.0
+    - 5.0.0
+  label: Viadeo
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f2a9
+  voted: false
+vial:
+  aliases:
+    unicodes:
+      composite:
+        - 1f9ea
+      secondary:
+        - 10f492
+  changes:
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Vial
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f492
+  voted: false
+vial-circle-check:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Vial Circle-check
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e596
+  voted: false
+vial-virus:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  label: Vial Virus
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e597
+  voted: false
+vials:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f493
+  changes:
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Vials
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f493
+  voted: false
+viber:
+  changes:
+    - 5.0.0
+    - 5.0.3
+  label: Viber
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f409
+  voted: false
+video:
+  aliases:
+    names:
+      - video-camera
+    unicodes:
+      secondary:
+        - 10f03d
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.0.9
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Video
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f03d
+  voted: false
+video-slash:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f4e2
+  changes:
+    - 5.0.9
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Video Slash
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f4e2
+  voted: false
+vihara:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f6a7
+  changes:
+    - 5.3.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Vihara
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f6a7
+  voted: false
+vimeo:
+  changes:
+    - 5.0.0
+  label: Vimeo
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f40a
+  voted: false
+vimeo-v:
+  changes:
+    - 4.4.0
+    - 5.0.0
+  label: Vimeo
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f27d
+  voted: false
+vine:
+  changes:
+    - 4.1.0
+    - 5.0.0
+  label: Vine
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f1ca
+  voted: false
+virus:
+  aliases:
+    unicodes:
+      secondary:
+        - '10e074'
+  changes:
+    - 5.13.0
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.1.0
+    - 6.1.2
+    - 6.2.0
+  label: Virus
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e074
+  voted: false
+virus-covid:
+  changes:
+    - 6.0.0
+    - 6.1.0
+    - 6.2.0
+  label: Virus Covid
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e4a8
+  voted: false
+virus-covid-slash:
+  changes:
+    - 6.0.0
+    - 6.2.0
+  label: Virus Covid-slash
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e4a9
+  voted: false
+virus-slash:
+  aliases:
+    unicodes:
+      secondary:
+        - '10e075'
+  changes:
+    - 5.13.0
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.1.2
+    - 6.2.0
+  label: Virus Slash
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e075
+  voted: false
+viruses:
+  aliases:
+    unicodes:
+      secondary:
+        - '10e076'
+  changes:
+    - 5.13.0
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Viruses
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e076
+  voted: false
+vk:
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 6.0.0-beta3
+  label: VK
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f189
+  voted: false
+vnv:
+  changes:
+    - 5.0.0
+  label: VNV
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f40b
+  voted: false
+voicemail:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f897
+  changes:
+    - 5.9.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Voicemail
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f897
+  voted: true
+volcano:
+  aliases:
+    unicodes:
+      composite:
+        - 1f30b
+      secondary:
+        - 10f770
+  changes:
+    - 5.5.0
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.1.0
+    - 6.2.0
+  label: Volcano
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f770
+  voted: false
+volleyball:
+  aliases:
+    names:
+      - volleyball-ball
+    unicodes:
+      composite:
+        - 1f3d0
+      secondary:
+        - 10f45f
+  changes:
+    - 5.0.5
+    - 5.8.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Volleyball Ball
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f45f
+  voted: false
+volume-high:
+  aliases:
+    names:
+      - volume-up
+    unicodes:
+      composite:
+        - 1f50a
+      secondary:
+        - 10f028
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.3.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Volume high
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f028
+  voted: false
+volume-low:
+  aliases:
+    names:
+      - volume-down
+    unicodes:
+      composite:
+        - 1f508
+      secondary:
+        - 10f027
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.3.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Volume low
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f027
+  voted: false
+volume-off:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f026
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.3.0
+    - 5.8.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Volume Off
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f026
+  voted: false
+volume-xmark:
+  aliases:
+    names:
+      - volume-mute
+      - volume-times
+    unicodes:
+      secondary:
+        - 10f6a9
+  changes:
+    - 5.3.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Volume X Mark
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f6a9
+  voted: true
+vr-cardboard:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f729
+  changes:
+    - 5.4.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Cardboard VR
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f729
+  voted: true
+vuejs:
+  changes:
+    - 5.0.0
+  label: Vue.js
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f41f
+  voted: false
+w:
+  aliases:
+    unicodes:
+      composite:
+        - '77'
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  label: W
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: '57'
+  voted: false
+walkie-talkie:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f8ef
+  changes:
+    - 5.11.0
+    - 6.0.0-beta1
+    - 6.1.0
+    - 6.2.0
+  label: Walkie Talkie
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f8ef
+  voted: false
+wallet:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f555
+  changes:
+    - 5.0.13
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Wallet
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f555
+  voted: true
+wand-magic:
+  aliases:
+    names:
+      - magic
+    unicodes:
+      secondary:
+        - 10f0d0
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Wand magic
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f0d0
+  voted: false
+wand-magic-sparkles:
+  aliases:
+    names:
+      - magic-wand-sparkles
+  changes:
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  label: Wand magic sparkles
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: e2ca
+  voted: false
+wand-sparkles:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f72b
+  changes:
+    - 5.4.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Wand sparkles
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f72b
+  voted: false
+warehouse:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f494
+  changes:
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  label: Warehouse
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f494
+  voted: false
+watchman-monitoring:
+  changes:
+    - 5.15.0
+  label: Watchman Monitoring
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: e087
+  voted: false
+water:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f773
+  changes:
+    - 5.5.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Water
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f773
+  voted: false
+water-ladder:
+  aliases:
+    names:
+      - ladder-water
+      - swimming-pool
+    unicodes:
+      secondary:
+        - 10f5c5
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Water ladder
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f5c5
+  voted: false
+wave-square:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f83e
+  changes:
+    - 5.8.0
+    - 6.0.0-beta1
+    - 6.2.0
+  label: Square Wave
+  search:
+    terms: []
+  styles:
+    - solid
+  unicode: f83e
+  voted: false
+waze:
+  changes:
+    - 5.8.0
+  label: Waze
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f83f
+  voted: false
+weebly:
+  changes:
+    - 5.1.0
+  label: Weebly
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode: f5cc
+  voted: true
+weibo:
+  changes:
+    - 3.2.0
+    - 5.0.0
+  label: Weibo
+  search:
+    terms: []
+  styles:
+    - brands
+  unicode

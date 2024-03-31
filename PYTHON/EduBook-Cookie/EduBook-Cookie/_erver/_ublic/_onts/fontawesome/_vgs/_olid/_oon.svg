@@ -1,0 +1,25 @@
+"style": "brands"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "brands"
+        }
+      ]
+    }
+  },
+  "glass-water": {
+    "changes": [
+      "6.1.0",
+      "6.1.2",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "e4f4",
+    "label": "Glass Water",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+  

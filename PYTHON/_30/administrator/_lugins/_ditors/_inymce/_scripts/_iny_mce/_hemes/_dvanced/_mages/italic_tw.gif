@@ -1,0 +1,11 @@
+dmark',
+        allowedAttrs: [ 'aria-expanded' ],
+        superclassRole: [ 'landmark' ]
+      },
+      'doc-cover': {
+        type: 'img',
+        allowedAttrs: [ 'aria-expanded' ],
+        superclassRole: [ 'img' ]
+      },
+      'doc-credit': {
+        type: 'section',

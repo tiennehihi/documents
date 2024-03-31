@@ -1,0 +1,49 @@
+/**
+ * Cross-browser support for logging in a web application.
+ *
+ * @author David I. Lehn <dlehn@digitalbazaar.com>
+ *
+ * Copyright (c) 2008-2013 Digital Bazaar, Inc.
+ */
+var forge = require('./forge');
+require('./util');
+
+/* LOG API */
+module.exports = forge.log = forge.log || {};
+
+/**
+ * Application logging system.
+ *
+ * Each logger level available as it's own function of the form:
+ *   forge.log.level(category, args...)
+ * The category is an arbitrary string, and the args are the same as
+ * Firebug's console.log API. By default the call will be output as:
+ *   'LEVEL [category] <args[0]>, args[1], ...'
+ * This enables proper % formatting via the first argument.
+ * Each category is enabled by default but can be enabled or disabled with
+ * the setCategoryEnabled() function.
+ */
+// list of known levels
+forge.log.levels = [
+  'none', 'error', 'warning', 'info', 'debug', 'verbose', 'max'];
+// info on the levels indexed by name:
+//   index: level index
+//   name: uppercased display name
+var sLevelInfo = {};
+// list of loggers
+var sLoggers = [];
+/**
+ * Standard console logger. If no console support is enabled this will
+ * remain null. Check before using.
+ */
+var sConsoleLogger = null;
+
+// logger flags
+/**
+ * Lock the level at the current value. Used in cases where user config may
+ * set the level such that only critical messages are seen but more verbose
+ * messages are needed for debugging or other purposes.
+ */
+forge.log.LEVEL_LOCKED = (1 << 1);
+/**
+ * Always 

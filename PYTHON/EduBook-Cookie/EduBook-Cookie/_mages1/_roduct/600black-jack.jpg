@@ -1,0 +1,1130 @@
+ (const key in typesVersions) {
+      if (hasProperty(typesVersions, key) && !VersionRange.tryParse(key)) {
+        trace(state.host, Diagnostics.package_json_has_a_typesVersions_entry_0_that_is_not_a_valid_semver_range, key);
+      }
+    }
+  }
+  const result = getPackageJsonTypesVersionsPaths(typesVersions);
+  if (!result) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.package_json_does_not_have_a_typesVersions_entry_that_matches_version_0, versionMajorMinor);
+    }
+    return;
+  }
+  const { version: bestVersionKey, paths: bestVersionPaths } = result;
+  if (typeof bestVersionPaths !== "object") {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Expected_type_of_0_field_in_package_json_to_be_1_got_2, `typesVersions['${bestVersionKey}']`, "object", typeof bestVersionPaths);
+    }
+    return;
+  }
+  return result;
+}
+var typeScriptVersion;
+function getPackageJsonTypesVersionsPaths(typesVersions) {
+  if (!typeScriptVersion)
+    typeScriptVersion = new Version(version);
+  for (const key in typesVersions) {
+    if (!hasProperty(typesVersions, key))
+      continue;
+    const keyRange = VersionRange.tryParse(key);
+    if (keyRange === void 0) {
+      continue;
+    }
+    if (keyRange.test(typeScriptVersion)) {
+      return { version: key, paths: typesVersions[key] };
+    }
+  }
+}
+function getEffectiveTypeRoots(options, host) {
+  if (options.typeRoots) {
+    return options.typeRoots;
+  }
+  let currentDirectory;
+  if (options.configFilePath) {
+    currentDirectory = getDirectoryPath(options.configFilePath);
+  } else if (host.getCurrentDirectory) {
+    currentDirectory = host.getCurrentDirectory();
+  }
+  if (currentDirectory !== void 0) {
+    return getDefaultTypeRoots(currentDirectory);
+  }
+}
+function getDefaultTypeRoots(currentDirectory) {
+  let typeRoots;
+  forEachAncestorDirectory(normalizePath(currentDirectory), (directory) => {
+    const atTypes = combinePaths(directory, nodeModulesAtTypes);
+    (typeRoots ?? (typeRoots = [])).push(atTypes);
+  });
+  return typeRoots;
+}
+var nodeModulesAtTypes = combinePaths("node_modules", "@types");
+function arePathsEqual(path1, path2, host) {
+  const useCaseSensitiveFileNames2 = typeof host.useCaseSensitiveFileNames === "function" ? host.useCaseSensitiveFileNames() : host.useCaseSensitiveFileNames;
+  return comparePaths(path1, path2, !useCaseSensitiveFileNames2) === 0 /* EqualTo */;
+}
+function getOriginalAndResolvedFileName(fileName, host, traceEnabled) {
+  const resolvedFileName = realPath(fileName, host, traceEnabled);
+  const pathsAreEqual = arePathsEqual(fileName, resolvedFileName, host);
+  return {
+    // If the fileName and realpath are differing only in casing prefer fileName so that we can issue correct errors for casing under forceConsistentCasingInFileNames
+    resolvedFileName: pathsAreEqual ? fileName : resolvedFileName,
+    originalPath: pathsAreEqual ? void 0 : fileName
+  };
+}
+function getCandidateFromTypeRoot(typeRoot, typeReferenceDirectiveName, moduleResolutionState) {
+  const nameForLookup = endsWith(typeRoot, "/node_modules/@types") || endsWith(typeRoot, "/node_modules/@types/") ? mangleScopedPackageNameWithTrace(typeReferenceDirectiveName, moduleResolutionState) : typeReferenceDirectiveName;
+  return combinePaths(typeRoot, nameForLookup);
+}
+function resolveTypeReferenceDirective(typeReferenceDirectiveName, containingFile, options, host, redirectedReference, cache, resolutionMode) {
+  Debug.assert(typeof typeReferenceDirectiveName === "string", "Non-string value passed to `ts.resolveTypeReferenceDirective`, likely by a wrapping package working with an outdated `resolveTypeReferenceDirectives` signature. This is probably not a problem in TS itself.");
+  const traceEnabled = isTraceEnabled(options, host);
+  if (redirectedReference) {
+    options = redirectedReference.commandLine.options;
+  }
+  const containingDirectory = containingFile ? getDirectoryPath(containingFile) : void 0;
+  let result = containingDirectory ? cache == null ? void 0 : cache.getFromDirectoryCache(typeReferenceDirectiveName, resolutionMode, containingDirectory, redirectedReference) : void 0;
+  if (!result && containingDirectory && !isExternalModuleNameRelative(typeReferenceDirectiveName)) {
+    result = cache == null ? void 0 : cache.getFromNonRelativeNameCache(typeReferenceDirectiveName, resolutionMode, containingDirectory, redirectedReference);
+  }
+  if (result) {
+    if (traceEnabled) {
+      trace(host, Diagnostics.Resolving_type_reference_directive_0_containing_file_1, typeReferenceDirectiveName, containingFile);
+      if (redirectedReference)
+        trace(host, Diagnostics.Using_compiler_options_of_project_reference_redirect_0, redirectedReference.sourceFile.fileName);
+      trace(host, Diagnostics.Resolution_for_type_reference_directive_0_was_found_in_cache_from_location_1, typeReferenceDirectiveName, containingDirectory);
+      traceResult(result);
+    }
+    return result;
+  }
+  const typeRoots = getEffectiveTypeRoots(options, host);
+  if (traceEnabled) {
+    if (containingFile === void 0) {
+      if (typeRoots === void 0) {
+        trace(host, Diagnostics.Resolving_type_reference_directive_0_containing_file_not_set_root_directory_not_set, typeReferenceDirectiveName);
+      } else {
+        trace(host, Diagnostics.Resolving_type_reference_directive_0_containing_file_not_set_root_directory_1, typeReferenceDirectiveName, typeRoots);
+      }
+    } else {
+      if (typeRoots === void 0) {
+        trace(host, Diagnostics.Resolving_type_reference_directive_0_containing_file_1_root_directory_not_set, typeReferenceDirectiveName, containingFile);
+      } else {
+        trace(host, Diagnostics.Resolving_type_reference_directive_0_containing_file_1_root_directory_2, typeReferenceDirectiveName, containingFile, typeRoots);
+      }
+    }
+    if (redirectedReference) {
+      trace(host, Diagnostics.Using_compiler_options_of_project_reference_redirect_0, redirectedReference.sourceFile.fileName);
+    }
+  }
+  const failedLookupLocations = [];
+  const affectingLocations = [];
+  let features = getNodeResolutionFeatures(options);
+  if (resolutionMode !== void 0) {
+    features |= 30 /* AllFeatures */;
+  }
+  const moduleResolution = getEmitModuleResolutionKind(options);
+  if (resolutionMode === 99 /* ESNext */ && (3 /* Node16 */ <= moduleResolution && moduleResolution <= 99 /* NodeNext */)) {
+    features |= 32 /* EsmMode */;
+  }
+  const conditions = features & 8 /* Exports */ ? getConditions(options, resolutionMode) : [];
+  const diagnostics = [];
+  const moduleResolutionState = {
+    compilerOptions: options,
+    host,
+    traceEnabled,
+    failedLookupLocations,
+    affectingLocations,
+    packageJsonInfoCache: cache,
+    features,
+    conditions,
+    requestContainingDirectory: containingDirectory,
+    reportDiagnostic: (diag2) => void diagnostics.push(diag2),
+    isConfigLookup: false,
+    candidateIsFromPackageJsonField: false,
+    resolvedPackageDirectory: false
+  };
+  let resolved = primaryLookup();
+  let primary = true;
+  if (!resolved) {
+    resolved = secondaryLookup();
+    primary = false;
+  }
+  let resolvedTypeReferenceDirective;
+  if (resolved) {
+    const { fileName, packageId } = resolved;
+    let resolvedFileName = fileName, originalPath;
+    if (!options.preserveSymlinks)
+      ({ resolvedFileName, originalPath } = getOriginalAndResolvedFileName(fileName, host, traceEnabled));
+    resolvedTypeReferenceDirective = {
+      primary,
+      resolvedFileName,
+      originalPath,
+      packageId,
+      isExternalLibraryImport: pathContainsNodeModules(fileName)
+    };
+  }
+  result = {
+    resolvedTypeReferenceDirective,
+    failedLookupLocations: initializeResolutionField(failedLookupLocations),
+    affectingLocations: initializeResolutionField(affectingLocations),
+    resolutionDiagnostics: initializeResolutionField(diagnostics)
+  };
+  if (containingDirectory && cache && !cache.isReadonly) {
+    cache.getOrCreateCacheForDirectory(containingDirectory, redirectedReference).set(
+      typeReferenceDirectiveName,
+      /*mode*/
+      resolutionMode,
+      result
+    );
+    if (!isExternalModuleNameRelative(typeReferenceDirectiveName)) {
+      cache.getOrCreateCacheForNonRelativeName(typeReferenceDirectiveName, resolutionMode, redirectedReference).set(containingDirectory, result);
+    }
+  }
+  if (traceEnabled)
+    traceResult(result);
+  return result;
+  function traceResult(result2) {
+    var _a;
+    if (!((_a = result2.resolvedTypeReferenceDirective) == null ? void 0 : _a.resolvedFileName)) {
+      trace(host, Diagnostics.Type_reference_directive_0_was_not_resolved, typeReferenceDirectiveName);
+    } else if (result2.resolvedTypeReferenceDirective.packageId) {
+      trace(host, Diagnostics.Type_reference_directive_0_was_successfully_resolved_to_1_with_Package_ID_2_primary_Colon_3, typeReferenceDirectiveName, result2.resolvedTypeReferenceDirective.resolvedFileName, packageIdToString(result2.resolvedTypeReferenceDirective.packageId), result2.resolvedTypeReferenceDirective.primary);
+    } else {
+      trace(host, Diagnostics.Type_reference_directive_0_was_successfully_resolved_to_1_primary_Colon_2, typeReferenceDirectiveName, result2.resolvedTypeReferenceDirective.resolvedFileName, result2.resolvedTypeReferenceDirective.primary);
+    }
+  }
+  function primaryLookup() {
+    if (typeRoots && typeRoots.length) {
+      if (traceEnabled) {
+        trace(host, Diagnostics.Resolving_with_primary_search_path_0, typeRoots.join(", "));
+      }
+      return firstDefined(typeRoots, (typeRoot) => {
+        const candidate = getCandidateFromTypeRoot(typeRoot, typeReferenceDirectiveName, moduleResolutionState);
+        const directoryExists = directoryProbablyExists(typeRoot, host);
+        if (!directoryExists && traceEnabled) {
+          trace(host, Diagnostics.Directory_0_does_not_exist_skipping_all_lookups_in_it, typeRoot);
+        }
+        if (options.typeRoots) {
+          const resolvedFromFile = loadModuleFromFile(4 /* Declaration */, candidate, !directoryExists, moduleResolutionState);
+          if (resolvedFromFile) {
+            const packageDirectory = parseNodeModuleFromPath(resolvedFromFile.path);
+            const packageInfo = packageDirectory ? getPackageJsonInfo(
+              packageDirectory,
+              /*onlyRecordFailures*/
+              false,
+              moduleResolutionState
+            ) : void 0;
+            return resolvedTypeScriptOnly(withPackageId(packageInfo, resolvedFromFile));
+          }
+        }
+        return resolvedTypeScriptOnly(
+          loadNodeModuleFromDirectory(4 /* Declaration */, candidate, !directoryExists, moduleResolutionState)
+        );
+      });
+    } else {
+      if (traceEnabled) {
+        trace(host, Diagnostics.Root_directory_cannot_be_determined_skipping_primary_search_paths);
+      }
+    }
+  }
+  function secondaryLookup() {
+    const initialLocationForSecondaryLookup = containingFile && getDirectoryPath(containingFile);
+    if (initialLocationForSecondaryLookup !== void 0) {
+      let result2;
+      if (!options.typeRoots || !endsWith(containingFile, inferredTypesContainingFile)) {
+        if (traceEnabled) {
+          trace(host, Diagnostics.Looking_up_in_node_modules_folder_initial_location_0, initialLocationForSecondaryLookup);
+        }
+        if (!isExternalModuleNameRelative(typeReferenceDirectiveName)) {
+          const searchResult = loadModuleFromNearestNodeModulesDirectory(
+            4 /* Declaration */,
+            typeReferenceDirectiveName,
+            initialLocationForSecondaryLookup,
+            moduleResolutionState,
+            /*cache*/
+            void 0,
+            /*redirectedReference*/
+            void 0
+          );
+          result2 = searchResult && searchResult.value;
+        } else {
+          const { path: candidate } = normalizePathForCJSResolution(initialLocationForSecondaryLookup, typeReferenceDirectiveName);
+          result2 = nodeLoadModuleByRelativeName(
+            4 /* Declaration */,
+            candidate,
+            /*onlyRecordFailures*/
+            false,
+            moduleResolutionState,
+            /*considerPackageJson*/
+            true
+          );
+        }
+      } else if (traceEnabled) {
+        trace(host, Diagnostics.Resolving_type_reference_directive_for_program_that_specifies_custom_typeRoots_skipping_lookup_in_node_modules_folder);
+      }
+      return resolvedTypeScriptOnly(result2);
+    } else {
+      if (traceEnabled) {
+        trace(host, Diagnostics.Containing_file_is_not_specified_and_root_directory_cannot_be_determined_skipping_lookup_in_node_modules_folder);
+      }
+    }
+  }
+}
+function getNodeResolutionFeatures(options) {
+  let features = 0 /* None */;
+  switch (getEmitModuleResolutionKind(options)) {
+    case 3 /* Node16 */:
+      features = 30 /* Node16Default */;
+      break;
+    case 99 /* NodeNext */:
+      features = 30 /* NodeNextDefault */;
+      break;
+    case 100 /* Bundler */:
+      features = 30 /* BundlerDefault */;
+      break;
+  }
+  if (options.resolvePackageJsonExports) {
+    features |= 8 /* Exports */;
+  } else if (options.resolvePackageJsonExports === false) {
+    features &= ~8 /* Exports */;
+  }
+  if (options.resolvePackageJsonImports) {
+    features |= 2 /* Imports */;
+  } else if (options.resolvePackageJsonImports === false) {
+    features &= ~2 /* Imports */;
+  }
+  return features;
+}
+function getConditions(options, resolutionMode) {
+  const moduleResolution = getEmitModuleResolutionKind(options);
+  if (resolutionMode === void 0) {
+    if (moduleResolution === 100 /* Bundler */) {
+      resolutionMode = 99 /* ESNext */;
+    } else if (moduleResolution === 2 /* Node10 */) {
+      return [];
+    }
+  }
+  const conditions = resolutionMode === 99 /* ESNext */ ? ["import"] : ["require"];
+  if (!options.noDtsResolution) {
+    conditions.push("types");
+  }
+  if (moduleResolution !== 100 /* Bundler */) {
+    conditions.push("node");
+  }
+  return concatenate(conditions, options.customConditions);
+}
+function resolvePackageNameToPackageJson(packageName, containingDirectory, options, host, cache) {
+  const moduleResolutionState = getTemporaryModuleResolutionState(cache == null ? void 0 : cache.getPackageJsonInfoCache(), host, options);
+  return forEachAncestorDirectory(containingDirectory, (ancestorDirectory) => {
+    if (getBaseFileName(ancestorDirectory) !== "node_modules") {
+      const nodeModulesFolder = combinePaths(ancestorDirectory, "node_modules");
+      const candidate = combinePaths(nodeModulesFolder, packageName);
+      return getPackageJsonInfo(
+        candidate,
+        /*onlyRecordFailures*/
+        false,
+        moduleResolutionState
+      );
+    }
+  });
+}
+function getAutomaticTypeDirectiveNames(options, host) {
+  if (options.types) {
+    return options.types;
+  }
+  const result = [];
+  if (host.directoryExists && host.getDirectories) {
+    const typeRoots = getEffectiveTypeRoots(options, host);
+    if (typeRoots) {
+      for (const root of typeRoots) {
+        if (host.directoryExists(root)) {
+          for (const typeDirectivePath of host.getDirectories(root)) {
+            const normalized = normalizePath(typeDirectivePath);
+            const packageJsonPath = combinePaths(root, normalized, "package.json");
+            const isNotNeededPackage = host.fileExists(packageJsonPath) && readJson(packageJsonPath, host).typings === null;
+            if (!isNotNeededPackage) {
+              const baseFileName = getBaseFileName(normalized);
+              if (baseFileName.charCodeAt(0) !== 46 /* dot */) {
+                result.push(baseFileName);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return result;
+}
+function isPackageJsonInfo(entry) {
+  return !!(entry == null ? void 0 : entry.contents);
+}
+function isMissingPackageJsonInfo(entry) {
+  return !!entry && !entry.contents;
+}
+function compilerOptionValueToString(value) {
+  var _a;
+  if (value === null || typeof value !== "object") {
+    return "" + value;
+  }
+  if (isArray(value)) {
+    return `[${(_a = value.map((e) => compilerOptionValueToString(e))) == null ? void 0 : _a.join(",")}]`;
+  }
+  let str = "{";
+  for (const key in value) {
+    if (hasProperty(value, key)) {
+      str += `${key}: ${compilerOptionValueToString(value[key])}`;
+    }
+  }
+  return str + "}";
+}
+function getKeyForCompilerOptions(options, affectingOptionDeclarations) {
+  return affectingOptionDeclarations.map((option) => compilerOptionValueToString(getCompilerOptionValue(options, option))).join("|") + `|${options.pathsBasePath}`;
+}
+function createCacheWithRedirects(ownOptions, optionsToRedirectsKey) {
+  const redirectsMap = /* @__PURE__ */ new Map();
+  const redirectsKeyToMap = /* @__PURE__ */ new Map();
+  let ownMap = /* @__PURE__ */ new Map();
+  if (ownOptions)
+    redirectsMap.set(ownOptions, ownMap);
+  return {
+    getMapOfCacheRedirects,
+    getOrCreateMapOfCacheRedirects,
+    update,
+    clear: clear2,
+    getOwnMap: () => ownMap
+  };
+  function getMapOfCacheRedirects(redirectedReference) {
+    return redirectedReference ? getOrCreateMap(
+      redirectedReference.commandLine.options,
+      /*create*/
+      false
+    ) : ownMap;
+  }
+  function getOrCreateMapOfCacheRedirects(redirectedReference) {
+    return redirectedReference ? getOrCreateMap(
+      redirectedReference.commandLine.options,
+      /*create*/
+      true
+    ) : ownMap;
+  }
+  function update(newOptions) {
+    if (ownOptions !== newOptions) {
+      if (ownOptions)
+        ownMap = getOrCreateMap(
+          newOptions,
+          /*create*/
+          true
+        );
+      else
+        redirectsMap.set(newOptions, ownMap);
+      ownOptions = newOptions;
+    }
+  }
+  function getOrCreateMap(redirectOptions, create) {
+    let result = redirectsMap.get(redirectOptions);
+    if (result)
+      return result;
+    const key = getRedirectsCacheKey(redirectOptions);
+    result = redirectsKeyToMap.get(key);
+    if (!result) {
+      if (ownOptions) {
+        const ownKey = getRedirectsCacheKey(ownOptions);
+        if (ownKey === key)
+          result = ownMap;
+        else if (!redirectsKeyToMap.has(ownKey))
+          redirectsKeyToMap.set(ownKey, ownMap);
+      }
+      if (create)
+        result ?? (result = /* @__PURE__ */ new Map());
+      if (result)
+        redirectsKeyToMap.set(key, result);
+    }
+    if (result)
+      redirectsMap.set(redirectOptions, result);
+    return result;
+  }
+  function clear2() {
+    const ownKey = ownOptions && optionsToRedirectsKey.get(ownOptions);
+    ownMap.clear();
+    redirectsMap.clear();
+    optionsToRedirectsKey.clear();
+    redirectsKeyToMap.clear();
+    if (ownOptions) {
+      if (ownKey)
+        optionsToRedirectsKey.set(ownOptions, ownKey);
+      redirectsMap.set(ownOptions, ownMap);
+    }
+  }
+  function getRedirectsCacheKey(options) {
+    let result = optionsToRedirectsKey.get(options);
+    if (!result) {
+      optionsToRedirectsKey.set(options, result = getKeyForCompilerOptions(options, moduleResolutionOptionDeclarations));
+    }
+    return result;
+  }
+}
+function createPackageJsonInfoCache(currentDirectory, getCanonicalFileName) {
+  let cache;
+  return { getPackageJsonInfo: getPackageJsonInfo2, setPackageJsonInfo, clear: clear2, getInternalMap };
+  function getPackageJsonInfo2(packageJsonPath) {
+    return cache == null ? void 0 : cache.get(toPath(packageJsonPath, currentDirectory, getCanonicalFileName));
+  }
+  function setPackageJsonInfo(packageJsonPath, info) {
+    (cache || (cache = /* @__PURE__ */ new Map())).set(toPath(packageJsonPath, currentDirectory, getCanonicalFileName), info);
+  }
+  function clear2() {
+    cache = void 0;
+  }
+  function getInternalMap() {
+    return cache;
+  }
+}
+function getOrCreateCache(cacheWithRedirects, redirectedReference, key, create) {
+  const cache = cacheWithRedirects.getOrCreateMapOfCacheRedirects(redirectedReference);
+  let result = cache.get(key);
+  if (!result) {
+    result = create();
+    cache.set(key, result);
+  }
+  return result;
+}
+function createPerDirectoryResolutionCache(currentDirectory, getCanonicalFileName, options, optionsToRedirectsKey) {
+  const directoryToModuleNameMap = createCacheWithRedirects(options, optionsToRedirectsKey);
+  return {
+    getFromDirectoryCache,
+    getOrCreateCacheForDirectory,
+    clear: clear2,
+    update,
+    directoryToModuleNameMap
+  };
+  function clear2() {
+    directoryToModuleNameMap.clear();
+  }
+  function update(options2) {
+    directoryToModuleNameMap.update(options2);
+  }
+  function getOrCreateCacheForDirectory(directoryName, redirectedReference) {
+    const path = toPath(directoryName, currentDirectory, getCanonicalFileName);
+    return getOrCreateCache(directoryToModuleNameMap, redirectedReference, path, () => createModeAwareCache());
+  }
+  function getFromDirectoryCache(name, mode, directoryName, redirectedReference) {
+    var _a, _b;
+    const path = toPath(directoryName, currentDirectory, getCanonicalFileName);
+    return (_b = (_a = directoryToModuleNameMap.getMapOfCacheRedirects(redirectedReference)) == null ? void 0 : _a.get(path)) == null ? void 0 : _b.get(name, mode);
+  }
+}
+function createModeAwareCacheKey(specifier, mode) {
+  return mode === void 0 ? specifier : `${mode}|${specifier}`;
+}
+function createModeAwareCache() {
+  const underlying = /* @__PURE__ */ new Map();
+  const memoizedReverseKeys = /* @__PURE__ */ new Map();
+  const cache = {
+    get(specifier, mode) {
+      return underlying.get(getUnderlyingCacheKey(specifier, mode));
+    },
+    set(specifier, mode, value) {
+      underlying.set(getUnderlyingCacheKey(specifier, mode), value);
+      return cache;
+    },
+    delete(specifier, mode) {
+      underlying.delete(getUnderlyingCacheKey(specifier, mode));
+      return cache;
+    },
+    has(specifier, mode) {
+      return underlying.has(getUnderlyingCacheKey(specifier, mode));
+    },
+    forEach(cb) {
+      return underlying.forEach((elem, key) => {
+        const [specifier, mode] = memoizedReverseKeys.get(key);
+        return cb(elem, specifier, mode);
+      });
+    },
+    size() {
+      return underlying.size;
+    }
+  };
+  return cache;
+  function getUnderlyingCacheKey(specifier, mode) {
+    const result = createModeAwareCacheKey(specifier, mode);
+    memoizedReverseKeys.set(result, [specifier, mode]);
+    return result;
+  }
+}
+function getOriginalOrResolvedModuleFileName(result) {
+  return result.resolvedModule && (result.resolvedModule.originalPath || result.resolvedModule.resolvedFileName);
+}
+function getOriginalOrResolvedTypeReferenceFileName(result) {
+  return result.resolvedTypeReferenceDirective && (result.resolvedTypeReferenceDirective.originalPath || result.resolvedTypeReferenceDirective.resolvedFileName);
+}
+function createNonRelativeNameResolutionCache(currentDirectory, getCanonicalFileName, options, getResolvedFileName, optionsToRedirectsKey) {
+  const moduleNameToDirectoryMap = createCacheWithRedirects(options, optionsToRedirectsKey);
+  return {
+    getFromNonRelativeNameCache,
+    getOrCreateCacheForNonRelativeName,
+    clear: clear2,
+    update
+  };
+  function clear2() {
+    moduleNameToDirectoryMap.clear();
+  }
+  function update(options2) {
+    moduleNameToDirectoryMap.update(options2);
+  }
+  function getFromNonRelativeNameCache(nonRelativeModuleName, mode, directoryName, redirectedReference) {
+    var _a, _b;
+    Debug.assert(!isExternalModuleNameRelative(nonRelativeModuleName));
+    return (_b = (_a = moduleNameToDirectoryMap.getMapOfCacheRedirects(redirectedReference)) == null ? void 0 : _a.get(createModeAwareCacheKey(nonRelativeModuleName, mode))) == null ? void 0 : _b.get(directoryName);
+  }
+  function getOrCreateCacheForNonRelativeName(nonRelativeModuleName, mode, redirectedReference) {
+    Debug.assert(!isExternalModuleNameRelative(nonRelativeModuleName));
+    return getOrCreateCache(moduleNameToDirectoryMap, redirectedReference, createModeAwareCacheKey(nonRelativeModuleName, mode), createPerModuleNameCache);
+  }
+  function createPerModuleNameCache() {
+    const directoryPathMap = /* @__PURE__ */ new Map();
+    return { get, set };
+    function get(directory) {
+      return directoryPathMap.get(toPath(directory, currentDirectory, getCanonicalFileName));
+    }
+    function set(directory, result) {
+      const path = toPath(directory, currentDirectory, getCanonicalFileName);
+      if (directoryPathMap.has(path)) {
+        return;
+      }
+      directoryPathMap.set(path, result);
+      const resolvedFileName = getResolvedFileName(result);
+      const commonPrefix = resolvedFileName && getCommonPrefix(path, resolvedFileName);
+      let current = path;
+      while (current !== commonPrefix) {
+        const parent2 = getDirectoryPath(current);
+        if (parent2 === current || directoryPathMap.has(parent2)) {
+          break;
+        }
+        directoryPathMap.set(parent2, result);
+        current = parent2;
+      }
+    }
+    function getCommonPrefix(directory, resolution) {
+      const resolutionDirectory = toPath(getDirectoryPath(resolution), currentDirectory, getCanonicalFileName);
+      let i = 0;
+      const limit = Math.min(directory.length, resolutionDirectory.length);
+      while (i < limit && directory.charCodeAt(i) === resolutionDirectory.charCodeAt(i)) {
+        i++;
+      }
+      if (i === directory.length && (resolutionDirectory.length === i || resolutionDirectory[i] === directorySeparator)) {
+        return directory;
+      }
+      const rootLength = getRootLength(directory);
+      if (i < rootLength) {
+        return void 0;
+      }
+      const sep = directory.lastIndexOf(directorySeparator, i - 1);
+      if (sep === -1) {
+        return void 0;
+      }
+      return directory.substr(0, Math.max(sep, rootLength));
+    }
+  }
+}
+function createModuleOrTypeReferenceResolutionCache(currentDirectory, getCanonicalFileName, options, packageJsonInfoCache, getResolvedFileName, optionsToRedirectsKey) {
+  optionsToRedirectsKey ?? (optionsToRedirectsKey = /* @__PURE__ */ new Map());
+  const perDirectoryResolutionCache = createPerDirectoryResolutionCache(
+    currentDirectory,
+    getCanonicalFileName,
+    options,
+    optionsToRedirectsKey
+  );
+  const nonRelativeNameResolutionCache = createNonRelativeNameResolutionCache(
+    currentDirectory,
+    getCanonicalFileName,
+    options,
+    getResolvedFileName,
+    optionsToRedirectsKey
+  );
+  packageJsonInfoCache ?? (packageJsonInfoCache = createPackageJsonInfoCache(currentDirectory, getCanonicalFileName));
+  return {
+    ...packageJsonInfoCache,
+    ...perDirectoryResolutionCache,
+    ...nonRelativeNameResolutionCache,
+    clear: clear2,
+    update,
+    getPackageJsonInfoCache: () => packageJsonInfoCache,
+    clearAllExceptPackageJsonInfoCache,
+    optionsToRedirectsKey
+  };
+  function clear2() {
+    clearAllExceptPackageJsonInfoCache();
+    packageJsonInfoCache.clear();
+  }
+  function clearAllExceptPackageJsonInfoCache() {
+    perDirectoryResolutionCache.clear();
+    nonRelativeNameResolutionCache.clear();
+  }
+  function update(options2) {
+    perDirectoryResolutionCache.update(options2);
+    nonRelativeNameResolutionCache.update(options2);
+  }
+}
+function createModuleResolutionCache(currentDirectory, getCanonicalFileName, options, packageJsonInfoCache, optionsToRedirectsKey) {
+  const result = createModuleOrTypeReferenceResolutionCache(
+    currentDirectory,
+    getCanonicalFileName,
+    options,
+    packageJsonInfoCache,
+    getOriginalOrResolvedModuleFileName,
+    optionsToRedirectsKey
+  );
+  result.getOrCreateCacheForModuleName = (nonRelativeName, mode, redirectedReference) => result.getOrCreateCacheForNonRelativeName(nonRelativeName, mode, redirectedReference);
+  return result;
+}
+function createTypeReferenceDirectiveResolutionCache(currentDirectory, getCanonicalFileName, options, packageJsonInfoCache, optionsToRedirectsKey) {
+  return createModuleOrTypeReferenceResolutionCache(
+    currentDirectory,
+    getCanonicalFileName,
+    options,
+    packageJsonInfoCache,
+    getOriginalOrResolvedTypeReferenceFileName,
+    optionsToRedirectsKey
+  );
+}
+function getOptionsForLibraryResolution(options) {
+  return { moduleResolution: 2 /* Node10 */, traceResolution: options.traceResolution };
+}
+function resolveLibrary(libraryName, resolveFrom, compilerOptions, host, cache) {
+  return resolveModuleName(libraryName, resolveFrom, getOptionsForLibraryResolution(compilerOptions), host, cache);
+}
+function resolveModuleNameFromCache(moduleName, containingFile, cache, mode) {
+  const containingDirectory = getDirectoryPath(containingFile);
+  return cache.getFromDirectoryCache(
+    moduleName,
+    mode,
+    containingDirectory,
+    /*redirectedReference*/
+    void 0
+  );
+}
+function resolveModuleName(moduleName, containingFile, compilerOptions, host, cache, redirectedReference, resolutionMode) {
+  var _a, _b, _c;
+  const traceEnabled = isTraceEnabled(compilerOptions, host);
+  if (redirectedReference) {
+    compilerOptions = redirectedReference.commandLine.options;
+  }
+  if (traceEnabled) {
+    trace(host, Diagnostics.Resolving_module_0_from_1, moduleName, containingFile);
+    if (redirectedReference) {
+      trace(host, Diagnostics.Using_compiler_options_of_project_reference_redirect_0, redirectedReference.sourceFile.fileName);
+    }
+  }
+  const containingDirectory = getDirectoryPath(containingFile);
+  let result = cache == null ? void 0 : cache.getFromDirectoryCache(moduleName, resolutionMode, containingDirectory, redirectedReference);
+  if (result) {
+    if (traceEnabled) {
+      trace(host, Diagnostics.Resolution_for_module_0_was_found_in_cache_from_location_1, moduleName, containingDirectory);
+    }
+  } else {
+    let moduleResolution = compilerOptions.moduleResolution;
+    if (moduleResolution === void 0) {
+      moduleResolution = getEmitModuleResolutionKind(compilerOptions);
+      if (traceEnabled) {
+        trace(host, Diagnostics.Module_resolution_kind_is_not_specified_using_0, ModuleResolutionKind[moduleResolution]);
+      }
+    } else {
+      if (traceEnabled) {
+        trace(host, Diagnostics.Explicitly_specified_module_resolution_kind_Colon_0, ModuleResolutionKind[moduleResolution]);
+      }
+    }
+    (_a = perfLogger) == null ? void 0 : _a.logStartResolveModule(moduleName);
+    switch (moduleResolution) {
+      case 3 /* Node16 */:
+        result = node16ModuleNameResolver(moduleName, containingFile, compilerOptions, host, cache, redirectedReference, resolutionMode);
+        break;
+      case 99 /* NodeNext */:
+        result = nodeNextModuleNameResolver(moduleName, containingFile, compilerOptions, host, cache, redirectedReference, resolutionMode);
+        break;
+      case 2 /* Node10 */:
+        result = nodeModuleNameResolver(moduleName, containingFile, compilerOptions, host, cache, redirectedReference, resolutionMode ? getConditions(compilerOptions, resolutionMode) : void 0);
+        break;
+      case 1 /* Classic */:
+        result = classicNameResolver(moduleName, containingFile, compilerOptions, host, cache, redirectedReference);
+        break;
+      case 100 /* Bundler */:
+        result = bundlerModuleNameResolver(moduleName, containingFile, compilerOptions, host, cache, redirectedReference, resolutionMode ? getConditions(compilerOptions, resolutionMode) : void 0);
+        break;
+      default:
+        return Debug.fail(`Unexpected moduleResolution: ${moduleResolution}`);
+    }
+    if (result && result.resolvedModule)
+      (_b = perfLogger) == null ? void 0 : _b.logInfoEvent(`Module "${moduleName}" resolved to "${result.resolvedModule.resolvedFileName}"`);
+    (_c = perfLogger) == null ? void 0 : _c.logStopResolveModule(result && result.resolvedModule ? "" + result.resolvedModule.resolvedFileName : "null");
+    if (cache && !cache.isReadonly) {
+      cache.getOrCreateCacheForDirectory(containingDirectory, redirectedReference).set(moduleName, resolutionMode, result);
+      if (!isExternalModuleNameRelative(moduleName)) {
+        cache.getOrCreateCacheForNonRelativeName(moduleName, resolutionMode, redirectedReference).set(containingDirectory, result);
+      }
+    }
+  }
+  if (traceEnabled) {
+    if (result.resolvedModule) {
+      if (result.resolvedModule.packageId) {
+        trace(host, Diagnostics.Module_name_0_was_successfully_resolved_to_1_with_Package_ID_2, moduleName, result.resolvedModule.resolvedFileName, packageIdToString(result.resolvedModule.packageId));
+      } else {
+        trace(host, Diagnostics.Module_name_0_was_successfully_resolved_to_1, moduleName, result.resolvedModule.resolvedFileName);
+      }
+    } else {
+      trace(host, Diagnostics.Module_name_0_was_not_resolved, moduleName);
+    }
+  }
+  return result;
+}
+function tryLoadModuleUsingOptionalResolutionSettings(extensions, moduleName, containingDirectory, loader, state) {
+  const resolved = tryLoadModuleUsingPathsIfEligible(extensions, moduleName, loader, state);
+  if (resolved)
+    return resolved.value;
+  if (!isExternalModuleNameRelative(moduleName)) {
+    return tryLoadModuleUsingBaseUrl(extensions, moduleName, loader, state);
+  } else {
+    return tryLoadModuleUsingRootDirs(extensions, moduleName, containingDirectory, loader, state);
+  }
+}
+function tryLoadModuleUsingPathsIfEligible(extensions, moduleName, loader, state) {
+  var _a;
+  const { baseUrl, paths, configFile } = state.compilerOptions;
+  if (paths && !pathIsRelative(moduleName)) {
+    if (state.traceEnabled) {
+      if (baseUrl) {
+        trace(state.host, Diagnostics.baseUrl_option_is_set_to_0_using_this_value_to_resolve_non_relative_module_name_1, baseUrl, moduleName);
+      }
+      trace(state.host, Diagnostics.paths_option_is_specified_looking_for_a_pattern_to_match_module_name_0, moduleName);
+    }
+    const baseDirectory = getPathsBasePath(state.compilerOptions, state.host);
+    const pathPatterns = (configFile == null ? void 0 : configFile.configFileSpecs) ? (_a = configFile.configFileSpecs).pathPatterns || (_a.pathPatterns = tryParsePatterns(paths)) : void 0;
+    return tryLoadModuleUsingPaths(
+      extensions,
+      moduleName,
+      baseDirectory,
+      paths,
+      pathPatterns,
+      loader,
+      /*onlyRecordFailures*/
+      false,
+      state
+    );
+  }
+}
+function tryLoadModuleUsingRootDirs(extensions, moduleName, containingDirectory, loader, state) {
+  if (!state.compilerOptions.rootDirs) {
+    return void 0;
+  }
+  if (state.traceEnabled) {
+    trace(state.host, Diagnostics.rootDirs_option_is_set_using_it_to_resolve_relative_module_name_0, moduleName);
+  }
+  const candidate = normalizePath(combinePaths(containingDirectory, moduleName));
+  let matchedRootDir;
+  let matchedNormalizedPrefix;
+  for (const rootDir of state.compilerOptions.rootDirs) {
+    let normalizedRoot = normalizePath(rootDir);
+    if (!endsWith(normalizedRoot, directorySeparator)) {
+      normalizedRoot += directorySeparator;
+    }
+    const isLongestMatchingPrefix = startsWith(candidate, normalizedRoot) && (matchedNormalizedPrefix === void 0 || matchedNormalizedPrefix.length < normalizedRoot.length);
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Checking_if_0_is_the_longest_matching_prefix_for_1_2, normalizedRoot, candidate, isLongestMatchingPrefix);
+    }
+    if (isLongestMatchingPrefix) {
+      matchedNormalizedPrefix = normalizedRoot;
+      matchedRootDir = rootDir;
+    }
+  }
+  if (matchedNormalizedPrefix) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Longest_matching_prefix_for_0_is_1, candidate, matchedNormalizedPrefix);
+    }
+    const suffix = candidate.substr(matchedNormalizedPrefix.length);
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Loading_0_from_the_root_dir_1_candidate_location_2, suffix, matchedNormalizedPrefix, candidate);
+    }
+    const resolvedFileName = loader(extensions, candidate, !directoryProbablyExists(containingDirectory, state.host), state);
+    if (resolvedFileName) {
+      return resolvedFileName;
+    }
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Trying_other_entries_in_rootDirs);
+    }
+    for (const rootDir of state.compilerOptions.rootDirs) {
+      if (rootDir === matchedRootDir) {
+        continue;
+      }
+      const candidate2 = combinePaths(normalizePath(rootDir), suffix);
+      if (state.traceEnabled) {
+        trace(state.host, Diagnostics.Loading_0_from_the_root_dir_1_candidate_location_2, suffix, rootDir, candidate2);
+      }
+      const baseDirectory = getDirectoryPath(candidate2);
+      const resolvedFileName2 = loader(extensions, candidate2, !directoryProbablyExists(baseDirectory, state.host), state);
+      if (resolvedFileName2) {
+        return resolvedFileName2;
+      }
+    }
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Module_resolution_using_rootDirs_has_failed);
+    }
+  }
+  return void 0;
+}
+function tryLoadModuleUsingBaseUrl(extensions, moduleName, loader, state) {
+  const { baseUrl } = state.compilerOptions;
+  if (!baseUrl) {
+    return void 0;
+  }
+  if (state.traceEnabled) {
+    trace(state.host, Diagnostics.baseUrl_option_is_set_to_0_using_this_value_to_resolve_non_relative_module_name_1, baseUrl, moduleName);
+  }
+  const candidate = normalizePath(combinePaths(baseUrl, moduleName));
+  if (state.traceEnabled) {
+    trace(state.host, Diagnostics.Resolving_module_name_0_relative_to_base_url_1_2, moduleName, baseUrl, candidate);
+  }
+  return loader(extensions, candidate, !directoryProbablyExists(getDirectoryPath(candidate), state.host), state);
+}
+function resolveJSModule(moduleName, initialDir, host) {
+  const { resolvedModule, failedLookupLocations } = tryResolveJSModuleWorker(moduleName, initialDir, host);
+  if (!resolvedModule) {
+    throw new Error(`Could not resolve JS module '${moduleName}' starting at '${initialDir}'. Looked in: ${failedLookupLocations == null ? void 0 : failedLookupLocations.join(", ")}`);
+  }
+  return resolvedModule.resolvedFileName;
+}
+var NodeResolutionFeatures = /* @__PURE__ */ ((NodeResolutionFeatures2) => {
+  NodeResolutionFeatures2[NodeResolutionFeatures2["None"] = 0] = "None";
+  NodeResolutionFeatures2[NodeResolutionFeatures2["Imports"] = 2] = "Imports";
+  NodeResolutionFeatures2[NodeResolutionFeatures2["SelfName"] = 4] = "SelfName";
+  NodeResolutionFeatures2[NodeResolutionFeatures2["Exports"] = 8] = "Exports";
+  NodeResolutionFeatures2[NodeResolutionFeatures2["ExportsPatternTrailers"] = 16] = "ExportsPatternTrailers";
+  NodeResolutionFeatures2[NodeResolutionFeatures2["AllFeatures"] = 30] = "AllFeatures";
+  NodeResolutionFeatures2[NodeResolutionFeatures2["Node16Default"] = 30] = "Node16Default";
+  NodeResolutionFeatures2[NodeResolutionFeatures2["NodeNextDefault"] = 30 /* AllFeatures */] = "NodeNextDefault";
+  NodeResolutionFeatures2[NodeResolutionFeatures2["BundlerDefault"] = 30] = "BundlerDefault";
+  NodeResolutionFeatures2[NodeResolutionFeatures2["EsmMode"] = 32] = "EsmMode";
+  return NodeResolutionFeatures2;
+})(NodeResolutionFeatures || {});
+function node16ModuleNameResolver(moduleName, containingFile, compilerOptions, host, cache, redirectedReference, resolutionMode) {
+  return nodeNextModuleNameResolverWorker(
+    30 /* Node16Default */,
+    moduleName,
+    containingFile,
+    compilerOptions,
+    host,
+    cache,
+    redirectedReference,
+    resolutionMode
+  );
+}
+function nodeNextModuleNameResolver(moduleName, containingFile, compilerOptions, host, cache, redirectedReference, resolutionMode) {
+  return nodeNextModuleNameResolverWorker(
+    30 /* NodeNextDefault */,
+    moduleName,
+    containingFile,
+    compilerOptions,
+    host,
+    cache,
+    redirectedReference,
+    resolutionMode
+  );
+}
+function nodeNextModuleNameResolverWorker(features, moduleName, containingFile, compilerOptions, host, cache, redirectedReference, resolutionMode, conditions) {
+  const containingDirectory = getDirectoryPath(containingFile);
+  const esmMode = resolutionMode === 99 /* ESNext */ ? 32 /* EsmMode */ : 0;
+  let extensions = compilerOptions.noDtsResolution ? 3 /* ImplementationFiles */ : 1 /* TypeScript */ | 2 /* JavaScript */ | 4 /* Declaration */;
+  if (getResolveJsonModule(compilerOptions)) {
+    extensions |= 8 /* Json */;
+  }
+  return nodeModuleNameResolverWorker(
+    features | esmMode,
+    moduleName,
+    containingDirectory,
+    compilerOptions,
+    host,
+    cache,
+    extensions,
+    /*isConfigLookup*/
+    false,
+    redirectedReference,
+    conditions
+  );
+}
+function tryResolveJSModuleWorker(moduleName, initialDir, host) {
+  return nodeModuleNameResolverWorker(
+    0 /* None */,
+    moduleName,
+    initialDir,
+    { moduleResolution: 2 /* Node10 */, allowJs: true },
+    host,
+    /*cache*/
+    void 0,
+    2 /* JavaScript */,
+    /*isConfigLookup*/
+    false,
+    /*redirectedReference*/
+    void 0,
+    /*conditions*/
+    void 0
+  );
+}
+function bundlerModuleNameResolver(moduleName, containingFile, compilerOptions, host, cache, redirectedReference, conditions) {
+  const containingDirectory = getDirectoryPath(containingFile);
+  let extensions = compilerOptions.noDtsResolution ? 3 /* ImplementationFiles */ : 1 /* TypeScript */ | 2 /* JavaScript */ | 4 /* Declaration */;
+  if (getResolveJsonModule(compilerOptions)) {
+    extensions |= 8 /* Json */;
+  }
+  return nodeModuleNameResolverWorker(
+    getNodeResolutionFeatures(compilerOptions),
+    moduleName,
+    containingDirectory,
+    compilerOptions,
+    host,
+    cache,
+    extensions,
+    /*isConfigLookup*/
+    false,
+    redirectedReference,
+    conditions
+  );
+}
+function nodeModuleNameResolver(moduleName, containingFile, compilerOptions, host, cache, redirectedReference, conditions, isConfigLookup) {
+  let extensions;
+  if (isConfigLookup) {
+    extensions = 8 /* Json */;
+  } else if (compilerOptions.noDtsResolution) {
+    extensions = 3 /* ImplementationFiles */;
+    if (getResolveJsonModule(compilerOptions))
+      extensions |= 8 /* Json */;
+  } else {
+    extensions = getResolveJsonModule(compilerOptions) ? 1 /* TypeScript */ | 2 /* JavaScript */ | 4 /* Declaration */ | 8 /* Json */ : 1 /* TypeScript */ | 2 /* JavaScript */ | 4 /* Declaration */;
+  }
+  return nodeModuleNameResolverWorker(conditions ? 30 /* AllFeatures */ : 0 /* None */, moduleName, getDirectoryPath(containingFile), compilerOptions, host, cache, extensions, !!isConfigLookup, redirectedReference, conditions);
+}
+function nodeNextJsonConfigResolver(moduleName, containingFile, host) {
+  return nodeModuleNameResolverWorker(
+    30 /* NodeNextDefault */,
+    moduleName,
+    getDirectoryPath(containingFile),
+    { moduleResolution: 99 /* NodeNext */ },
+    host,
+    /*cache*/
+    void 0,
+    8 /* Json */,
+    /*isConfigLookup*/
+    true,
+    /*redirectedReference*/
+    void 0,
+    /*conditions*/
+    void 0
+  );
+}
+function nodeModuleNameResolverWorker(features, moduleName, containingDirectory, compilerOptions, host, cache, extensions, isConfigLookup, redirectedReference, conditions) {
+  var _a, _b, _c, _d, _e;
+  const traceEnabled = isTraceEnabled(compilerOptions, host);
+  const failedLookupLocations = [];
+  const affectingLocations = [];
+  const moduleResolution = getEmitModuleResolutionKind(compilerOptions);
+  conditions ?? (conditions = getConditions(
+    compilerOptions,
+    moduleResolution === 100 /* Bundler */ || moduleResolution === 2 /* Node10 */ ? void 0 : features & 32 /* EsmMode */ ? 99 /* ESNext */ : 1 /* CommonJS */
+  ));
+  const diagnostics = [];
+  const state = {
+    compilerOptions,
+    host,
+    traceEnabled,
+    failedLookupLocations,
+    affectingLocations,
+    packageJsonInfoCache: cache,
+    features,
+    conditions: conditions ?? emptyArray,
+    requestContainingDirectory: containingDirectory,
+    reportDiagnostic: (diag2) => void diagnostics.push(diag2),
+    isConfigLookup,
+    candidateIsFromPackageJsonField: false,
+    resolvedPackageDirectory: false
+  };
+  if (traceEnabled && moduleResolutionSupportsPackageJsonExportsAndImports(moduleResolution)) {
+    trace(host, Diagnostics.Resolving_in_0_mode_with_conditions_1, features & 32 /* EsmMode */ ? "ESM" : "CJS", state.conditions.map((c) => `'${c}'`).join(", "));
+  }
+  let result;
+  if (moduleResolution === 2 /* Node10 */) {
+    const priorityExtensions = extensions & (1 /* TypeScript */ | 4 /* Declaration */);
+    const secondaryExtensions = extensions & ~(1 /* TypeScript */ | 4 /* Declaration */);
+    result = priorityExtensions && tryResolve(priorityExtensions, state) || secondaryExtensions && tryResolve(secondaryExtensions, state) || void 0;
+  } else {
+    result = tryResolve(extensions, state);
+  }
+  let alternateResult;
+  if (state.resolvedPackageDirectory && !isConfigLookup && !isExternalModuleNameRelative(moduleName)) {
+    const wantedTypesButGotJs = (result == null ? void 0 : result.value) && extensions & (1 /* TypeScript */ | 4 /* Declaration */) && !extensionIsOk(1 /* TypeScript */ | 4 /* Declaration */, result.value.resolved.extension);
+    if (((_a = result == null ? void 0 : result.value) == null ? void 0 : _a.isExternalLibraryImport) && wantedTypesButGotJs && features & 8 /* Exports */ && (conditions == null ? void 0 : conditions.includes("import"))) {
+      traceIfEnabled(state, Diagnostics.Resolution_of_non_relative_name_failed_trying_with_modern_Node_resolution_features_disabled_to_see_if_npm_library_needs_configuration_update);
+      const diagnosticState = {
+        ...state,
+        features: state.features & ~8 /* Exports */,
+        reportDiagnostic: noop
+      };
+      const diagnosticResult = tryResolve(extensions & (1 /* TypeScript */ | 4 /* Declaration */), diagnosticState);
+      if ((_b = diagnosticResult == null ? void 0 : diagnosticResult.value) == null ? void 0 : _b.isExternalLibraryImport) {
+        alternateResult = diagnosticResult.value.resolved.path;
+      }
+    } else if ((!(result == null ? void 0 : result.value) || wantedTypesButGotJs) && moduleResolution === 2 /* Node10 */) {
+      traceIfEnabled(state, Diagnostics.Resolution_of_non_relative_name_failed_trying_with_moduleResolution_bundler_to_see_if_project_may_need_configuration_update);
+      const diagnosticsCompilerOptions = { ...state.compilerOptions, moduleResolution: 100 /* Bundler */ };
+      const diagnosticState = {
+        ...state,
+        compilerOptions: diagnosticsCompilerOptions,
+        features: 30 /* BundlerDefault */,
+        conditions: getConditions(diagnosticsCompilerOptions),
+        reportDiagnostic: noop
+      };
+      const diagnosticResult = tryResolve(extensions & (1 /* TypeScript */ | 4 /* Declaration */), diagnosticState);
+      if ((_c = diagnosticResult == null ? void 0 : diagnosticResult.value) == null ? void 0 : _c.isExternalLibraryImport) {
+        alternateResult = diagnosticResult.value.resolved.path;
+      }
+    }
+  }
+  return createResolvedModuleWithFailedLookupLocationsHandlingSymlink(
+    moduleName,
+    (_d = result == null ? void 0 : result.value) == null ? void 0 : _d.resolved,
+    (_e = result == null ? void 0 : result.value) == null ? void 0 : _e.isExternalLibraryImport,
+    failedLookupLocations,
+    affectingLocations,
+    diagnostics,
+    state,
+    cache,
+    alternateResult
+  );
+  function tryResolve(extensions2, state2) {
+    const loader = (extensions3, candidate, onlyRecordFailures, state3) => nodeLoadModuleByRelativeName(
+      extensions3,
+      candidate,
+      onlyRecordFailures,
+      state3,
+      /*considerPackageJson*/
+      true
+    );
+    const resolved = tryLoadModuleUsingOptionalResolutionSettings(extensions2, moduleName, containingDirectory, loader, state2);
+    if (resolved) {
+      return toSearchResult({ resolved, isExternalLibraryImport: pathContainsNodeModules(resolved.path) });
+    }
+    if (!isExternalModuleNameRelative(moduleName)) {
+      let resolved2;
+      if (features & 2 /* Imports */ && startsWith(moduleName, "#")) {
+        resolved2 = loadModuleFromImports(extensions2, moduleName, containingDirectory, state2, cache, redirectedReference);
+      }
+      if (!resolved2 && features & 4 /* SelfName */) {
+        resolved2 = loadModuleFromSelfNameReference(extensions2, moduleName, containingDirectory, state2, cache, redirectedReference);
+      }
+      if (!resolved2) {
+        if (moduleName.includes(":")) {
+          if (traceEnabled) {
+            trace(host, Diagnostics.Skipping_module_0_that_looks_like_an_absolute_URI_target_file_types_Colon_1, moduleName, formatExtensions(extensions2));
+          }
+          return void 0;
+        }
+        if (traceEnabled) {
+          trace(host, Diagnostics.Loading_module_0_from_node_modules_folder_target_file_types_Colon_1, moduleName, formatExtensions(extensions2));
+        }
+        resolved2 = loadModuleFromNearestNodeModulesDirectory(extensions2,

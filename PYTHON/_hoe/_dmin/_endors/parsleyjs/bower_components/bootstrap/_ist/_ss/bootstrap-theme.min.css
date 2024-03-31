@@ -1,0 +1,286 @@
+endListener(event: "sessionError", listener: (err: Error) => void): this;
+        prependListener(
+            event: "stream",
+            listener: (stream: ServerHttp2Stream, headers: IncomingHttpHeaders, flags: number) => void,
+        ): this;
+        prependListener(event: "timeout", listener: () => void): this;
+        prependListener(event: string | symbol, listener: (...args: any[]) => void): this;
+        prependOnceListener(
+            event: "checkContinue",
+            listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void,
+        ): this;
+        prependOnceListener(
+            event: "request",
+            listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void,
+        ): this;
+        prependOnceListener(event: "session", listener: (session: ServerHttp2Session) => void): this;
+        prependOnceListener(event: "sessionError", listener: (err: Error) => void): this;
+        prependOnceListener(
+            event: "stream",
+            listener: (stream: ServerHttp2Stream, headers: IncomingHttpHeaders, flags: number) => void,
+        ): this;
+        prependOnceListener(event: "timeout", listener: () => void): this;
+        prependOnceListener(event: string | symbol, listener: (...args: any[]) => void): this;
+    }
+    export interface Http2SecureServer extends tls.Server, HTTP2ServerCommon {
+        addListener(
+            event: "checkContinue",
+            listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void,
+        ): this;
+        addListener(
+            event: "request",
+            listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void,
+        ): this;
+        addListener(event: "session", listener: (session: ServerHttp2Session) => void): this;
+        addListener(event: "sessionError", listener: (err: Error) => void): this;
+        addListener(
+            event: "stream",
+            listener: (stream: ServerHttp2Stream, headers: IncomingHttpHeaders, flags: number) => void,
+        ): this;
+        addListener(event: "timeout", listener: () => void): this;
+        addListener(event: "unknownProtocol", listener: (socket: tls.TLSSocket) => void): this;
+        addListener(event: string | symbol, listener: (...args: any[]) => void): this;
+        emit(event: "checkContinue", request: Http2ServerRequest, response: Http2ServerResponse): boolean;
+        emit(event: "request", request: Http2ServerRequest, response: Http2ServerResponse): boolean;
+        emit(event: "session", session: ServerHttp2Session): boolean;
+        emit(event: "sessionError", err: Error): boolean;
+        emit(event: "stream", stream: ServerHttp2Stream, headers: IncomingHttpHeaders, flags: number): boolean;
+        emit(event: "timeout"): boolean;
+        emit(event: "unknownProtocol", socket: tls.TLSSocket): boolean;
+        emit(event: string | symbol, ...args: any[]): boolean;
+        on(
+            event: "checkContinue",
+            listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void,
+        ): this;
+        on(event: "request", listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void): this;
+        on(event: "session", listener: (session: ServerHttp2Session) => void): this;
+        on(event: "sessionError", listener: (err: Error) => void): this;
+        on(
+            event: "stream",
+            listener: (stream: ServerHttp2Stream, headers: IncomingHttpHeaders, flags: number) => void,
+        ): this;
+        on(event: "timeout", listener: () => void): this;
+        on(event: "unknownProtocol", listener: (socket: tls.TLSSocket) => void): this;
+        on(event: string | symbol, listener: (...args: any[]) => void): this;
+        once(
+            event: "checkContinue",
+            listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void,
+        ): this;
+        once(event: "request", listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void): this;
+        once(event: "session", listener: (session: ServerHttp2Session) => void): this;
+        once(event: "sessionError", listener: (err: Error) => void): this;
+        once(
+            event: "stream",
+            listener: (stream: ServerHttp2Stream, headers: IncomingHttpHeaders, flags: number) => void,
+        ): this;
+        once(event: "timeout", listener: () => void): this;
+        once(event: "unknownProtocol", listener: (socket: tls.TLSSocket) => void): this;
+        once(event: string | symbol, listener: (...args: any[]) => void): this;
+        prependListener(
+            event: "checkContinue",
+            listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void,
+        ): this;
+        prependListener(
+            event: "request",
+            listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void,
+        ): this;
+        prependListener(event: "session", listener: (session: ServerHttp2Session) => void): this;
+        prependListener(event: "sessionError", listener: (err: Error) => void): this;
+        prependListener(
+            event: "stream",
+            listener: (stream: ServerHttp2Stream, headers: IncomingHttpHeaders, flags: number) => void,
+        ): this;
+        prependListener(event: "timeout", listener: () => void): this;
+        prependListener(event: "unknownProtocol", listener: (socket: tls.TLSSocket) => void): this;
+        prependListener(event: string | symbol, listener: (...args: any[]) => void): this;
+        prependOnceListener(
+            event: "checkContinue",
+            listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void,
+        ): this;
+        prependOnceListener(
+            event: "request",
+            listener: (request: Http2ServerRequest, response: Http2ServerResponse) => void,
+        ): this;
+        prependOnceListener(event: "session", listener: (session: ServerHttp2Session) => void): this;
+        prependOnceListener(event: "sessionError", listener: (err: Error) => void): this;
+        prependOnceListener(
+            event: "stream",
+            listener: (stream: ServerHttp2Stream, headers: IncomingHttpHeaders, flags: number) => void,
+        ): this;
+        prependOnceListener(event: "timeout", listener: () => void): this;
+        prependOnceListener(event: "unknownProtocol", listener: (socket: tls.TLSSocket) => void): this;
+        prependOnceListener(event: string | symbol, listener: (...args: any[]) => void): this;
+    }
+    /**
+     * A `Http2ServerRequest` object is created by {@link Server} or {@link SecureServer} and passed as the first argument to the `'request'` event. It may be used to access a request status,
+     * headers, and
+     * data.
+     * @since v8.4.0
+     */
+    export class Http2ServerRequest extends stream.Readable {
+        constructor(
+            stream: ServerHttp2Stream,
+            headers: IncomingHttpHeaders,
+            options: stream.ReadableOptions,
+            rawHeaders: readonly string[],
+        );
+        /**
+         * The `request.aborted` property will be `true` if the request has
+         * been aborted.
+         * @since v10.1.0
+         */
+        readonly aborted: boolean;
+        /**
+         * The request authority pseudo header field. Because HTTP/2 allows requests
+         * to set either `:authority` or `host`, this value is derived from`req.headers[':authority']` if present. Otherwise, it is derived from`req.headers['host']`.
+         * @since v8.4.0
+         */
+        readonly authority: string;
+        /**
+         * See `request.socket`.
+         * @since v8.4.0
+         * @deprecated Since v13.0.0 - Use `socket`.
+         */
+        readonly connection: net.Socket | tls.TLSSocket;
+        /**
+         * The `request.complete` property will be `true` if the request has
+         * been completed, aborted, or destroyed.
+         * @since v12.10.0
+         */
+        readonly complete: boolean;
+        /**
+         * The request/response headers object.
+         *
+         * Key-value pairs of header names and values. Header names are lower-cased.
+         *
+         * ```js
+         * // Prints something like:
+         * //
+         * // { 'user-agent': 'curl/7.22.0',
+         * //   host: '127.0.0.1:8000',
+         * //   accept: '*' }
+         * console.log(request.headers);
+         * ```
+         *
+         * See `HTTP/2 Headers Object`.
+         *
+         * In HTTP/2, the request path, host name, protocol, and method are represented as
+         * special headers prefixed with the `:` character (e.g. `':path'`). These special
+         * headers will be included in the `request.headers` object. Care must be taken not
+         * to inadvertently modify these special headers or errors may occur. For instance,
+         * removing all headers from the request will cause errors to occur:
+         *
+         * ```js
+         * removeAllHeaders(request.headers);
+         * assert(request.url);   // Fails because the :path header has been removed
+         * ```
+         * @since v8.4.0
+         */
+        readonly headers: IncomingHttpHeaders;
+        /**
+         * In case of server request, the HTTP version sent by the client. In the case of
+         * client response, the HTTP version of the connected-to server. Returns`'2.0'`.
+         *
+         * Also `message.httpVersionMajor` is the first integer and`message.httpVersionMinor` is the second.
+         * @since v8.4.0
+         */
+        readonly httpVersion: string;
+        readonly httpVersionMinor: number;
+        readonly httpVersionMajor: number;
+        /**
+         * The request method as a string. Read-only. Examples: `'GET'`, `'DELETE'`.
+         * @since v8.4.0
+         */
+        readonly method: string;
+        /**
+         * The raw request/response headers list exactly as they were received.
+         *
+         * The keys and values are in the same list. It is _not_ a
+         * list of tuples. So, the even-numbered offsets are key values, and the
+         * odd-numbered offsets are the associated values.
+         *
+         * Header names are not lowercased, and duplicates are not merged.
+         *
+         * ```js
+         * // Prints something like:
+         * //
+         * // [ 'user-agent',
+         * //   'this is invalid because there can be only one',
+         * //   'User-Agent',
+         * //   'curl/7.22.0',
+         * //   'Host',
+         * //   '127.0.0.1:8000',
+         * //   'ACCEPT',
+         * //   '*' ]
+         * console.log(request.rawHeaders);
+         * ```
+         * @since v8.4.0
+         */
+        readonly rawHeaders: string[];
+        /**
+         * The raw request/response trailer keys and values exactly as they were
+         * received. Only populated at the `'end'` event.
+         * @since v8.4.0
+         */
+        readonly rawTrailers: string[];
+        /**
+         * The request scheme pseudo header field indicating the scheme
+         * portion of the target URL.
+         * @since v8.4.0
+         */
+        readonly scheme: string;
+        /**
+         * Returns a `Proxy` object that acts as a `net.Socket` (or `tls.TLSSocket`) but
+         * applies getters, setters, and methods based on HTTP/2 logic.
+         *
+         * `destroyed`, `readable`, and `writable` properties will be retrieved from and
+         * set on `request.stream`.
+         *
+         * `destroy`, `emit`, `end`, `on` and `once` methods will be called on`request.stream`.
+         *
+         * `setTimeout` method will be called on `request.stream.session`.
+         *
+         * `pause`, `read`, `resume`, and `write` will throw an error with code`ERR_HTTP2_NO_SOCKET_MANIPULATION`. See `Http2Session and Sockets` for
+         * more information.
+         *
+         * All other interactions will be routed directly to the socket. With TLS support,
+         * use `request.socket.getPeerCertificate()` to obtain the client's
+         * authentication details.
+         * @since v8.4.0
+         */
+        readonly socket: net.Socket | tls.TLSSocket;
+        /**
+         * The `Http2Stream` object backing the request.
+         * @since v8.4.0
+         */
+        readonly stream: ServerHttp2Stream;
+        /**
+         * The request/response trailers object. Only populated at the `'end'` event.
+         * @since v8.4.0
+         */
+        readonly trailers: IncomingHttpHeaders;
+        /**
+         * Request URL string. This contains only the URL that is present in the actual
+         * HTTP request. If the request is:
+         *
+         * ```http
+         * GET /status?name=ryan HTTP/1.1
+         * Accept: text/plain
+         * ```
+         *
+         * Then `request.url` will be:
+         *
+         * ```js
+         * '/status?name=ryan'
+         * ```
+         *
+         * To parse the url into its parts, `new URL()` can be used:
+         *
+         * ```console
+         * $ node
+         * > new URL('/status?name=ryan', 'http://example.com')
+         * URL {
+         *   href: 'http://example.com/status?name=ryan',
+         *   origin: 'http://example.com',
+         *   protocol: 'http:',
+ 

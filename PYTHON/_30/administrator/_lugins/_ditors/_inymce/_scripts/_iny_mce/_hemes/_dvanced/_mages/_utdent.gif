@@ -1,0 +1,3 @@
+ntext.frames.length === 0) {
+        var env = _respondable.isInFrame() ? 'frame' : 'page';
+        throw new 

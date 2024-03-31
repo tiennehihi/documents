@@ -1,0 +1,8 @@
+'use strict';
+const fs = require('fs');
+
+let isDocker;
+
+function hasDockerEnv() {
+	try {
+		fs.statSync('/.docke

@@ -1,0 +1,29 @@
+import type {FuncKeywordDefinition, SchemaCxt} from "ajv"
+
+const sequences: Record<string, number | undefined> = {}
+
+export type DynamicDefaultFunc = (args?: Record<string, any>) => () => any
+
+const DEFAULTS: Record<string, DynamicDefaultFunc | undefined> = {
+  timestamp: () => () => Date.now(),
+  datetime: () => () => new Date().toISOString(),
+  date: () => () => new Date().toISOString().slice(0, 10),
+  time: () => () => new Date().toISOString().slice(11),
+  random: () => () => Math.random(),
+  randomint: (args?: {max?: number}) => {
+    const max = args?.max ?? 2
+    return () => Math.floor(Math.random() * max)
+  },
+  seq: (args?: {name?: string}) => {
+    const name = args?.name ?? ""
+    sequences[name] ||= 0
+    return () => (sequences[name] as number)++
+  },
+}
+
+interface PropertyDefaultSchema {
+  func: string
+  args: Record<string, any>
+}
+
+type DefaultSchema = Record<string, string | PropertyDefau

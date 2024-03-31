@@ -1,0 +1,1527 @@
+deFunctionName(node) {
+    if (inStrictMode) {
+      checkStrictModeEvalOrArguments(node, node.name);
+    }
+  }
+  function getStrictModeBlockScopeFunctionDeclarationMessage(node) {
+    if (getContainingClass(node)) {
+      return Diagnostics.Function_declarations_are_not_allowed_inside_blocks_in_strict_mode_when_targeting_ES3_or_ES5_Class_definitions_are_automatically_in_strict_mode;
+    }
+    if (file.externalModuleIndicator) {
+      return Diagnostics.Function_declarations_are_not_allowed_inside_blocks_in_strict_mode_when_targeting_ES3_or_ES5_Modules_are_automatically_in_strict_mode;
+    }
+    return Diagnostics.Function_declarations_are_not_allowed_inside_blocks_in_strict_mode_when_targeting_ES3_or_ES5;
+  }
+  function checkStrictModeFunctionDeclaration(node) {
+    if (languageVersion < 2 /* ES2015 */) {
+      if (blockScopeContainer.kind !== 312 /* SourceFile */ && blockScopeContainer.kind !== 267 /* ModuleDeclaration */ && !isFunctionLikeOrClassStaticBlockDeclaration(blockScopeContainer)) {
+        const errorSpan = getErrorSpanForNode(file, node);
+        file.bindDiagnostics.push(createFileDiagnostic(file, errorSpan.start, errorSpan.length, getStrictModeBlockScopeFunctionDeclarationMessage(node)));
+      }
+    }
+  }
+  function checkStrictModePostfixUnaryExpression(node) {
+    if (inStrictMode) {
+      checkStrictModeEvalOrArguments(node, node.operand);
+    }
+  }
+  function checkStrictModePrefixUnaryExpression(node) {
+    if (inStrictMode) {
+      if (node.operator === 46 /* PlusPlusToken */ || node.operator === 47 /* MinusMinusToken */) {
+        checkStrictModeEvalOrArguments(node, node.operand);
+      }
+    }
+  }
+  function checkStrictModeWithStatement(node) {
+    if (inStrictMode) {
+      errorOnFirstToken(node, Diagnostics.with_statements_are_not_allowed_in_strict_mode);
+    }
+  }
+  function checkStrictModeLabeledStatement(node) {
+    if (inStrictMode && getEmitScriptTarget(options) >= 2 /* ES2015 */) {
+      if (isDeclarationStatement(node.statement) || isVariableStatement(node.statement)) {
+        errorOnFirstToken(node.label, Diagnostics.A_label_is_not_allowed_here);
+      }
+    }
+  }
+  function errorOnFirstToken(node, message, ...args) {
+    const span = getSpanOfTokenAtPosition(file, node.pos);
+    file.bindDiagnostics.push(createFileDiagnostic(file, span.start, span.length, message, ...args));
+  }
+  function errorOrSuggestionOnNode(isError, node, message) {
+    errorOrSuggestionOnRange(isError, node, node, message);
+  }
+  function errorOrSuggestionOnRange(isError, startNode2, endNode2, message) {
+    addErrorOrSuggestionDiagnostic(isError, { pos: getTokenPosOfNode(startNode2, file), end: endNode2.end }, message);
+  }
+  function addErrorOrSuggestionDiagnostic(isError, range, message) {
+    const diag2 = createFileDiagnostic(file, range.pos, range.end - range.pos, message);
+    if (isError) {
+      file.bindDiagnostics.push(diag2);
+    } else {
+      file.bindSuggestionDiagnostics = append(file.bindSuggestionDiagnostics, { ...diag2, category: 2 /* Suggestion */ });
+    }
+  }
+  function bind(node) {
+    if (!node) {
+      return;
+    }
+    setParent(node, parent2);
+    if (tracing)
+      node.tracingPath = file.path;
+    const saveInStrictMode = inStrictMode;
+    bindWorker(node);
+    if (node.kind > 165 /* LastToken */) {
+      const saveParent = parent2;
+      parent2 = node;
+      const containerFlags = getContainerFlags(node);
+      if (containerFlags === 0 /* None */) {
+        bindChildren(node);
+      } else {
+        bindContainer(node, containerFlags);
+      }
+      parent2 = saveParent;
+    } else {
+      const saveParent = parent2;
+      if (node.kind === 1 /* EndOfFileToken */)
+        parent2 = node;
+      bindJSDoc(node);
+      parent2 = saveParent;
+    }
+    inStrictMode = saveInStrictMode;
+  }
+  function bindJSDoc(node) {
+    if (hasJSDocNodes(node)) {
+      if (isInJSFile(node)) {
+        for (const j of node.jsDoc) {
+          bind(j);
+        }
+      } else {
+        for (const j of node.jsDoc) {
+          setParent(j, node);
+          setParentRecursive(
+            j,
+            /*incremental*/
+            false
+          );
+        }
+      }
+    }
+  }
+  function updateStrictModeStatementList(statements) {
+    if (!inStrictMode) {
+      for (const statement of statements) {
+        if (!isPrologueDirective(statement)) {
+          return;
+        }
+        if (isUseStrictPrologueDirective(statement)) {
+          inStrictMode = true;
+          return;
+        }
+      }
+    }
+  }
+  function isUseStrictPrologueDirective(node) {
+    const nodeText2 = getSourceTextOfNodeFromSourceFile(file, node.expression);
+    return nodeText2 === '"use strict"' || nodeText2 === "'use strict'";
+  }
+  function bindWorker(node) {
+    switch (node.kind) {
+      case 80 /* Identifier */:
+        if (node.flags & 4096 /* IdentifierIsInJSDocNamespace */) {
+          let parentNode = node.parent;
+          while (parentNode && !isJSDocTypeAlias(parentNode)) {
+            parentNode = parentNode.parent;
+          }
+          bindBlockScopedDeclaration(parentNode, 524288 /* TypeAlias */, 788968 /* TypeAliasExcludes */);
+          break;
+        }
+      case 110 /* ThisKeyword */:
+        if (currentFlow && (isExpression(node) || parent2.kind === 304 /* ShorthandPropertyAssignment */)) {
+          node.flowNode = currentFlow;
+        }
+        return checkContextualIdentifier(node);
+      case 166 /* QualifiedName */:
+        if (currentFlow && isPartOfTypeQuery(node)) {
+          node.flowNode = currentFlow;
+        }
+        break;
+      case 236 /* MetaProperty */:
+      case 108 /* SuperKeyword */:
+        node.flowNode = currentFlow;
+        break;
+      case 81 /* PrivateIdentifier */:
+        return checkPrivateIdentifier(node);
+      case 211 /* PropertyAccessExpression */:
+      case 212 /* ElementAccessExpression */:
+        const expr = node;
+        if (currentFlow && isNarrowableReference(expr)) {
+          expr.flowNode = currentFlow;
+        }
+        if (isSpecialPropertyDeclaration(expr)) {
+          bindSpecialPropertyDeclaration(expr);
+        }
+        if (isInJSFile(expr) && file.commonJsModuleIndicator && isModuleExportsAccessExpression(expr) && !lookupSymbolForName(blockScopeContainer, "module")) {
+          declareSymbol(
+            file.locals,
+            /*parent*/
+            void 0,
+            expr.expression,
+            1 /* FunctionScopedVariable */ | 134217728 /* ModuleExports */,
+            111550 /* FunctionScopedVariableExcludes */
+          );
+        }
+        break;
+      case 226 /* BinaryExpression */:
+        const specialKind = getAssignmentDeclarationKind(node);
+        switch (specialKind) {
+          case 1 /* ExportsProperty */:
+            bindExportsPropertyAssignment(node);
+            break;
+          case 2 /* ModuleExports */:
+            bindModuleExportsAssignment(node);
+            break;
+          case 3 /* PrototypeProperty */:
+            bindPrototypePropertyAssignment(node.left, node);
+            break;
+          case 6 /* Prototype */:
+            bindPrototypeAssignment(node);
+            break;
+          case 4 /* ThisProperty */:
+            bindThisPropertyAssignment(node);
+            break;
+          case 5 /* Property */:
+            const expression = node.left.expression;
+            if (isInJSFile(node) && isIdentifier(expression)) {
+              const symbol = lookupSymbolForName(blockScopeContainer, expression.escapedText);
+              if (isThisInitializedDeclaration(symbol == null ? void 0 : symbol.valueDeclaration)) {
+                bindThisPropertyAssignment(node);
+                break;
+              }
+            }
+            bindSpecialPropertyAssignment(node);
+            break;
+          case 0 /* None */:
+            break;
+          default:
+            Debug.fail("Unknown binary expression special property assignment kind");
+        }
+        return checkStrictModeBinaryExpression(node);
+      case 299 /* CatchClause */:
+        return checkStrictModeCatchClause(node);
+      case 220 /* DeleteExpression */:
+        return checkStrictModeDeleteExpression(node);
+      case 225 /* PostfixUnaryExpression */:
+        return checkStrictModePostfixUnaryExpression(node);
+      case 224 /* PrefixUnaryExpression */:
+        return checkStrictModePrefixUnaryExpression(node);
+      case 254 /* WithStatement */:
+        return checkStrictModeWithStatement(node);
+      case 256 /* LabeledStatement */:
+        return checkStrictModeLabeledStatement(node);
+      case 197 /* ThisType */:
+        seenThisKeyword = true;
+        return;
+      case 182 /* TypePredicate */:
+        break;
+      case 168 /* TypeParameter */:
+        return bindTypeParameter(node);
+      case 169 /* Parameter */:
+        return bindParameter(node);
+      case 260 /* VariableDeclaration */:
+        return bindVariableDeclarationOrBindingElement(node);
+      case 208 /* BindingElement */:
+        node.flowNode = currentFlow;
+        return bindVariableDeclarationOrBindingElement(node);
+      case 172 /* PropertyDeclaration */:
+      case 171 /* PropertySignature */:
+        return bindPropertyWorker(node);
+      case 303 /* PropertyAssignment */:
+      case 304 /* ShorthandPropertyAssignment */:
+        return bindPropertyOrMethodOrAccessor(node, 4 /* Property */, 0 /* PropertyExcludes */);
+      case 306 /* EnumMember */:
+        return bindPropertyOrMethodOrAccessor(node, 8 /* EnumMember */, 900095 /* EnumMemberExcludes */);
+      case 179 /* CallSignature */:
+      case 180 /* ConstructSignature */:
+      case 181 /* IndexSignature */:
+        return declareSymbolAndAddToSymbolTable(node, 131072 /* Signature */, 0 /* None */);
+      case 174 /* MethodDeclaration */:
+      case 173 /* MethodSignature */:
+        return bindPropertyOrMethodOrAccessor(node, 8192 /* Method */ | (node.questionToken ? 16777216 /* Optional */ : 0 /* None */), isObjectLiteralMethod(node) ? 0 /* PropertyExcludes */ : 103359 /* MethodExcludes */);
+      case 262 /* FunctionDeclaration */:
+        return bindFunctionDeclaration(node);
+      case 176 /* Constructor */:
+        return declareSymbolAndAddToSymbolTable(
+          node,
+          16384 /* Constructor */,
+          /*symbolExcludes:*/
+          0 /* None */
+        );
+      case 177 /* GetAccessor */:
+        return bindPropertyOrMethodOrAccessor(node, 32768 /* GetAccessor */, 46015 /* GetAccessorExcludes */);
+      case 178 /* SetAccessor */:
+        return bindPropertyOrMethodOrAccessor(node, 65536 /* SetAccessor */, 78783 /* SetAccessorExcludes */);
+      case 184 /* FunctionType */:
+      case 324 /* JSDocFunctionType */:
+      case 330 /* JSDocSignature */:
+      case 185 /* ConstructorType */:
+        return bindFunctionOrConstructorType(node);
+      case 187 /* TypeLiteral */:
+      case 329 /* JSDocTypeLiteral */:
+      case 200 /* MappedType */:
+        return bindAnonymousTypeWorker(node);
+      case 339 /* JSDocClassTag */:
+        return bindJSDocClassTag(node);
+      case 210 /* ObjectLiteralExpression */:
+        return bindObjectLiteralExpression(node);
+      case 218 /* FunctionExpression */:
+      case 219 /* ArrowFunction */:
+        return bindFunctionExpression(node);
+      case 213 /* CallExpression */:
+        const assignmentKind = getAssignmentDeclarationKind(node);
+        switch (assignmentKind) {
+          case 7 /* ObjectDefinePropertyValue */:
+            return bindObjectDefinePropertyAssignment(node);
+          case 8 /* ObjectDefinePropertyExports */:
+            return bindObjectDefinePropertyExport(node);
+          case 9 /* ObjectDefinePrototypeProperty */:
+            return bindObjectDefinePrototypeProperty(node);
+          case 0 /* None */:
+            break;
+          default:
+            return Debug.fail("Unknown call expression assignment declaration kind");
+        }
+        if (isInJSFile(node)) {
+          bindCallExpression(node);
+        }
+        break;
+      case 231 /* ClassExpression */:
+      case 263 /* ClassDeclaration */:
+        inStrictMode = true;
+        return bindClassLikeDeclaration(node);
+      case 264 /* InterfaceDeclaration */:
+        return bindBlockScopedDeclaration(node, 64 /* Interface */, 788872 /* InterfaceExcludes */);
+      case 265 /* TypeAliasDeclaration */:
+        return bindBlockScopedDeclaration(node, 524288 /* TypeAlias */, 788968 /* TypeAliasExcludes */);
+      case 266 /* EnumDeclaration */:
+        return bindEnumDeclaration(node);
+      case 267 /* ModuleDeclaration */:
+        return bindModuleDeclaration(node);
+      case 292 /* JsxAttributes */:
+        return bindJsxAttributes(node);
+      case 291 /* JsxAttribute */:
+        return bindJsxAttribute(node, 4 /* Property */, 0 /* PropertyExcludes */);
+      case 271 /* ImportEqualsDeclaration */:
+      case 274 /* NamespaceImport */:
+      case 276 /* ImportSpecifier */:
+      case 281 /* ExportSpecifier */:
+        return declareSymbolAndAddToSymbolTable(node, 2097152 /* Alias */, 2097152 /* AliasExcludes */);
+      case 270 /* NamespaceExportDeclaration */:
+        return bindNamespaceExportDeclaration(node);
+      case 273 /* ImportClause */:
+        return bindImportClause(node);
+      case 278 /* ExportDeclaration */:
+        return bindExportDeclaration(node);
+      case 277 /* ExportAssignment */:
+        return bindExportAssignment(node);
+      case 312 /* SourceFile */:
+        updateStrictModeStatementList(node.statements);
+        return bindSourceFileIfExternalModule();
+      case 241 /* Block */:
+        if (!isFunctionLikeOrClassStaticBlockDeclaration(node.parent)) {
+          return;
+        }
+      case 268 /* ModuleBlock */:
+        return updateStrictModeStatementList(node.statements);
+      case 348 /* JSDocParameterTag */:
+        if (node.parent.kind === 330 /* JSDocSignature */) {
+          return bindParameter(node);
+        }
+        if (node.parent.kind !== 329 /* JSDocTypeLiteral */) {
+          break;
+        }
+      case 355 /* JSDocPropertyTag */:
+        const propTag = node;
+        const flags = propTag.isBracketed || propTag.typeExpression && propTag.typeExpression.type.kind === 323 /* JSDocOptionalType */ ? 4 /* Property */ | 16777216 /* Optional */ : 4 /* Property */;
+        return declareSymbolAndAddToSymbolTable(propTag, flags, 0 /* PropertyExcludes */);
+      case 353 /* JSDocTypedefTag */:
+      case 345 /* JSDocCallbackTag */:
+      case 347 /* JSDocEnumTag */:
+        return (delayedTypeAliases || (delayedTypeAliases = [])).push(node);
+      case 346 /* JSDocOverloadTag */:
+        return bind(node.typeExpression);
+    }
+  }
+  function bindPropertyWorker(node) {
+    const isAutoAccessor = isAutoAccessorPropertyDeclaration(node);
+    const includes = isAutoAccessor ? 98304 /* Accessor */ : 4 /* Property */;
+    const excludes = isAutoAccessor ? 13247 /* AccessorExcludes */ : 0 /* PropertyExcludes */;
+    return bindPropertyOrMethodOrAccessor(node, includes | (node.questionToken ? 16777216 /* Optional */ : 0 /* None */), excludes);
+  }
+  function bindAnonymousTypeWorker(node) {
+    return bindAnonymousDeclaration(node, 2048 /* TypeLiteral */, "__type" /* Type */);
+  }
+  function bindSourceFileIfExternalModule() {
+    setExportContextFlag(file);
+    if (isExternalModule(file)) {
+      bindSourceFileAsExternalModule();
+    } else if (isJsonSourceFile(file)) {
+      bindSourceFileAsExternalModule();
+      const originalSymbol = file.symbol;
+      declareSymbol(file.symbol.exports, file.symbol, file, 4 /* Property */, -1 /* All */);
+      file.symbol = originalSymbol;
+    }
+  }
+  function bindSourceFileAsExternalModule() {
+    bindAnonymousDeclaration(file, 512 /* ValueModule */, `"${removeFileExtension(file.fileName)}"`);
+  }
+  function bindExportAssignment(node) {
+    if (!container.symbol || !container.symbol.exports) {
+      bindAnonymousDeclaration(node, 111551 /* Value */, getDeclarationName(node));
+    } else {
+      const flags = exportAssignmentIsAlias(node) ? 2097152 /* Alias */ : 4 /* Property */;
+      const symbol = declareSymbol(container.symbol.exports, container.symbol, node, flags, -1 /* All */);
+      if (node.isExportEquals) {
+        setValueDeclaration(symbol, node);
+      }
+    }
+  }
+  function bindNamespaceExportDeclaration(node) {
+    if (some(node.modifiers)) {
+      file.bindDiagnostics.push(createDiagnosticForNode2(node, Diagnostics.Modifiers_cannot_appear_here));
+    }
+    const diag2 = !isSourceFile(node.parent) ? Diagnostics.Global_module_exports_may_only_appear_at_top_level : !isExternalModule(node.parent) ? Diagnostics.Global_module_exports_may_only_appear_in_module_files : !node.parent.isDeclarationFile ? Diagnostics.Global_module_exports_may_only_appear_in_declaration_files : void 0;
+    if (diag2) {
+      file.bindDiagnostics.push(createDiagnosticForNode2(node, diag2));
+    } else {
+      file.symbol.globalExports = file.symbol.globalExports || createSymbolTable();
+      declareSymbol(file.symbol.globalExports, file.symbol, node, 2097152 /* Alias */, 2097152 /* AliasExcludes */);
+    }
+  }
+  function bindExportDeclaration(node) {
+    if (!container.symbol || !container.symbol.exports) {
+      bindAnonymousDeclaration(node, 8388608 /* ExportStar */, getDeclarationName(node));
+    } else if (!node.exportClause) {
+      declareSymbol(container.symbol.exports, container.symbol, node, 8388608 /* ExportStar */, 0 /* None */);
+    } else if (isNamespaceExport(node.exportClause)) {
+      setParent(node.exportClause, node);
+      declareSymbol(container.symbol.exports, container.symbol, node.exportClause, 2097152 /* Alias */, 2097152 /* AliasExcludes */);
+    }
+  }
+  function bindImportClause(node) {
+    if (node.name) {
+      declareSymbolAndAddToSymbolTable(node, 2097152 /* Alias */, 2097152 /* AliasExcludes */);
+    }
+  }
+  function setCommonJsModuleIndicator(node) {
+    if (file.externalModuleIndicator && file.externalModuleIndicator !== true) {
+      return false;
+    }
+    if (!file.commonJsModuleIndicator) {
+      file.commonJsModuleIndicator = node;
+      if (!file.externalModuleIndicator) {
+        bindSourceFileAsExternalModule();
+      }
+    }
+    return true;
+  }
+  function bindObjectDefinePropertyExport(node) {
+    if (!setCommonJsModuleIndicator(node)) {
+      return;
+    }
+    const symbol = forEachIdentifierInEntityName(
+      node.arguments[0],
+      /*parent*/
+      void 0,
+      (id, symbol2) => {
+        if (symbol2) {
+          addDeclarationToSymbol(symbol2, id, 1536 /* Module */ | 67108864 /* Assignment */);
+        }
+        return symbol2;
+      }
+    );
+    if (symbol) {
+      const flags = 4 /* Property */ | 1048576 /* ExportValue */;
+      declareSymbol(symbol.exports, symbol, node, flags, 0 /* None */);
+    }
+  }
+  function bindExportsPropertyAssignment(node) {
+    if (!setCommonJsModuleIndicator(node)) {
+      return;
+    }
+    const symbol = forEachIdentifierInEntityName(
+      node.left.expression,
+      /*parent*/
+      void 0,
+      (id, symbol2) => {
+        if (symbol2) {
+          addDeclarationToSymbol(symbol2, id, 1536 /* Module */ | 67108864 /* Assignment */);
+        }
+        return symbol2;
+      }
+    );
+    if (symbol) {
+      const isAlias = isAliasableExpression(node.right) && (isExportsIdentifier(node.left.expression) || isModuleExportsAccessExpression(node.left.expression));
+      const flags = isAlias ? 2097152 /* Alias */ : 4 /* Property */ | 1048576 /* ExportValue */;
+      setParent(node.left, node);
+      declareSymbol(symbol.exports, symbol, node.left, flags, 0 /* None */);
+    }
+  }
+  function bindModuleExportsAssignment(node) {
+    if (!setCommonJsModuleIndicator(node)) {
+      return;
+    }
+    const assignedExpression = getRightMostAssignedExpression(node.right);
+    if (isEmptyObjectLiteral(assignedExpression) || container === file && isExportsOrModuleExportsOrAlias(file, assignedExpression)) {
+      return;
+    }
+    if (isObjectLiteralExpression(assignedExpression) && every(assignedExpression.properties, isShorthandPropertyAssignment)) {
+      forEach(assignedExpression.properties, bindExportAssignedObjectMemberAlias);
+      return;
+    }
+    const flags = exportAssignmentIsAlias(node) ? 2097152 /* Alias */ : 4 /* Property */ | 1048576 /* ExportValue */ | 512 /* ValueModule */;
+    const symbol = declareSymbol(file.symbol.exports, file.symbol, node, flags | 67108864 /* Assignment */, 0 /* None */);
+    setValueDeclaration(symbol, node);
+  }
+  function bindExportAssignedObjectMemberAlias(node) {
+    declareSymbol(file.symbol.exports, file.symbol, node, 2097152 /* Alias */ | 67108864 /* Assignment */, 0 /* None */);
+  }
+  function bindThisPropertyAssignment(node) {
+    Debug.assert(isInJSFile(node));
+    const hasPrivateIdentifier = isBinaryExpression(node) && isPropertyAccessExpression(node.left) && isPrivateIdentifier(node.left.name) || isPropertyAccessExpression(node) && isPrivateIdentifier(node.name);
+    if (hasPrivateIdentifier) {
+      return;
+    }
+    const thisContainer = getThisContainer(
+      node,
+      /*includeArrowFunctions*/
+      false,
+      /*includeClassComputedPropertyName*/
+      false
+    );
+    switch (thisContainer.kind) {
+      case 262 /* FunctionDeclaration */:
+      case 218 /* FunctionExpression */:
+        let constructorSymbol = thisContainer.symbol;
+        if (isBinaryExpression(thisContainer.parent) && thisContainer.parent.operatorToken.kind === 64 /* EqualsToken */) {
+          const l = thisContainer.parent.left;
+          if (isBindableStaticAccessExpression(l) && isPrototypeAccess(l.expression)) {
+            constructorSymbol = lookupSymbolForPropertyAccess(l.expression.expression, thisParentContainer);
+          }
+        }
+        if (constructorSymbol && constructorSymbol.valueDeclaration) {
+          constructorSymbol.members = constructorSymbol.members || createSymbolTable();
+          if (hasDynamicName(node)) {
+            bindDynamicallyNamedThisPropertyAssignment(node, constructorSymbol, constructorSymbol.members);
+          } else {
+            declareSymbol(constructorSymbol.members, constructorSymbol, node, 4 /* Property */ | 67108864 /* Assignment */, 0 /* PropertyExcludes */ & ~4 /* Property */);
+          }
+          addDeclarationToSymbol(constructorSymbol, constructorSymbol.valueDeclaration, 32 /* Class */);
+        }
+        break;
+      case 176 /* Constructor */:
+      case 172 /* PropertyDeclaration */:
+      case 174 /* MethodDeclaration */:
+      case 177 /* GetAccessor */:
+      case 178 /* SetAccessor */:
+      case 175 /* ClassStaticBlockDeclaration */:
+        const containingClass = thisContainer.parent;
+        const symbolTable = isStatic(thisContainer) ? containingClass.symbol.exports : containingClass.symbol.members;
+        if (hasDynamicName(node)) {
+          bindDynamicallyNamedThisPropertyAssignment(node, containingClass.symbol, symbolTable);
+        } else {
+          declareSymbol(
+            symbolTable,
+            containingClass.symbol,
+            node,
+            4 /* Property */ | 67108864 /* Assignment */,
+            0 /* None */,
+            /*isReplaceableByMethod*/
+            true
+          );
+        }
+        break;
+      case 312 /* SourceFile */:
+        if (hasDynamicName(node)) {
+          break;
+        } else if (thisContainer.commonJsModuleIndicator) {
+          declareSymbol(thisContainer.symbol.exports, thisContainer.symbol, node, 4 /* Property */ | 1048576 /* ExportValue */, 0 /* None */);
+        } else {
+          declareSymbolAndAddToSymbolTable(node, 1 /* FunctionScopedVariable */, 111550 /* FunctionScopedVariableExcludes */);
+        }
+        break;
+      case 267 /* ModuleDeclaration */:
+        break;
+      default:
+        Debug.failBadSyntaxKind(thisContainer);
+    }
+  }
+  function bindDynamicallyNamedThisPropertyAssignment(node, symbol, symbolTable) {
+    declareSymbol(
+      symbolTable,
+      symbol,
+      node,
+      4 /* Property */,
+      0 /* None */,
+      /*isReplaceableByMethod*/
+      true,
+      /*isComputedName*/
+      true
+    );
+    addLateBoundAssignmentDeclarationToSymbol(node, symbol);
+  }
+  function addLateBoundAssignmentDeclarationToSymbol(node, symbol) {
+    if (symbol) {
+      (symbol.assignmentDeclarationMembers || (symbol.assignmentDeclarationMembers = /* @__PURE__ */ new Map())).set(getNodeId(node), node);
+    }
+  }
+  function bindSpecialPropertyDeclaration(node) {
+    if (node.expression.kind === 110 /* ThisKeyword */) {
+      bindThisPropertyAssignment(node);
+    } else if (isBindableStaticAccessExpression(node) && node.parent.parent.kind === 312 /* SourceFile */) {
+      if (isPrototypeAccess(node.expression)) {
+        bindPrototypePropertyAssignment(node, node.parent);
+      } else {
+        bindStaticPropertyAssignment(node);
+      }
+    }
+  }
+  function bindPrototypeAssignment(node) {
+    setParent(node.left, node);
+    setParent(node.right, node);
+    bindPropertyAssignment(
+      node.left.expression,
+      node.left,
+      /*isPrototypeProperty*/
+      false,
+      /*containerIsClass*/
+      true
+    );
+  }
+  function bindObjectDefinePrototypeProperty(node) {
+    const namespaceSymbol = lookupSymbolForPropertyAccess(node.arguments[0].expression);
+    if (namespaceSymbol && namespaceSymbol.valueDeclaration) {
+      addDeclarationToSymbol(namespaceSymbol, namespaceSymbol.valueDeclaration, 32 /* Class */);
+    }
+    bindPotentiallyNewExpandoMemberToNamespace(
+      node,
+      namespaceSymbol,
+      /*isPrototypeProperty*/
+      true
+    );
+  }
+  function bindPrototypePropertyAssignment(lhs, parent3) {
+    const classPrototype = lhs.expression;
+    const constructorFunction = classPrototype.expression;
+    setParent(constructorFunction, classPrototype);
+    setParent(classPrototype, lhs);
+    setParent(lhs, parent3);
+    bindPropertyAssignment(
+      constructorFunction,
+      lhs,
+      /*isPrototypeProperty*/
+      true,
+      /*containerIsClass*/
+      true
+    );
+  }
+  function bindObjectDefinePropertyAssignment(node) {
+    let namespaceSymbol = lookupSymbolForPropertyAccess(node.arguments[0]);
+    const isToplevel = node.parent.parent.kind === 312 /* SourceFile */;
+    namespaceSymbol = bindPotentiallyMissingNamespaces(
+      namespaceSymbol,
+      node.arguments[0],
+      isToplevel,
+      /*isPrototypeProperty*/
+      false,
+      /*containerIsClass*/
+      false
+    );
+    bindPotentiallyNewExpandoMemberToNamespace(
+      node,
+      namespaceSymbol,
+      /*isPrototypeProperty*/
+      false
+    );
+  }
+  function bindSpecialPropertyAssignment(node) {
+    var _a;
+    const parentSymbol = lookupSymbolForPropertyAccess(node.left.expression, blockScopeContainer) || lookupSymbolForPropertyAccess(node.left.expression, container);
+    if (!isInJSFile(node) && !isFunctionSymbol(parentSymbol)) {
+      return;
+    }
+    const rootExpr = getLeftmostAccessExpression(node.left);
+    if (isIdentifier(rootExpr) && ((_a = lookupSymbolForName(container, rootExpr.escapedText)) == null ? void 0 : _a.flags) & 2097152 /* Alias */) {
+      return;
+    }
+    setParent(node.left, node);
+    setParent(node.right, node);
+    if (isIdentifier(node.left.expression) && container === file && isExportsOrModuleExportsOrAlias(file, node.left.expression)) {
+      bindExportsPropertyAssignment(node);
+    } else if (hasDynamicName(node)) {
+      bindAnonymousDeclaration(node, 4 /* Property */ | 67108864 /* Assignment */, "__computed" /* Computed */);
+      const sym = bindPotentiallyMissingNamespaces(
+        parentSymbol,
+        node.left.expression,
+        isTopLevelNamespaceAssignment(node.left),
+        /*isPrototypeProperty*/
+        false,
+        /*containerIsClass*/
+        false
+      );
+      addLateBoundAssignmentDeclarationToSymbol(node, sym);
+    } else {
+      bindStaticPropertyAssignment(cast(node.left, isBindableStaticNameExpression));
+    }
+  }
+  function bindStaticPropertyAssignment(node) {
+    Debug.assert(!isIdentifier(node));
+    setParent(node.expression, node);
+    bindPropertyAssignment(
+      node.expression,
+      node,
+      /*isPrototypeProperty*/
+      false,
+      /*containerIsClass*/
+      false
+    );
+  }
+  function bindPotentiallyMissingNamespaces(namespaceSymbol, entityName, isToplevel, isPrototypeProperty, containerIsClass) {
+    if ((namespaceSymbol == null ? void 0 : namespaceSymbol.flags) & 2097152 /* Alias */) {
+      return namespaceSymbol;
+    }
+    if (isToplevel && !isPrototypeProperty) {
+      const flags = 1536 /* Module */ | 67108864 /* Assignment */;
+      const excludeFlags = 110735 /* ValueModuleExcludes */ & ~67108864 /* Assignment */;
+      namespaceSymbol = forEachIdentifierInEntityName(entityName, namespaceSymbol, (id, symbol, parent3) => {
+        if (symbol) {
+          addDeclarationToSymbol(symbol, id, flags);
+          return symbol;
+        } else {
+          const table = parent3 ? parent3.exports : file.jsGlobalAugmentations || (file.jsGlobalAugmentations = createSymbolTable());
+          return declareSymbol(table, parent3, id, flags, excludeFlags);
+        }
+      });
+    }
+    if (containerIsClass && namespaceSymbol && namespaceSymbol.valueDeclaration) {
+      addDeclarationToSymbol(namespaceSymbol, namespaceSymbol.valueDeclaration, 32 /* Class */);
+    }
+    return namespaceSymbol;
+  }
+  function bindPotentiallyNewExpandoMemberToNamespace(declaration, namespaceSymbol, isPrototypeProperty) {
+    if (!namespaceSymbol || !isExpandoSymbol(namespaceSymbol)) {
+      return;
+    }
+    const symbolTable = isPrototypeProperty ? namespaceSymbol.members || (namespaceSymbol.members = createSymbolTable()) : namespaceSymbol.exports || (namespaceSymbol.exports = createSymbolTable());
+    let includes = 0 /* None */;
+    let excludes = 0 /* None */;
+    if (isFunctionLikeDeclaration(getAssignedExpandoInitializer(declaration))) {
+      includes = 8192 /* Method */;
+      excludes = 103359 /* MethodExcludes */;
+    } else if (isCallExpression(declaration) && isBindableObjectDefinePropertyCall(declaration)) {
+      if (some(declaration.arguments[2].properties, (p) => {
+        const id = getNameOfDeclaration(p);
+        return !!id && isIdentifier(id) && idText(id) === "set";
+      })) {
+        includes |= 65536 /* SetAccessor */ | 4 /* Property */;
+        excludes |= 78783 /* SetAccessorExcludes */;
+      }
+      if (some(declaration.arguments[2].properties, (p) => {
+        const id = getNameOfDeclaration(p);
+        return !!id && isIdentifier(id) && idText(id) === "get";
+      })) {
+        includes |= 32768 /* GetAccessor */ | 4 /* Property */;
+        excludes |= 46015 /* GetAccessorExcludes */;
+      }
+    }
+    if (includes === 0 /* None */) {
+      includes = 4 /* Property */;
+      excludes = 0 /* PropertyExcludes */;
+    }
+    declareSymbol(symbolTable, namespaceSymbol, declaration, includes | 67108864 /* Assignment */, excludes & ~67108864 /* Assignment */);
+  }
+  function isTopLevelNamespaceAssignment(propertyAccess) {
+    return isBinaryExpression(propertyAccess.parent) ? getParentOfBinaryExpression(propertyAccess.parent).parent.kind === 312 /* SourceFile */ : propertyAccess.parent.parent.kind === 312 /* SourceFile */;
+  }
+  function bindPropertyAssignment(name, propertyAccess, isPrototypeProperty, containerIsClass) {
+    let namespaceSymbol = lookupSymbolForPropertyAccess(name, blockScopeContainer) || lookupSymbolForPropertyAccess(name, container);
+    const isToplevel = isTopLevelNamespaceAssignment(propertyAccess);
+    namespaceSymbol = bindPotentiallyMissingNamespaces(namespaceSymbol, propertyAccess.expression, isToplevel, isPrototypeProperty, containerIsClass);
+    bindPotentiallyNewExpandoMemberToNamespace(propertyAccess, namespaceSymbol, isPrototypeProperty);
+  }
+  function isExpandoSymbol(symbol) {
+    if (symbol.flags & (16 /* Function */ | 32 /* Class */ | 1024 /* NamespaceModule */)) {
+      return true;
+    }
+    const node = symbol.valueDeclaration;
+    if (node && isCallExpression(node)) {
+      return !!getAssignedExpandoInitializer(node);
+    }
+    let init = !node ? void 0 : isVariableDeclaration(node) ? node.initializer : isBinaryExpression(node) ? node.right : isPropertyAccessExpression(node) && isBinaryExpression(node.parent) ? node.parent.right : void 0;
+    init = init && getRightMostAssignedExpression(init);
+    if (init) {
+      const isPrototypeAssignment = isPrototypeAccess(isVariableDeclaration(node) ? node.name : isBinaryExpression(node) ? node.left : node);
+      return !!getExpandoInitializer(isBinaryExpression(init) && (init.operatorToken.kind === 57 /* BarBarToken */ || init.operatorToken.kind === 61 /* QuestionQuestionToken */) ? init.right : init, isPrototypeAssignment);
+    }
+    return false;
+  }
+  function getParentOfBinaryExpression(expr) {
+    while (isBinaryExpression(expr.parent)) {
+      expr = expr.parent;
+    }
+    return expr.parent;
+  }
+  function lookupSymbolForPropertyAccess(node, lookupContainer = container) {
+    if (isIdentifier(node)) {
+      return lookupSymbolForName(lookupContainer, node.escapedText);
+    } else {
+      const symbol = lookupSymbolForPropertyAccess(node.expression);
+      return symbol && symbol.exports && symbol.exports.get(getElementOrPropertyAccessName(node));
+    }
+  }
+  function forEachIdentifierInEntityName(e, parent3, action) {
+    if (isExportsOrModuleExportsOrAlias(file, e)) {
+      return file.symbol;
+    } else if (isIdentifier(e)) {
+      return action(e, lookupSymbolForPropertyAccess(e), parent3);
+    } else {
+      const s = forEachIdentifierInEntityName(e.expression, parent3, action);
+      const name = getNameOrArgument(e);
+      if (isPrivateIdentifier(name)) {
+        Debug.fail("unexpected PrivateIdentifier");
+      }
+      return action(name, s && s.exports && s.exports.get(getElementOrPropertyAccessName(e)), s);
+    }
+  }
+  function bindCallExpression(node) {
+    if (!file.commonJsModuleIndicator && isRequireCall(
+      node,
+      /*requireStringLiteralLikeArgument*/
+      false
+    )) {
+      setCommonJsModuleIndicator(node);
+    }
+  }
+  function bindClassLikeDeclaration(node) {
+    if (node.kind === 263 /* ClassDeclaration */) {
+      bindBlockScopedDeclaration(node, 32 /* Class */, 899503 /* ClassExcludes */);
+    } else {
+      const bindingName = node.name ? node.name.escapedText : "__class" /* Class */;
+      bindAnonymousDeclaration(node, 32 /* Class */, bindingName);
+      if (node.name) {
+        classifiableNames.add(node.name.escapedText);
+      }
+    }
+    const { symbol } = node;
+    const prototypeSymbol = createSymbol(4 /* Property */ | 4194304 /* Prototype */, "prototype");
+    const symbolExport = symbol.exports.get(prototypeSymbol.escapedName);
+    if (symbolExport) {
+      if (node.name) {
+        setParent(node.name, node);
+      }
+      file.bindDiagnostics.push(createDiagnosticForNode2(symbolExport.declarations[0], Diagnostics.Duplicate_identifier_0, symbolName(prototypeSymbol)));
+    }
+    symbol.exports.set(prototypeSymbol.escapedName, prototypeSymbol);
+    prototypeSymbol.parent = symbol;
+  }
+  function bindEnumDeclaration(node) {
+    return isEnumConst(node) ? bindBlockScopedDeclaration(node, 128 /* ConstEnum */, 899967 /* ConstEnumExcludes */) : bindBlockScopedDeclaration(node, 256 /* RegularEnum */, 899327 /* RegularEnumExcludes */);
+  }
+  function bindVariableDeclarationOrBindingElement(node) {
+    if (inStrictMode) {
+      checkStrictModeEvalOrArguments(node, node.name);
+    }
+    if (!isBindingPattern(node.name)) {
+      const possibleVariableDecl = node.kind === 260 /* VariableDeclaration */ ? node : node.parent.parent;
+      if (isInJSFile(node) && isVariableDeclarationInitializedToBareOrAccessedRequire(possibleVariableDecl) && !getJSDocTypeTag(node) && !(getCombinedModifierFlags(node) & 32 /* Export */)) {
+        declareSymbolAndAddToSymbolTable(node, 2097152 /* Alias */, 2097152 /* AliasExcludes */);
+      } else if (isBlockOrCatchScoped(node)) {
+        bindBlockScopedDeclaration(node, 2 /* BlockScopedVariable */, 111551 /* BlockScopedVariableExcludes */);
+      } else if (isParameterDeclaration(node)) {
+        declareSymbolAndAddToSymbolTable(node, 1 /* FunctionScopedVariable */, 111551 /* ParameterExcludes */);
+      } else {
+        declareSymbolAndAddToSymbolTable(node, 1 /* FunctionScopedVariable */, 111550 /* FunctionScopedVariableExcludes */);
+      }
+    }
+  }
+  function bindParameter(node) {
+    if (node.kind === 348 /* JSDocParameterTag */ && container.kind !== 330 /* JSDocSignature */) {
+      return;
+    }
+    if (inStrictMode && !(node.flags & 33554432 /* Ambient */)) {
+      checkStrictModeEvalOrArguments(node, node.name);
+    }
+    if (isBindingPattern(node.name)) {
+      bindAnonymousDeclaration(node, 1 /* FunctionScopedVariable */, "__" + node.parent.parameters.indexOf(node));
+    } else {
+      declareSymbolAndAddToSymbolTable(node, 1 /* FunctionScopedVariable */, 111551 /* ParameterExcludes */);
+    }
+    if (isParameterPropertyDeclaration(node, node.parent)) {
+      const classDeclaration = node.parent.parent;
+      declareSymbol(classDeclaration.symbol.members, classDeclaration.symbol, node, 4 /* Property */ | (node.questionToken ? 16777216 /* Optional */ : 0 /* None */), 0 /* PropertyExcludes */);
+    }
+  }
+  function bindFunctionDeclaration(node) {
+    if (!file.isDeclarationFile && !(node.flags & 33554432 /* Ambient */)) {
+      if (isAsyncFunction(node)) {
+        emitFlags |= 4096 /* HasAsyncFunctions */;
+      }
+    }
+    checkStrictModeFunctionName(node);
+    if (inStrictMode) {
+      checkStrictModeFunctionDeclaration(node);
+      bindBlockScopedDeclaration(node, 16 /* Function */, 110991 /* FunctionExcludes */);
+    } else {
+      declareSymbolAndAddToSymbolTable(node, 16 /* Function */, 110991 /* FunctionExcludes */);
+    }
+  }
+  function bindFunctionExpression(node) {
+    if (!file.isDeclarationFile && !(node.flags & 33554432 /* Ambient */)) {
+      if (isAsyncFunction(node)) {
+        emitFlags |= 4096 /* HasAsyncFunctions */;
+      }
+    }
+    if (currentFlow) {
+      node.flowNode = currentFlow;
+    }
+    checkStrictModeFunctionName(node);
+    const bindingName = node.name ? node.name.escapedText : "__function" /* Function */;
+    return bindAnonymousDeclaration(node, 16 /* Function */, bindingName);
+  }
+  function bindPropertyOrMethodOrAccessor(node, symbolFlags, symbolExcludes) {
+    if (!file.isDeclarationFile && !(node.flags & 33554432 /* Ambient */) && isAsyncFunction(node)) {
+      emitFlags |= 4096 /* HasAsyncFunctions */;
+    }
+    if (currentFlow && isObjectLiteralOrClassExpressionMethodOrAccessor(node)) {
+      node.flowNode = currentFlow;
+    }
+    return hasDynamicName(node) ? bindAnonymousDeclaration(node, symbolFlags, "__computed" /* Computed */) : declareSymbolAndAddToSymbolTable(node, symbolFlags, symbolExcludes);
+  }
+  function getInferTypeContainer(node) {
+    const extendsType = findAncestor(node, (n) => n.parent && isConditionalTypeNode(n.parent) && n.parent.extendsType === n);
+    return extendsType && extendsType.parent;
+  }
+  function bindTypeParameter(node) {
+    if (isJSDocTemplateTag(node.parent)) {
+      const container2 = getEffectiveContainerForJSDocTemplateTag(node.parent);
+      if (container2) {
+        Debug.assertNode(container2, canHaveLocals);
+        container2.locals ?? (container2.locals = createSymbolTable());
+        declareSymbol(
+          container2.locals,
+          /*parent*/
+          void 0,
+          node,
+          262144 /* TypeParameter */,
+          526824 /* TypeParameterExcludes */
+        );
+      } else {
+        declareSymbolAndAddToSymbolTable(node, 262144 /* TypeParameter */, 526824 /* TypeParameterExcludes */);
+      }
+    } else if (node.parent.kind === 195 /* InferType */) {
+      const container2 = getInferTypeContainer(node.parent);
+      if (container2) {
+        Debug.assertNode(container2, canHaveLocals);
+        container2.locals ?? (container2.locals = createSymbolTable());
+        declareSymbol(
+          container2.locals,
+          /*parent*/
+          void 0,
+          node,
+          262144 /* TypeParameter */,
+          526824 /* TypeParameterExcludes */
+        );
+      } else {
+        bindAnonymousDeclaration(node, 262144 /* TypeParameter */, getDeclarationName(node));
+      }
+    } else {
+      declareSymbolAndAddToSymbolTable(node, 262144 /* TypeParameter */, 526824 /* TypeParameterExcludes */);
+    }
+  }
+  function shouldReportErrorOnModuleDeclaration(node) {
+    const instanceState = getModuleInstanceState(node);
+    return instanceState === 1 /* Instantiated */ || instanceState === 2 /* ConstEnumOnly */ && shouldPreserveConstEnums(options);
+  }
+  function checkUnreachable(node) {
+    if (!(currentFlow.flags & 1 /* Unreachable */)) {
+      return false;
+    }
+    if (currentFlow === unreachableFlow) {
+      const reportError = (
+        // report error on all statements except empty ones
+        isStatementButNotDeclaration(node) && node.kind !== 242 /* EmptyStatement */ || // report error on class declarations
+        node.kind === 263 /* ClassDeclaration */ || // report error on instantiated modules or const-enums only modules if preserveConstEnums is set
+        node.kind === 267 /* ModuleDeclaration */ && shouldReportErrorOnModuleDeclaration(node)
+      );
+      if (reportError) {
+        currentFlow = reportedUnreachableFlow;
+        if (!options.allowUnreachableCode) {
+          const isError = unreachableCodeIsError(options) && !(node.flags & 33554432 /* Ambient */) && (!isVariableStatement(node) || !!(getCombinedNodeFlags(node.declarationList) & 7 /* BlockScoped */) || node.declarationList.declarations.some((d) => !!d.initializer));
+          eachUnreachableRange(node, (start2, end) => errorOrSuggestionOnRange(isError, start2, end, Diagnostics.Unreachable_code_detected));
+        }
+      }
+    }
+    return true;
+  }
+}
+function eachUnreachableRange(node, cb) {
+  if (isStatement(node) && isExecutableStatement(node) && isBlock(node.parent)) {
+    const { statements } = node.parent;
+    const slice = sliceAfter(statements, node);
+    getRangesWhere(slice, isExecutableStatement, (start2, afterEnd) => cb(slice[start2], slice[afterEnd - 1]));
+  } else {
+    cb(node, node);
+  }
+}
+function isExecutableStatement(s) {
+  return !isFunctionDeclaration(s) && !isPurelyTypeDeclaration(s) && !isEnumDeclaration(s) && // `var x;` may declare a variable used above
+  !(isVariableStatement(s) && !(getCombinedNodeFlags(s) & 7 /* BlockScoped */) && s.declarationList.declarations.some((d) => !d.initializer));
+}
+function isPurelyTypeDeclaration(s) {
+  switch (s.kind) {
+    case 264 /* InterfaceDeclaration */:
+    case 265 /* TypeAliasDeclaration */:
+      return true;
+    case 267 /* ModuleDeclaration */:
+      return getModuleInstanceState(s) !== 1 /* Instantiated */;
+    case 266 /* EnumDeclaration */:
+      return hasSyntacticModifier(s, 4096 /* Const */);
+    default:
+      return false;
+  }
+}
+function isExportsOrModuleExportsOrAlias(sourceFile, node) {
+  let i = 0;
+  const q = createQueue();
+  q.enqueue(node);
+  while (!q.isEmpty() && i < 100) {
+    i++;
+    node = q.dequeue();
+    if (isExportsIdentifier(node) || isModuleExportsAccessExpression(node)) {
+      return true;
+    } else if (isIdentifier(node)) {
+      const symbol = lookupSymbolForName(sourceFile, node.escapedText);
+      if (!!symbol && !!symbol.valueDeclaration && isVariableDeclaration(symbol.valueDeclaration) && !!symbol.valueDeclaration.initializer) {
+        const init = symbol.valueDeclaration.initializer;
+        q.enqueue(init);
+        if (isAssignmentExpression(
+          init,
+          /*excludeCompoundAssignment*/
+          true
+        )) {
+          q.enqueue(init.left);
+          q.enqueue(init.right);
+        }
+      }
+    }
+  }
+  return false;
+}
+function getContainerFlags(node) {
+  switch (node.kind) {
+    case 231 /* ClassExpression */:
+    case 263 /* ClassDeclaration */:
+    case 266 /* EnumDeclaration */:
+    case 210 /* ObjectLiteralExpression */:
+    case 187 /* TypeLiteral */:
+    case 329 /* JSDocTypeLiteral */:
+    case 292 /* JsxAttributes */:
+      return 1 /* IsContainer */;
+    case 264 /* InterfaceDeclaration */:
+      return 1 /* IsContainer */ | 64 /* IsInterface */;
+    case 267 /* ModuleDeclaration */:
+    case 265 /* TypeAliasDeclaration */:
+    case 200 /* MappedType */:
+    case 181 /* IndexSignature */:
+      return 1 /* IsContainer */ | 32 /* HasLocals */;
+    case 312 /* SourceFile */:
+      return 1 /* IsContainer */ | 4 /* IsControlFlowContainer */ | 32 /* HasLocals */;
+    case 177 /* GetAccessor */:
+    case 178 /* SetAccessor */:
+    case 174 /* MethodDeclaration */:
+      if (isObjectLiteralOrClassExpressionMethodOrAccessor(node)) {
+        return 1 /* IsContainer */ | 4 /* IsControlFlowContainer */ | 32 /* HasLocals */ | 8 /* IsFunctionLike */ | 128 /* IsObjectLiteralOrClassExpressionMethodOrAccessor */;
+      }
+    case 176 /* Constructor */:
+    case 262 /* FunctionDeclaration */:
+    case 173 /* MethodSignature */:
+    case 179 /* CallSignature */:
+    case 330 /* JSDocSignature */:
+    case 324 /* JSDocFunctionType */:
+    case 184 /* FunctionType */:
+    case 180 /* ConstructSignature */:
+    case 185 /* ConstructorType */:
+    case 175 /* ClassStaticBlockDeclaration */:
+      return 1 /* IsContainer */ | 4 /* IsControlFlowContainer */ | 32 /* HasLocals */ | 8 /* IsFunctionLike */;
+    case 218 /* FunctionExpression */:
+    case 219 /* ArrowFunction */:
+      return 1 /* IsContainer */ | 4 /* IsControlFlowContainer */ | 32 /* HasLocals */ | 8 /* IsFunctionLike */ | 16 /* IsFunctionExpression */;
+    case 268 /* ModuleBlock */:
+      return 4 /* IsControlFlowContainer */;
+    case 172 /* PropertyDeclaration */:
+      return node.initializer ? 4 /* IsControlFlowContainer */ : 0;
+    case 299 /* CatchClause */:
+    case 248 /* ForStatement */:
+    case 249 /* ForInStatement */:
+    case 250 /* ForOfStatement */:
+    case 269 /* CaseBlock */:
+      return 2 /* IsBlockScopedContainer */ | 32 /* HasLocals */;
+    case 241 /* Block */:
+      return isFunctionLike(node.parent) || isClassStaticBlockDeclaration(node.parent) ? 0 /* None */ : 2 /* IsBlockScopedContainer */ | 32 /* HasLocals */;
+  }
+  return 0 /* None */;
+}
+function lookupSymbolForName(container, name) {
+  var _a, _b, _c, _d;
+  const local = (_b = (_a = tryCast(container, canHaveLocals)) == null ? void 0 : _a.locals) == null ? void 0 : _b.get(name);
+  if (local) {
+    return local.exportSymbol ?? local;
+  }
+  if (isSourceFile(container) && container.jsGlobalAugmentations && container.jsGlobalAugmentations.has(name)) {
+    return container.jsGlobalAugmentations.get(name);
+  }
+  if (canHaveSymbol(container)) {
+    return (_d = (_c = container.symbol) == null ? void 0 : _c.exports) == null ? void 0 : _d.get(name);
+  }
+}
+
+// src/compiler/symbolWalker.ts
+function createGetSymbolWalker(getRestTypeOfSignature, getTypePredicateOfSignature, getReturnTypeOfSignature, getBaseTypes, resolveStructuredTypeMembers, getTypeOfSymbol, getResolvedSymbol, getConstraintOfTypeParameter, getFirstIdentifier2, getTypeArguments) {
+  return getSymbolWalker;
+  function getSymbolWalker(accept = () => true) {
+    const visitedTypes = [];
+    const visitedSymbols = [];
+    return {
+      walkType: (type) => {
+        try {
+          visitType(type);
+          return { visitedTypes: getOwnValues(visitedTypes), visitedSymbols: getOwnValues(visitedSymbols) };
+        } finally {
+          clear(visitedTypes);
+          clear(visitedSymbols);
+        }
+      },
+      walkSymbol: (symbol) => {
+        try {
+          visitSymbol(symbol);
+          return { visitedTypes: getOwnValues(visitedTypes), visitedSymbols: getOwnValues(visitedSymbols) };
+        } finally {
+          clear(visitedTypes);
+          clear(visitedSymbols);
+        }
+      }
+    };
+    function visitType(type) {
+      if (!type) {
+        return;
+      }
+      if (visitedTypes[type.id]) {
+        return;
+      }
+      visitedTypes[type.id] = type;
+      const shouldBail = visitSymbol(type.symbol);
+      if (shouldBail)
+        return;
+      if (type.flags & 524288 /* Object */) {
+        const objectType = type;
+        const objectFlags = objectType.objectFlags;
+        if (objectFlags & 4 /* Reference */) {
+          visitTypeReference(type);
+        }
+        if (objectFlags & 32 /* Mapped */) {
+          visitMappedType(type);
+        }
+        if (objectFlags & (1 /* Class */ | 2 /* Interface */)) {
+          visitInterfaceType(type);
+        }
+        if (objectFlags & (8 /* Tuple */ | 16 /* Anonymous */)) {
+          visitObjectType(objectType);
+        }
+      }
+      if (type.flags & 262144 /* TypeParameter */) {
+        visitTypeParameter(type);
+      }
+      if (type.flags & 3145728 /* UnionOrIntersection */) {
+        visitUnionOrIntersectionType(type);
+      }
+      if (type.flags & 4194304 /* Index */) {
+        visitIndexType(type);
+      }
+      if (type.flags & 8388608 /* IndexedAccess */) {
+        visitIndexedAccessType(type);
+      }
+    }
+    function visitTypeReference(type) {
+      visitType(type.target);
+      forEach(getTypeArguments(type), visitType);
+    }
+    function visitTypeParameter(type) {
+      visitType(getConstraintOfTypeParameter(type));
+    }
+    function visitUnionOrIntersectionType(type) {
+      forEach(type.types, visitType);
+    }
+    function visitIndexType(type) {
+      visitType(type.type);
+    }
+    function visitIndexedAccessType(type) {
+      visitType(type.objectType);
+      visitType(type.indexType);
+      visitType(type.constraint);
+    }
+    function visitMappedType(type) {
+      visitType(type.typeParameter);
+      visitType(type.constraintType);
+      visitType(type.templateType);
+      visitType(type.modifiersType);
+    }
+    function visitSignature(signature) {
+      const typePredicate = getTypePredicateOfSignature(signature);
+      if (typePredicate) {
+        visitType(typePredicate.type);
+      }
+      forEach(signature.typeParameters, visitType);
+      for (const parameter of signature.parameters) {
+        visitSymbol(parameter);
+      }
+      visitType(getRestTypeOfSignature(signature));
+      visitType(getReturnTypeOfSignature(signature));
+    }
+    function visitInterfaceType(interfaceT) {
+      visitObjectType(interfaceT);
+      forEach(interfaceT.typeParameters, visitType);
+      forEach(getBaseTypes(interfaceT), visitType);
+      visitType(interfaceT.thisType);
+    }
+    function visitObjectType(type) {
+      const resolved = resolveStructuredTypeMembers(type);
+      for (const info of resolved.indexInfos) {
+        visitType(info.keyType);
+        visitType(info.type);
+      }
+      for (const signature of resolved.callSignatures) {
+        visitSignature(signature);
+      }
+      for (const signature of resolved.constructSignatures) {
+        visitSignature(signature);
+      }
+      for (const p of resolved.properties) {
+        visitSymbol(p);
+      }
+    }
+    function visitSymbol(symbol) {
+      if (!symbol) {
+        return false;
+      }
+      const symbolId = getSymbolId(symbol);
+      if (visitedSymbols[symbolId]) {
+        return false;
+      }
+      visitedSymbols[symbolId] = symbol;
+      if (!accept(symbol)) {
+        return true;
+      }
+      const t = getTypeOfSymbol(symbol);
+      visitType(t);
+      if (symbol.exports) {
+        symbol.exports.forEach(visitSymbol);
+      }
+      forEach(symbol.declarations, (d) => {
+        if (d.type && d.type.kind === 186 /* TypeQuery */) {
+          const query = d.type;
+          const entity = getResolvedSymbol(getFirstIdentifier2(query.exprName));
+          visitSymbol(entity);
+        }
+      });
+      return false;
+    }
+  }
+}
+
+// src/compiler/_namespaces/ts.moduleSpecifiers.ts
+var ts_moduleSpecifiers_exports = {};
+__export(ts_moduleSpecifiers_exports, {
+  RelativePreference: () => RelativePreference,
+  countPathComponents: () => countPathComponents,
+  forEachFileNameOfModule: () => forEachFileNameOfModule,
+  getModuleSpecifier: () => getModuleSpecifier,
+  getModuleSpecifierPreferences: () => getModuleSpecifierPreferences,
+  getModuleSpecifiers: () => getModuleSpecifiers,
+  getModuleSpecifiersWithCacheInfo: () => getModuleSpecifiersWithCacheInfo,
+  getNodeModulesPackageName: () => getNodeModulesPackageName,
+  tryGetJSExtensionForFile: () => tryGetJSExtensionForFile,
+  tryGetModuleSpecifiersFromCache: () => tryGetModuleSpecifiersFromCache,
+  tryGetRealFileNameForNonJsDeclarationFileName: () => tryGetRealFileNameForNonJsDeclarationFileName,
+  updateModuleSpecifier: () => updateModuleSpecifier
+});
+
+// src/compiler/moduleSpecifiers.ts
+var RelativePreference = /* @__PURE__ */ ((RelativePreference2) => {
+  RelativePreference2[RelativePreference2["Relative"] = 0] = "Relative";
+  RelativePreference2[RelativePreference2["NonRelative"] = 1] = "NonRelative";
+  RelativePreference2[RelativePreference2["Shortest"] = 2] = "Shortest";
+  RelativePreference2[RelativePreference2["ExternalNonRelative"] = 3] = "ExternalNonRelative";
+  return RelativePreference2;
+})(RelativePreference || {});
+function getModuleSpecifierPreferences({ importModuleSpecifierPreference, importModuleSpecifierEnding }, compilerOptions, importingSourceFile, oldImportSpecifier) {
+  const filePreferredEnding = getPreferredEnding();
+  return {
+    relativePreference: oldImportSpecifier !== void 0 ? isExternalModuleNameRelative(oldImportSpecifier) ? 0 /* Relative */ : 1 /* NonRelative */ : importModuleSpecifierPreference === "relative" ? 0 /* Relative */ : importModuleSpecifierPreference === "non-relative" ? 1 /* NonRelative */ : importModuleSpecifierPreference === "project-relative" ? 3 /* ExternalNonRelative */ : 2 /* Shortest */,
+    getAllowedEndingsInPreferredOrder: (syntaxImpliedNodeFormat) => {
+      const preferredEnding = syntaxImpliedNodeFormat !== importingSourceFile.impliedNodeFormat ? getPreferredEnding(syntaxImpliedNodeFormat) : filePreferredEnding;
+      if ((syntaxImpliedNodeFormat ?? importingSourceFile.impliedNodeFormat) === 99 /* ESNext */) {
+        if (shouldAllowImportingTsExtension(compilerOptions, importingSourceFile.fileName)) {
+          return [3 /* TsExtension */, 2 /* JsExtension */];
+        }
+        return [2 /* JsExtension */];
+      }
+      if (getEmitModuleResolutionKind(compilerOptions) === 1 /* Classic */) {
+        return preferredEnding === 2 /* JsExtension */ ? [2 /* JsExtension */, 1 /* Index */] : [1 /* Index */, 2 /* JsExtension */];
+      }
+      const allowImportingTsExtension = shouldAllowImportingTsExtension(compilerOptions, importingSourceFile.fileName);
+      switch (preferredEnding) {
+        case 2 /* JsExtension */:
+          return allowImportingTsExtension ? [2 /* JsExtension */, 3 /* TsExtension */, 0 /* Minimal */, 1 /* Index */] : [2 /* JsExtension */, 0 /* Minimal */, 1 /* Index */];
+        case 3 /* TsExtension */:
+          return [3 /* TsExtension */, 0 /* Minimal */, 2 /* JsExtension */, 1 /* Index */];
+        case 1 /* Index */:
+          return allowImportingTsExtension ? [1 /* Index */, 0 /* Minimal */, 3 /* TsExtension */, 2 /* JsExtension */] : [1 /* Index */, 0 /* Minimal */, 2 /* JsExtension */];
+        case 0 /* Minimal */:
+          return allowImportingTsExtension ? [0 /* Minimal */, 1 /* Index */, 3 /* TsExtension */, 2 /* JsExtension */] : [0 /* Minimal */, 1 /* Index */, 2 /* JsExtension */];
+        default:
+          Debug.assertNever(preferredEnding);
+      }
+    }
+  };
+  function getPreferredEnding(resolutionMode) {
+    if (oldImportSpecifier !== void 0) {
+      if (hasJSFileExtension(oldImportSpecifier))
+        return 2 /* JsExtension */;
+      if (endsWith(oldImportSpecifier, "/index"))
+        return 1 /* Index */;
+    }
+    return getModuleSpecifierEndingPreference(
+      importModuleSpecifierEnding,
+      resolutionMode ?? importingSourceFile.impliedNodeFormat,
+      compilerOptions,
+      importingSourceFile
+    );
+  }
+}
+function updateModuleSpecifier(compilerOptions, importingSourceFile, importingSourceFileName, toFileName2, host, oldImportSpecifier, options = {}) {
+  const res = getModuleSpecifierWorker(compilerOptions, importingSourceFile, importingSourceFileName, toFileName2, host, getModuleSpecifierPreferences({}, compilerOptions, importingSourceFile, oldImportSpecifier), {}, options);
+  if (res === oldImportSpecifier)
+    return void 0;
+  return res;
+}
+function getModuleSpecifier(compilerOptions, importingSourceFile, importingSourceFileName, toFileName2, host, options = {}) {
+  return getModuleSpecifierWorker(compilerOptions, importingSourceFile, importingSourceFileName, toFileName2, host, getModuleSpecifierPreferences({}, compilerOptions, importingSourceFile), {}, options);
+}
+function getNodeModulesPackageName(compilerOptions, importingSourceFile, nodeModulesFileName, host, preferences, options = {}) {
+  const info = getInfo(importingSourceFile.fileName, host);
+  const modulePaths = getAllModulePaths(info, nodeModulesFileName, host, preferences, options);
+  return firstDefined(modulePaths, (modulePath) => tryGetModuleNameAsNodeModule(
+    modulePath,
+    info,
+    importingSourceFile,
+    host,
+    compilerOptions,
+    preferences,
+    /*packageNameOnly*/
+    true,
+    options.overrideImportMode
+  ));
+}
+function getModuleSpecifierWorker(compilerOptions, importingSourceFile, importingSourceFileName, toFileName2, host, preferences, userPreferences, options = {}) {
+  const info = getInfo(importingSourceFileName, host);
+  const modulePaths = getAllModulePaths(info, toFileName2, host, userPreferences, options);
+  return firstDefined(modulePaths, (modulePath) => tryGetModuleNameAsNodeModule(
+    modulePath,
+    info,
+    importingSourceFile,
+    host,
+    compilerOptions,
+    userPreferences,
+    /*packageNameOnly*/
+    void 0,
+    options.overrideImportMode
+  )) || getLocalModuleSpecifier(toFileName2, info, compilerOptions, host, options.overrideImportMode || importingSourceFile.impliedNodeFormat, preferences);
+}
+function tryGetModuleSpecifiersFromCache(moduleSymbol, importingSourceFile, host, userPreferences, options = {}) {
+  return tryGetModuleSpecifiersFromCacheWorker(
+    moduleSymbol,
+    importingSourceFile,
+    host,
+    userPreferences,
+    options
+  )[0];
+}
+function tryGetModuleSpecifiersFromCacheWorker(moduleSymbol, importingSourceFile, host, userPreferences, options = {}) {
+  var _a;
+  const moduleSourceFile = getSourceFileOfModule(moduleSymbol);
+  if (!moduleSourceFile) {
+    return emptyArray;
+  }
+  const cache = (_a = host.getModuleSpecifierCache) == null ? void 0 : _a.call(host);
+  const cached = cache == null ? void 0 : cache.get(importingSourceFile.path, moduleSourceFile.path, userPreferences, options);
+  return [cached == null ? void 0 : cached.moduleSpecifiers, moduleSourceFile, cached == null ? void 0 : cached.modulePaths, cache];
+}
+function getModuleSpecifiers(moduleSymbol, checker, compilerOptions, importingSourceFile, host, userPreferences, options = {}) {
+  return getModuleSpecifiersWithCacheInfo(
+    moduleSymbol,
+    checker,
+    compilerOptions,
+    importingSourceFile,
+    host,
+    userPreferences,
+    options,
+    /*forAutoImport*/
+    false
+  ).moduleSpecifiers;
+}
+function getModuleSpecifiersWithCacheInfo(moduleSymbol, checker, compilerOptions, importingSourceFile, host, userPreferences, options = {}, forAutoImport) {
+  let computedWithoutCache = false;
+  const ambient = tryGetModuleNameFromAmbientModule(moduleSymbol, checker);
+  if (ambient)
+    return { moduleSpecifiers: [ambient], computedWithoutCache };
+  let [specifiers, moduleSourceFile, modulePaths, cache] = tryGetModuleSpecifiersFromCacheWorker(
+    moduleSymbol,
+    importingSourceFile,
+    host,
+    userPreferences,
+    options
+  );
+  if (specifiers)
+    return { moduleSpecifiers: specifiers, computedWithoutCache };
+  if (!moduleSourceFile)
+    return { moduleSpecifiers: emptyArray, computedWithoutCache };
+  computedWithoutCache = true;
+  modulePaths || (modulePaths = getAllModulePathsWorker(getInfo(importingSourceFile.fileName, host), moduleSourceFile.originalFileName, host));
+  const result = computeModuleSpecifiers(
+    modulePaths,
+    compilerOptions,
+    importingSourceFile,
+    host,
+    userPreferences,
+    options,
+    forAutoImport
+  );
+  cache == null ? void 0 : cache.set(importingSourceFile.path, moduleSourceFile.path, userPreferences, options, modulePaths, result);
+  return { moduleSpecifiers: result, computedWithoutCache };
+}
+function computeModuleSpecifiers(modulePaths, compilerOptions, importingSourceFile, host, userPreferences, options = {}, forAutoImport) {
+  const info = getInfo(importingSourceFile.fileName, host);
+  const preferences = getModuleSpecifierPreferences(userPreferences, compilerOptions, importingSourceFile);
+  const existingSpecifier = forEach(modulePaths, (modulePath) => forEach(
+    host.getFileIncludeReasons().get(toPath(modulePath.path, host.getCurrentDirectory(), info.getCanonicalFileName)),
+    (reason) => {
+      if (reason.kind !== 3 /* Import */ || reason.file !== importingSourceFile.path)
+        return void 0;
+      if (importingSourceFile.impliedNodeFormat && importingSourceFile.impliedNodeFormat !== getModeForResolutionAtIndex(importingSourceFile, reason.index, compilerOptions))
+        return void 0;
+      const specifier = getModuleNameStringLiteralAt(importingSourceFile, reason.index).text;
+      return preferences.relativePreference !== 1 /* NonRelative */ || !pathIsRelative(specifier) ? specifier : void 0;
+    }
+  ));
+  if (existingSpecifier) {
+    const moduleSpecifiers = [existingSpecifier];
+    return moduleSpecifiers;
+  }
+  const importedFileIsInNodeModules = some(modulePaths, (p) => p.isInNodeModules);
+  let nodeModulesSpecifiers;
+  let pathsSpecifiers;
+  let redirectPathsSpecifiers;
+  let relativeSpecifiers;
+  for (const modulePath of modulePaths) {
+    const specifier = modulePath.isInNodeModules ? tryGetModuleNameAsNodeModule(
+      modulePath,
+      info,
+      importingSourceFile,
+      host,
+      compilerOptions,
+      userPreferences,
+      /*packageNameOnly*/
+      void 0,
+      options.overrideImportMode
+    ) : void 0;
+    nodeModulesSpecifiers = append(nodeModulesSpecifiers, specifier);
+    if (specifier && modulePath.isRedirect) {
+      return nodeModulesSpecifiers;
+    }
+    if (!specifier) {
+      const local = getLocalModuleSpecifier(
+        modulePath.path,
+        info,
+        compilerOptions,
+        host,
+        options.overrideImportMode || importingSourceFile.impliedNodeFormat,
+        preferences,
+        /*pathsOnly*/
+        modulePath.isRedirect
+      );
+      if (!local) {
+        continue;
+      }
+      if (modulePath.isRedirect) {
+        redirectPathsSpecifiers = append(redirectPathsSpecifiers, local);
+      } else if (pathIsBareSpecifier(local)) {
+        if (pathContainsNodeModules(local)) {
+          relativeSpecifiers = append(relativeSpecifiers, local);
+        } else {
+          pathsSpecifiers = append(pathsSpecifiers, local);
+        }
+      } else if (forAutoImport || !importedFileIsInNodeModules || modulePath.isInNodeModules) {
+        relativeSpecifiers = append(relativeSpecifiers, local);
+      }
+    }
+  }
+  return (pathsSpecifiers == null ? void 0 : pathsSpecifiers.length) ? pathsSpecifiers : (redirectPathsSpecifiers == null ? void 0 : redirectPathsSpecifiers.length) ? redirectPathsSpecifiers : (nodeModulesSpecifiers == null ? void 0 : nodeModulesSpecifiers.length) ? nodeModulesSpecifiers : Debug.checkDefined(relativeSpecifiers);
+}
+function getInfo(importingSourceFileName, host) {
+  importingSourceFileName = getNormalizedAbsolutePath(importingSourceFileName, host.getCurrentDirectory());
+  const getCanonicalFileName = createGetCanonicalFileName(host.useCaseSensitiveFileNames ? host.useCaseSensitiveFileNames() : true);
+  const sourceDirectory = getDirectoryPath(importingSourceFileName);
+  return {
+    getCanonicalFileName,
+    importingSourceFileName,
+    sourceDirectory,
+    canonicalSourceDirectory: getCanonicalFileName(sourceDirectory)
+  };
+}
+function getLocalModuleSpecifier(moduleFileName, info, compilerOptions, host, importMode, { getAllowedEndingsInPreferredOrder: getAllowedEndingsInPrefererredOrder, relativePreference }, pathsOnly) {
+  const { baseUrl, paths, rootDirs } = compilerOptions;
+  if (pathsOnly && !paths) {
+    return void 0;
+  }
+  const { sourceDirectory, canonicalSourceDirectory, getCanonicalFileName } = info;
+  const allowedEndings = getAllowedEndingsInPrefererredOrder(importMode);
+  const relativePath = rootDirs && tryGetModuleNameFromRootDirs(rootDirs, moduleFileName, sourceDirectory, getCanonicalFileName, allowedEndings, compilerOptions) || processEnding(ensurePathIsNonModuleName(getRelativePathFromDirectory(sourceDirectory, moduleFileName, getCanonicalFileName)), allowedEndings, compilerOptions);
+  if (!baseUrl && !paths && !getResolvePackageJsonImports(compilerOptions) || relativePreference === 0 /* Relative */) {
+    return pathsOnly ? void 0 : relativePath;
+  }
+  const baseDirectory = getNormalizedAbsolutePath(getPathsBasePath(compilerOptions, host) || baseUrl, host.getCurrentDirectory());
+  const relativeToBaseUrl = getRelativePathIfInSameVolume(moduleFileName, baseDirectory, getCanonicalFileName);
+  if (!relativeToBaseUrl) {
+    return pathsOnly ? void 0 : relativePath;
+  }
+  const fromPackageJsonImports = pathsOnly ? void 0 : tryGetModuleNameFromPackageJsonImports(moduleFileName, sourceDirectory, compilerOptions, host, importMode);
+  const fromPaths = pathsOnly || fromPackageJsonImports === void 0 ? paths && tryGetModuleNameFromPaths(relativeToBaseUrl, paths, allowedEndings, host, compilerOptions) : void 0;
+  if (pathsOnly) {
+    return fromPaths;
+  }
+  const maybeNonRelative = fromPackageJsonImports ?? (fromPaths === void 0 && baseUrl !== void 0 ? processEnding(relativeToBaseUrl, allowedEndings, compilerOptions) : fromPaths);
+  if (!maybeNonRelative) {
+    return relativePath;
+  }
+  if (relativePreference === 1 /* NonRelative */ && !pathIsRelative(maybeNonRelative)) {
+    return maybeNonRelative;
+  }
+  if (relativePreference === 3 /* ExternalNonRelative */ && !pathIsRelative(maybeNonRelative)) {
+    const projectDirectory = compilerOptions.configFilePath ? toPath(getDirectoryPath(compilerOptions.configFilePath), host.getCurrentDirectory(), info.getCanonicalFileName) : info.getCanonicalFileName(host.getCurrentDirectory());
+    const modulePath = toPath(moduleFileName, projectDirectory, getCanonicalFileName);
+    const sourceIsInternal = startsWith(canonicalSourceDirectory, projectDirectory);
+    const targetIsInternal = startsWith(modulePath, projectDirectory);
+    if (sourceIsInternal && !targetIsInternal || !sourceIsInternal && targetIsInternal) {
+      return maybeNonRelative;
+    }
+    const nearestTargetPackageJson = getNearestAncestorDirector

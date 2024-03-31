@@ -1,0 +1,80 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.collectVariableUsage = exports.getDeclarationDomain = exports.getUsageDomain = exports.UsageDomain = exports.DeclarationDomain = void 0;
+const util_1 = require("./util");
+const ts = require("typescript");
+var DeclarationDomain;
+(function (DeclarationDomain) {
+    DeclarationDomain[DeclarationDomain["Namespace"] = 1] = "Namespace";
+    DeclarationDomain[DeclarationDomain["Type"] = 2] = "Type";
+    DeclarationDomain[DeclarationDomain["Value"] = 4] = "Value";
+    DeclarationDomain[DeclarationDomain["Import"] = 8] = "Import";
+    DeclarationDomain[DeclarationDomain["Any"] = 7] = "Any";
+})(DeclarationDomain = exports.DeclarationDomain || (exports.DeclarationDomain = {}));
+var UsageDomain;
+(function (UsageDomain) {
+    UsageDomain[UsageDomain["Namespace"] = 1] = "Namespace";
+    UsageDomain[UsageDomain["Type"] = 2] = "Type";
+    UsageDomain[UsageDomain["Value"] = 4] = "Value";
+    UsageDomain[UsageDomain["ValueOrNamespace"] = 5] = "ValueOrNamespace";
+    UsageDomain[UsageDomain["Any"] = 7] = "Any";
+    UsageDomain[UsageDomain["TypeQuery"] = 8] = "TypeQuery";
+})(UsageDomain = exports.UsageDomain || (exports.UsageDomain = {}));
+// TODO handle cases where values are used only for their types, e.g. `declare [propSymbol]: number`
+function getUsageDomain(node) {
+    const parent = node.parent;
+    switch (parent.kind) {
+        case ts.SyntaxKind.TypeReference:
+            return node.originalKeywordKind !== ts.SyntaxKind.ConstKeyword ? 2 /* Type */ : undefined;
+        case ts.SyntaxKind.ExpressionWithTypeArguments:
+            return parent.parent.token === ts.SyntaxKind.ImplementsKeyword ||
+                parent.parent.parent.kind === ts.SyntaxKind.InterfaceDeclaration
+                ? 2 /* Type */
+                : 4 /* Value */;
+        case ts.SyntaxKind.TypeQuery:
+            return 5 /* ValueOrNamespace */ | 8 /* TypeQuery */;
+        case ts.SyntaxKind.QualifiedName:
+            if (parent.left === node) {
+                if (getEntityNameParent(parent).kind === ts.SyntaxKind.TypeQuery)
+                    return 1 /* Namespace */ | 8 /* TypeQuery */;
+                return 1 /* Namespace */;
+            }
+            break;
+        case ts.SyntaxKind.ExportSpecifier:
+            // either {name} or {propertyName as name}
+            if (parent.propertyName === undefined ||
+                parent.propertyName === node)
+                return 7 /* Any */; // TODO handle type-only exports
+            break;
+        case ts.SyntaxKind.ExportAssignment:
+            return 7 /* Any */;
+        // Value
+        case ts.SyntaxKind.BindingElement:
+            if (parent.initializer === node)
+                return 5 /* ValueOrNamespace */;
+            break;
+        case ts.SyntaxKind.Parameter:
+        case ts.SyntaxKind.EnumMember:
+        case ts.SyntaxKind.PropertyDeclaration:
+        case ts.SyntaxKind.VariableDeclaration:
+        case ts.SyntaxKind.PropertyAssignment:
+        case ts.SyntaxKind.PropertyAccessExpression:
+        case ts.SyntaxKind.ImportEqualsDeclaration:
+            if (parent.name !== node)
+                return 5 /* ValueOrNamespace */; // TODO handle type-only imports
+            break;
+        case ts.SyntaxKind.JsxAttribute:
+        case ts.SyntaxKind.FunctionDeclaration:
+        case ts.SyntaxKind.FunctionExpression:
+        case ts.SyntaxKind.NamespaceImport:
+        case ts.SyntaxKind.ClassDeclaration:
+        case ts.SyntaxKind.ClassExpression:
+        case ts.SyntaxKind.ModuleDeclaration:
+        case ts.SyntaxKind.MethodDeclaration:
+        case ts.SyntaxKind.EnumDeclaration:
+        case ts.SyntaxKind.GetAccessor:
+        case ts.SyntaxKind.SetAccessor:
+        case ts.SyntaxKind.LabeledStatement:
+        case ts.SyntaxKind.BreakStatement:
+        case ts.SyntaxKind.ContinueStatement:
+        c

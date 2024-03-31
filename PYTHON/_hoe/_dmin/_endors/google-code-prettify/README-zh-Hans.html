@@ -1,0 +1,140 @@
+tzak taula horretako beste gelaxka bati erreferentzia egiten diola bermatzea",
+      "help": "headers atributua erabiltzen duten elementu table baten gelaxka guztiek taula bereko beste gelaxka batzuei bakarrik egin behar diete erreferentzia"
+    },
+    "th-has-data-cells": {
+      "description": "Datu-taula bateko taula-goiburu bakoitzak datu-gelaxkak aipatzen dituela bermatzea",
+      "help": "th eta 'role = columnheader/rowheader 'duten elementu guztiek deskribatzen duten datu-gelaxkak izan behar dituzte:"
+    },
+    "valid-lang": {
+      "description": "lang atributuek balio baliodunak dituztela bermatzen du",
+      "help": "lang atributuak balio balioduna izan behar du"
+    },
+    "video-caption": {
+      "description": "Bermatzen du <video> elementuek azpitituluak dituztela",
+      "help": "<bideo> elementuek azpitituluak izan behar dituzte"
+    }
+  },
+  "checks": {
+    "abstractrole": {
+      "pass": "Ez dira 'abstract rolak' erabiltzen",
+      "fail": "'abstract rolak 'ezin dira zuzenean erabili"
+    },
+    "aria-allowed-attr": {
+      "pass": "ARIA atributuak behar bezala erabiltzen dira zehaztutako rolerako",
+      "fail": {
+        "singular": "ARIAn, atributuak ez daude baimenduta : ${data.values}",
+        "plural": "ARIAn, atributua ez dago baimenduta : ${data.values}"
+      }
+    },
+    "aria-allowed-role": {
+      "pass": "ARIA rola baimenduta dago emandako elementurako",
+      "fail": {
+        "singular": "ARIAn, rolak ${data.values} -ak ez daude baimenduta emandako elementurako",
+        "plural": "ARIAn, rola ${data.values} -a ez dago baimenduta emandako elementurako"
+      },
+      "incomplete": {
+        "singular": "AREAN, rolak kendu behar dira ${data.values} elementua ikusgai egiten denean, zeren elementurako  ez daude baimenduta",
+        "plural": "AREAN, rola kendu behar da ${data.values} elementua ikusgai egiten denean, zeren elementurako  ez dago baimenduta"
+      }
+    },
+    "aria-hidden-body": {
+      "pass": "Ez dago dokumentuko 'body'ean agertzen den aria-hidden atributurik",
+      "fail": "aria-hidden = true ez da dokumentuaren 'body'ean egon behar"
+    },
+    "aria-errormessage": {
+      "pass": "Teknika onartu bat erabiltzen du aria-errormessagerako",
+      "fail": {
+        "singular": "aria-errormessagen, bailioaes  ${data.values}`, mezua iragartzeko teknika bat erabili behar da (adibidez: aria-live, aria-describedby, role = alert, etab.).",
+        "plural": "aria-errormessagen, bailioa  ${data.values}`, mezua iragartzeko teknika bat erabili behar da (adibidez: aria-live, aria-describedby, role = alert, etab.)."
+      }
+    },
+    "has-widget-role": {
+      "pass": "Elementuak widget rola du.",
+      "fail": "Elementuak ez du widget rolik."
+    },
+    "invalidrole": {
+      "pass": "ARIA rola baliozkoa da",
+      "fail": "Rolak baliozko ARIA rola izan behar du"
+    },
+    "no-implicit-explicit-label": {
+      "pass": "Ez dago desadostasunik <label> baten eta izen irisgarriaren artean",
+      "incomplete": "Egiaztatu < label> zenbakiak ez duela zertan ARIAren ${data} parte izan eremuaren izenerako"
+    },
+    "aria-required-attr": {
+      "pass": "ARIA atributu guztiak daude",
+      "fail": {
+        "singular": "Eskatutako atributuak ez daude: ${data.values}",
+        "plural": "Eskatutako atributua ez dago: ${data.values}"
+      }
+    },
+    "aria-required-children": {
+      "pass": "Eskatutako ARIA semeak bertan daude",
+      "fail": {
+        "singular": "Esktatutako ARIARren semeak ez daude : ${data.values}",
+        "plural": "Esktatutako ARIARren semeaez dago : ${data.values}"
+      },
+      "incomplete": {
+        "singular": "ARIA rola semeentzako: ${data.values}",
+        "plural": "ARIA rola semearentzako: ${data.values}"
+      }
+    },
+    "aria-required-parent": {
+      "pass": "ARIAn eskatzen den aitaren rola bertan dago",
+      "fail": {
+        "singular": "ARIAn eskatutako aitentzako rola  ez dago: ${data.values}",
+        "plural": "ARIAn eskatutako aitarentzako rola ez dago: ${data.values}"
+      }
+    },
+    "aria-unsupported-attr": {
+      "pass": "ARIA atributua onartuta dago",
+      "fail": "ARIA atributua ez dago oso onartuta pantaila-irakurgailuetan eta laguntza-teknologietan:  ${data.values}"
+    },
+    "unsupportedrole": {
+      "pass": "ARIA rola onartuta dago",
+      "fail": "Erabilitako rola ez dago oso onartuta pantaila-irakurgailuetan eta laguntza-teknologietan:  ${data.values}"
+    },
+    "aria-valid-attr-value": {
+      "pass": "ARIA atributuen balioak baliozkoak dira",
+      "fail": {
+        "singular": "Balioak ez dira baliozkoak ARIA atributorako: ${data.values}",
+        "plural": "Balioa ez da baliozkoa ARIA atributorako: ${data.values}"
+      },
+      "incomplete": {
+        "singular": "Elementuen atributua  ARIA ID ez dago orrian: ${data.values}",
+        "plural": "Elementuaren atributua  ARIA ID ez dago orrian: ${data.values}"
+      }
+    },
+    "aria-valid-attr": {
+      "pass": {
+        "singular": "Baliozko ARIA atributuen izenak",
+        "plural": "Baliozko ARIA atributuen izena"
+      },
+      "fail": {
+        "singular": "Baliogabeko ARIA atributuen izenak:  ${data.values}",
+        "plural": "Baliogabeko ARIA atributuen izenak:  ${data.values}"
+      }
+    },
+    "valid-scrollable-semantics": {
+      "pass": "Elementuak semantika balioduna du foku-ordenan dagoen elementu batentzat.",
+      "fail": "Elementuak foku-ordenan dagoen elementu batentzat baliozkoa ez den semantika bat du.."
+    },
+    "color-contrast": {
+      "pass": "Elementuak ${data.contrastRatio}-ko kolore-kontraste nahikoa du",
+      "fail": "Elementuaren ${data.contrastRatio}-ko kolore-kontrastea ez da nahikoa (ehen planoaren kolorea: ${data.fgColor}, hondoaren kolorea: ${data.bgColor}, letra-iturriaren tamaina: ${data.fontSize}, letra-iturriaren lodiera: ${data.fontWeight}). Espero den kontraste-ratioa: ${data.expectedContrastRatio}",
+      "incomplete": {
+        "bgImage": "Elementuaren hondoko kolorea ezin izan da zehaztu, hondoko irudi batengatik",
+        "bgGradient": "Elementuaren hondoko kolorea ezin izan da zehaztu hondoko degradatu baten ondorioz",
+        "imgNode": "Elementuaren hondoaren kolorea ezin izan da zehaztu, elementuak irudi-nodo bat duelako.",
+        "bgOverlap": "Hondoko kolorea ezin izan da zehaztu, gainjarritako beste elementu bat duelako",
+        "fgAlpha": "Hondoko kolorea ezin izan da zehaztu alfa gardentasun baten ondorioz",
+        "elmPartiallyObscured": "Hondoaren kolorea ezin izan da zehaztu, beste elementu batek partzialki ezkutatzen duelako",
+        "elmPartiallyObscuring": "Elementuaren hondoaren kolorea ezin izan da zehaztu, beste elementu batzuei partzialki gainjartzen baitzaie.",
+        "outsideViewport": "Elementuaren hondoko kolorea ezin izan da zehaztu, leiho grafikotik kanpo dagoelako ('viewport')",
+        "equalRatio": "Elementuak 1:1 kontraste-ratioa du hondoarekin",
+        "shortTextContent": "Elementuaren edukia laburregia da testu-edukia bera den zehazteko",
+        "default": "Ezinezkoa da kontraste-ratioa zehaztea"
+      }
+    },
+    "color-contrast-enhanced": {
+      "pass": "Elementuak ${data.contrastRatio}-ko kolore-kontraste nahikoa du",
+      "fail": "Elementuaren ${data.contrastRatio}-ko kolore-kontrastea ez da nahikoa (ehen planoaren kolorea: ${data.fgColor}, hondoaren kolorea: ${data.bgColor}, letra-iturriaren tamaina: ${data.fontSize}, letra-i

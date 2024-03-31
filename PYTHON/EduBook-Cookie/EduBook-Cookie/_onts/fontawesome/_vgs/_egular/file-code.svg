@@ -1,0 +1,17 @@
+dexKind2["Number"] = 1] = "Number";
+  return IndexKind2;
+})(IndexKind || {});
+var TypeMapKind = /* @__PURE__ */ ((TypeMapKind2) => {
+  TypeMapKind2[TypeMapKind2["Simple"] = 0] = "Simple";
+  TypeMapKind2[TypeMapKind2["Array"] = 1] = "Array";
+  TypeMapKind2[TypeMapKind2["Deferred"] = 2] = "Deferred";
+  TypeMapKind2[TypeMapKind2["Function"] = 3] = "Function";
+  TypeMapKind2[TypeMapKind2["Composite"] = 4] = "Composite";
+  TypeMapKind2[TypeMapKind2["Merged"] = 5] = "Merged";
+  return TypeMapKind2;
+})(TypeMapKind || {});
+var InferencePriority = /* @__PURE__ */ ((InferencePriority2) => {
+  InferencePriority2[InferencePriority2["None"] = 0] = "None";
+  InferencePriority2[InferencePriority2["NakedTypeVariable"] = 1] = "NakedTypeVariable";
+  InferencePriority2[InferencePriority2["SpeculativeTuple"] = 2] = "SpeculativeTuple";
+  InferencePriority2[In

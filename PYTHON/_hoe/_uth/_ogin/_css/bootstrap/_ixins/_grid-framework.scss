@@ -1,0 +1,62 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+/** @typedef {import("estree").Node} Node */
+/** @typedef {import("./JavascriptParser").Range} Range */
+/** @typedef {import("./JavascriptParser").VariableInfoInterface} VariableInfoInterface */
+
+const TypeUnknown = 0;
+const TypeUndefined = 1;
+const TypeNull = 2;
+const TypeString = 3;
+const TypeNumber = 4;
+const TypeBoolean = 5;
+const TypeRegExp = 6;
+const TypeConditional = 7;
+const TypeArray = 8;
+const TypeConstArray = 9;
+const TypeIdentifier = 10;
+const TypeWrapped = 11;
+const TypeTemplateString = 12;
+const TypeBigInt = 13;
+
+class BasicEvaluatedExpression {
+	constructor() {
+		this.type = TypeUnknown;
+		/** @type {[number, number] | undefined} */
+		this.range = undefined;
+		/** @type {boolean} */
+		this.falsy = false;
+		/** @type {boolean} */
+		this.truthy = false;
+		/** @type {boolean | undefined} */
+		this.nullish = undefined;
+		/** @type {boolean} */
+		this.sideEffects = true;
+		/** @type {boolean | undefined} */
+		this.bool = undefined;
+		/** @type {number | undefined} */
+		this.number = undefined;
+		/** @type {bigint | undefined} */
+		this.bigint = undefined;
+		/** @type {RegExp | undefined} */
+		this.regExp = undefined;
+		/** @type {string | undefined} */
+		this.string = undefined;
+		/** @type {BasicEvaluatedExpression[] | undefined} */
+		this.quasis = undefined;
+		/** @type {BasicEvaluatedExpression[] | undefined} */
+		this.parts = undefined;
+		/** @type {any[] | undefined} */
+		this.array = undefined;
+		/** @type {BasicEvaluatedExpression[] | undefined} */
+		this.items = undefined;
+		/** @type {BasicEvaluatedExpression[] | undefined} */
+		this.options = undefined;
+		/** @type {BasicEvaluatedExpression | undefined | null} */
+		this.prefix = undefined;
+		/** @type {BasicEvalua

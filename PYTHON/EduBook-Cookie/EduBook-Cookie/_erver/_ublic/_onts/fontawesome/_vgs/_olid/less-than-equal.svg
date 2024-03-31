@@ -1,0 +1,30 @@
+   "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "chess": {
+    "aliases": {
+      "unicodes": {
+        "secondary": [
+          "10f439"
+        ]
+      }
+    },
+    "changes": [
+      "5.0.5",
+      "5.9.0",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f439",
+    "label": "Chess",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321797

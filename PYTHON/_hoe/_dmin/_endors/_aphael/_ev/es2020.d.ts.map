@@ -1,0 +1,6 @@
+ction (node) {
+            if (abort)
+                return node;
+            // Skip nodes before `candidate` as quickly as possible
+            if (!hit) {
+                if (node !== hit_

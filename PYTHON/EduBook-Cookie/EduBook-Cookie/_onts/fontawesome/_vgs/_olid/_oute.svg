@@ -1,0 +1,13 @@
+# import/no-unresolved
+
+💼 This rule is enabled in the following configs: ❗ `errors`, ☑️ `recommended`.
+
+<!-- end auto-generated rule header -->
+
+Ensures an imported module can be resolved to a module on the local filesystem,
+as defined by standard Node `require.resolve` behavior.
+
+See [settings](../../README.md#settings) for customization options for the resolution (i.e.
+additional filetypes, `NODE_PATH`, etc.)
+
+This rule can also optionally report on unresolved modules in CommonJS `require('./foo')` calls and AMD `require(['./foo'], functi

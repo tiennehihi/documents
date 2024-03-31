@@ -1,0 +1,13 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _ariaAbstractRoles = _interopRequireDefault(require("./etc/roles/ariaAbstractRoles"));
+var _ariaLiteralRoles = _interopRequireDefault(require("./etc/roles/ariaLiteralRoles"));
+var _ariaDpubRoles = _interopRequireDefault(require("./etc/roles/ariaDpubRoles"));
+var _ariaGraphicsRoles = _interopRequireDefault(require("./etc/roles/ariaGraphicsRoles"));
+var _iterationDecorator = _interopRequireDefault(require("./util/iterationDecorator"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _defineProperty(ob

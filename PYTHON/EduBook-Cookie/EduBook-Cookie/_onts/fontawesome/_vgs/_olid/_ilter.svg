@@ -1,0 +1,6 @@
+ent &&
+                        callbackBody[0].argument) {
+                        return checkNode(callbackBody[0].argument);
+                    }
+                    // Potential enhancement: could use code-path analysis to check
+                    //   any function with a single 

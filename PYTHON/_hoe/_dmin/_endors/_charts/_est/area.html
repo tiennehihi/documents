@@ -1,0 +1,79 @@
+import { compareFunctionCovs, compareRangeCovs, compareScriptCovs } from "./compare";
+import { RangeTree } from "./range-tree";
+/**
+ * Normalizes a process coverage.
+ *
+ * Sorts the scripts alphabetically by `url`.
+ * Reassigns script ids: the script at index `0` receives `"0"`, the script at
+ * index `1` receives `"1"` etc.
+ * This does not normalize the script coverages.
+ *
+ * @param processCov Process coverage to normalize.
+ */
+export function normalizeProcessCov(processCov) {
+    processCov.result.sort(compareScriptCovs);
+    for (const [scriptId, scriptCov] of processCov.result.entries()) {
+        scriptCov.scriptId = scriptId.toString(10);
+    }
+}
+/**
+ * Normalizes a process coverage deeply.
+ *
+ * Normalizes the script coverages deeply, then normalizes the process coverage
+ * itself.
+ *
+ * @param processCov Process coverage to normalize.
+ */
+export function deepNormalizeProcessCov(processCov) {
+    for (const scriptCov of processCov.result) {
+        deepNormalizeScriptCov(scriptCov);
+    }
+    normalizeProcessCov(processCov);
+}
+/**
+ * Normalizes a script coverage.
+ *
+ * Sorts the function by root range (pre-order sort).
+ * This does not normalize the function coverages.
+ *
+ * @param scriptCov Script coverage to normalize.
+ */
+export function normalizeScriptCov(scriptCov) {
+    scriptCov.functions.sort(compareFunctionCovs);
+}
+/**
+ * Normalizes a script coverage deeply.
+ *
+ * Normalizes the function coverages deeply, then normalizes the script coverage
+ * itself.
+ *
+ * @param scriptCov Script coverage to normalize.
+ */
+export function deepNormalizeScriptCov(scriptCov) {
+    for (const funcCov of scriptCov.functions) {
+        normalizeFunctionCov(funcCov);
+    }
+    normalizeScriptCov(scriptCov);
+}
+/**
+ * Normalizes a function coverage.
+ *
+ * Sorts the ranges (pre-order sort).
+ * TODO: Tree-based normalization of the ranges.
+ *
+ * @param funcCov Function coverage to normalize.
+ */
+export function normalizeFunctionCov(funcCov) {
+    funcCov.ranges.sort(compareRangeCovs);
+    const tree = RangeTree.fromSortedRanges(funcCov.ranges);
+    normalizeRangeTree(tree);
+    funcCov.ranges = tree.toRanges();
+}
+/**
+ * @internal
+ */
+export function normalizeRangeTree(tree) {
+    tree.normalize();
+}
+
+//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIl9zcmMvbm9ybWFsaXplLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sRUFBRSxtQkFBbUIsRUFBRSxnQkFBZ0IsRUFBRSxpQkFBaUIsRUFBRSxNQUFNLFdBQVcsQ0FBQztBQUNyRixPQUFPLEVBQUUsU0FBUyxFQUFFLE1BQU0sY0FBYyxDQUFDO0FBR3pDOzs7Ozs7Ozs7R0FTRztBQUNILE1BQU0sVUFBVSxtQkFBbUIsQ0FBQyxVQUFzQjtJQUN4RCxVQUFVLENBQUMsTUFBTSxDQUFDLElBQUksQ0FBQyxpQkFBaUIsQ0FBQyxDQUFDO0lBQzFDLEtBQUssTUFBTSxDQUFDLFFBQVEsRUFBRSxTQUFTLENBQUMsSUFBSSxVQUFVLENBQUMsTUFBTSxDQUFDLE9BQU8sRUFBRSxFQUFFO1FBQy9ELFNBQVMsQ0FBQyxRQUFRLEdBQUcsUUFBUSxDQUFDLFFBQVEsQ0FBQyxFQUFFLENBQUMsQ0FBQztLQUM1QztBQUNILENBQUM7QUFFRDs7Ozs7OztHQU9HO0FBQ0gsTUFBTSxVQUFVLHVCQUF1QixDQUFDLFVBQXNCO0lBQzVELEtBQUssTUFBTSxTQUFTLElBQUksVUFBVSxDQUFDLE1BQU0sRUFBRTtRQUN6QyxzQkFBc0IsQ0FBQyxTQUFTLENBQUMsQ0FBQztLQUNuQztJQUNELG1CQUFtQixDQUFDLFVBQVUsQ0FBQyxDQUFDO0FBQ2xDLENBQUM7QUFFRDs7Ozs7OztHQU9HO0FBQ0gsTUFBTSxVQUFVLGtCQUFrQixDQUFDLFNBQW9CO0lBQ3JELFNBQVMsQ0FBQyxTQUFTLENBQUMsSUFBSSxDQUFDLG1CQUFtQixDQUFDLENBQUM7QUFDaEQsQ0FBQztBQUVEOzs7Ozs7O0dBT0c7QUFDSCxNQUFNLFVBQVUsc0JBQXNCLENBQUMsU0FBb0I7SUFDekQsS0FBSyxNQUFNLE9BQU8sSUFBSSxTQUFTLENBQUMsU0FBUyxFQUFFO1FBQ3pDLG9CQUFvQixDQUFDLE9BQU8sQ0FBQyxDQUFDO0tBQy9CO0lBQ0Qsa0JBQWtCLENBQUMsU0FBUyxDQUFDLENBQUM7QUFDaEMsQ0FBQztBQUVEOzs7Ozs7O0dBT0c7QUFDSCxNQUFNLFVBQVUsb0JBQW9CLENBQUMsT0FBb0I7SUFDdkQsT0FBTyxDQUFDLE1BQU0sQ0FBQyxJQUFJLENBQUMsZ0JBQWdCLENBQUMsQ0FBQztJQUN0QyxNQUFNLElBQUksR0FBYyxTQUFTLENBQUMsZ0JBQWdCLENBQUMsT0FBTyxDQUFDLE1BQU0sQ0FBRSxDQUFDO0lBQ3BFLGtCQUFrQixDQUFDLElBQUksQ0FBQyxDQUFDO0lBQ3pCLE9BQU8sQ0FBQyxNQUFNLEdBQUcsSUFBSSxDQUFDLFFBQVEsRUFBRSxDQUFDO0FBQ25DLENBQUM7QUFFRDs7R0FFRztBQUNILE1BQU0sVUFBVSxrQkFBa0IsQ0FBQyxJQUFlO0lBQ2hELElBQUksQ0FBQyxTQUFTLEVBQUUsQ0FBQztBQUNuQixDQUFDIiwiZmlsZSI6Im5vcm1hbGl6ZS5qcyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGNvbXBhcmVGdW5jdGlvbkNvdnMsIGNvbXBhcmVSYW5nZUNvdnMsIGNvbXBhcmVTY3JpcHRDb3ZzIH0gZnJvbSBcIi4vY29tcGFyZVwiO1xuaW1wb3J0IHsgUmFuZ2VUcmVlIH0gZnJvbSBcIi4vcmFuZ2UtdHJlZVwiO1xuaW1wb3J0IHsgRnVuY3Rpb25Db3YsIFByb2Nlc3NDb3YsIFNjcmlwdENvdiB9IGZyb20gXCIuL3R5cGVzXCI7XG5cbi8qKlxuICogTm9ybWFsaXplcyBhIHByb2Nlc3MgY292ZXJhZ2UuXG4gKlxuICogU29ydHMgdGhlIHNjcmlwdHMgYWxwaGFiZXRpY2FsbHkgYnkgYHVybGAuXG4gKiBSZWFzc2lnbnMgc2NyaXB0IGlkczogdGhlIHNjcmlwdCBhdCBpbmRleCBgMGAgcmVjZWl2ZXMgYFwiMFwiYCwgdGhlIHNjcmlwdCBhdFxuICogaW5kZXggYDFgIHJlY2VpdmVzIGBcIjFcImAgZXRjLlxuICogVGhpcyBkb2VzIG5vdCBub3JtYWxpemUgdGhlIHNjcmlwdCBjb3ZlcmFnZXMuXG4gKlxuICogQHBhcmFtIHByb2Nlc3NDb3YgUHJvY2VzcyBjb3ZlcmFnZSB0byBub3JtYWxpemUuXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBub3JtYWxpemVQcm9jZXNzQ292KHByb2Nlc3NDb3Y6IFByb2Nlc3NDb3YpOiB2b2lkIHtcbiAgcHJvY2Vzc0Nvdi5yZXN1bHQuc29ydChjb21wYXJlU2NyaXB0Q292cyk7XG4gIGZvciAoY29uc3QgW3NjcmlwdElkLCBzY3JpcHRDb3ZdIG9mIHByb2Nlc3NDb3YucmVzdWx0LmVudHJpZXMoKSkge1xuICAgIHNjcmlwdENvdi5zY3JpcHRJZCA9IHNjcm

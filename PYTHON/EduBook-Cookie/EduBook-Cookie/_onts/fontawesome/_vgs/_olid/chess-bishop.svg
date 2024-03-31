@@ -1,0 +1,23 @@
+/**
+ * @fileoverview Rule for disallowing require() outside of the top-level module context
+ * @author Jamund Ferguson
+ * @deprecated in ESLint v7.0.0
+ */
+
+"use strict";
+
+const ACCEPTABLE_PARENTS = new Set([
+    "AssignmentExpression",
+    "VariableDeclarator",
+    "MemberExpression",
+    "ExpressionStatement",
+    "CallExpression",
+    "ConditionalExpression",
+    "Program",
+    "VariableDeclaration",
+    "ChainExpression"
+]);
+
+/**
+ * Finds the eslint-scope reference in the given scope.
+ * @param {Object} scope T

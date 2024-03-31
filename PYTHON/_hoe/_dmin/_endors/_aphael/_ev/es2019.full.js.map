@@ -1,0 +1,14 @@
+ERN_TAG_URI.test(tagName)) {
+      throwError(state, 'tag name cannot contain such characters: ' + tagName);
+    }
+
+    try {
+      tagName = decodeURIComponent(tagName);
+    } catch (err) {
+      throwError(state, 'tag name is malformed: ' + tagName);
+    }
+
+    if (isVerbatim) {
+      state.tag = tagName;
+
+    } else if (_ha

@@ -1,0 +1,33 @@
+var TYPE = require('../../tokenizer').TYPE;
+
+var IDENT = TYPE.Ident;
+var FUNCTION = TYPE.Function;
+var COLON = TYPE.Colon;
+var RIGHTPARENTHESIS = TYPE.RightParenthesis;
+
+// : [ <ident> | <function-token> <any-value>? ) ]
+module.exports = {
+    name: 'PseudoClassSelector',
+    structure: {
+        name: String,
+        children: [['Raw'], null]
+    },
+    parse: function() {
+        var start = this.scanner.tokenStart;
+        var children = null;
+        var name;
+        var nameLowerCase;
+
+        this.eat(COLON);
+
+        if (this.scanner.tokenType === FUNCTION) {
+            name = this.consumeFunctionName();
+            nameLowerCase = name.toLowerCase();
+
+            if (this.pseudo.hasOwnProperty(nameLowerCase)) {
+                this.scanner.skipSC();
+                children = this.pseudo[nameLowerCase].call(this);
+                this.scanner.skipSC();
+            } else {
+                children = this.createList();
+      

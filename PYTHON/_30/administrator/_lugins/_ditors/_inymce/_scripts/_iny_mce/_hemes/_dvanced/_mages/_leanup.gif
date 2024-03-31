@@ -1,0 +1,8 @@
+illegal sequence');
+                }
+                charCode = ((charCode & 1023) << 10) + (extraCharCode & 1023) + 65536;
+              }
+              result += '\\' + charCode.toString(16) + ' ';
+            } else {
+              result += chr;
+     

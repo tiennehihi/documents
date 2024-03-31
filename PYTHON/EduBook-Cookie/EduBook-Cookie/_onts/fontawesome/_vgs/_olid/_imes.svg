@@ -1,0 +1,17 @@
+s) {
+  return !!file && (file.scriptKind === 1 /* JS */ || file.scriptKind === 2 /* JSX */) && !file.checkJsDirective && checkJs === void 0;
+}
+function isStatementWithLocals(node) {
+  switch (node.kind) {
+    case 241 /* Block */:
+    case 269 /* CaseBlock */:
+    case 248 /* ForStatement */:
+    case 249 /* ForInStatement */:
+    case 250 /* ForOfStatement */:
+      return true;
+  }
+  return false;
+}
+function getStartPositionOfLine(line, sourceFile) {
+  Debug.assert(line >= 0);
+  return ge

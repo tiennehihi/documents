@@ -1,0 +1,7 @@
+'use strict';
+const valueParser = require('postcss-value-parser');
+const { optimize } = require('svgo');
+const { encode, decode } = require('./lib/url');
+
+const PLUGIN = 'postcss-svgo';
+const dataURI = /data:i

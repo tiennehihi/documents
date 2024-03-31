@@ -1,0 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FsaNodeCore = void 0;
+const util_1 = require("../node/util");
+const util_2 = require("./util");
+const constants_1 = require("../node/constants");
+const FsaNodeFsOpenFile_1 = require("./FsaNodeFsOpenFile");
+const util = require("../node/util");
+class Fs

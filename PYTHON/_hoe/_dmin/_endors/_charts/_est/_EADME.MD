@@ -1,0 +1,108 @@
+{
+  "ch": {
+    "groups": [
+      "CSS Units",
+      "CSS Lengths"
+    ],
+    "status": "standard"
+  },
+  "cm": {
+    "groups": [
+      "CSS Units",
+      "CSS Lengths"
+    ],
+    "status": "standard"
+  },
+  "deg": {
+    "groups": [
+      "CSS Units",
+      "CSS Angles"
+    ],
+    "status": "standard"
+  },
+  "dpcm": {
+    "groups": [
+      "CSS Units",
+      "CSS Resolutions"
+    ],
+    "status": "standard"
+  },
+  "dpi": {
+    "groups": [
+      "CSS Units",
+      "CSS Resolutions"
+    ],
+    "status": "standard"
+  },
+  "dppx": {
+    "groups": [
+      "CSS Units",
+      "CSS Resolutions"
+    ],
+    "status": "standard"
+  },
+  "em": {
+    "groups": [
+      "CSS Units",
+      "CSS Lengths"
+    ],
+    "status": "standard"
+  },
+  "ex": {
+    "groups": [
+      "CSS Units",
+      "CSS Lengths"
+    ],
+    "status": "standard"
+  },
+  "fr": {
+    "groups": [
+      "CSS Units",
+      "CSS Flexible Lengths",
+      "CSS Grid Layout"
+    ],
+    "status": "standard"
+  },
+  "grad": {
+    "groups": [
+      "CSS Units",
+      "CSS Angles"
+    ],
+    "status": "standard"
+  },
+  "Hz": {
+    "groups": [
+      "CSS Units",
+      "CSS Frequencies"
+    ],
+    "status": "standard"
+  },
+  "in": {
+    "groups": [
+      "CSS Units",
+      "CSS Lengths"
+    ],
+    "status": "standard"
+  },
+  "kHz": {
+    "groups": [
+      "CSS Units",
+      "CSS Frequencies"
+    ],
+    "status": "standard"
+  },
+  "mm": {
+    "groups": [
+      "CSS Units",
+      "CSS Lengths"
+    ],
+    "status": "standard"
+  },
+  "ms": {
+    "groups": [
+      "CSS Units",
+      "CSS Times"
+    ],
+    "status": "standard"
+  },
+  "pc":

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="" type="image/x-icon">
+        <title>Document</title>
+        <style>
+            .scrolling-text-container {
+                width: 300px; /* Điều chỉnh chiều rộng khung */
+                overflow: hidden;
+                border: 1px solid #ccc; /* Có thể thêm border để tạo khung */
+              }
+              
+              .scrolling-text {
+                white-space: nowrap;
+                animation: scrollText 10s linear infinite; /* Điều chỉnh thời gian và hiệu ứng */
+              }
+              
+              @keyframes scrollText {
+                0% {
+                  transform: translateX(100%); /* Bắt đầu từ phải ra khỏi khung */
+                }
+                100% {
+                  transform: translateX(-100%); /* Di chuyển sang trái ra khỏi khung */
+                }
+              }             
+        </style>
+    </head>
+    <body>
+        <div class="scrolling-text-container">
+            <div class="scrolling-text">
+              Học lập trình tại F8 - Học lập trình tại F8
+            </div>
+          </div>          
+    </body>
+    <script>
+        const scrollingText = document.querySelector('.scrolling-text');
+        scrollingText.addEventListener('animationiteration', () => {
+        scrollingText.style.animation = 'none'; // Tạm dừng animation
+        void scrollingText.offsetWidth; // Kích hoạt reflow
+        scrollingText.style.animation = null; // Khởi động animation lại
+        scrollingText.style.animationDuration = (textWidth / 50) + 's'; // Điều chỉnh tốc độ dựa trên độ dài của văn bản
+        });
+    </script>
+</html>

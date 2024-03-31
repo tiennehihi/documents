@@ -1,0 +1,5 @@
+'Null':
+                return Null(anySchema, anyReferences, value);
+            case 'Number':
+                return Number(anySchema, anyReferences, value);
+            case 'Obje

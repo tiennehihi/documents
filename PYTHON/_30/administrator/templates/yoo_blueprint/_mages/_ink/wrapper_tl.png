@@ -1,0 +1,77 @@
+// regjsparser
+//
+// ==================================================================
+//
+// See ECMA-262 Standard: 15.10.1
+//
+// NOTE: The ECMA-262 standard uses the term "Assertion" for /^/. Here the
+//   term "Anchor" is used.
+//
+// Pattern ::
+//      Disjunction
+//
+// Disjunction ::
+//      Alternative
+//      Alternative | Disjunction
+//
+// Alternative ::
+//      [empty]
+//      Alternative Term
+//
+// Term ::
+//      Anchor
+//      Atom
+//      Atom Quantifier
+//
+// Anchor ::
+//      ^
+//      $
+//      \ b
+//      \ B
+//      ( ? = Disjunction )
+//      ( ? ! Disjunction )
+//      ( ? < = Disjunction )
+//      ( ? < ! Disjunction )
+//
+// Quantifier ::
+//      QuantifierPrefix
+//      QuantifierPrefix ?
+//
+// QuantifierPrefix ::
+//      *
+//      +
+//      ?
+//      { DecimalDigits }
+//      { DecimalDigits , }
+//      { DecimalDigits , DecimalDigits }
+//
+// Atom ::
+//      PatternCharacter
+//      .
+//      \ AtomEscape
+//      CharacterClass
+//      ( GroupSpecifier Disjunction )
+//      ( ? : Disjunction )
+//
+// PatternCharacter ::
+//      SourceCharacter but not any of: ^ $ \ . * + ? ( ) [ ] { } |
+//
+// AtomEscape ::
+//      DecimalEscape
+//      CharacterClassEscape
+//      CharacterEscape
+//      k GroupName
+//
+// CharacterEscape[U] ::
+//      ControlEscape
+//      c ControlLetter
+//      HexEscapeSequence
+//      RegExpUnicodeEscapeSequence[?U] (ES6)
+//      IdentityEscape[?U]
+//
+// ControlEscape ::
+//      one of f n r t v
+// ControlLetter ::
+//      one of
+//          a b c d e f g h i j k l m n o p q r s t u v w x y z
+//        

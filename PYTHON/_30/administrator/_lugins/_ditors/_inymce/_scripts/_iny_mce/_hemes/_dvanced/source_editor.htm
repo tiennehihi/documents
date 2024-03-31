@@ -1,0 +1,48 @@
+wing - bStartFollowing) {
+            // Optimization: number of changes in forward direction
+            // is equal to number of items in following interval,
+            // therefore it cannot contain any common items.
+            division.aStartFollowing = aEnd;
+            division.bStartFollowing = bEnd;
+          } else {
+            division.aStartFollowing = aStartFollowing;
+            division.bStartFollowing = bStartFollowing;
+          }
+        }
+
+        return true;
+      }
+    }
+  }
+
+  return false;
+}; // Given index intervals and input function to compare items at indexes,
+// divide at the middle change.
+//
+// DO NOT CALL if start === end, because interval cannot contain common items
+// and because this function will throw the “no overlap” error.
+
+const divide = (
+  nChange,
+  aStart,
+  aEnd,
+  bStart,
+  bEnd,
+  isCommon,
+  aIndexesF,
+  aIndexesR,
+  division // output
+) => {
+  const bF = bStart - aStart; // bIndex = bF + aIndex - kF
+
+  const bR = bEnd - aEnd; // bIndex = bR + aIndex - kR
+
+  const aLength = aEnd - aStart;
+  const bLength = bEnd - bStart; // Because graph has square or portrait orientation,
+  // length difference is minimum number of items to insert from b.
+  // Corresponding forward and reverse diagonals in graph
+  // depend on length difference of the sequences:
+  // kF = kR - baDeltaLength
+  // kR = kF + baDeltaLength
+
+  const baDeltaLength = bLength - aLength; // Optimization: max diagonal in graph int

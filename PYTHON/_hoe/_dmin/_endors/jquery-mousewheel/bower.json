@@ -1,0 +1,8 @@
+   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     */
+
+
+
+    // A single base 64 digit can contain 6 bits of data. For the base 64 variable
+    // length quantities we use in the source map spec, the first bit is the sign,
+    // the next 

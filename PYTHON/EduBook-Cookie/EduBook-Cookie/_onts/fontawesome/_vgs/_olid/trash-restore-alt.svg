@@ -1,0 +1,11 @@
+rationList !== declarationList ? update(createVariableStatement(modifiers, declarationList), node) : node;
+  }
+  function createEmptyStatement() {
+    const node = createBaseNode(242 /* EmptyStatement */);
+    node.jsDoc = void 0;
+    return node;
+  }
+  function createExpressionStatement(expression) {
+    const node = createBaseNode(244 /* ExpressionStatement */);
+    node.expression = parenthesizerRules().parenthesizeExpressionOfExpressionStatement(expression);
+    node.transformFla

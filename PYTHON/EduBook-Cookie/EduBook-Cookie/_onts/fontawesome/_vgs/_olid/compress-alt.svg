@@ -1,0 +1,19 @@
+ds (#2982)
+
+### Pull Requests
+
+- [#2981](https://github.com/rollup/rollup/pull/2981): Do not skip onwarn handler when --silent is used (@lukastaegert)
+- [#2982](https://github.com/rollup/rollup/pull/2982): Make tests run on Node 12, fix watcher cleanup issue (@lukastaegert)
+
+## 1.16.4
+
+_2019-07-02_
+
+### Bug Fixes
+
+- Do not show a TypeScript error when providing a location as number to this.warn and this.error (#2974)
+- Use the correct TypeScript type for Sourcemap.version (#2976)
+
+### Pull Requests
+
+- [#2965](https://github.com/rollup/rollup/pull/2965): Use async readFile in getRollupDefa

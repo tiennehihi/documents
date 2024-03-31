@@ -1,0 +1,18 @@
+var sourceMap = require('./sourceMap');
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function processChildren(node, delimeter) {
+    var list = node.children;
+    var prev = null;
+
+    if (typeof delimeter !== 'function') {
+        list.forEach(this.node, this);
+    } else {
+        list.forEach(function(node) {
+            if (prev !== null) {
+                delimeter.call(this, prev);
+            }
+
+            this.node(node);
+            prev = node;
+        }, th

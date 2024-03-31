@@ -1,0 +1,35 @@
+import * as fs from "fs";
+
+/**
+ * Typing for the fields of package.json we care about
+ */
+export interface PackageJson {
+  [key: string]: string;
+}
+
+/**
+ * A function that json from a file
+ */
+export interface ReadJsonSync {
+  // tslint:disable-next-line:no-any
+  (packageJsonPath: string): any | undefined;
+}
+
+export interface FileExistsSync {
+  (name: string): boolean;
+}
+
+export interface FileExistsAsync {
+  (path: string, callback: (err?: Error, exists?: boolean) => void): void;
+}
+
+export interface ReadJsonAsyncCallback {
+  // tslint:disable-next-line:no-any
+  (err?: Error, content?: any): void;
+}
+
+export interface ReadJsonAsync {
+  (path: string, callback: ReadJsonAsyncCallback): void;
+}
+
+export function fileExistsSync(path: string): boolean 

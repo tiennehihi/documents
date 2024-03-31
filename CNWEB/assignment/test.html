@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Trang chủ</title>
+  <style>
+    .highlight {
+      background-color: yellow;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bài báo hot</h1>
+  <input type="text" id="searchInput" placeholder="Nhập từ khóa">
+  <button onclick="search()">Tìm kiếm</button>
+  <ul id="articleList">
+    <li><a href="article.html?id=1">Bài báo 1: Java Programming</a></li>
+    <li><a href="article.html?id=2">Bài báo 2: Introduction to Java</a></li>
+    <li><a href="article.html?id=3">Bài báo 3: Advanced Java Techniques</a></li>
+    <li><a href="article.html?id=4">Bài báo 4: Java vs. Python</a></li>
+    <li><a href="article.html?id=5">Bài báo 5: Java Best Practices</a></li>
+  </ul>
+
+  <script>
+    function search() {
+      var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      var articleList = document.getElementById('articleList');
+      var articles = articleList.getElementsByTagName('li');
+
+      for (var i = 0; i < articles.length; i++) {
+        var article = articles[i];
+        var articleTitle = article.getElementsByTagName('a')[0];
+        var titleText = articleTitle.innerText.toLowerCase();
+
+        if (titleText.includes(searchTerm)) {
+          articleTitle.innerHTML = articleTitle.innerHTML.replace(new RegExp(searchTerm, 'gi'), '<span class="highlight">$&</span>');
+        } else {
+          articleTitle.innerHTML = articleTitle.innerText;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

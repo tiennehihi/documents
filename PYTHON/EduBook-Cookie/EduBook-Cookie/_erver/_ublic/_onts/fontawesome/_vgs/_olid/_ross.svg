@@ -1,0 +1,1 @@
+mentsCallback,H=void 0===s?V2:s,c=void 0===(c=c.observeMutationsRoot)?v:c,L2=new o(function(c){var a;m2||(a=S1,l1(c).forEach(function(c){var s,l,z;"childList"===c.type&&0<c.addedNodes.length&&!r2(c.addedNodes[0])&&(G.searchPseudoElements&&H(c.target),e(c.target)),"attributes"===c.type&&c.target.parentNode&&G.search

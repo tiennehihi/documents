@@ -1,0 +1,10 @@
+{
+	"name": "string.prototype.trim",
+	"version": "1.2.8",
+	"author": {
+		"name": "Jordan Harband",
+		"email": "ljharb@gmail.com",
+		"url": "http://ljharb.codes"
+	},
+	"funding": {
+		"url": "https://github.com/sponsors/ljhar

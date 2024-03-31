@@ -1,0 +1,19 @@
+ },
+    "changes": [
+      "4.4.0",
+      "5.0.0",
+      "5.10.1",
+      "6.0.0-beta1",
+      "6.0.0-beta2",
+      "6.0.0-beta3",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f253",
+    "label": "Hourglass End",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321832,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 384 512\"><path d=\"M32 0C14.3 0 0 14.3 0 32S14.3 64 32 64V75c0 42.4 16.9 83.1 46.9 113.1L146.7 256 78.9 323.9C48.9 

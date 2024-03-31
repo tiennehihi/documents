@@ -1,0 +1,35 @@
+rray = function MappingList_toArray() {
+      if (!this._sorted) {
+        this._array.sort(util.compareByGeneratedPositionsInflated);
+        this._sorted = true;
+      }
+      return this._array;
+    };
+
+    var MappingList_1 = MappingList;
+
+    var mappingList = {
+    	MappingList: MappingList_1
+    };
+
+    /* -*- Mode: js; js-indent-level: 2; -*- */
+    /*
+     * Copyright 2011 Mozilla Foundation and contributors
+     * Licensed under the New BSD license. See LICENSE or:
+     * http://opensource.org/licenses/BSD-3-Clause
+     */
+
+
+
+    var ArraySet$1 = arraySet.ArraySet;
+    var MappingList$1 = mappingList.MappingList;
+
+    /**
+     * An instance of the SourceMapGenerator represents a source map which is
+     * being built incrementally. You may pass an object with the following
+     * properties:
+     *
+     *   - file: The filename of the generated source.
+     *   - sourceRoot: A root for all relative URLs in this source map.
+     */
+    function SourceMapGenerat

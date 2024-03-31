@@ -1,0 +1,12 @@
+'use strict';
+const fs = require('fs');
+const arrayUnion = require('array-union');
+const merge2 = require('merge2');
+const fastGlob = require('fast-glob');
+const dirGlob = require('dir-glob');
+const gitignore = require('./gitignore');
+const {FilterStream, UniqueStream} = require('./stream-utils');
+
+const DEFAULT_FILTER = () => false;
+
+const isNegative = pattern

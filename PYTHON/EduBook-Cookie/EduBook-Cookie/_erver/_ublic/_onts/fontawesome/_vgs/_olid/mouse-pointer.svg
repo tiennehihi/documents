@@ -1,0 +1,18 @@
+]
+      }
+    },
+    "changes": [
+      "5.6.0",
+      "5.11.0",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f7a6",
+    "label": "Guitar",
+    "voted": true,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321827,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"

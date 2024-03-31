@@ -1,0 +1,40 @@
+c
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: User X Mark
+  unicode: f235
+  voted: false
+users:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f0c0
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 5.0.3
+    - 5.0.11
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Users
+  unicode: f0c0
+  voted: false
+users-between-lines:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - fam

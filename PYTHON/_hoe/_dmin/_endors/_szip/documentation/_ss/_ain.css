@@ -1,0 +1,23 @@
+import {
+    AST_Array,
+    AST_Chain,
+    AST_Constant,
+    AST_Dot,
+    AST_ImportMeta,
+    AST_Node,
+    AST_Object,
+    AST_ObjectKeyVal,
+    AST_PropAccess,
+    AST_SymbolDeclaration,
+    AST_SymbolRef,
+    AST_Toplevel,
+    TreeTransformer,
+} from "../ast.js";
+import { make_node, noop, HOP } from "../utils/index.js";
+import { make_node_from_constant } from "./common.js";
+import { is_lhs } from "./inference.js";
+
+(function(def_find_defs) {
+    function to_node(value, orig) {
+        if (value instanceof AST_Node) {
+            if (!(value instanceof AST_Constant)) {

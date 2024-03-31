@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const codegen_1 = require("../../compile/codegen");
+const util_1 = require("../../compile/util");
+const error = {
+    message: ({ params }) => (0, codegen_1.str) `must match "${params.ifClause}" schema`,
+    params: ({ params }) => (0, codegen_1._) `{failingKeyword: ${params.ifClause}}`,
+};
+const def = {
+    keyword: "if",
+    schemaType: ["object", "boolean"],
+    trackErrors: true,
+    error,
+    code(cxt) {
+        const { gen, parentSchema, it } = cxt;
+        if (parentSchema.then === undefined && pa

@@ -1,0 +1,2 @@
+nction_block_1300", "'with' statements are not allowed in an async function block."),
+  await_expressions_are_only_allowed_within_async_functions_and_at_the_top_levels_of_modules: diag(1308, 1 /* Error */, "await_expressions_are_only_allowed_within_async_functions_and_at_the_top_levels_of_modules_1308", "'await' expressions are only allowed within async functions an

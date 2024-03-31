@@ -1,0 +1,30 @@
+s;
+      }
+      switch (moduleResolution) {
+        case 3 /* Node16 */:
+        case 99 /* NodeNext */:
+        case 100 /* Bundler */:
+          return true;
+      }
+      return false;
+    }
+  },
+  resolveJsonModule: {
+    dependencies: ["moduleResolution", "module", "target"],
+    computeValue: (compilerOptions) => {
+      if (compilerOptions.resolveJsonModule !== void 0) {
+        return compilerOptions.resolveJsonModule;
+      }
+      return computedOptions.moduleResolution.computeValue(compilerOptions) === 100 /* Bundler */;
+    }
+  },
+  declaration: {
+    dependencies: ["composite"],
+    computeValue: (compilerOptions) => {
+      return !!(compilerOptions.declaration || compilerOptions.composite);
+    }
+  },
+  preserveConstEnums: {
+    dependencies: ["isolatedModules", "verbatimModuleSyntax"],
+    computeValue: (compilerOptions) => {
+      return !!(compilerOptions.preserveConstEnums || computedOptions.isolatedModules.c

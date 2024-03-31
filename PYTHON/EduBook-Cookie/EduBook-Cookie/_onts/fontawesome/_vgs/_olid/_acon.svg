@@ -1,0 +1,21 @@
+"use strict";
+// THIS CODE WAS AUTOMATICALLY GENERATED
+// DO NOT EDIT THIS CODE BY HAND
+// RUN THE FOLLOWING COMMAND FROM THE WORKSPACE ROOT TO REGENERATE:
+// npx nx generate-lib @typescript-eslint/scope-manager
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.lib = void 0;
+const decorators_1 = require("./decorators");
+const decorators_legacy_1 = require("./decorators.legacy");
+const dom_1 = require("./dom");
+const dom_iterable_1 = require("./dom.iterable");
+const es5_1 = require("./es5");
+const es6_1 = require("./es6");
+const es7_1 = require("./es7");
+const es2015_1 = require("./es2015");
+const es2015_collection_1 = require("./es2015.collection");
+const es2015_core_1 = require("./es2015.core");
+const es2015_generator_1 = require("./es2015.generator");
+const es2015_iterable_1 = require("./es2015.iterable");
+const es2015_promise_1 = require("./es2015.promise");
+const

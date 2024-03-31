@@ -1,0 +1,17 @@
+  let leadingComments;
+  let currentDetachedCommentInfo;
+  if (removeComments) {
+    if (node.pos === 0) {
+      leadingComments = filter(getLeadingCommentRanges(text, node.pos), isPinnedCommentLocal);
+    }
+  } else {
+    leadingComments = getLeadingCommentRanges(text, node.pos);
+  }
+  if (leadingComments) {
+    const detachedComments = [];
+    let lastComment;
+    for (const comment of leadingComments) {
+      if (lastComment) {
+        const lastCommentLine = getLineOfLocalPositionFromLineMap(lineMap, lastComment.end);
+        const commentLine = getLineOfLocalPositionFromLineMap(lineMap, comment.pos);
+        if (commentL

@@ -1,0 +1,5 @@
+{
+  "name": "content-type",
+  "description": "Create and parse HTTP Content-Type header",
+  "version": "1.0.5",
+  "author": "Douglas Christopher Wil

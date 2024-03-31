@@ -1,0 +1,37 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = generateCode;
+function _convertSourceMap() {
+  const data = require("convert-source-map");
+  _convertSourceMap = function () {
+    return data;
+  };
+  return data;
+}
+function _generator() {
+  const data = require("@babel/generator");
+  _generator = function () {
+    return data;
+  };
+  return data;
+}
+var _mergeMap = require("./merge-map.js");
+function generateCode(pluginPasses, file) {
+  const {
+    opts,
+    ast,
+    code,
+    inputMap
+  } = file;
+  const {
+    generatorOpts
+  } = opts;
+  generatorOpts.inputSourceMap = inputMap == null ? void 0 : inputMap.toObject();
+  const results = [];
+  for (const plugins of pluginPasses) {
+    for (const plugin of plugins) {
+      const {
+        generatorOv

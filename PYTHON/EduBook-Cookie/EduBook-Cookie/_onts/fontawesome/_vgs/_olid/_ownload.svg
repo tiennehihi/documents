@@ -1,0 +1,16 @@
+/**
+ * @fileoverview Rule to require grouped accessor pairs in object literals and classes
+ * @author Milos Djermanovic
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const astUtils = require("./utils/ast-utils");
+
+//------------------------------------------------------------------------------
+// Typedefs
+//------------------------------------------------------------

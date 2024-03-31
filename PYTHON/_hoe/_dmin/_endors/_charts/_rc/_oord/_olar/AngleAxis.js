@@ -1,0 +1,3 @@
+# bonjour-service
+
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/onlxltd/bonjour-service/publish-release.yml?style=flat-square) ![npm bundle size](https://img.shields.io/bundlephobia/min/bonjour-service?style=flat-square) ![GitHub Release Date](https://img.shields.io/github/release-date/onlxltd/bonjour-service?style=flat-square) ![npm](https://img.shields.io/npm/dw/bonjour-service?color=%23888&style=flat-square) ![GitHub](https://img.shields.io/github/license/onlxltd/bonjour-service?style=flat-square) [![DeepScan grade](https://deepscan.io/api/teams/13435/projects/16430/branches/352351/badge/grade.svg?style=flat-square)](https://deepscan.io/dashboard#view=project&ti

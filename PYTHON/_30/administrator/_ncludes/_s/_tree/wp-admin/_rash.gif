@@ -1,0 +1,19 @@
+ist.length - 1; i >= 0; --i) {
+        if (leavelist[i].node === candidate) {
+          return true;
+        }
+      }
+      return false;
+    }
+    Controller.prototype.traverse = function traverse(root, visitor) {
+      var worklist, leavelist, element, node, nodeType, ret, key, current, current2, candidates, candidate, sentinel;
+      this.__initialize(root, visitor);
+      sentinel = {};
+
+      // reference
+      worklist = this.__worklist;
+      leavelist = this.__leavelist;
+
+      // initialize
+      worklist.push(new Element(root, null, null, null));
+      leavel

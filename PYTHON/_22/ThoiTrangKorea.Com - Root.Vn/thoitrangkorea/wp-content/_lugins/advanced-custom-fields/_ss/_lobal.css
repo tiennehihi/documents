@@ -1,0 +1,209 @@
+ is a possible string representation of the value of `select` keyword and each property value is a corresponding schema (from draft-06 it can be boolean) that must be used to validate the data.
+
+The value of `selectDefault` keyword is a schema (also can be boolean) that must be used to validate the data in case `selectCases` has no key equal to the stringified value of `select` keyword.
+
+The validation succeeds in one of the following cases:
+
+- the validation of data using selected schema succeeds,
+- none of the schemas is selected for validation,
+- the value of select is undefined (no property in the data that the data reference points to).
+
+If `select` value (in data) is not a primitive type the validation fails.
+
+This keyword correctly tracks evaluated properties and items to work with `unevaluatedProperties` and `unevaluatedItems` keywords - only properties and items from the subschema that was used (one of `selectCases` subschemas or `selectDefault` subschema) are marked as evaluated.
+
+**Please note**: these keywords require Ajv `$data` option to support [\$data reference](https://github.com/ajv-validator/ajv/blob/master/docs/validation.md#data-reference).
+
+```javascript
+require("ajv-keywords")(ajv, "select")
+
+const schema = {
+  type: "object",
+  required: ["kind"],
+  properties: {
+    kind: {type: "string"},
+  },
+  select: {$data: "0/kind"},
+  selectCases: {
+    foo: {
+      required: ["foo"],
+      properties: {
+        kind: {},
+        foo: {type: "string"},
+      },
+      additionalProperties: false,
+    },
+    bar: {
+      required: ["bar"],
+      properties: {
+        kind: {},
+        bar: {type: "number"},
+      },
+      additionalProperties: false,
+    },
+  },
+  selectDefault: {
+    propertyNames: {
+      not: {enum: ["foo", "bar"]},
+    },
+  },
+}
+
+const validDataList = [
+  {kind: "foo", foo: "any"},
+  {kind: "bar", bar: 1},
+  {kind: "anything_else", not_bar_or_foo: "any value"},
+]
+
+const invalidDataList = [
+  {kind: "foo"}, // no property foo
+  {kind: "bar"}, // no property bar
+  {kind: "foo", foo: "any", another: "any value"}, // additional property
+  {kind: "bar", bar: 1, another: "any value"}, // additional property
+  {kind: "anything_else", foo: "any"}, // property foo not allowed
+  {kind: "anything_else", bar: 1}, // property bar not allowed
+]
+```
+
+#### `dynamicDefaults`
+
+This keyword allows to assign dynamic defaults to properties, such as timestamps, unique IDs etc.
+
+This keyword only works if `useDefaults` options is used and not inside `anyOf` keywords etc., in the same way as [default keyword treated by Ajv](https://github.com/epoberezkin/ajv#assigning-defaults).
+
+The keyword should be added on the object level. Its value should be an object with each property corresponding to a property name, in the same way as in standard `properties` keyword. The value of each property can be:
+
+- an identifier of dynamic default function (a string)
+- an object with properties `func` (an identifier) and `args` (an object with parameters that will be passed to this function during schema compilation - see examples).
+
+The properties used in `dynamicDefaults` should not be added to `required` keyword in the same schema (or validation will fail), because unlike `default` this keyword is processed after validation.
+
+There are several predefined dynamic default functions:
+
+- `"timestamp"` - current timestamp in milliseconds
+- `"datetime"` - current date and time as string (ISO, valid according to `date-time` format)
+- `"date"` - current date as string (ISO, valid according to `date` format)
+- `"time"` - current time as string (ISO, valid according to `time` format)
+- `"random"` - pseudo-random number in [0, 1) interval
+- `"randomint"` - pseudo-random integer number. If string is used as a property value, the function will randomly return 0 or 1. If object `{ func: 'randomint', args: { max: N } }` is used then the default will be an integer number in [0, N) interval.
+- `"seq"` - sequential integer number starting from 0. If string is used as a property value, the default sequence will be used. If object `{ func: 'seq', args: { name: 'foo'} }` is used then the sequence with name `"foo"` will be used. Sequences are global, even if different ajv instances are used.
+
+```javascript
+const schema = {
+  type: "object",
+  dynamicDefaults: {
+    ts: "datetime",
+    r: {func: "randomint", args: {max: 100}},
+    id: {func: "seq", args: {name: "id"}},
+  },
+  properties: {
+    ts: {
+      type: "string",
+      format: "date-time",
+    },
+    r: {
+      type: "integer",
+      minimum: 0,
+      exclusiveMaximum: 100,
+    },
+    id: {
+      type: "integer",
+      minimum: 0,
+    },
+  },
+}
+
+const data = {}
+ajv.validate(data) // true
+data // { ts: '2016-12-01T22:07:28.829Z', r: 25, id: 0 }
+
+const data1 = {}
+ajv.validate(data1) // true
+data1 // { ts: '2016-12-01T22:07:29.832Z', r: 68, id: 1 }
+
+ajv.validate(data1) // true
+data1 // didn't change, as all properties were defined
+```
+
+When using the `useDefaults` option value `"empty"`, properties and items equal to `null` or `""` (empty string) will be considered missing and assigned defaults. Use `allOf` [compound keyword](https://github.com/epoberezkin/ajv/blob/master/KEYWORDS.md#compound-keywords) to execute `dynamicDefaults` before validation.
+
+```javascript
+const schema = {
+  type: "object",
+  allOf: [
+    {
+      dynamicDefaults: {
+        ts: "datetime",
+        r: {func: "randomint", args: {min: 5, max: 100}},
+        id: {func: "seq", args: {name: "id"}},
+      },
+    },
+    {
+      properties: {
+        ts: {
+          type: "string",
+        },
+        r: {
+          type: "number",
+          minimum: 5,
+          exclusiveMaximum: 100,
+        },
+        id: {
+          type: "integer",
+          minimum: 0,
+        },
+      },
+    },
+  ],
+}
+
+const data = {ts: "", r: null}
+ajv.validate(data) // true
+data // { ts: '2016-12-01T22:07:28.829Z', r: 25, id: 0 }
+```
+
+You can add your own dynamic default function to be recognised by this keyword:
+
+```javascript
+const uuid = require("uuid")
+
+const def = require("ajv-keywords/dist/definitions/dynamicDefaults")
+def.DEFAULTS.uuid = () => uuid.v4
+
+const schema = {
+  dynamicDefaults: {id: "uuid"},
+  properties: {id: {type: "string", format: "uuid"}},
+}
+
+const data = {}
+ajv.validate(schema, data) // true
+data // { id: 'a1183fbe-697b-4030-9bcc-cfeb282a9150' };
+
+const data1 = {}
+ajv.validate(schema, data1) // true
+data1 // { id: '5b008de7-1669-467a-a5c6-70fa244d7209' }
+```
+
+You also can define dynamic default that accept parameters, e.g. version of uuid:
+
+```javascript
+const uuid = require("uuid")
+
+function getUuid(args) {
+  const version = "v" + ((arvs && args.v) || "4")
+  return uuid[version]
+}
+
+const def = require("ajv-keywords/dist/definitions/dynamicDefaults")
+def.DEFAULTS.uuid = getUuid
+
+const schema = {
+  dynamicDefaults: {
+    id1: "uuid", // v4
+    id2: {func: "uuid", v: 4}, // v4
+    id3: {func: "uuid", v: 1}, // v1
+  },
+}
+```
+
+**Please

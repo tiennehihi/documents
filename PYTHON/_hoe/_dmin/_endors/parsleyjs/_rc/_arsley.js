@@ -1,0 +1,2 @@
+pression), declaration);
+    } else if (isBinaryExpression(declaration) || isInJSFile(declaration) && (isCallExpression(declaration) || (isPropertyAccessExpression(declaration) || isBindableStaticElementAccessExpression(declaratio

@@ -1,0 +1,3 @@
+s*class[\s{/}]/;
+      var functionToString = Function.prototype.toString;
+      module.exports = function(val

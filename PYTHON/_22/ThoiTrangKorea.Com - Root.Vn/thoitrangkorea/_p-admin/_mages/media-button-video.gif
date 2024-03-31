@@ -1,0 +1,4 @@
+taType(), invalid$DataSchema());
+        function wrong$DataType() {
+            if (schemaType.length) {
+                /* istanbul ignor

@@ -1,0 +1,155 @@
+/// <reference types="node" />
+/// <reference types="node" />
+/// <reference types="node" />
+/// <reference types="node" />
+import { PathLike, symlink } from 'fs';
+import { Node, Link, File } from './node';
+import Stats from './Stats';
+import Dirent from './Dirent';
+import { TSetTimeout } from './setTimeoutUnref';
+import { Readable, Writable } from 'stream';
+import { constants } from './constants';
+import { EventEmitter } from 'events';
+import { TEncodingExtended, TDataOut } from './encoding';
+export interface IError extends Error {
+    code?: string;
+}
+export type TFileId = PathLike | number;
+export type TData = TDataOut | Uint8Array;
+export type TFlags = string | number;
+export type TMode = string | number;
+export type TTime = number | string | Date;
+export type TCallback<TData> = (error?: IError | null, data?: TData) => void;
+export declare enum FLAGS {
+    r,
+    'r+',
+    rs,
+    sr,
+    'rs+',
+    'sr+',
+    w,
+    wx,
+    xw,
+    'w+',
+    'wx+',
+    'xw+',
+    a,
+    ax,
+    xa,
+    'a+',
+    'ax+',
+    'xa+'
+}
+export type TFlagsCopy = typeof constants.COPYFILE_EXCL | typeof constants.COPYFILE_FICLONE | typeof constants.COPYFILE_FICLONE_FORCE;
+export declare function flagsToNumber(flags: TFlags | undefined): number;
+export interface IOptions {
+    encoding?: BufferEncoding | TEncodingExtended;
+}
+export interface IFileOptions extends IOptions {
+    mode?: TMode;
+    flag?: TFlags;
+}
+export interface IReadFileOptions extends IOptions {
+    flag?: string;
+}
+export interface IWriteFileOptions extends IFileOptions {
+}
+export interface IAppendFileOptions extends IFileOptions {
+}
+export interface IRealpathOptions {
+    encoding?: TEncodingExtended;
+}
+export interface IWatchFileOptions {
+    persistent?: boolean;
+    interval?: number;
+}
+export interface IReadStreamOptions {
+    flags?: TFlags;
+    encoding?: BufferEncoding;
+    fd?: number;
+    mode?: TMode;
+    autoClose?: boolean;
+    start?: number;
+    end?: number;
+}
+export interface IWriteStreamOptions {
+    flags?: TFlags;
+    defaultEncoding?: BufferEncoding;
+    fd?: number;
+    mode?: TMode;
+    autoClose?: boolean;
+    start?: number;
+}
+export interface IWatchOptions extends IOptions {
+    persistent?: boolean;
+    recursive?: boolean;
+}
+export interface IMkdirOptions {
+    mode?: TMode;
+    recursive?: boolean;
+}
+export interface IRmdirOptions {
+    recursive?: boolean;
+}
+export interface IRmOptions {
+    force?: boolean;
+    maxRetries?: number;
+    recursive?: boolean;
+    retryDelay?: number;
+}
+export interface IReaddirOptions extends IOptions {
+    withFileTypes?: boolean;
+}
+export interface IStatOptions {
+    bigint?: boolean;
+    throwIfNoEntry?: boolean;
+}
+export interface IFStatOptions {
+    bigint?: boolean;
+}
+export declare function pathToFilename(path: PathLike): string;
+export declare function filenameToSteps(filename: string, base?: string): string[];
+export declare function pathToSteps(path: PathLike): string[];
+export declare function dataToStr(data: TData, encoding?: string): string;
+export declare function dataToBuffer(data: TData, encoding?: string): Buffer;
+export declare function bufferToEncoding(buffer: Buffer, encoding?: TEncodingExtended): TDataOut;
+export declare function toUnixTimestamp(time: any): any;
+type DirectoryContent = string | null;
+export interface DirectoryJSON {
+    [key: string]: DirectoryContent;
+}
+export interface NestedDirectoryJSON {
+    [key: string]: DirectoryContent | NestedDirectoryJSON;
+}
+/**
+ * `Volume` represents a file system.
+ */
+export declare class Volume {
+    static fromJSON(json: DirectoryJSON, cwd?: string): Volume;
+    static fromNestedJSON(json: NestedDirectoryJSON, cwd?: string): Volume;
+    /**
+     * Global file descriptor counter. UNIX file descriptors start from 0 and go sequentially
+     * up, so here, in order not to conflict with them, we choose some big number and descrease
+     * the file descriptor of every new opened file.
+     * @type {number}
+     * @todo This should not be static, right?
+     */
+    static fd: number;
+    root: Link;
+    ino: number;
+    inodes: {
+        [ino: number]: Node;
+    };
+    releasedInos: number[];
+    fds: {
+        [fd: number]: File;
+    };
+    releasedFds: number[];
+    maxFiles: number;
+    openFiles: number;
+    StatWatcher: new () => StatWatcher;
+    ReadStream: new (...args: any[]) => IReadStream;
+    WriteStream: new (...args: any[]) => IWriteStream;
+    FSWatcher: new () => FSWatcher;
+    props: {
+        Node: new (...args: a

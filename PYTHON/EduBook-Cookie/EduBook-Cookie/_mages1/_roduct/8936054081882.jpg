@@ -1,0 +1,945 @@
+rn forEach(getOwnKeys(exports2), (k) => {
+      const subPackageName = getNormalizedAbsolutePath(
+        combinePaths(packageName, k),
+        /*currentDirectory*/
+        void 0
+      );
+      const mode = endsWith(k, "/") ? 1 /* Directory */ : k.includes("*") ? 2 /* Pattern */ : 0 /* Exact */;
+      return tryGetModuleNameFromExportsOrImports(
+        options,
+        host,
+        targetFilePath,
+        packageDirectory,
+        subPackageName,
+        exports2[k],
+        conditions,
+        mode,
+        /*isImports*/
+        false
+      );
+    });
+  }
+  return tryGetModuleNameFromExportsOrImports(
+    options,
+    host,
+    targetFilePath,
+    packageDirectory,
+    packageName,
+    exports2,
+    conditions,
+    0 /* Exact */,
+    /*isImports*/
+    false
+  );
+}
+function tryGetModuleNameFromPackageJsonImports(moduleFileName, sourceDirectory, options, host, importMode) {
+  var _a, _b, _c;
+  if (!host.readFile || !getResolvePackageJsonImports(options)) {
+    return void 0;
+  }
+  const ancestorDirectoryWithPackageJson = getNearestAncestorDirectoryWithPackageJson(host, sourceDirectory);
+  if (!ancestorDirectoryWithPackageJson) {
+    return void 0;
+  }
+  const packageJsonPath = combinePaths(ancestorDirectoryWithPackageJson, "package.json");
+  const cachedPackageJson = (_b = (_a = host.getPackageJsonInfoCache) == null ? void 0 : _a.call(host)) == null ? void 0 : _b.getPackageJsonInfo(packageJsonPath);
+  if (isMissingPackageJsonInfo(cachedPackageJson) || !host.fileExists(packageJsonPath)) {
+    return void 0;
+  }
+  const packageJsonContent = (cachedPackageJson == null ? void 0 : cachedPackageJson.contents.packageJsonContent) || tryParseJson(host.readFile(packageJsonPath));
+  const imports = packageJsonContent == null ? void 0 : packageJsonContent.imports;
+  if (!imports) {
+    return void 0;
+  }
+  const conditions = getConditions(options, importMode);
+  return (_c = forEach(getOwnKeys(imports), (k) => {
+    if (!startsWith(k, "#") || k === "#" || startsWith(k, "#/"))
+      return void 0;
+    const mode = endsWith(k, "/") ? 1 /* Directory */ : k.includes("*") ? 2 /* Pattern */ : 0 /* Exact */;
+    return tryGetModuleNameFromExportsOrImports(
+      options,
+      host,
+      moduleFileName,
+      ancestorDirectoryWithPackageJson,
+      k,
+      imports[k],
+      conditions,
+      mode,
+      /*isImports*/
+      true
+    );
+  })) == null ? void 0 : _c.moduleFileToTry;
+}
+function tryGetModuleNameFromRootDirs(rootDirs, moduleFileName, sourceDirectory, getCanonicalFileName, allowedEndings, compilerOptions) {
+  const normalizedTargetPaths = getPathsRelativeToRootDirs(moduleFileName, rootDirs, getCanonicalFileName);
+  if (normalizedTargetPaths === void 0) {
+    return void 0;
+  }
+  const normalizedSourcePaths = getPathsRelativeToRootDirs(sourceDirectory, rootDirs, getCanonicalFileName);
+  const relativePaths = flatMap(normalizedSourcePaths, (sourcePath) => {
+    return map(normalizedTargetPaths, (targetPath) => ensurePathIsNonModuleName(getRelativePathFromDirectory(sourcePath, targetPath, getCanonicalFileName)));
+  });
+  const shortest = min(relativePaths, compareNumberOfDirectorySeparators);
+  if (!shortest) {
+    return void 0;
+  }
+  return processEnding(shortest, allowedEndings, compilerOptions);
+}
+function tryGetModuleNameAsNodeModule({ path, isRedirect }, { getCanonicalFileName, canonicalSourceDirectory }, importingSourceFile, host, options, userPreferences, packageNameOnly, overrideMode) {
+  if (!host.fileExists || !host.readFile) {
+    return void 0;
+  }
+  const parts = getNodeModulePathParts(path);
+  if (!parts) {
+    return void 0;
+  }
+  const preferences = getModuleSpecifierPreferences(userPreferences, options, importingSourceFile);
+  const allowedEndings = preferences.getAllowedEndingsInPreferredOrder();
+  let moduleSpecifier = path;
+  let isPackageRootPath = false;
+  if (!packageNameOnly) {
+    let packageRootIndex = parts.packageRootIndex;
+    let moduleFileName;
+    while (true) {
+      const { moduleFileToTry, packageRootPath, blockedByExports, verbatimFromExports } = tryDirectoryWithPackageJson(packageRootIndex);
+      if (getEmitModuleResolutionKind(options) !== 1 /* Classic */) {
+        if (blockedByExports) {
+          return void 0;
+        }
+        if (verbatimFromExports) {
+          return moduleFileToTry;
+        }
+      }
+      if (packageRootPath) {
+        moduleSpecifier = packageRootPath;
+        isPackageRootPath = true;
+        break;
+      }
+      if (!moduleFileName)
+        moduleFileName = moduleFileToTry;
+      packageRootIndex = path.indexOf(directorySeparator, packageRootIndex + 1);
+      if (packageRootIndex === -1) {
+        moduleSpecifier = processEnding(moduleFileName, allowedEndings, options, host);
+        break;
+      }
+    }
+  }
+  if (isRedirect && !isPackageRootPath) {
+    return void 0;
+  }
+  const globalTypingsCacheLocation = host.getGlobalTypingsCacheLocation && host.getGlobalTypingsCacheLocation();
+  const pathToTopLevelNodeModules = getCanonicalFileName(moduleSpecifier.substring(0, parts.topLevelNodeModulesIndex));
+  if (!(startsWith(canonicalSourceDirectory, pathToTopLevelNodeModules) || globalTypingsCacheLocation && startsWith(getCanonicalFileName(globalTypingsCacheLocation), pathToTopLevelNodeModules))) {
+    return void 0;
+  }
+  const nodeModulesDirectoryName = moduleSpecifier.substring(parts.topLevelPackageNameIndex + 1);
+  const packageName = getPackageNameFromTypesPackageName(nodeModulesDirectoryName);
+  return getEmitModuleResolutionKind(options) === 1 /* Classic */ && packageName === nodeModulesDirectoryName ? void 0 : packageName;
+  function tryDirectoryWithPackageJson(packageRootIndex) {
+    var _a, _b;
+    const packageRootPath = path.substring(0, packageRootIndex);
+    const packageJsonPath = combinePaths(packageRootPath, "package.json");
+    let moduleFileToTry = path;
+    let maybeBlockedByTypesVersions = false;
+    const cachedPackageJson = (_b = (_a = host.getPackageJsonInfoCache) == null ? void 0 : _a.call(host)) == null ? void 0 : _b.getPackageJsonInfo(packageJsonPath);
+    if (isPackageJsonInfo(cachedPackageJson) || cachedPackageJson === void 0 && host.fileExists(packageJsonPath)) {
+      const packageJsonContent = (cachedPackageJson == null ? void 0 : cachedPackageJson.contents.packageJsonContent) || tryParseJson(host.readFile(packageJsonPath));
+      const importMode = overrideMode || importingSourceFile.impliedNodeFormat;
+      if (getResolvePackageJsonExports(options)) {
+        const nodeModulesDirectoryName2 = packageRootPath.substring(parts.topLevelPackageNameIndex + 1);
+        const packageName2 = getPackageNameFromTypesPackageName(nodeModulesDirectoryName2);
+        const conditions = getConditions(options, importMode);
+        const fromExports = (packageJsonContent == null ? void 0 : packageJsonContent.exports) ? tryGetModuleNameFromExports(options, host, path, packageRootPath, packageName2, packageJsonContent.exports, conditions) : void 0;
+        if (fromExports) {
+          return { ...fromExports, verbatimFromExports: true };
+        }
+        if (packageJsonContent == null ? void 0 : packageJsonContent.exports) {
+          return { moduleFileToTry: path, blockedByExports: true };
+        }
+      }
+      const versionPaths = (packageJsonContent == null ? void 0 : packageJsonContent.typesVersions) ? getPackageJsonTypesVersionsPaths(packageJsonContent.typesVersions) : void 0;
+      if (versionPaths) {
+        const subModuleName = path.slice(packageRootPath.length + 1);
+        const fromPaths = tryGetModuleNameFromPaths(
+          subModuleName,
+          versionPaths.paths,
+          allowedEndings,
+          host,
+          options
+        );
+        if (fromPaths === void 0) {
+          maybeBlockedByTypesVersions = true;
+        } else {
+          moduleFileToTry = combinePaths(packageRootPath, fromPaths);
+        }
+      }
+      const mainFileRelative = (packageJsonContent == null ? void 0 : packageJsonContent.typings) || (packageJsonContent == null ? void 0 : packageJsonContent.types) || (packageJsonContent == null ? void 0 : packageJsonContent.main) || "index.js";
+      if (isString(mainFileRelative) && !(maybeBlockedByTypesVersions && matchPatternOrExact(tryParsePatterns(versionPaths.paths), mainFileRelative))) {
+        const mainExportFile = toPath(mainFileRelative, packageRootPath, getCanonicalFileName);
+        const canonicalModuleFileToTry = getCanonicalFileName(moduleFileToTry);
+        if (removeFileExtension(mainExportFile) === removeFileExtension(canonicalModuleFileToTry)) {
+          return { packageRootPath, moduleFileToTry };
+        } else if ((packageJsonContent == null ? void 0 : packageJsonContent.type) !== "module" && !fileExtensionIsOneOf(canonicalModuleFileToTry, extensionsNotSupportingExtensionlessResolution) && startsWith(canonicalModuleFileToTry, mainExportFile) && getDirectoryPath(canonicalModuleFileToTry) === removeTrailingDirectorySeparator(mainExportFile) && removeFileExtension(getBaseFileName(canonicalModuleFileToTry)) === "index") {
+          return { packageRootPath, moduleFileToTry };
+        }
+      }
+    } else {
+      const fileName = getCanonicalFileName(moduleFileToTry.substring(parts.packageRootIndex + 1));
+      if (fileName === "index.d.ts" || fileName === "index.js" || fileName === "index.ts" || fileName === "index.tsx") {
+        return { moduleFileToTry, packageRootPath };
+      }
+    }
+    return { moduleFileToTry };
+  }
+}
+function tryGetAnyFileFromPath(host, path) {
+  if (!host.fileExists)
+    return;
+  const extensions = flatten(getSupportedExtensions({ allowJs: true }, [{ extension: "node", isMixedContent: false }, { extension: "json", isMixedContent: false, scriptKind: 6 /* JSON */ }]));
+  for (const e of extensions) {
+    const fullPath = path + e;
+    if (host.fileExists(fullPath)) {
+      return fullPath;
+    }
+  }
+}
+function getPathsRelativeToRootDirs(path, rootDirs, getCanonicalFileName) {
+  return mapDefined(rootDirs, (rootDir) => {
+    const relativePath = getRelativePathIfInSameVolume(path, rootDir, getCanonicalFileName);
+    return relativePath !== void 0 && isPathRelativeToParent(relativePath) ? void 0 : relativePath;
+  });
+}
+function processEnding(fileName, allowedEndings, options, host) {
+  if (fileExtensionIsOneOf(fileName, [".json" /* Json */, ".mjs" /* Mjs */, ".cjs" /* Cjs */])) {
+    return fileName;
+  }
+  const noExtension = removeFileExtension(fileName);
+  if (fileName === noExtension) {
+    return fileName;
+  }
+  const jsPriority = allowedEndings.indexOf(2 /* JsExtension */);
+  const tsPriority = allowedEndings.indexOf(3 /* TsExtension */);
+  if (fileExtensionIsOneOf(fileName, [".mts" /* Mts */, ".cts" /* Cts */]) && tsPriority !== -1 && tsPriority < jsPriority) {
+    return fileName;
+  } else if (fileExtensionIsOneOf(fileName, [".d.mts" /* Dmts */, ".mts" /* Mts */, ".d.cts" /* Dcts */, ".cts" /* Cts */])) {
+    return noExtension + getJSExtensionForFile(fileName, options);
+  } else if (!fileExtensionIsOneOf(fileName, [".d.ts" /* Dts */]) && fileExtensionIsOneOf(fileName, [".ts" /* Ts */]) && fileName.includes(".d.")) {
+    return tryGetRealFileNameForNonJsDeclarationFileName(fileName);
+  }
+  switch (allowedEndings[0]) {
+    case 0 /* Minimal */:
+      const withoutIndex = removeSuffix(noExtension, "/index");
+      if (host && withoutIndex !== noExtension && tryGetAnyFileFromPath(host, withoutIndex)) {
+        return noExtension;
+      }
+      return withoutIndex;
+    case 1 /* Index */:
+      return noExtension;
+    case 2 /* JsExtension */:
+      return noExtension + getJSExtensionForFile(fileName, options);
+    case 3 /* TsExtension */:
+      if (isDeclarationFileName(fileName)) {
+        const extensionlessPriority = allowedEndings.findIndex((e) => e === 0 /* Minimal */ || e === 1 /* Index */);
+        return extensionlessPriority !== -1 && extensionlessPriority < jsPriority ? noExtension : noExtension + getJSExtensionForFile(fileName, options);
+      }
+      return fileName;
+    default:
+      return Debug.assertNever(allowedEndings[0]);
+  }
+}
+function tryGetRealFileNameForNonJsDeclarationFileName(fileName) {
+  const baseName = getBaseFileName(fileName);
+  if (!endsWith(fileName, ".ts" /* Ts */) || !baseName.includes(".d.") || fileExtensionIsOneOf(baseName, [".d.ts" /* Dts */]))
+    return void 0;
+  const noExtension = removeExtension(fileName, ".ts" /* Ts */);
+  const ext = noExtension.substring(noExtension.lastIndexOf("."));
+  return noExtension.substring(0, noExtension.indexOf(".d.")) + ext;
+}
+function getJSExtensionForFile(fileName, options) {
+  return tryGetJSExtensionForFile(fileName, options) ?? Debug.fail(`Extension ${extensionFromPath(fileName)} is unsupported:: FileName:: ${fileName}`);
+}
+function tryGetJSExtensionForFile(fileName, options) {
+  const ext = tryGetExtensionFromPath2(fileName);
+  switch (ext) {
+    case ".ts" /* Ts */:
+    case ".d.ts" /* Dts */:
+      return ".js" /* Js */;
+    case ".tsx" /* Tsx */:
+      return options.jsx === 1 /* Preserve */ ? ".jsx" /* Jsx */ : ".js" /* Js */;
+    case ".js" /* Js */:
+    case ".jsx" /* Jsx */:
+    case ".json" /* Json */:
+      return ext;
+    case ".d.mts" /* Dmts */:
+    case ".mts" /* Mts */:
+    case ".mjs" /* Mjs */:
+      return ".mjs" /* Mjs */;
+    case ".d.cts" /* Dcts */:
+    case ".cts" /* Cts */:
+    case ".cjs" /* Cjs */:
+      return ".cjs" /* Cjs */;
+    default:
+      return void 0;
+  }
+}
+function getRelativePathIfInSameVolume(path, directoryPath, getCanonicalFileName) {
+  const relativePath = getRelativePathToDirectoryOrUrl(
+    directoryPath,
+    path,
+    directoryPath,
+    getCanonicalFileName,
+    /*isAbsolutePathAnUrl*/
+    false
+  );
+  return isRootedDiskPath(relativePath) ? void 0 : relativePath;
+}
+function isPathRelativeToParent(path) {
+  return startsWith(path, "..");
+}
+
+// src/compiler/checker.ts
+var ambientModuleSymbolRegex = /^".+"$/;
+var anon = "(anonymous)";
+var nextSymbolId = 1;
+var nextNodeId = 1;
+var nextMergeId = 1;
+var nextFlowId = 1;
+var TypeFacts = /* @__PURE__ */ ((TypeFacts3) => {
+  TypeFacts3[TypeFacts3["None"] = 0] = "None";
+  TypeFacts3[TypeFacts3["TypeofEQString"] = 1] = "TypeofEQString";
+  TypeFacts3[TypeFacts3["TypeofEQNumber"] = 2] = "TypeofEQNumber";
+  TypeFacts3[TypeFacts3["TypeofEQBigInt"] = 4] = "TypeofEQBigInt";
+  TypeFacts3[TypeFacts3["TypeofEQBoolean"] = 8] = "TypeofEQBoolean";
+  TypeFacts3[TypeFacts3["TypeofEQSymbol"] = 16] = "TypeofEQSymbol";
+  TypeFacts3[TypeFacts3["TypeofEQObject"] = 32] = "TypeofEQObject";
+  TypeFacts3[TypeFacts3["TypeofEQFunction"] = 64] = "TypeofEQFunction";
+  TypeFacts3[TypeFacts3["TypeofEQHostObject"] = 128] = "TypeofEQHostObject";
+  TypeFacts3[TypeFacts3["TypeofNEString"] = 256] = "TypeofNEString";
+  TypeFacts3[TypeFacts3["TypeofNENumber"] = 512] = "TypeofNENumber";
+  TypeFacts3[TypeFacts3["TypeofNEBigInt"] = 1024] = "TypeofNEBigInt";
+  TypeFacts3[TypeFacts3["TypeofNEBoolean"] = 2048] = "TypeofNEBoolean";
+  TypeFacts3[TypeFacts3["TypeofNESymbol"] = 4096] = "TypeofNESymbol";
+  TypeFacts3[TypeFacts3["TypeofNEObject"] = 8192] = "TypeofNEObject";
+  TypeFacts3[TypeFacts3["TypeofNEFunction"] = 16384] = "TypeofNEFunction";
+  TypeFacts3[TypeFacts3["TypeofNEHostObject"] = 32768] = "TypeofNEHostObject";
+  TypeFacts3[TypeFacts3["EQUndefined"] = 65536] = "EQUndefined";
+  TypeFacts3[TypeFacts3["EQNull"] = 131072] = "EQNull";
+  TypeFacts3[TypeFacts3["EQUndefinedOrNull"] = 262144] = "EQUndefinedOrNull";
+  TypeFacts3[TypeFacts3["NEUndefined"] = 524288] = "NEUndefined";
+  TypeFacts3[TypeFacts3["NENull"] = 1048576] = "NENull";
+  TypeFacts3[TypeFacts3["NEUndefinedOrNull"] = 2097152] = "NEUndefinedOrNull";
+  TypeFacts3[TypeFacts3["Truthy"] = 4194304] = "Truthy";
+  TypeFacts3[TypeFacts3["Falsy"] = 8388608] = "Falsy";
+  TypeFacts3[TypeFacts3["IsUndefined"] = 16777216] = "IsUndefined";
+  TypeFacts3[TypeFacts3["IsNull"] = 33554432] = "IsNull";
+  TypeFacts3[TypeFacts3["IsUndefinedOrNull"] = 50331648] = "IsUndefinedOrNull";
+  TypeFacts3[TypeFacts3["All"] = 134217727] = "All";
+  TypeFacts3[TypeFacts3["BaseStringStrictFacts"] = 3735041] = "BaseStringStrictFacts";
+  TypeFacts3[TypeFacts3["BaseStringFacts"] = 12582401] = "BaseStringFacts";
+  TypeFacts3[TypeFacts3["StringStrictFacts"] = 16317953] = "StringStrictFacts";
+  TypeFacts3[TypeFacts3["StringFacts"] = 16776705] = "StringFacts";
+  TypeFacts3[TypeFacts3["EmptyStringStrictFacts"] = 12123649] = "EmptyStringStrictFacts";
+  TypeFacts3[TypeFacts3["EmptyStringFacts"] = 12582401 /* BaseStringFacts */] = "EmptyStringFacts";
+  TypeFacts3[TypeFacts3["NonEmptyStringStrictFacts"] = 7929345] = "NonEmptyStringStrictFacts";
+  TypeFacts3[TypeFacts3["NonEmptyStringFacts"] = 16776705] = "NonEmptyStringFacts";
+  TypeFacts3[TypeFacts3["BaseNumberStrictFacts"] = 3734786] = "BaseNumberStrictFacts";
+  TypeFacts3[TypeFacts3["BaseNumberFacts"] = 12582146] = "BaseNumberFacts";
+  TypeFacts3[TypeFacts3["NumberStrictFacts"] = 16317698] = "NumberStrictFacts";
+  TypeFacts3[TypeFacts3["NumberFacts"] = 16776450] = "NumberFacts";
+  TypeFacts3[TypeFacts3["ZeroNumberStrictFacts"] = 12123394] = "ZeroNumberStrictFacts";
+  TypeFacts3[TypeFacts3["ZeroNumberFacts"] = 12582146 /* BaseNumberFacts */] = "ZeroNumberFacts";
+  TypeFacts3[TypeFacts3["NonZeroNumberStrictFacts"] = 7929090] = "NonZeroNumberStrictFacts";
+  TypeFacts3[TypeFacts3["NonZeroNumberFacts"] = 16776450] = "NonZeroNumberFacts";
+  TypeFacts3[TypeFacts3["BaseBigIntStrictFacts"] = 3734276] = "BaseBigIntStrictFacts";
+  TypeFacts3[TypeFacts3["BaseBigIntFacts"] = 12581636] = "BaseBigIntFacts";
+  TypeFacts3[TypeFacts3["BigIntStrictFacts"] = 16317188] = "BigIntStrictFacts";
+  TypeFacts3[TypeFacts3["BigIntFacts"] = 16775940] = "BigIntFacts";
+  TypeFacts3[TypeFacts3["ZeroBigIntStrictFacts"] = 12122884] = "ZeroBigIntStrictFacts";
+  TypeFacts3[TypeFacts3["ZeroBigIntFacts"] = 12581636 /* BaseBigIntFacts */] = "ZeroBigIntFacts";
+  TypeFacts3[TypeFacts3["NonZeroBigIntStrictFacts"] = 7928580] = "NonZeroBigIntStrictFacts";
+  TypeFacts3[TypeFacts3["NonZeroBigIntFacts"] = 16775940] = "NonZeroBigIntFacts";
+  TypeFacts3[TypeFacts3["BaseBooleanStrictFacts"] = 3733256] = "BaseBooleanStrictFacts";
+  TypeFacts3[TypeFacts3["BaseBooleanFacts"] = 12580616] = "BaseBooleanFacts";
+  TypeFacts3[TypeFacts3["BooleanStrictFacts"] = 16316168] = "BooleanStrictFacts";
+  TypeFacts3[TypeFacts3["BooleanFacts"] = 16774920] = "BooleanFacts";
+  TypeFacts3[TypeFacts3["FalseStrictFacts"] = 12121864] = "FalseStrictFacts";
+  TypeFacts3[TypeFacts3["FalseFacts"] = 12580616 /* BaseBooleanFacts */] = "FalseFacts";
+  TypeFacts3[TypeFacts3["TrueStrictFacts"] = 7927560] = "TrueStrictFacts";
+  TypeFacts3[TypeFacts3["TrueFacts"] = 16774920] = "TrueFacts";
+  TypeFacts3[TypeFacts3["SymbolStrictFacts"] = 7925520] = "SymbolStrictFacts";
+  TypeFacts3[TypeFacts3["SymbolFacts"] = 16772880] = "SymbolFacts";
+  TypeFacts3[TypeFacts3["ObjectStrictFacts"] = 7888800] = "ObjectStrictFacts";
+  TypeFacts3[TypeFacts3["ObjectFacts"] = 16736160] = "ObjectFacts";
+  TypeFacts3[TypeFacts3["FunctionStrictFacts"] = 7880640] = "FunctionStrictFacts";
+  TypeFacts3[TypeFacts3["FunctionFacts"] = 16728e3] = "FunctionFacts";
+  TypeFacts3[TypeFacts3["VoidFacts"] = 9830144] = "VoidFacts";
+  TypeFacts3[TypeFacts3["UndefinedFacts"] = 26607360] = "UndefinedFacts";
+  TypeFacts3[TypeFacts3["NullFacts"] = 42917664] = "NullFacts";
+  TypeFacts3[TypeFacts3["EmptyObjectStrictFacts"] = 83427327] = "EmptyObjectStrictFacts";
+  TypeFacts3[TypeFacts3["EmptyObjectFacts"] = 83886079] = "EmptyObjectFacts";
+  TypeFacts3[TypeFacts3["UnknownFacts"] = 83886079] = "UnknownFacts";
+  TypeFacts3[TypeFacts3["AllTypeofNE"] = 556800] = "AllTypeofNE";
+  TypeFacts3[TypeFacts3["OrFactsMask"] = 8256] = "OrFactsMask";
+  TypeFacts3[TypeFacts3["AndFactsMask"] = 134209471] = "AndFactsMask";
+  return TypeFacts3;
+})(TypeFacts || {});
+var typeofNEFacts = new Map(Object.entries({
+  string: 256 /* TypeofNEString */,
+  number: 512 /* TypeofNENumber */,
+  bigint: 1024 /* TypeofNEBigInt */,
+  boolean: 2048 /* TypeofNEBoolean */,
+  symbol: 4096 /* TypeofNESymbol */,
+  undefined: 524288 /* NEUndefined */,
+  object: 8192 /* TypeofNEObject */,
+  function: 16384 /* TypeofNEFunction */
+}));
+var CheckMode = /* @__PURE__ */ ((CheckMode3) => {
+  CheckMode3[CheckMode3["Normal"] = 0] = "Normal";
+  CheckMode3[CheckMode3["Contextual"] = 1] = "Contextual";
+  CheckMode3[CheckMode3["Inferential"] = 2] = "Inferential";
+  CheckMode3[CheckMode3["SkipContextSensitive"] = 4] = "SkipContextSensitive";
+  CheckMode3[CheckMode3["SkipGenericFunctions"] = 8] = "SkipGenericFunctions";
+  CheckMode3[CheckMode3["IsForSignatureHelp"] = 16] = "IsForSignatureHelp";
+  CheckMode3[CheckMode3["RestBindingElement"] = 32] = "RestBindingElement";
+  CheckMode3[CheckMode3["TypeOnly"] = 64] = "TypeOnly";
+  return CheckMode3;
+})(CheckMode || {});
+var SignatureCheckMode = /* @__PURE__ */ ((SignatureCheckMode3) => {
+  SignatureCheckMode3[SignatureCheckMode3["None"] = 0] = "None";
+  SignatureCheckMode3[SignatureCheckMode3["BivariantCallback"] = 1] = "BivariantCallback";
+  SignatureCheckMode3[SignatureCheckMode3["StrictCallback"] = 2] = "StrictCallback";
+  SignatureCheckMode3[SignatureCheckMode3["IgnoreReturnTypes"] = 4] = "IgnoreReturnTypes";
+  SignatureCheckMode3[SignatureCheckMode3["StrictArity"] = 8] = "StrictArity";
+  SignatureCheckMode3[SignatureCheckMode3["StrictTopSignature"] = 16] = "StrictTopSignature";
+  SignatureCheckMode3[SignatureCheckMode3["Callback"] = 3] = "Callback";
+  return SignatureCheckMode3;
+})(SignatureCheckMode || {});
+var isNotOverloadAndNotAccessor = and(isNotOverload, isNotAccessor);
+var intrinsicTypeKinds = new Map(Object.entries({
+  Uppercase: 0 /* Uppercase */,
+  Lowercase: 1 /* Lowercase */,
+  Capitalize: 2 /* Capitalize */,
+  Uncapitalize: 3 /* Uncapitalize */,
+  NoInfer: 4 /* NoInfer */
+}));
+var SymbolLinks = class {
+};
+function NodeLinks() {
+  this.flags = 0 /* None */;
+}
+function getNodeId(node) {
+  if (!node.id) {
+    node.id = nextNodeId;
+    nextNodeId++;
+  }
+  return node.id;
+}
+function getSymbolId(symbol) {
+  if (!symbol.id) {
+    symbol.id = nextSymbolId;
+    nextSymbolId++;
+  }
+  return symbol.id;
+}
+function isInstantiatedModule(node, preserveConstEnums) {
+  const moduleState = getModuleInstanceState(node);
+  return moduleState === 1 /* Instantiated */ || preserveConstEnums && moduleState === 2 /* ConstEnumOnly */;
+}
+function createTypeChecker(host) {
+  var deferredDiagnosticsCallbacks = [];
+  var addLazyDiagnostic = (arg) => {
+    deferredDiagnosticsCallbacks.push(arg);
+  };
+  var cancellationToken;
+  var requestedExternalEmitHelperNames = /* @__PURE__ */ new Set();
+  var requestedExternalEmitHelpers;
+  var externalHelpersModule;
+  var Symbol47 = objectAllocator.getSymbolConstructor();
+  var Type28 = objectAllocator.getTypeConstructor();
+  var Signature14 = objectAllocator.getSignatureConstructor();
+  var typeCount = 0;
+  var symbolCount = 0;
+  var totalInstantiationCount = 0;
+  var instantiationCount = 0;
+  var instantiationDepth = 0;
+  var inlineLevel = 0;
+  var currentNode;
+  var varianceTypeParameter;
+  var isInferencePartiallyBlocked = false;
+  var emptySymbols = createSymbolTable();
+  var arrayVariances = [1 /* Covariant */];
+  var compilerOptions = host.getCompilerOptions();
+  var languageVersion = getEmitScriptTarget(compilerOptions);
+  var moduleKind = getEmitModuleKind(compilerOptions);
+  var legacyDecorators = !!compilerOptions.experimentalDecorators;
+  var useDefineForClassFields = getUseDefineForClassFields(compilerOptions);
+  var emitStandardClassFields = getEmitStandardClassFields(compilerOptions);
+  var allowSyntheticDefaultImports = getAllowSyntheticDefaultImports(compilerOptions);
+  var strictNullChecks = getStrictOptionValue(compilerOptions, "strictNullChecks");
+  var strictFunctionTypes = getStrictOptionValue(compilerOptions, "strictFunctionTypes");
+  var strictBindCallApply = getStrictOptionValue(compilerOptions, "strictBindCallApply");
+  var strictPropertyInitialization = getStrictOptionValue(compilerOptions, "strictPropertyInitialization");
+  var noImplicitAny = getStrictOptionValue(compilerOptions, "noImplicitAny");
+  var noImplicitThis = getStrictOptionValue(compilerOptions, "noImplicitThis");
+  var useUnknownInCatchVariables = getStrictOptionValue(compilerOptions, "useUnknownInCatchVariables");
+  var keyofStringsOnly = !!compilerOptions.keyofStringsOnly;
+  var defaultIndexFlags = keyofStringsOnly ? 1 /* StringsOnly */ : 0 /* None */;
+  var freshObjectLiteralFlag = compilerOptions.suppressExcessPropertyErrors ? 0 : 8192 /* FreshLiteral */;
+  var exactOptionalPropertyTypes = compilerOptions.exactOptionalPropertyTypes;
+  var checkBinaryExpression = createCheckBinaryExpression();
+  var emitResolver = createResolver();
+  var nodeBuilder = createNodeBuilder();
+  var globals = createSymbolTable();
+  var undefinedSymbol = createSymbol(4 /* Property */, "undefined");
+  undefinedSymbol.declarations = [];
+  var globalThisSymbol = createSymbol(1536 /* Module */, "globalThis", 8 /* Readonly */);
+  globalThisSymbol.exports = globals;
+  globalThisSymbol.declarations = [];
+  globals.set(globalThisSymbol.escapedName, globalThisSymbol);
+  var argumentsSymbol = createSymbol(4 /* Property */, "arguments");
+  var requireSymbol = createSymbol(4 /* Property */, "require");
+  var isolatedModulesLikeFlagName = compilerOptions.verbatimModuleSyntax ? "verbatimModuleSyntax" : "isolatedModules";
+  var canCollectSymbolAliasAccessabilityData = !compilerOptions.verbatimModuleSyntax || !!compilerOptions.importsNotUsedAsValues;
+  var apparentArgumentCount;
+  var lastGetCombinedNodeFlagsNode;
+  var lastGetCombinedNodeFlagsResult = 0 /* None */;
+  var lastGetCombinedModifierFlagsNode;
+  var lastGetCombinedModifierFlagsResult = 0 /* None */;
+  const checker = {
+    getNodeCount: () => reduceLeft(host.getSourceFiles(), (n, s) => n + s.nodeCount, 0),
+    getIdentifierCount: () => reduceLeft(host.getSourceFiles(), (n, s) => n + s.identifierCount, 0),
+    getSymbolCount: () => reduceLeft(host.getSourceFiles(), (n, s) => n + s.symbolCount, symbolCount),
+    getTypeCount: () => typeCount,
+    getInstantiationCount: () => totalInstantiationCount,
+    getRelationCacheSizes: () => ({
+      assignable: assignableRelation.size,
+      identity: identityRelation.size,
+      subtype: subtypeRelation.size,
+      strictSubtype: strictSubtypeRelation.size
+    }),
+    isUndefinedSymbol: (symbol) => symbol === undefinedSymbol,
+    isArgumentsSymbol: (symbol) => symbol === argumentsSymbol,
+    isUnknownSymbol: (symbol) => symbol === unknownSymbol,
+    getMergedSymbol,
+    getDiagnostics: getDiagnostics2,
+    getGlobalDiagnostics,
+    getRecursionIdentity,
+    getUnmatchedProperties,
+    getTypeOfSymbolAtLocation: (symbol, locationIn) => {
+      const location = getParseTreeNode(locationIn);
+      return location ? getTypeOfSymbolAtLocation(symbol, location) : errorType;
+    },
+    getTypeOfSymbol,
+    getSymbolsOfParameterPropertyDeclaration: (parameterIn, parameterName) => {
+      const parameter = getParseTreeNode(parameterIn, isParameter);
+      if (parameter === void 0)
+        return Debug.fail("Cannot get symbols of a synthetic parameter that cannot be resolved to a parse-tree node.");
+      Debug.assert(isParameterPropertyDeclaration(parameter, parameter.parent));
+      return getSymbolsOfParameterPropertyDeclaration(parameter, escapeLeadingUnderscores(parameterName));
+    },
+    getDeclaredTypeOfSymbol,
+    getPropertiesOfType,
+    getPropertyOfType: (type, name) => getPropertyOfType(type, escapeLeadingUnderscores(name)),
+    getPrivateIdentifierPropertyOfType: (leftType, name, location) => {
+      const node = getParseTreeNode(location);
+      if (!node) {
+        return void 0;
+      }
+      const propName = escapeLeadingUnderscores(name);
+      const lexicallyScopedIdentifier = lookupSymbolForPrivateIdentifierDeclaration(propName, node);
+      return lexicallyScopedIdentifier ? getPrivateIdentifierPropertyOfType(leftType, lexicallyScopedIdentifier) : void 0;
+    },
+    getTypeOfPropertyOfType: (type, name) => getTypeOfPropertyOfType(type, escapeLeadingUnderscores(name)),
+    getIndexInfoOfType: (type, kind) => getIndexInfoOfType(type, kind === 0 /* String */ ? stringType : numberType),
+    getIndexInfosOfType,
+    getIndexInfosOfIndexSymbol,
+    getSignaturesOfType,
+    getIndexTypeOfType: (type, kind) => getIndexTypeOfType(type, kind === 0 /* String */ ? stringType : numberType),
+    getIndexType: (type) => getIndexType(type),
+    getBaseTypes,
+    getBaseTypeOfLiteralType,
+    getWidenedType,
+    getTypeFromTypeNode: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn, isTypeNode);
+      return node ? getTypeFromTypeNode(node) : errorType;
+    },
+    getParameterType: getTypeAtPosition,
+    getParameterIdentifierInfoAtPosition,
+    getPromisedTypeOfPromise,
+    getAwaitedType: (type) => getAwaitedType(type),
+    getReturnTypeOfSignature,
+    isNullableType,
+    getNullableType,
+    getNonNullableType,
+    getNonOptionalType: removeOptionalTypeMarker,
+    getTypeArguments,
+    typeToTypeNode: nodeBuilder.typeToTypeNode,
+    indexInfoToIndexSignatureDeclaration: nodeBuilder.indexInfoToIndexSignatureDeclaration,
+    signatureToSignatureDeclaration: nodeBuilder.signatureToSignatureDeclaration,
+    symbolToEntityName: nodeBuilder.symbolToEntityName,
+    symbolToExpression: nodeBuilder.symbolToExpression,
+    symbolToNode: nodeBuilder.symbolToNode,
+    symbolToTypeParameterDeclarations: nodeBuilder.symbolToTypeParameterDeclarations,
+    symbolToParameterDeclaration: nodeBuilder.symbolToParameterDeclaration,
+    typeParameterToDeclaration: nodeBuilder.typeParameterToDeclaration,
+    getSymbolsInScope: (locationIn, meaning) => {
+      const location = getParseTreeNode(locationIn);
+      return location ? getSymbolsInScope(location, meaning) : [];
+    },
+    getSymbolAtLocation: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn);
+      return node ? getSymbolAtLocation(
+        node,
+        /*ignoreErrors*/
+        true
+      ) : void 0;
+    },
+    getIndexInfosAtLocation: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn);
+      return node ? getIndexInfosAtLocation(node) : void 0;
+    },
+    getShorthandAssignmentValueSymbol: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn);
+      return node ? getShorthandAssignmentValueSymbol(node) : void 0;
+    },
+    getExportSpecifierLocalTargetSymbol: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn, isExportSpecifier);
+      return node ? getExportSpecifierLocalTargetSymbol(node) : void 0;
+    },
+    getExportSymbolOfSymbol(symbol) {
+      return getMergedSymbol(symbol.exportSymbol || symbol);
+    },
+    getTypeAtLocation: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn);
+      return node ? getTypeOfNode(node) : errorType;
+    },
+    getTypeOfAssignmentPattern: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn, isAssignmentPattern);
+      return node && getTypeOfAssignmentPattern(node) || errorType;
+    },
+    getPropertySymbolOfDestructuringAssignment: (locationIn) => {
+      const location = getParseTreeNode(locationIn, isIdentifier);
+      return location ? getPropertySymbolOfDestructuringAssignment(location) : void 0;
+    },
+    signatureToString: (signature, enclosingDeclaration, flags, kind) => {
+      return signatureToString(signature, getParseTreeNode(enclosingDeclaration), flags, kind);
+    },
+    typeToString: (type, enclosingDeclaration, flags) => {
+      return typeToString(type, getParseTreeNode(enclosingDeclaration), flags);
+    },
+    symbolToString: (symbol, enclosingDeclaration, meaning, flags) => {
+      return symbolToString(symbol, getParseTreeNode(enclosingDeclaration), meaning, flags);
+    },
+    typePredicateToString: (predicate, enclosingDeclaration, flags) => {
+      return typePredicateToString(predicate, getParseTreeNode(enclosingDeclaration), flags);
+    },
+    writeSignature: (signature, enclosingDeclaration, flags, kind, writer) => {
+      return signatureToString(signature, getParseTreeNode(enclosingDeclaration), flags, kind, writer);
+    },
+    writeType: (type, enclosingDeclaration, flags, writer) => {
+      return typeToString(type, getParseTreeNode(enclosingDeclaration), flags, writer);
+    },
+    writeSymbol: (symbol, enclosingDeclaration, meaning, flags, writer) => {
+      return symbolToString(symbol, getParseTreeNode(enclosingDeclaration), meaning, flags, writer);
+    },
+    writeTypePredicate: (predicate, enclosingDeclaration, flags, writer) => {
+      return typePredicateToString(predicate, getParseTreeNode(enclosingDeclaration), flags, writer);
+    },
+    getAugmentedPropertiesOfType,
+    getRootSymbols,
+    getSymbolOfExpando,
+    getContextualType: (nodeIn, contextFlags) => {
+      const node = getParseTreeNode(nodeIn, isExpression);
+      if (!node) {
+        return void 0;
+      }
+      if (contextFlags & 4 /* Completions */) {
+        return runWithInferenceBlockedFromSourceNode(node, () => getContextualType2(node, contextFlags));
+      }
+      return getContextualType2(node, contextFlags);
+    },
+    getContextualTypeForObjectLiteralElement: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn, isObjectLiteralElementLike);
+      return node ? getContextualTypeForObjectLiteralElement(
+        node,
+        /*contextFlags*/
+        void 0
+      ) : void 0;
+    },
+    getContextualTypeForArgumentAtIndex: (nodeIn, argIndex) => {
+      const node = getParseTreeNode(nodeIn, isCallLikeExpression);
+      return node && getContextualTypeForArgumentAtIndex(node, argIndex);
+    },
+    getContextualTypeForJsxAttribute: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn, isJsxAttributeLike);
+      return node && getContextualTypeForJsxAttribute(
+        node,
+        /*contextFlags*/
+        void 0
+      );
+    },
+    isContextSensitive,
+    getTypeOfPropertyOfContextualType,
+    getFullyQualifiedName,
+    getResolvedSignature: (node, candidatesOutArray, argumentCount) => getResolvedSignatureWorker(node, candidatesOutArray, argumentCount, 0 /* Normal */),
+    getCandidateSignaturesForStringLiteralCompletions,
+    getResolvedSignatureForSignatureHelp: (node, candidatesOutArray, argumentCount) => runWithoutResolvedSignatureCaching(node, () => getResolvedSignatureWorker(node, candidatesOutArray, argumentCount, 16 /* IsForSignatureHelp */)),
+    getExpandedParameters,
+    hasEffectiveRestParameter,
+    containsArgumentsReference,
+    getConstantValue: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn, canHaveConstantValue);
+      return node ? getConstantValue2(node) : void 0;
+    },
+    isValidPropertyAccess: (nodeIn, propertyName) => {
+      const node = getParseTreeNode(nodeIn, isPropertyAccessOrQualifiedNameOrImportTypeNode);
+      return !!node && isValidPropertyAccess(node, escapeLeadingUnderscores(propertyName));
+    },
+    isValidPropertyAccessForCompletions: (nodeIn, type, property) => {
+      const node = getParseTreeNode(nodeIn, isPropertyAccessExpression);
+      return !!node && isValidPropertyAccessForCompletions(node, type, property);
+    },
+    getSignatureFromDeclaration: (declarationIn) => {
+      const declaration = getParseTreeNode(declarationIn, isFunctionLike);
+      return declaration ? getSignatureFromDeclaration(declaration) : void 0;
+    },
+    isImplementationOfOverload: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn, isFunctionLike);
+      return node ? isImplementationOfOverload(node) : void 0;
+    },
+    getImmediateAliasedSymbol,
+    getAliasedSymbol: resolveAlias,
+    getEmitResolver,
+    getExportsOfModule: getExportsOfModuleAsArray,
+    getExportsAndPropertiesOfModule,
+    forEachExportAndPropertyOfModule,
+    getSymbolWalker: createGetSymbolWalker(
+      getRestTypeOfSignature,
+      getTypePredicateOfSignature,
+      getReturnTypeOfSignature,
+      getBaseTypes,
+      resolveStructuredTypeMembers,
+      getTypeOfSymbol,
+      getResolvedSymbol,
+      getConstraintOfTypeParameter,
+      getFirstIdentifier,
+      getTypeArguments
+    ),
+    getAmbientModules,
+    getJsxIntrinsicTagNamesAt,
+    isOptionalParameter: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn, isParameter);
+      return node ? isOptionalParameter(node) : false;
+    },
+    tryGetMemberInModuleExports: (name, symbol) => tryGetMemberInModuleExports(escapeLeadingUnderscores(name), symbol),
+    tryGetMemberInModuleExportsAndProperties: (name, symbol) => tryGetMemberInModuleExportsAndProperties(escapeLeadingUnderscores(name), symbol),
+    tryFindAmbientModule: (moduleName) => tryFindAmbientModule(
+      moduleName,
+      /*withAugmentations*/
+      true
+    ),
+    tryFindAmbientModuleWithoutAugmentations: (moduleName) => {
+      return tryFindAmbientModule(
+        moduleName,
+        /*withAugmentations*/
+        false
+      );
+    },
+    getApparentType,
+    getUnionType,
+    isTypeAssignableTo,
+    createAnonymousType,
+    createSignature,
+    createSymbol,
+    createIndexInfo,
+    getAnyType: () => anyType,
+    getStringType: () => stringType,
+    getStringLiteralType,
+    getNumberType: () => numberType,
+    getNumberLiteralType,
+    getBigIntType: () => bigintType,
+    createPromiseType,
+    createArrayType,
+    getElementTypeOfArrayType,
+    getBooleanType: () => booleanType,
+    getFalseType: (fresh) => fresh ? falseType : regularFalseType,
+    getTrueType: (fresh) => fresh ? trueType : regularTrueType,
+    getVoidType: () => voidType,
+    getUndefinedType: () => undefinedType,
+    getNullType: () => nullType,
+    getESSymbolType: () => esSymbolType,
+    getNeverType: () => neverType,
+    getOptionalType: () => optionalType,
+    getPromiseType: () => getGlobalPromiseType(
+      /*reportErrors*/
+      false
+    ),
+    getPromiseLikeType: () => getGlobalPromiseLikeType(
+      /*reportErrors*/
+      false
+    ),
+    getAsyncIterableType: () => {
+      const type = getGlobalAsyncIterableType(
+        /*reportErrors*/
+        false
+      );
+      if (type === emptyGenericType)
+        return void 0;
+      return type;
+    },
+    isSymbolAccessible,
+    isArrayType,
+    isTupleType,
+    isArrayLikeType,
+    isEmptyAnonymousObjectType,
+    isTypeInvalidDueToUnionDiscriminant,
+    getExactOptionalProperties,
+    getAllPossiblePropertiesOfTypes,
+    getSuggestedSymbolForNonexistentProperty,
+    getSuggestionForNonexistentProperty,
+    getSuggestedSymbolForNonexistentJSXAttribute,
+    getSuggestedSymbolForNonexistentSymbol: (location, name, meaning) => getSuggestedSymbolForNonexistentSymbol(location, escapeLeadingUnderscores(name), meaning),
+    getSuggestionForNonexistentSymbol: (location, name, meaning) => getSuggestionForNonexistentSymbol(location, escapeLeadingUnderscores(name), meaning),
+    getSuggestedSymbolForNonexistentModule,
+    getSuggestionForNonexistentExport,
+    getSuggestedSymbolForNonexistentClassMember,
+    getBaseConstraintOfType,
+    getDefaultFromTypeParameter: (type) => type && type.flags & 262144 /* TypeParameter */ ? getDefaultFromTypeParameter(type) : void 0,
+    resolveName(name, location, meaning, excludeGlobals) {
+      return resolveName(
+        location,
+        escapeLeadingUnderscores(name),
+        meaning,
+        /*nameNotFoundMessage*/
+        void 0,
+        /*nameArg*/
+        void 0,
+        /*isUse*/
+        false,
+        excludeGlobals
+      );
+    },
+    getJsxNamespace: (n) => unescapeLeadingUnderscores(getJsxNamespace(n)),
+    getJsxFragmentFactory: (n) => {
+      const jsxFragmentFactory = getJsxFragmentFactoryEntity(n);
+      return jsxFragmentFactory && unescapeLeadingUnderscores(getFirstIdentifier(jsxFragmentFactory).escapedText);
+    },
+    getAccessibleSymbolChain,
+    getTypePredicateOfSignature,
+    resolveExternalModuleName: (moduleSpecifierIn) => {
+      const moduleSpecifier = getParseTreeNode(moduleSpecifierIn, isExpression);
+      return moduleSpecifier && resolveExternalModuleName(
+        moduleSpecifier,
+        moduleSpecifier,
+        /*ignoreErrors*/
+        true
+      );
+    },
+    resolveExternalModuleSymbol,
+    tryGetThisTypeAt: (nodeIn, includeGlobalThis, container) => {
+      const node = getParseTreeNode(nodeIn);
+      return node && tryGetThisTypeAt(node, includeGlobalThis, container);
+    },
+    getTypeArgumentConstraint: (nodeIn) => {
+      const node = getParseTreeNode(nodeIn, isTypeNode);
+      return node && getTypeArgumentConstraint(node);
+    },
+    getSuggestionDiagnostics: (fileIn, ct) => {
+      const file = getParseTreeNode(fileIn, isSourceFile) || Debug.fail("Could not determine parsed source file.");
+      if (skipTypeChecking(file, compilerOptions, host)) {
+        return emptyArray;
+      }
+      let diagnostics2;
+      try {
+        cancellationToken = ct;
+        checkSourceFileWithEagerDiagnostics(file);
+        Debug.assert(!!(getNodeLinks(file).flags & 1 /* TypeChecked */));
+        diagnostics2 = addRange(diagnostics2, suggestionDiagnostics.getDiagnostics(file.fileName));
+        checkUnusedIdentifiers(getPotentiallyUnusedIdentifiers(file), (containingNode, kind, diag2) => {
+          if (!containsParseError(containingNode) && !unusedIsError(kind, !!(containingNode.flags & 33554432 /* Ambient */))) {
+            (diagnostics2 || (diagnostics2 = [])).push({ ...diag2, category: 2 /* Suggestion */ });
+          }
+        });
+        return diagnostics2 || emptyArray;
+      } finally {
+        cancellationToken = void 0;
+      }
+    },
+    runWithCancellationToken: (token, callback) => {
+      try {
+        cancellationToken = token;
+        return callback(checker);
+      } finally {
+        cancellationToken = void 0;
+      }
+    },
+    getLocalTypeParametersOfClassOrInterfaceOrTypeAlias,
+    isDeclarationVisible,
+    isPropertyAccessible,
+    getTypeOnlyAliasDeclaration,
+    getMemberOverrideModifierStatus,
+    isTypeParameterPossiblyReferenced,
+    typeHasCallOrConstructSignatures
+  };
+  function getCandidateSignaturesForStringLiteralCompletions(call, editingArgument) {
+    const candidatesSet = /* @__PURE__ */ new Set();
+    const candidates = [];
+    runWithInferenceBlockedFromSourceNode(editingArgument, () => getResolvedSignatureWorker(
+      call,
+      candidates,
+      /*argumentCount*/
+      void 0,
+      0 /* Normal */
+    ));
+    for (const candidate of candidates) {
+      candidatesSet.add(candidate);
+    }
+    candidates.length = 0;
+    runWithoutResolvedSignatureCaching(editingArgument, () => getResolvedSignatureWorker(
+      call,
+      candidates,
+      /*argumentCount*/
+      void 0,
+      0 /* Normal */
+    ));
+    for (const candidate of candidates) {
+      candidatesSet.add(candidate);
+    }
+    return arrayFrom(candidatesSet);
+  }
+  function runWithoutResolvedSignatureCaching(node, fn) {
+    node = findAncestor(node, isCallLikeOrFunctionLikeExpression);
+    if (node) {
+      const cachedResolvedSignatures = [];
+      const cachedTypes2 = [];
+      while (node) {
+        const nodeLinks2 = getNodeLinks(node);
+        cachedResolvedSignatures.push([nodeLinks2, nodeLinks2.resolvedSignature]);
+        nodeLinks2.resolvedSignature = void 0;
+        if (isFunctionExpressionOrArrowFunction(node)) {
+          const symbolLinks2 = getSymbolLinks(getSymbolOfDeclaration(node));
+          const type = symbolLinks2.type;
+          cachedTypes2.push([symbolLinks2, type]);
+          symbolLinks2.type = void 0;
+        }
+        node = findAncestor(node.parent, isCallLikeOrFunctionLikeExpression);
+      }
+      const result = fn();
+      for (const [nodeLinks2, resolvedSignature] of cachedResolvedSignatures) {
+        nodeLinks2.resolvedSignature = resolvedSignature;
+      }
+      for (const [symbolLinks2, type] of cachedTypes2) {
+        symbolLinks2.type = type;
+      }
+      return result;
+    }
+    return fn();
+  }
+  function runWithInferenceBlockedFromSourceNode(node, fn) {
+    const containingCall = findAncestor(node, isCallLikeExpression);
+    if (containingCall) {
+      let toMarkSkip = node;
+      do {
+        getNodeLinks(toMarkSkip).skipDirectInference = true;
+        toMarkSkip = toMarkSkip.parent;
+      } while (toMarkSkip && toMarkSkip !== containi

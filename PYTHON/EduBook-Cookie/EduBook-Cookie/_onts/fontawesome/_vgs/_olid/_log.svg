@@ -1,0 +1,17 @@
+var splitStringTransformer = function splitStringTransformer(splitBy) {
+  return {
+    onSubstitution: function onSubstitution(substitution, resultSoFar) {
+      if (splitBy != null && typeof splitBy === 'string') {
+        if (typeof substitution === 'string' && substitution.includes(splitBy)) {
+          substitution = substitution.split(splitBy);
+        }
+      } else {
+        throw new Error('You need to specify a string character to split by.');
+      }
+      return substitution;
+    }
+  };
+};
+
+export default splitStringTransformer;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9zcGxpdFN0cmluZ1RyYW5zZm9ybWVyL3NwbGl0U3Rya

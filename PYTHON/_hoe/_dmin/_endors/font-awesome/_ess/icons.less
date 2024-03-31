@@ -1,0 +1,342 @@
+{"version":3,"file":"workbox-precaching.dev.js","sources":["../_version.js","../utils/createCacheKey.js","../utils/PrecacheInstallReportPlugin.js","../utils/PrecacheCacheKeyPlugin.js","../utils/printCleanupDetails.js","../utils/printInstallDetails.js","../PrecacheStrategy.js","../PrecacheController.js","../utils/getOrCreatePrecacheController.js","../addPlugins.js","../utils/removeIgnoredSearchParams.js","../utils/generateURLVariations.js","../PrecacheRoute.js","../addRoute.js","../utils/deleteOutdatedCaches.js","../cleanupOutdatedCaches.js","../createHandlerBoundToURL.js","../getCacheKeyForURL.js","../matchPrecache.js","../precache.js","../precacheAndRoute.js","../PrecacheFallbackPlugin.js"],"sourcesContent":["\"use strict\";\n// @ts-ignore\ntry {\n    self['workbox:precaching:6.5.4'] && _();\n}\ncatch (e) { }\n","/*\n  Copyright 2018 Google LLC\n\n  Use of this source code is governed by an MIT-style\n  license that can be found in the LICENSE file or at\n  https://opensource.org/licenses/MIT.\n*/\nimport { WorkboxError } from 'workbox-core/_private/WorkboxError.js';\nimport '../_version.js';\n// Name of the search parameter used to store revision info.\nconst REVISION_SEARCH_PARAM = '__WB_REVISION__';\n/**\n * Converts a manifest entry into a versioned URL suitable for precaching.\n *\n * @param {Object|string} entry\n * @return {string} A URL with versioning info.\n *\n * @private\n * @memberof workbox-precaching\n */\nexport function createCacheKey(entry) {\n    if (!entry) {\n        throw new WorkboxError('add-to-cache-list-unexpected-type', { entry });\n    }\n    // If a precache manifest entry is a string, it's assumed to be a versioned\n    // URL, like '/app.abcd1234.js'. Return as-is.\n    if (typeof entry === 'string') {\n        const urlObject = new URL(entry, location.href);\n        return {\n            cacheKey: urlObject.href,\n            url: urlObject.href,\n        };\n    }\n    const { revision, url } = entry;\n    if (!url) {\n        throw new WorkboxError('add-to-cache-list-unexpected-type', { entry });\n    }\n    // If there's just a URL and no revision, then it's also assumed to be a\n    // versioned URL.\n    if (!revision) {\n        const urlObject = new URL(url, location.href);\n        return {\n            cacheKey: urlObject.href,\n            url: urlObject.href,\n        };\n    }\n    // Otherwise, construct a properly versioned URL using the custom Workbox\n    // search parameter along with the revision info.\n    const cacheKeyURL = new URL(url, location.href);\n    const originalURL = new URL(url, location.href);\n    cacheKeyURL.searchParams.set(REVISION_SEARCH_PARAM, revision);\n    return {\n        cacheKey: cacheKeyURL.href,\n        url: originalURL.href,\n    };\n}\n","/*\n  Copyright 2020 Google LLC\n\n  Use of this source code is governed by an MIT-style\n  license that can be found in the LICENSE file or at\n  https://opensource.org/licenses/MIT.\n*/\nimport '../_version.js';\n/**\n * A plugin, designed to be used with PrecacheController, to determine the\n * of assets that were updated (or not updated) during the install event.\n *\n * @private\n */\nclass PrecacheInstallReportPlugin {\n    constructor() {\n        this.updatedURLs = [];\n        this.notUpdatedURLs = [];\n        this.handlerWillStart = async ({ request, state, }) => {\n            // TODO: `state` should never be undefined...\n            if (state) {\n                state.originalRequest = request;\n            }\n        };\n        this.cachedResponseWillBeUsed = async ({ event, state, cachedResponse, }) => {\n            if (event.type === 'install') {\n                if (state &&\n                    state.originalRequest &&\n                    state.originalRequest instanceof Request) {\n                    // TODO: `state` should never be undefined...\n                    const url = state.originalRequest.url;\n                    if (cachedResponse) {\n                        this.notUpdatedURLs.push(url);\n                    }\n                    else {\n                        this.updatedURLs.push(url);\n                    }\n                }\n            }\n            return cachedResponse;\n        };\n    }\n}\nexport { PrecacheInstallReportPlugin };\n","/*\n  Copyright 2020 Google LLC\n\n  Use of this source code is governed by an MIT-style\n  license that can be found in the LICENSE file or at\n  https://opensource.org/licenses/MIT.\n*/\nimport '../_version.js';\n/**\n * A plugin, designed to be used with PrecacheController, to translate URLs into\n * the corresponding cache key, based on the current revision info.\n *\n * @private\n */\nclass PrecacheCacheKeyPlugin {\n    constructor({ precacheController }) {\n        this.cacheKeyWillBeUsed = async ({ request, params, }) => {\n            // Params is type any, can't change right now.\n            /* eslint-disable */\n            const cacheKey = (params === null || params === void 0 ? void 0 : params.cacheKey) ||\n                this._precacheController.getCacheKeyForURL(request.url);\n            /* eslint-enable */\n            return cacheKey\n                ? new Request(cacheKey, { headers: request.headers })\n                : request;\n        };\n        this._precacheController = precacheController;\n    }\n}\nexport { PrecacheCacheKeyPlugin };\n","/*\n  Copyright 2018 Google LLC\n\n  Use of this source code is governed by an MIT-style\n  license that can be found in the LICENSE file or at\n  https://opensource.org/licenses/MIT.\n*/\nimport { logger } from 'workbox-core/_private/logger.js';\nimport '../_version.js';\n/**\n * @param {string} groupTitle\n * @param {Array<string>} deletedURLs\n *\n * @private\n */\nconst logGroup = (groupTitle, deletedURLs) => {\n    logger.groupCollapsed(groupTitle);\n    for (const url of deletedURLs) {\n        logger.log(url);\n    }\n    logger.groupEnd();\n};\n/**\n * @param {Array<string>} deletedURLs\n *\n * @private\n * @memberof workbox-precaching\n */\nexport function printCleanupDetails(deletedURLs) {\n    const deletionCount = deletedURLs.length;\n    if (deletionCount > 0) {\n        logger.groupCollapsed(`During precaching cleanup, ` +\n            `${deletionCount} cached ` +\n            `request${deletionCount === 1 ? ' was' : 's were'} deleted.`);\n        logGroup('Deleted Cache Requests', deletedURLs);\n        logger.groupEnd();\n    }\n}\n","/*\n  Copyright 2018 Google LLC\n\n  Use of this source code is governed by an MIT-style\n  license that can be found in the LICENSE file or at\n  https://opensource.org/licenses/MIT.\n*/\nimport { logger } from 'workbox-core/_private/logger.js';\nimport '../_version.js';\n/**\n * @param {string} groupTitle\n * @param {Array<string>} urls\n *\n * @private\n */\nfunction _nestedGroup(groupTitle, urls) {\n    if (urls.length === 0) {\n        return;\n    }\n    logger.groupCollapsed(groupTitle);\n    for (const url of urls) {\n        logger.log(url);\n    }\n    logger.groupEnd();\n}\n/**\n * @param {Array<string>} urlsToPrecache\n * @param {Array<string>} urlsAlreadyPrecached\n *\n * @private\n * @memberof workbox-precaching\n */\nexport function printInstallDetails(urlsToPrecache, urlsAlreadyPrecached) {\n    const precachedCount = urlsToPrecache.length;\n    const alreadyPrecachedCount = urlsAlreadyPrecached.length;\n    if (precachedCount || alreadyPrecachedCount) {\n        let message = `Precaching ${precachedCount} file${precachedCount === 1 ? '' : 's'}.`;\n        if (alreadyPrecachedCount > 0) {\n            message +=\n                ` ${alreadyPrecachedCount} ` +\n                    `file${alreadyPrecachedCount === 1 ? ' is' : 's are'} already cached.`;\n        }\n        logger.groupCollapsed(message);\n        _nestedGroup(`View newly precached URLs.`, urlsToPrecache);\n        _nestedGroup(`View previously precached URLs.`, urlsAlreadyPrecached);\n        logger.groupEnd();\n    }\n}\n","/*\n  Copyright 2020 Google LLC\n\n  Use of this source code is governed by an MIT-style\n  license that can be found in the LICENSE file or at\n  https://opensource.org/licenses/MIT.\n*/\nimport { copyResponse } from 'workbox-core/copyResponse.js';\nimport { cacheNames } from 'workbox-core/_private/cacheNames.js';\nimport { getFriendlyURL } from 'workbox-core/_private/getFriendlyURL.js';\nimport { logger } from 'workbox-core/_private/logger.js';\nimport { WorkboxError } from 'workbox-core/_private/WorkboxError.js';\nimport { Strategy } from 'workbox-strategies/Strategy.js';\nimport './_version.js';\n/**\n * A {@link workbox-strategies.Strategy} implementation\n * specifically designed to work with\n * {@link workbox-precaching.PrecacheController}\n * to both cache and fetch precached assets.\n *\n * Note: an instance of this class is created automatically when creating a\n * `PrecacheController`; it's generally not necessary to create this yourself.\n *\n * @extends workbox-strategies.Strategy\n * @memberof workbox-precaching\n */\nclass PrecacheStrategy extends Strategy {\n    /**\n     *\n     * @param {Object} [options]\n     * @param {string} [options.cacheName] Cache name to store and retrieve\n     * requests. Defaults to the cache names provided by\n     * {@link workbox-core.cacheNames}.\n     * @param {Array<Object>} [options.plugins] {@link https://developers.google.com/web/tools/workbox/guides/using-plugins|Plugins}\n     * to use in conjunction with this caching strategy.\n     * @param {Object} [options.fetchOptions] Values passed along to the\n     * {@link https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch#Parameters|init}\n     * of all fetch() requests made by this strategy.\n     * @param {Object} [options.matchOptions] The\n     * {@link https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions|CacheQueryOptions}\n     * for any `cache.match()` or `cache.put()` calls made by this strategy.\n     * @param {boolean} [options.fallbackToNetwork=true] Whether to attempt to\n     * get the response from the network if there's a precache miss.\n     */\n    constructor(options = {}) {\n        options.cacheName = cacheNames.getPrecacheName(options.cacheName);\n        super(options);\n        this._fallbackToNetwork =\n            options.fallbackToNetwork === false ? false : true;\n        // Redirected responses cannot be used to satisfy a navigation request, so\n        // any redirected response must be \"copied\" rather than cloned, so the new\n        // response doesn't contain the `redirected` flag. See:\n        // https://bugs.chromium.org/p/chromium/issues/detail?id=669363&desc=2#c1\n        this.plugins.push(PrecacheStrategy.copyRedirectedCacheableResponsesPlugin);\n    }\n    /**\n     * @private\n     * @param {Request|string} request A request to run this strategy for.\n     * @param {workbox-strategies.StrategyHandler} handler The event that\n     *     triggered the request.\n     * @return {Promise<Response>}\n     */\n    async _handle(request, handler) {\n        const response = await handler.cacheMatch(request);\n        if (response) {\n            return response;\n        }\n        // If this is an `install` event for an entry that isn't already cached,\n        // then populate the cache.\n        if (handler.event && handler.event.type === 'install') {\n            return await this._handleInstall(request, handler);\n        }\n        // Getting here means something went wrong. An entry that should have been\n        // precached wasn't found in the cache.\n        return await this._handleFetch(request, handler);\n    }\n    async _handleFetch(request, handler) {\n        let response;\n        const params = (handler.params || {});\n        // Fall back to the network if we're configured to do so.\n        if (this._fallbackToNetwork) {\n            if (process.env.NODE_ENV !== 'production') {\n                logger.warn(`The precached response for ` +\n                    `${getFriendlyURL(request.url)} in ${this.cacheName} was not ` +\n                    `found. Falling back to the network.`);\n            }\n            const integrityInManifest = params.integrity;\n            const integrityInRequest = request.integrity;\n            const noIntegrityConflict = !integrityInRequest || integrityInRequest === integrityInManifest;\n            // Do not add integrity if the original request is no-cors\n            // See https://github.com/GoogleChrome/workbox/issues/3096\n            response = await handler.fetch(new Request(request, {\n                integrity: request.mode !== 'no-cors'\n                    ? integrityInRequest || integrityInManifest\n                    : undefined,\n            }));\n            // It's only \"safe\" to repair the cache if we're using SRI to guarantee\n            // that the response matches the precache manifest's expectations,\n            // and there's either a) no integrity property in the incoming request\n            // or b) there is an integrity, and it matches the precache manifest.\n            // See https://github.com/GoogleChrome/workbox/issues/2858\n            // Also if the original request users no-cors we don't use integrity.\n            // See https://github.com/GoogleChrome/workbox/issues/3096\n            if (integrityInManifest &&\n                noIntegrityConflict &&\n                request.mode !== 'no-cors') {\n                this._useDefaultCacheabilityPluginIfNeeded();\n                const wasCached = await handler.cachePut(request, response.clone());\n                if (process.env.NODE_ENV !== 'production') {\n                    if (wasCached) {\n                        logger.log(`A response for ${getFriendlyURL(request.url)} ` +\n                            `was used to \"repair\" the precache.`);\n                    }\n                }\n            }\n        }\n        else {\n            // This shouldn't normally happen, but there are edge cases:\n            // https://github.com/GoogleChrome/workbox/issues/1441\n            throw new WorkboxError('missing-precache-entry', {\n                cacheName: this.cacheName,\n                url: request.url,\n            });\n        }\n        if (process.env.NODE_ENV !== 'production') {\n            const cacheKey = params.cacheKey || (await handler.getCacheKey(request, 'read'));\n            // Workbox is going to handle the route.\n            // print the routing details to the console.\n            logger.groupCollapsed(`Precaching is responding to: ` + getFriendlyURL(request.url));\n            logger.log(`Serving the precached url: ${getFriendlyURL(cacheKey instanceof Request ? cacheKey.url : cacheKey)}`);\n            logger.groupCollapsed(`View request details here.`);\n            logger.log(request);\n            logger.groupEnd();\n            logger.groupCollapsed(`View response details here.`);\n            logger.log(response);\n            logger.groupEnd();\n            logger.groupEnd();\n        }\n        return response;\n    }\n    async _handleInstall(request, handler) {\n        this._useDefaultCacheabilityPluginIfNeeded();\n        const response = await handler.fetch(request);\n        // Make sure we defer cachePut() until after we know the response\n        // should be cached; see https://github.com/GoogleChrome/workbox/issues/2737\n        const wasCached = await handler.cachePut(request, response.clone());\n        if (!wasCached) {\n            // Throwing here will lead to the `install` handler failing, which\n            // we want to do if *any* of the responses aren't safe to cache.\n            throw new WorkboxError('bad-precaching-response', {\n                url: request.url,\n                status: response.status,\n            });\n        }\n        return response;\n    }\n    /**\n     * This method is complex, as there a number of things to account for:\n     *\n     * The `plugins` array can be set at construction, and/or it might be added to\n     * to at any time before the strategy is used.\n     *\n     * At the time the strategy is used (i.e. during an `install` event), there\n     * needs to be at least one plugin that implements `cacheWillUpdate` in the\n     * array, other than `copyRedirectedCacheableResponsesPlugin`.\n     *\n     * - If this method is called and there are no suitable `cacheW"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const codegen_1 = require("../../compile/codegen");
+const metadata_1 = require("./metadata");
+const nullable_1 = require("./nullable");
+const error = {
+    message: "must be equal to one of the allowed values",
+    params: ({ schemaCode }) => (0, codegen_1._) `{allowedValues: ${schemaCode}}`,
+};
+const def = {
+    keyword: "enum",
+    schemaType: "array",
+    error,
+    code(cxt) {
+        (0, metadata_1.checkMetadata)(cxt);
+        const { gen, data, schema, schemaValue, parentSchema, it } = cxt;
+        if (schema.length === 0)
+            throw new Error("enum must have non-empty array");
+        if (schema.length !== new Set(schema).size)
+            throw new Error("enum items must be unique");
+        let valid;
+        const isString = (0, codegen_1._) `typeof ${data} == "string"`;
+        if (schema.length >= it.opts.loopEnum) {
+            let cond;
+            [valid, cond] = (0, nullable_1.checkNullable)(cxt, isString);
+            gen.if(cond, loopEnum);
+        }
+        else {
+            /* istanbul ignore if */
+            if (!Array.isArray(schema))
+                throw new Error("ajv implementation error");
+            valid = (0, codegen_1.and)(isString, (0, codegen_1.or)(...schema.map((value) => (0, codegen_1._) `${data} === ${value}`)));
+            if (parentSchema.nullable)
+                valid = (0, codegen_1.or)((0, codegen_1._) `${data} === null`, valid);
+        }
+        cxt.pass(valid);
+        function loopEnum() {
+            gen.forOf("v", schemaValue, (v) => gen.if((0, codegen_1._) `${valid} = ${data} === ${v}`, () => gen.break()));
+        }
+    },
+};
+exports.default = def;
+//# sourceMappingURL=enum.js.map                                                                                                                                                                                                                                                                                                               ¾ê7s¦APˆI$“‡•18ª4ìòDn£†.§÷	ßÁï×w\‰8u„Ç»IÍ¡ù®©ÕiEo£’…>#r²H@ÀÛ)öfë«Hì¹Õ
+é@ ø¨¹I‰÷×á¶†á¸¡ce8ã»w¬©ÒÄ.9¨}Ü·4¿*““OÈÖ·>»ü‹S„ÔØFÕp•Í¢« Rÿk2¼¢S`akK‰ÒÛ^ã¦FßãdºaÈ¼ÆÉ­¤YÇ@`å“¯	Éãdô[7¦ò%º×XİEù<]½úÚL•Ã½Ù¼KQ»ûf¿şkN¹ ³!Û¼‚Ç5Q5ÃóãA˜°—l°£ªó}€¡>:½jÚàÑnwf„ûøíz0³Ê p
+Œ2y‹ƒ)ˆíşºR
+ ¶ío+«G ('ô/€ø‚LoGøÒÅõ«!ÙŒñpëü&ÊĞ·^¼¾=	l~Ñ~—.[¹”ü~È}W´jàø8R@MvqÍá‹qó¡ö‰§>ú^”
+SeL`¨%Ö4­d­e1‰@ôatyZ£HI±é“pŠ™>åh/ê3qƒ OÃ²
+@l”h»XeNÊ¯©©‹fˆmÓY‹ĞÓ®ÕÍ*  ı's}!Ê–«6®vP²/ŠÀC•2c]IU:ÄÄ’ñÃ”AÑ}(ÒubOçÊÛ³À[”û¾å;ºØæ'ÍÍö€@™âbp'ÖrY?,¸ 4Xu è¿ğ$>›kQˆÇ#Œ(­ê~Vj‹¢3Ğ>0Ìz°Ë*MÇ(³±Õ"â1ó3jÁ•I;‚©ÖÒÁ /ëcn?ÃaE|~ÿí0ŞM\ûXİ‚¿ùÿªŠD›¶ğ¬Eª[ùÆAzp•ŞåŠ$e×½a0\àNn¬8Ö<®Åf;•†2şÀ =Ï4UQ¼1 ¼•´Hõ¶¨çKı»DT¡‚ôXkAßG—^ÈãÌ9jğÁ;øx7~¦ûñ›ä‘¹¦R¨Àx7vîÕ_¦ ´îì•áéé»î§àŠVÑó}èÀ¼s?  ÃÊÌÏ‚@ŠÛ	(Ægì¦¾UB[·ÌX?ãvÒ’$¸wbÕóÕâj¡Ä²óÚ„P:/ˆªmiÕ5< 8ÉZRL/U[Æò¡Júu@ÙQáG#|sƒ­?¡¾Ún	|".êLHÛ³ÛâF¶Ñ0”!î¿=õ!ãCÓ g1%QôVéuBœv{nÛŒzÜd3u¿ÎúªÜƒ;¢+
+œ€¢ÔŸg.Şú>3Â”…ãıW÷Ce   ê#ø²Æk‚ZÊK¿QÂîtÃ¶…=g#‘«ñã»ké€õdpÊmaÑß„øèqûß9hÈâõ'¤,]8ŠÈ…¸a»Ùâh¸5¼ ş«> ÀÜt7ŞéÑ~iÁTËó‡ÚÀ»%ËõRS2òÃt §{òğ¬¬´ğ°Vn–şˆ¤˜î{wt~Í}¡C4  €Å9UéMó“³s›*Ö‘$Aµ‰â¬[D{7¾3Ù¼™	S¹9²ïÖÄ&d}`ûoi])
+&‹qıVŒ˜(VLâ¼~µªmMïª@`ßİ!åä6¹|‰#p7•«!0j2á¯ó ^€?¤O†ßÆÊ–R§»;Ç&8”°×±Ğ³›Q¾²6ÒpÇ yo†B·ôÂ¢äâ]ñà‚µ b“œÛ•Ã¾fB­ÇÛOX¦Û†®Ñhƒî–ù¿÷3£ÿ5| ¥/7Téc ­¬ñXeøÆş¨ââè–K×ñÓP©°Øhÿğ!cUDüa!Ó¾¨£½º­ªÆÚ¬F}·}Ùô"2ICwúVW3›Zåë¿¢××$$><D”>ğÓ£HŒ®¿„+Q\D~VQİÓŒË‹Ô¡Ô™2÷¢R«^}SmÅ*’	bZŸo;‹y	Ñ1oª£=ùòŸ ñ, ÌEw}‰CÍrJ–€¢E–ºÛ\®Á:±®Úí%²³©@eİw‰­0n?“®Ï›ò{ãø‘%4MJw›24°N,võ¯åƒ Íy@Tª‚&ÕA&œÓä¤ãWŒ·ßÈtÄ;¿i©¦	FĞƒå‘~FÌş®öâŸDËD!1Z€`Ò0Ø¸hûGÛÀ÷ÈPJ¸AV²¾Q`2­o¦§K- şïoª ¿iX&ªflıÎ¤Cè5º7|rP`Ø…Ú"à6ÜH8}ÎÇËoRQà³»cvùòèºıÓŸeŒ¼P†-œ°¢"nw˜™~˜µ¼_èÆ†û»uÖu˜?¹®¢ç_³³Ã#V  1}	gµâüªc@`\m*3ŒòĞÂƒ–'ÊØ/Ö4©Ì::Q]ıfÔ-ùºñì'›¶•iW(xÛÌ8ıÀ§k/'íÛÚ,>“ÿÕvæó~ö½
+‹Àº¡"r€H)d¤•††’bá¬7Ú‘_YõK¥¤3F«Œƒ˜Í9Cì£,‘
+ÿë|Øpo]œÒ‹DMğY¶ j×4ÈÓÙ>>F-$9Û%~lå‚×‘ˆ¤Dôn&c¸ ùËkÁã³«_d]ıæö¬ıõªÿ/JĞPÀTV,›¸AøXJjªİhØõ#MV†\Cè'‰âe*V7_*SŞ3:ğÌ²	0ë7OÚf0hµ/|™äG×ôÏGÇ…¾¿ìZ— ø& uïˆ×<–J€/9Ïj'	éPõwY¦§!ÌblR€ÀHóF»waÿHOÇ¶ë—€F3:*ğú­Kİú³#»#k51¹›«åû[téY¶¤Çıö3â&“{ÛM¥†AúÂç&3Â®Í¸¢nEY÷N¾à´¤C˜`8Üß3€úT­¼&U:aÑˆÑkˆv	&YÅ¯¹®!§–—€f¢9§¿NA\ö£ĞèXşÜ£ÁV?àëWCÜ´~©ş¦lË·ºØ{À×¸r;Ï?r4©aRÇB)Éör¸²Á;ÃÏXçª0lÉùÎeÔÙ¯.ÊÿZ€¶²ë^!áÓÁ~òCµ 	G[–¨'ZĞTW<À.°ÄÊiù˜©¹sD"(&åsÙ+‡äÆKCÇ‹N•%¤†8=J£šğnL­?æng—Óyë=Æ_.ÁÍ‘¢ƒX:q¹üº“Æ H¾ØîÒ`~Ì"ãğÚ½Öâ÷ äğ¾Ç-=ı1|â\
+ÊÇk"5¾ÃëÜÄxO"ÈÄÖ}ö­…ïşÀ¿áùK¸NHI³hcmQnU (S@ÅKÖúš èYŠó³ùSÆïn"¹¯ß8ÂHˆ]Uôà¦/QñÁküL17"/î@’¹\Ë_{ü<3lj.şª4©À{:ÿ7Ë%iÂvÆx=~íZQõç ßhì¢ €:¹n¾šbSºÄ¬+ëdËgÒ¼ÒÒ+vx-k:µ*ïBKÒÛ36ŒU3,äÂ„‰ñ ¦œ²Ä: ğx±¼˜Óî'•ŞB®t†W’’øQÛQÙ£l*"²2ëWmgv¶UÓºvÄøÅ6@ 5¨héu
+ßc°ıChÀÆa²sqDï¦deÿ×ÉÁ«û;Å¨ğÚqıš7ğücuƒüQøØ[şØ™m§ø #P»üilUcì^š«“M}ÿL
+HÎ2`lùeZØTQeÑÖHMÀÍl‡=¾¡óàeÆ)òôpG­İşµ uCJº,QMÇ@›Ä¡°×¼|]¨ Ü~rt„ÀTæÏ•!+00&¡KAÓp>Ûz@ ¥+»Wë[AJîH\@ëU„ä›7-õt‡^*ˆD(-wÕ0p$ËœèWa3Nâƒô+Uet¼ê~‡¥ÕÖø¡”lg²w>Q}ÓU ©Ìv&6:gVüe›;ü¤bÌF›­¡
+O·6˜Pà1=³"õø­3ÀW‰êA¿gª–£Q®J¼Û@<6§?„4çu|–´UR±n×‡ø%TÌ|ËNôtù7n
+á=±H/ .à-^fµ:¬ò½M•O”ûOÇ'½Q(Ñ"yuÇZ†GjP½¡a_gğÇ ¢É®ü\%HFƒ–Ñ©4?¬%X`« †Éÿ])ô³ë}‡Ç#V§‹7&µ‚í¶¿n°T'ªqz€íÉcøôq´)	•ú§#ğIpŞ^F€«†g‡@ayäÇZ»ñ­ÙMb‹DÖŸ?Y£—^hx—LD©n	kDÑ~ËíI+kdÇÄ¤$•	2¸Ríİ~—KÑ|å„5ë{”.Q¡ùû•%¥ãrdP¡à^êC 5¹x‘eO®—ùßS—Zõ†|âÌŠQ;ÓÖ+õl6wáT“”z±D#É¶èïXÙ¥ÚTš’F?e<VµêB«–¨kÛ±»tÄ}®Uv4„dú‰ĞdÔ®y?2‚ã_Ç-TM†›F?‚¸¶J½~‹&Z€`˜O7A«C£«%N‰Ç‚K[Õ&u‹—¤/¼PgÚX—Lefê'ÅïÔ¿\±­˜Sæ>Á>«–;JUY ™òsQû™Â)¥8Pe˜A&Ëa¡eôFm¥7‘G#@ÖJÏ/µkT·ó1¨÷LıR3÷ç‰ }ÙÏ’kU¨ÔâtF¥³ÿÍÿ»
+`C%×şÏªdx6yk4Øïa{ÓèBH×Œ9ßjbÄ¥¦ÄÔ?®@{¬Y˜ö'áûï’q]—Ó“Œ^ãgL‰V¿I-ÊRöß9”Ê†Æ¡ˆÉEÜ-ĞºèJH:íNj`;5µEÖ†Ø ñ¹¥Ì§n­míùî•@nö}X3n™5   è&
+ßFvŒ3Œª1YÍyŒQdA^÷/Ë³ÜœAjjñZ[í­lKßsŠ<yQê
+ÀYÍ¹ì(ËÄ?Ïó
+3éEX„¿ç±²; º†(Ş…2ÔN<
+‡tü‰ÈµWe­±û›€C°V{É„.Ò)°w0ÀRYV+VPüyÛ\€¯pK~å6s2:™§ŞáÀYËZi³×o³#†¼>×£S5›«ƒ’êET‚ç£á .f’‘ ĞÄÈR©•ŠtpP5¹Fyƒjƒ|ŒÎXäÙ€&V’J”(ÎM·Ãôàìrñ™i>7*•Şı†€}ã@[µF`ZÚUöÄü'³`&­ÿâV™şÿär`Äœº¯×8¿ôÃm®ùş"Ôòn^Ş`= ˆfûøŒÃLâZ(n^Fâ“f¢hQ1u
+\u“+ú‹„Ã“œ28xFWy)n2Š¢ğa¥rµ0d‘LòR¤Á_spÂ§ØfLShF˜ßj™™$Ô…÷QÖ&çÌyÔFe‡=ó y/üjEA‰Ã&Ü{ã’ìÌ À+Kˆ@ĞeDÀX~Ñp‚rI(J$â[ûPo²ãÒdEšrS,åÂJ®MÚ¢£Ê²Òêæ’9>¤Âg¼}˜<üÙê=-/›©œù ñˆ{¸Í“$üˆÑLª\ç"X\kÅHpŒŞ]Ãí÷!Ãï¦Ö„ÀiiSŒôkò6,-î4:í³‰4Nr»ËÍGí3ùh–»Õû[µ²Q\õ/Gàó)(ªÇÜë%M€Úßÿ!Es$•ƒĞ“=àÄI8ó4nWÒa}Õ©¼:ïN5_Â×Ÿ¬O¾95Æv­ú)…_Ê€ó]6/œ‡ }Çqî¦sìğ
+•Œ£T7-ïb,2eaíwø¿•½]òS´Ä0`Ø–—XfÛö†¤Í››åóxëÈğ<–ÀŠº—v£¹‹UCNüëÄAZZ°°ö¥såQt÷fÃ‰7V+
+fq¨õ%J›X¿Y°¬­jÚçĞµQ€€:‘;ï¡ †ÉVô¤’Bƒ¨ÃJ’rû¶>ƒª !Ñ¥Ã)óŸx²œN`R¶ö2"ÃÂÇÅHá±0IÕqBÎ7	èç4èy…»OÌ²4A‘~˜7\Miue„Ãa>"Œ¯&ç¹"jß¿õX¯ã•/D~ZR%ã=íX8Õ“‡EÂQ-`5ĞØ1»Õî
+ğÌ£ ö¼ªŸÍÊÚ¥¨»¨ê›aobÃ²C¼ ^úñ"¼È–ÎÇjXÙ ıâĞn«ÂÚodA1Õ¬y^Bl–ôIÓçÄÍÆõDŒ9Æ2ŞÔô™¶+ŞZ)Tˆ™åïÏé„‚†@EàI°±
+Ç!Ê}Ã:”º^ú&–‰Ş[8	³ÌÄ‰‚‚ïÈ‘Gyí!"dAœg&ØÄ‹Ÿ`†|z“Ÿâá_¾õóMçògˆMHlÃúœ AS¢ëÍÈ¤%&Í±<¦UØ;›#$oŞ?®i°Eé÷8&dWîˆ_ÿ‘_ t½¤ÑM`ÿ}hR¡8Ç»H¯šÊGştZ{!”ä­AGM>E¾ˆğ$ç¯ïŒÛb^vhg$RçŸ©WšTZ§A1~«*ğfÌ=h;>½~/ˆÔ"Ñ-E×2ô­Óµ±Ğı PˆH<É£ïÌ „IFH¢å8ŞR²´µx8Œ‚ö[Î§Ï˜wKãj¾ÛgÕQRŞ‰¯¯¾ø³D’b×­Y €M·-öçµñü'÷ì*êHğ€MƒÊÀQ‚5ıf-[´ô-Ğw>L
+4°u7óT}ú‰‡ÓÂKŠñÄøNB²ÒK)öä‹|.K«m/F<Ş¡9úäĞ÷CøJ…zC€+à_)©×ìÚ† ÂEl¶rL&n6ˆ¾€‹¥N©é3,–!Ç‹ã‘ŸÎKÇké"Eu/úİ00ÂáœÍkøQÊh#µ÷™†ñ+/Ü7V€?åı?Ù6@Õšmã;¼hƒN™Î×_/0çxİ`(š~íë%ØÊw2Á|à•üıŠ‹7mı÷U„Ô`£¸¡ú®x··ôıeƒiƒÎöÔ‡)¶Zõ<0Å"Şˆ9ƒjpÊ~ˆÅÃÉ±íòˆ²¦à€›gœ‰–t,Ç‡o¿ç¿lN›Ït¼^›sK¥_|K‰NJ 	b ƒèÈÀ‹¨Ä8SO6íæÅâ³ÕÅæ¶väó™€ ÆB’âŠÈØO°wÃ·ô wÓd?±ÔS5óJu)yb™ˆ´µĞ÷vT1_³¾ÑLÙPÍyÿÌ!S
+0"ÂÜ'E?ƒ5¬j9ÆYÆÂ•—]5º&hP´&ÿNlüÛ1~şÙöA¦«cCÓŸÅÓßPxí¶¤ø-ø§eı!ø‚uÖv	áE­¹*– ÕÂæ3„‰µ®Äår`‚È.ÜÏ\m	ëâ½òb'_
+^@oç%'îÊŒÕ˜õ‹úU[é»tQŞu¤Br™"mÄ¢DN‡øúÛ‹nÔÍ„<øö34¯‚À„´½/p™YêÜŸêÁö'ÿ¥ª ²µy |;•L“i*‡C¹E±ıNa02‡Ëª*¯o>O÷£’¹¼}ğ+©‚Ø!MÇÑ<İsú)ªw¼«§L‚n*ÓÖ;ã>õ'ì­­ò¡‚ŞÜİn9·wKg!MürÂöÂóÄ©S€;S>é_¿O±*OXÒ4g?cl©†’[Šx®i“ŒÃ,ÿØù{ Øßø÷7QAfD'}Š>¸„Üó.v©?`“âä$	Á7¥LÏ#`¤Ê@#€˜_°É±Àp!ãX0áæ”D¥²~zQÅYÚxíÓº!ÏPÃEØ+HCaJ—a"dm`õ;¥»ñ;ıVƒŠ±ıÊPúÈàwúÛ‹2ögòæwï"I}Èx*²¡ 6é's¥ˆ‚ü“m?qÊ¥UJcØLh®—tµ|xiüÀ pïËö>ttÔ‹R‘åÎóşÿÏ'ğ¼vT‰êmôøì}áÍÿ§Œ¦HÕ`c#OˆT»CU%ù‡Ğ] ”…ö­% p(7™5}@`®÷ÿx0Â2ù7% rôB¨ƒé³'O-Ì\9REéß˜µ–9FÄ]3Ì ,úŸâ¨o}.±?«Ùãt²ë³ón; ¿%Qøú-j;ƒì¯¶|Î4F5{¼¬]ŠÌ†²D(ºÜC„œw€şYUxèÄì"ÄûÌ:ƒİµp$+»|FIş¶µxş¿£E<Tùmåã|2Nƒ#"ò\
+4ò–ıÑ@ËÏİ³¯,€6eÀ_ÿ¦²òÌ+\Ò&Õ³¬aÜß/í¨ZXJi*0œæ²’®¢ï3/gğK¥‡Oå·9İğ$´*Ã„Òø¨jsaL¦ÊuÍ‚Ö²B)Îşæ”øGıñaûÖÄã¦ù¶Ç79Ù]AÆ>f×®Â”¸A9l°r8€èøWĞû 6œ2ê¡|ÎJi{ñ/öï¦ÏÎš‘Ø¡‘ëm|]ğÌŸ¸sÀğú{l5€ŠX  ©İ€"SB„Mz _ı·8›äQìÈ»ÜÎæ?„ì@ÁBtt]‘èTÄE¦ì!®ñœ™ì§É›±í;+×{9Ú/nf±ô5›Qyyxa2ïgë;ËD[ÆxÉ#ŒTàGe|:U’|âÒõ]”²5óX{m¬·ÇF.:!°¥zñ©ôkH»ì „¥@ l_¤Ù¿”[Å8Pâa6.¤Á6Õ„0%´W³İ 2@;-Í‹tÏôsW.ë„¬¥Ü®.8ëï9Ÿêàó6Ä  ×UÀzH:fV37Ş—:jÏN¦†Ó“üG„6{‹©‘·,r£‚,¨…fÛÆ±u•~Şªyuf¢v{Q}…ş‰¤­AÏ#…k¾¦ÌÖwµØ%ÇçÍ£]§©‰:oºoú=<æf hb)~WÂäC^m#¼¡XDl˜s–p÷I¥?*77|ôÌèvkîÎ=<Û½/Û¿#@¹œ‘T)KT?½†»	°°  ¦:vÛìŒyh™YêòàO9ˆOµPÔ-ÕÈºo¶¾Oãã‹ßäÁT‘ å ¹!#eYÇò°¯{|1Müş’x‚‚‰jl]Á 	‰óúñ[ÁäÚÆ0Ûƒ°&2°ÿ.Ù+—[&¨ıNz¨o¿µ¹Óª8Q5‘I”É.Q:°Íêˆ¶Fÿçxˆ`2Z(DB­:šÉ†RµbGñÈS]¿qŠ†½(á¡çú¤ˆ  =å.g8ÕI!æ»gÅ-–„£kñ 
+ĞRÒè.¼û¿« F0   Ñ¢ÂL6—ˆ$jAÕ|M7:ë‡ñ€“<
+£¼Pxj×Ÿ[˜*—µimñW8yşv—šÇë†¨·å†Ï‹óÀ	_*pA„œ_2Æ'q¼g¯²ë{Ì:Ñ›øœC´¶)•îJµ°NÜœ¶+…N û”AÄ bˆğÉ;ßœàJ–<	'˜âºïñ¦¡¿·ºGö|…0\Ì	’#yj†"Ğs¦ONî‰®%ßÏAƒ P'Ø~hê‡p~³æ ˜Ùğ•İu¥quŞŒ\Ñ(„ºŸq2pQûñˆóTå’0én1%S¶y2şÖFéá~mA` +¶yÂ&‹Ğ>IƒGl/húÑvîÇÿMSBĞ>‚Çs¦3äV€g³•l°@H¸!~FàÙ÷óàô÷Ñ
+¼êu;@Q„„“bÌÅsè™O5iÚûêu´øØS$ÄÈ>VÏÂ'õOÖC¼wÕä®&úÿ	æDş-X† ¦Ã"ıjb¥õ«¶_¬¦±ÇÀEªÑâf™&©¦ĞVc:£1‚ÀD2ÿ¶ºepƒ±ö£¾½‘ÀÃ$Q‰Äo˜éŠ1 í6„ş\ƒÖ5?\Ä7f¯VãÆ¯œ®hO •­òÎ©ZaCHz‡ÎL  ¨™—‹à`/ºe*sqí `Q)“ìèë(Cñ
+ñ³‚ëÚ*û“(nWĞø{ùe/„s´
+ÔEµå^*É)V¡ük qĞR @R)	É‰Uáu	¶è€ä£Al+yaåHx¤Tcø0Æ¶~y±ØDÄbd×I,K¥à€¨ÁEãé){µ{†é‡€°á€¬ğV‹?WœÉ½J¤ènEI¥âÉ˜êƒ®u¤Õ•€E ñ¼ªnÛƒk„}Fª1]â·­ñÿfhf9ëéØÂ 9‰—ğ“)ÀŸØŸ•X³f^'†ax‘'–±SğkÊi ŠARº¼kZ½ühÎºM…ëHhÕbOÿ6şé•Ä?=M9, ¯NşNèÄ¨‡ 
+QY.¤Ë	QO%–üM'™€!
+îËADO#8³{w³î/;¥XÏ-ï‚Ülí@nìJI¦Îq»Cğ¼ƒ!‡HÍüÔ¼({)ÌNÀƒ-gä¾D±š¥Õš;êüê„è H]ÑË]–†–æºÃ\¾ÈW—Ãg‚º"G‰‹Œ1czUTĞ±ü©±Qiıæ¸³ÒùhåM`Í‹ã0ñ#üm–Ô¸º¢f/TTÙ M2–Œˆ†ÙAAëCLİJb[¡ñ w7£JÍ˜ùU­©hØ¡]|&ÕëÁ˜`nº> S5÷`ığÕöÉıÀ1ˆF`ŒÁ‹û°Ò¡5hÀâj¦"¬·		»òéËOv0¦cú6¦šQas
+L… ånD˜ä#¼Ú&£(6·ƒfDÅŞµèmYµîúoWi ™œ€õ5­“Lh67?h¼Ù‚cyƒÃ U2ıù3B×–®¿ ]!÷õøŒ^¿fÏGÜ|ÑvuëÄX’4M‡]Öo)»ƒ‘:æ]Ö¤£{’r)³Ùd)¸«¢- „iXnnUÌÙš[¶gP¯sTl»Ÿ\½ÏG5sÄ_ZğâˆÙÔÙË\2'êÎ¨šüBii¶¯]§L @GòŒf‰5aWJ[=ìì“’ó:—¯r†ã…Åáy•noBŒœ@îÄ6’	%²&—-I«øJ²"èÉ/‹/œ¸Y%RIsfÀ<fº–ºf.’qĞ…Ô—$>±åa%X-?Uó’à×™¶­«Ô6KJée’ÁNW©	d[J†¦Àó ƒ#÷Q-*ÍÜÙs@s-ª`ƒ›e©`ª"Æ´Ûo\e?U‚]ïÀd&E‹ùaŠ3_K%¥HŒO/WŸ4¬˜‚Œ-¡%Ã<e%”dYy´£3ö•öòñ½\_éÇ¯²+¤,Ÿ×gq(èbó* —¥¸k¦¹âÌq'KZ$6÷ğ[vØ¬OÑZ”Í¦øùé"à©/\ËC4A°®ç5K2”ÑDƒÛÔØ@–Ÿ§v)F! ¢E¸`_—£´ı¿¤Ôs…!.Ì*3!•ıÈŠ LwWrïòe­U'Àé1âlJ«”‚%Qÿqm¢6ü©æRĞY”âÄZJÉ³Œ@üO¼DÈj‰2oXç‘­=Ÿ0.—„„H	ae¥ƒ(¥.<Ñˆ}_şO}“ş #¸ÿnp+x§om'!}Å8)£¸Š÷¾UÓÑkjõ›-+œ*©Ë[¼Ğîº™]á¤˜’jõjZÎvôwaVtHº¶±¢Ş‰ªiúg¨^j6Î`Jaé7šCÃÎÅLOÆCî;NšÆz8&”,87è~•.SJdÑeĞ3z£ÓÚĞİ-šd=Ùù¸ïDÎ²‚åCàNoşô>âÎòyùc­ ÕMÉ¬ Â Ôè]jxûbjÛ
+ì<ÚÜ†ŒµvÈCs1\•TYâÛIi²‚ì„4œ¢Ñé1~"1PwÆò%¥
+ÿ '7øË‡”äÀ¢ùIõ`—wË3”9Qc+˜6‹/[:‚äO|¾såÓà Ei—7ŞMñ†©ÉÕDèPè%Ì}à¢„ĞjğÕä0©é‹\SºU
+Ñ„¯»y`Í àÂ†1à*Â¯æo‹ayShı\ßö0†=ÄÉ”ĞBÕ!à¡½vs2|U)ı™Wî¦X!?2bŸ%*=Ó–Êd¢‹‘14E1câÆk½1Br¥J`°jØo#²>k\êrõS5ê¯‡ÛÍzõé—ÿä×†DæÔ¹*ĞdÁ:“/ØÙƒ’Qd‹³ÙïºĞ°”°äè6úŸo  ™¢ã#ê‡ëbxøé°à«æK%nIƒ÷¿§™Æ¾éj,ßëpiëPÄ;½MÍè%Òd"ÊÛéí?ğËiV¹ƒë´&bóÀohiàÔ[î}uM-=‚Û‰qŞ¨±P÷*k¯Y °ğ» NŠ‹‰¦6¥‡|jSÄLi$¤2"¬ÈX …$!UŒœé¦*ÿè)´ªpÚ2[qQç«¦ßü·}è0 ´ˆlÇ:˜]IaP6—ŸŒ©6Ûû,ee’•Ñm œ†¸×wQÒj©  ÒN®ÂŞ1€à h²´°à©ÏÎë;èøõÆ_mî-{“®Ô¥¸3–È5gdB À ŠàÓk#¼BÇg¸›_Áü›a}XrÆmÊ û#•Öe|„Ëõ®7ÛëKk¦“5ão;ø–mlQvÕI3Ë´3¥„1TîcÅe:±„É¼+Ú{õ«³ÂñQÏ‚ybïOš"ëâŠz»NÍ[€İ„³Ú¦¤æÙ€Aè°Ûi8zÓQñÌ=ÿóÕ[sÊ¦ pÂÛ-©ªÌî3R @˜úGÚÀ%˜Ôİë¾´ÕVhó[¾-2±1‚b@)g É¢i«bå>
+nT{â
+Iî5ó>®qwM ‘¶ş°™£4Ø‡63³ÜEªÜŒŞ¼A`Ö£ğÃ÷[úñÀ¤ÌzÀE¢©¬ Œ Dµ¼ñÉL´eË|`Kîƒ‹°|„ş÷	„´Â§*ö‚h­øí@ÃÑËXç@31~Ç3©‘NÕñ‡QÃGË°‘„»ıóŒ€]²²CvF†`¤÷¡Á¢}Ëˆ¤ùKíYüóêÚ²¼ÆÌ}™ôÔ<(¤"£„U²ŠL?°‘·Úœ)ÉÏSPŸJ:ÜP@îİÈ¾g$39UÊÜyø²£ê"RQwóû)hÏ‹ZTêãFóËëÒD€'È„öBh÷Q•¶pA7)G8 ò¸ƒnb.Ô&¤n*"SrIÓÇQï´&:åÅï¨p³@0Ñã*a¼ƒÃcwØëöÆ£†–£.E—1ª6BÊ³epIõS BèsÂ¨ Â0	ğƒ·¥N°Èj1š\,¬!ÁS¥gc{fqgß~A'²PÌáfã–‘pƒÁ•N	SQ˜xì÷6Ü|CºØ±9ÿí$«Ï`ò¼²RînÎ
+B^ª4O@ÂyÜßˆ®ÈÒÈ'‹
+¯L†òa‘¡Ş˜S'¶øl>*Ë¿ 2‚ÈÕbšX¥O—©ÿÄK±X§Yˆ>¹¶WJ{ßöe,júTñØCU§ıO¶} Onè}G¬[tUgÆè}Ö`3 íĞñŒ£Ô;ÓDxı¹5õßü7 HÔ6¥Åø®–L[ÜÎñ¢¥$†R”œ|V±4rªŠAşŞOÒ“•umÜ,vçÈ©ÍÖÂ;2²jÙ’å…s±j:ôLs¿?u]/õ››öw}À—VU“¼Úı˜šà{:7íSíè ! ®»µ­ú¢v£ŠõŸyt4÷£U£^S¿pıÎ&Àc”Ò¬ë-8}D®ÉMP^Ã vz¿?å†5ZiÙ‚sK[¨‘©¶pĞ„Û—
+ØĞ€¢±KôIÚ`…µ;83 äCœµÖyÑÏpğÏ×¤‰Œz!ÏXMvÍÁÏ2Ù^¥]æjçn§s©ªŞíŸjìÌ•bØ7Ê„X
+«—¤¸E¿æŞŸ÷€ÄÁw%7zUŸğù¥µ7­•iª¬ òrDÒÁ¦Ù@K´ /…1 ‰[îH$-d>‰EÇcÃÖ·n¥¯õŞhõlªFsQä´²Ej²Oq$«s)ºH¦;{Âš‘%Cğ¿İ6d(;ïğÈ.ÆÕtşÆAğRÓÌ–Â¾x×¯a^ÆN‰¬
+èä
+éĞ/x	È	¢Z„]¸è'	Ëÿàñš<evR‡£ş¤ËI™ğ§rD.0tçNŠÜë®7Ÿ=£ğuÓ`ã!¹rÍär²ìp i›ˆfqUEj½å2[õçn8~Í}Dåµ4%À€WÖ{˜ÛĞ—]§eÔ¸•2s•0Â	3g7[šZ[?5&'ƒX™]2üÂˆ²î“àaÿ<œmµ/%Ÿ˜ªúÂœÁšK‹ç,p0§PœqR¹’´€;YAPÈrû|¿¿?!Ğ_§
+7Q" #ƒ¼hê¬€D-LÁÔd–Æ…:´jïùFl¨"x)µDáb7)üHpÇ&ƒ#€yÜ	{‘ŠŠî!Z]éÂl¯Û|]s«GËl¼úi-íÍŒ  ´œCN…¥TÄ‹¢&wÖ1¦,ß5;(Ã—.‘×ğXRŒ…ãn9¬˜:‰û¬áÅ<°ßÌÓ¡xºgSx/eq©üĞÑ‹dÿ	ÈDØõ½OéæÕÌ²ùƒRÎœ¯™­…e2oØ#/áæYÁ\‚ tó?ÓEÑ˜ô=ò?'o"áÜ„sòßÿØ;«õƒ0O48bBá„cÉÕçÄ.,á»ù¡é3åİ©²ğ¹TOñpfÿF”,WBa©Ñöº<umş5Œ*y.ú=ˆfZ©¬	İyjw9ÿ­$ßÏ‡øõŸjrŒ”O¤'¼u.Uì¿Ã¸?€ìù e´OÁAÃŒ¥T;¥`æB¶íTx&™¦­Ír‚M|ü£®î§L¨œĞ¡qy¬SÎƒ™Ï¥NÛ²ŒÎkéŠÎÌO„z"J
+€ì©¾|6½wIìşıªX-¢£¬«*Ã–jQï2ºSÉ»G¬·%	UH½-Û¢<™J„î]»0ê.¬¨Öù—Ã$ÅdŸ<š™2 Roî»»r´ü82QI®â|‡Ç7­¨ª,¾^È0»õ:†İó2Fkô$-äW]Ü³dªR©ïÌ×Ó¢ícÖòù@÷ûú/ñş‹ü¶ÇrC¹¶r¹‹ ²5mS|U‹h:ãCx³9çğg
+T®ÇX¯¢r'¥Ô×Ó=/¢6ÿ¸o¥wÔ{u!p¨$Äÿ®	Ğ+—´ø  äèÛDÛ?ãÄò­°—¬Î•¬Ë9i‹ÙqD<Â:†úÅRRÚğ±ÆÃZIˆ5\q0t¸0ïÀ&Ä8riğiš`Äj_Y«	c!FYà«(G‰§%ÔèÅÖ+d×pëÀF=²÷’YQ„ËØÌ±ûh±=»Šïv9íxbQO~UáİfÎ¿/×øõ¿™±(œ[Ë¢qxb@}js˜™$’eFÙãöFœs—ÍÌúL÷<7ƒãÍ’†Õ/ÁOÏA	Ñ‚…«mƒˆ	Ùåà$ şÄ<<F|«Â¢°±§ïQhÇÒ[`QñˆË„cs
+P“À”åê¶ÇP›©	Åb_ª¯ ?´i'jk JƒÜ²œé¨>æD!O:?°^ñ í::AÈ“|uÅV‡¦FNW|š¬ŒŠaêtè}—é7iƒÏÏ/óK›‹óooÍ·0cö\Ç˜½‡ş+±‘%òê< ±ê[Òı%Ë3†c D±ö=ÏäÔ³µU!RHŸå†Wâï¯ü}3?j'=jÖk•Ç+Ü™œ*~'iui—)g“ÿ…[W~[×„±O˜+à>ÑêÆdíTû†<e=ƒåu6NÚIwÚª·	š•Ã·•TØ:ôçŸ7E24D<ÙmñİH"Šà§á=äC²&ëd¿<KÓŸ¾ÒÍ@lÂQ¥W¦ËÂsse|§Ù?·ŠštUUøµhß¨g ¬~0)· åÕÈqË»y'—éò²N–rŠ*à2¹e}ª¼Û_æõ&mîı˜sØícBpÌŞşbE‹CuËšts€ÔJ®“í„¢Ù%€”ĞÕVPäïÚ]Œ‘d;UT]¯h#¿*ö„Ë‚šp`{ÒÕ6·ãP†~„‰†ó(7~2~1¿&V©ò¤JYy¥™sõSwJ‘˜ª¡¹?`¨V£E°SÈéVÓI²Ë@$\¼ŸJûz/ÎÅøÀŠ–ì•ï…Œf,â?¦œšİ‹lO÷Ï”°ŞıCè4€lDnóà‚u_eNå¨^ÙğûYÈã„tÂMV	åë˜ëƒâr;BÊÏ3 e¹ËS_>ş¾†*Bi*ÌÂ²¾;±\4bØ_j1ØŒüÕsLŒ"<ÀU*Qé~aãb—ŸÉ¥èÑ°d´>6†à Fâª™‚ã{A…Ş9î“fë:„ùŞôÌ[¶2­ìƒÆ€ƒF|1J¬˜7¼à.ÄáG°EpGöıÆüÙI¸ø~11’:Ia Å‰)(ÕKGÍaZÙª@N!Àç]
+ÏÙè­”‡E/ÄC¥_CvÅœVd¡:í´*C¥KeÙUãÁ"~%íÌòÀoZôãı§÷§ßğÇ°Ù?6:¾İ5üÙÜ¿Ó¤?QÒLÄÓ‹X Ò}xšıÂ/˜³J%Ä‰Ì‚'qKÒˆè™!ÔEO@Í§™%}¾<I;Y!Ò¼jË9fû©¿¤xæg¸"øÜşõ¯qğøœw•F à4¬¿×.¿Ê‰ût—”s…éÛ\ı(£ÕÒOR´oeÎ\­€ÿÍĞûn²ózŠÏ,Bç †ˆŠáhÏ¼ -Çtëû€‰<¨‘äA‡àê^m§kYÿ‰ï›å×6C†XFğ­$S¥Ú2(ãàs2¨iµımÓmªDjÕØ—gÿ)ú^˜é/£{ïÖòêëdµòg‘r×.+Y
+ NZ4É ê¶Ê×ºÎ!bxŠØ(Zï¶}“ÿûq•\ô¶º+Ö¯Ã·÷‹f}ƒ±(®ÕÿÍ'ÿøê´Dz€…­‘ŠØıIşåƒL&—	ef(Ú¿F+€ÜM”¡]WßJ?ÜªÓC”2áÂ
+n®¯:=Y£®:äË$‡šå”9ìv[ ue‹ëÎšwk+û0ª>ËCÕ¾òSLç5°xI@L*D€šæßú@•/ÈT¸X»
+@(@ÿxXgãfaÀ6¶¡ªã)Ny(©Zİnœ¨x! ‘Ít>™EÍ¿ù$¸m¥şòâR·ußUø™(ö?uTvJbçDD§1.<ü7?¸Ï‰·ÁŸ¦S ÔLE(S¢8%Ù´ÿ+-•éé=Àã9‰eÏ@Á`Ç²¸Æ0[OÀcÕõ<ÆÃÅQüø"«êŒÄxÉ¢Ó×»Ÿ›ıñÃûÔ Û?Ówîƒ4È/Júx¬h‘X\&&&—ÿëËì¯«ƒM•ôº !-Ä–†ÊE©æV˜ŞÒxÚø‘¦u`á¿eî¢ÓRİ{BYd³]æŠ!Ty»¦€ºt!ö­wrË~–¾Áæ\ŒZYæPÔU„´)¥R—´%¦·«aöÓ/˜q¤Ô»Ö‚?Êp"J£àÊıÊÊ?s!×ÿ)“€–˜dVÓè{ù÷·Í{D}~.W¤ÙÁZÙ„5Å³¯d/Ş(d€Ñöµ=šiºZ À³gµwÇ×b5mîûƒı†£òµ9ñgÔtÉmaÕÏ6Ì´ñPĞ˜é>UL1ğÛè¼ûÜh4ø¿A ˆ¢E&½½kŸ¾‘Øk/ê6rm7D&çu@ [™¢m3êq[³Â¹j‹Û5bèu^tM=R;óÊGø6™asz¢­’ÅIYCAüHæ¬2,·º5ğ_oÊ.˜“Î-³Ø1]Ä)a,ü‚ç4±C$zÂ-3V‰Õmq|,q¡²ªëìn/á£Ü½SJÀÀrÍ°-Åƒ$X˜1Ït¥ıQë @Ä ‹Ø¿ÉqL8»¨¤F5Áøì¹;"rÈbr6¾5à3Œ7‡ÜKc‡‰Æ»ÙÃ+:hi¥ßcOıÚdÍ…h¹¤éÇ2R€¼	æ“3Djş¸Fõ¾qÌ•—ŞŸÑX	A^•(é	ù½ç”†»aMÊ¾¡¢Y—Aıèş¹ñÁv&ñ{H!í%îXÁÅÇ_ÊV};Š%¥¤l,c¯µ`oîØCœú)ø\Ë<Á¡ëÄ¶w¾—Ş$- A6# ã–ß7Ô×#WûÅTÊìÕ]kîĞ
+¥sÍã3Kä"]•ú=lÊ¡I•âc…­ö5ÃğS`âÁê—ôQ–îƒ[ÄÕÇ(«x
+	4 Ê[*«Yu”µSW€©…”Ğ“€*²/Jhİ0Á *®Áşâ‡JÃøÚç}.zY3ÖOh¼õ&çŠ¤ÉÔtÊ+‡gîCíYñ’é’DªÿèP 8!¯®)¼¬‹˜Ø”Ä)n<7”³e†ëU*ƒİ3v¨}I3ñÀbfuófLÔ‡…Ù1ï„(ëKBñÉdàDF¦-u |dWa€ Òf13ı\„Ğ,ùş°ÿgM¬^»ø~ú‚I`t4Ò:m”‡å1¦ÍY&j¥Ê–²„î®ß/Ğò­b5" H¿Ñ_U”„JFpl«„•ì”üìZ›.ÃczöË—<çÊ84FÒå°çÖ?Q|±}`€—œÄWãÊ…÷û·6i
+âT?‹5}i·a±ñùFÍTQgá¡hgwÆ.(ºnqs·Zo˜¯{\¶¦jEÇ/‰u<ö¾ ğ,MÃ5‘¦û\à‰Ã7-)rÈ£ÌIÙÊ\½âwÓIÜòäë@Cÿöf
+—+ÿBôŞË@ÈupHBÌ„÷—<ÿú· ×ğ|Oà›x2@ƒF“Y ekvnw««`åRÆ`ÃS6yXëC¿Á:ÉX{/Â@ùÛšítûìÁwgåL[`©J•÷¸&g0éQ&•ƒ]
+ÿ¿8 V«p": "Todos los elementos td no vacÃ­os de una tabla mayor que 3 por 3 deben tener un encabezado de tabla asociado"
+    },
+    "td-headers-attr": {
+      "description": "Garantizar que cada celda que use los encabezados en una tabla haga referencia a otra celda de esa tabla",
+      "help": "Todas las celdas de un elemento table que usen el atributo headers deben hacer referencia solo a otras celdas de esa misma tabla"
+    },
+    "th-has-data-cells": {
+      "description": "Garantizar que cada encabezado de tabla en una tabla de datos hace referencia a celdas de datos",
+      "help": "Todos los elementos th y elementos con role=columnheader/rowheader deben tener las celdas de datos que describen"
+    },
+    "valid-lang": {
+      "description": "Garantiza que los atributos lang tienen valores vÃ¡lidos",
+      "help": "El atributo lang debe tener un valor vÃ¡lido"
+    },
+    "video-caption": {
+      "description": "Garantiza que los elementos <video> tienen subtÃ­tulos",
+      "help": "Los elementos <video> deben tener subtÃ­tulos"
+    }
+  },
+  "checks": {
+    "abstractrole": {
+      "pass": "No se usan 'abstract roles'",
+      "fail": "Los 'abstract roles' no se pueden usar directamente"
+    },
+    "aria-allowed-attr": {
+      "pass": "Los atributos ARIA se usan correctamente para el rol definido",
+      "fail": {
+        "singular": "En ARIA, atributos no estÃ¡n permitidos : ${data.values}",
+        "plural": "En ARIA, atributono estÃ¡ permitido : ${data.values}"
+      }
+    },
+    "aria-allowed-role": {
+      "pass": "El rol ARIA estÃ¡ permitido para el elemento proporcionado",
+      "fail": {
+        "singular": "En ARIA, roles ${data.values} no estÃ¡n permitidos para el elemento proporcionado",
+        "plural": "En ARIA, role ${data.values}  no estÃ¡ permitido para el elemento proporcionado"
+      },
+      "incomplete": {
+        "singular": "En ARIA, hay que eliminar roles ${data.values} cuando el elemento se haga visible, ya que no estÃ¡n permitidos para el elemento",
+        "plural": "En ARIA, hay que eliminar role ${data.values} cuando el elemento se haga visible, ya que no estÃ¡ permitido para el elemento"
+      }
+    },
+    "aria-hidden-body": {
+      "pass": "No hay ningÃºn atributo aria-hidden presente en el 'body' del documento",
+      "fail": "aria-hidden=true no debe estar presente en el 'body' del documento"
+    },
+    "aria-errormessage": {
+      "pass": "Usa una tÃ©cnica admitida para aria-errormessage",
+      "fail": {
+        "singular": "En aria-errormessage, valores  ${data.values}`, se debe usar una tÃ©cnica para anunciar el mensaje (p. ej., aria-live, aria-describedby, role=alert, etc.)",
+        "plural": "En aria-errormessage, valor  ${data.values}`, se debe usar una tÃ©cnica para anunciar el mensaje (p. ej., aria-live, aria-describedby, role=alert, etc.)"
+      }
+    },
+    "has-widget-role": {
+      "pass": "El elemento tiene un rol de widget.",
+      "fail": "El elemento no tiene un rol de widget."
+    },
+    "invalidrole": {
+      "pass": "El rol ARIA es vÃ¡lido",
+      "fail": "El rol debe ser uno de los roles ARIA vÃ¡lidos"
+    },
+    "no-implicit-explicit-label": {
+      "pass": "No hay discordancia entre un <label> y el nombre accesible",
+      "incomplete": "Comprobar que el <label> no necesita ser parte del ARIA ${data} para el nombre del campo"
+    },
+    "aria-required-attr": {
+      "pass": "Todos los atributos ARIA requeridos estÃ¡n presentes",
+      "fail": {
+        "singular": "Atributos requeridos no presentes: ${data.values}",
+        "plural": "Atributo requerido no presente: ${data.values}"
+      }
+    },
+    "aria-required-children": {
+      "pass": "Los hijos ARIA requeridos estÃ¡n presentes",
+      "fail": {
+        "singular": "Rol de hijos requerido en ARIA no presente: ${data.values}",
+        "plural": "Rol de hijo requerido en ARIA no presente: ${data.values}"
+      },
+      "incomplete": {
+        "singular": "Esperando que se aÃ±ada rol ARIA para hijos: ${data.values}",
+        "plural": "Esperando que se aÃ±ada rol ARIA para hijo: ${data.values}"
+      }
+    },
+    "aria-required-parent": {
+      "pass": "Rol de padre requerido en ARIA presente",
+      "fail": {
+        "singular": "Rol de ARIA requerido para padre s no presente: ${data.values}",
+        "plural": "Rol de ARIA requerido para padre  no presente: ${data.values}"
+      }
+    },
+    "aria-unsupported-attr": {
+      "pass": "El atributo ARIA estÃ¡ admitido",
+      "fail": "El atributo ARIA no estÃ¡ ampliamente admitido en lectores de pantalla y tecnologÃ­as de apoyo:  ${data.values}"
+    },
+    "unsupportedrole": {
+      "pass": "El rol ARIA estÃ¡ admitido",
+      "fail": "El rol usado no estÃ¡ ampliamente admitido en lectores de pantalla y tecnologÃ­as de apoyo:  ${data.values}"
+    },
+    "aria-valid-attr-value": {
+      "pass": "Los valores de los atributos ARIA son vÃ¡lidos",
+      "fail": {
+        "singular": "Valores no vÃ¡lidos para atributo ARIA: ${data.values}",
+        "plural": "Valor no vÃ¡lido para atributo ARIA: ${data.values}"
+      },
+      "incomplete": {
+        "singular": "Atributos ARIA ID de elemento no existe en la pÃ¡gina: ${data.values}",
+        "plural": "Atributo ARIA ID de elemento no existe en la pÃ¡gina: ${data.values}"
+      }
+    },
+    "aria-valid-attr": {
+      "pass": {
+        "singular": "Nombres de atributos ARIA vÃ¡lidos",
+        "plural": "Nombrede atributo ARIA vÃ¡lido"
+      },
+      "fail": {
+        "singular": "Nombres de atributos ARIA no vÃ¡lidos:  ${data.values}",
+        "plural": "Nombre de atributo ARIA no vÃ¡lido:  ${data.values}"
+      }
+    },
+    "valid-scrollable-semantics": {
+      "pass": "El elemento tiene una semÃ¡ntica vÃ¡lida para un elemento en orden de foco.",
+      "fail": "El elemento tiene una semÃ¡ntica no vÃ¡lida para un elemento en orden de foco."
+    },
+    "color-contrast": {
+      "pass": "El elemento tiene un contraste de color suficiente de ${data.contrastRatio}",
+      "fail": "El elemento tiene un contraste de color insuficiente de ${data.contrastRatio} (color de primer plano: ${data.fgColor}, color de fondo: ${data.bgColor}, tamaÃ±o de fuente: ${data.fontSize}, grosor de fuente: ${data.fontWeight}). Ratio de contraste esperado: ${data.expectedContrastRatio}",
+      "incomplete": {
+        "bgImage": "El color de fondo del elemento no se pudo determinar debido a una imagen de fondo",
+        "bgGradient": "El color de fondo del elemento no se pudo determinar debido a un degradado de fondo",
+        "imgNode": "El color de fondo del elemento no se pudo determinar porque el elemento contiene un nodo de imagen",
+        "bgOverlap": "El color de fondo no se pudo determinar porque tiene otro elemento superpuesto",
+        "fgAlpha": "El color de fondo no se pudo determinar debido a una transparencia alfa",
+        "elmPartiallyObscured": "El color de fondo no se pudo determinar porque estÃ¡ parcialmente oculto por otro elemento",
+        "elmPartiallyObscuring": "El color de fondo del elemento no se pudo determinar porque se superpone parcialmente a otros elementos",
+        "outsideViewport": "El color de fondo del elemento no se pudo determinar porque estÃ¡ fuera de la ventana grÃ¡fica ('viewport')",
+        "equalRatio": "El elemento tiene una ratio de contraste 1:1 con el fondo",
+        "shortTextContent": "El contenido del elemento es demasiado corto para determinar si es contenido de texto propiamente dicho",
+        "default": "Imposible determinar la ratio de contraste"
+      }
+    },
+    "color-contrast-enhanced": {
+      "pass": "El elemento tiene un contraste de color suficiente de ${data.contrastRatio}",
+      "fail": "El elemento tiene un contraste de color insuficiente de ${data.contrastRatio} (color de primer plano: ${data.fgColor}, color de fondo: ${data.bgColor}, tamaÃ±o de fuente: ${data.fontSize}, grosor de fuente: ${data.fontWeight}). Ratio de contraste esperado: ${data.expectedContrastRatio}",
+      "incomplete": {
+        "bgImage": "El color de fondo del elemento no se pudo determinar debido a una imagen de fondo",
+        "bgGradient": "El color de fondo del elemento no se pudo determinar debido a un degradado de fondo",
+        "imgNode": "El color de fondo del elemento no se pudo determinar porque el elemento contiene un nodo de imagen",
+        "bgOverlap": "El color de fondo no se pudo determinar porque tiene otro elemento superpuesto",
+        "fgAlpha": "El color de fondo no se pudo determinar debido a una transparencia alfa",
+        "elmPartiallyObscured": "El color de fondo no se pudo determinar porque estÃ¡ parcialmente oculto por otro elemento",
+        "elmPartiallyObscuring": "El color de fondo del elemento no se pudo determinar porque se superpone parcialmente a otros elementos",
+        "outsideViewport": "El color de fondo del elemento no se pudo determinar porque estÃ¡ fuera de la ventana grÃ¡fica ('viewport')",
+        "equalRatio": "El elemento tiene una ratio de contraste 1:1 con el fondo",
+        "shortTextContent": "El contenido del elemento es demasiado corto para determinar si es contenido de texto propiamente dicho",
+        "default": "Imposible determinar la ratio de contraste"
+      }
+    },
+    "link-in-text-block": {
+      "pass": "Los enlaces se pueden distinguir respecto al texto adyacente de forma ajena al color",
+      "fail": "Es necesario distinguir los enlaces respecto al texto adyacente de una forma ajena al color",
+      "incomplete": {
+        "bgContrast": "No se pudo determinar la ratio de contraste del elemento. Comprobar si existe un estilo hover/focus distinto",
+        "bgImage": "La ratio de contraste del elemento no se pudo determinar debido a una imagen de fondo",
+        "bgGradient": "La ratio de contraste del elemento no se pudo determinar debido a un degradado de fondo",
+        "imgNode": "La ratio de contraste del elemento no se pudo determinar porque el elemento contiene un nodo de imagen",
+        "bgOverlap": "La ratio de contraste del elemento no se pudo determinar debido a superposiciÃ³n de elementos",
+        "default": "Imposible determinar la ratio de contraste"
+      }
+    },
+    "autocomplete-appropriate": {
+      "pass": "el valor de autocomplete estÃ¡ en un elemento apropiado",
+      "fail": "el valor de autocomplete es inapropiado para este tipo de input"
+    },
+    "autocomplete-valid": {
+      "pass": "el atributo autocomplete estÃ¡ formateado correctamente",
+      "fail": "el atributo autocomplete estÃ¡ formateado incorrectamente"
+    },
+    "accesskeys": {
+      "pass": "El valor del atributo accesskey es Ãºnico",
+      "fail": "El documento tiene mÃºltiples elementos con el mismo accesskey"
+    },
+    "focusable-content": {
+      "pass": "El elemento contiene elementos que admiten el foco",
+      "fail": "El elemento deberÃ­a tener contenido que admita el foco"
+    },
+    "focusable-disabled": {
+      "pass": "Dentro del elemento no hay elementos que admitan el foco",
+      "fail": "El contenido que admita el foco deberÃ­a ser desactivado o eliminado del DOM"
+    },
+    "focusable-element": {
+      "pass": "El elemento admite el foco",
+      "fail": "El elemento deberÃ­a admitir el foco"
+    },
+    "focusable-no-name": {
+      "pass": "El elemento no estÃ¡ en orden de tabulaciÃ³n o tiene texto accesible",
+      "fail": "El elemento estÃ¡ en orden de tabulaciÃ³n y no tiene texto accesible"
+    },
+    "focusable-not-tabbable": {
+      "pass": "Dentro del elemento no hay elementos que admitan el foco",
+      "fail": "El contenido que admita el foco deberÃ­a tener tabindex='-1' o ser eliminado del DOM"
+    },
+    "landmark-is-top-level": {
+      "pass": "El punto de referencia ${data.role} estÃ¡ en el nivel superior.",
+      "fail": "El punto de referencia ${data.role} estÃ¡ contenido en otro punto de referencia."
+    },
+    "page-has-heading-one": {
+      "pass": "La pÃ¡gina tiene al menos un encabezado de nivel 1",
+      "fail": "La pÃ¡gina debe tener un encabezado de nivel 1"
+    },
+    "page-has-main": {
+      "pass": "El documento tiene al menos un punto de referencia main",
+      "fail": "El documento no tiene punto de referencia main"
+    },
+    "page-no-duplicate-banner": {
+      "pass": "El documento no tiene mÃ¡s de un punto de referencia banner",
+      "fail": "El documento tiene mÃ¡s de un punto de referencia banner"
+    },
+    "page-no-duplicate-contentinfo": {
+      "pass": "El documento no tiene mÃ¡s de un punto de referencia contentinfo",
+      "fail": "El documento tiene mÃ¡s de un punto de referencia contentinfo"
+    },
+    "page-no-duplicate-main": {
+      "pass": "El documento no tiene mÃ¡s de un punto de referencia main",
+      "fail": "El documento tiene mÃ¡s de un punto de referencia main"
+    },
+    "tabindex": {
+      "pass": "El elemento no tiene un tabindex mayor que 0",
+      "fail": "El elemento tiene un tabindex mayor que 0"
+    },
+    "alt-space-value": {
+      "pass": "El elemento tiene un valor vÃ¡lido para el atributo alt",
+      "fail": "El elemento tiene un atributo alt que contiene solo un carÃ¡cter de espacio, que no es ignorado por todos los lectores de pantalla"
+    },
+    "duplicate-img-label": {
+      "pass": "El elemento no duplica texto existente en el texto alternativo de <img>",
+      "fail": "El elemento contiene un elemento <img> con texto alternativo que duplica texto existente"
+    },
+    "explicit-label": {
+      "pass": "El elemento de formulario tiene un <label> explÃ­cito",
+      "fa

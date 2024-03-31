@@ -1,0 +1,80 @@
+import { TrustedScriptURL } from 'trusted-types/lib';
+import { WorkboxEventTarget } from './utils/WorkboxEventTarget.js';
+import './_version.js';
+/**
+ * A class to aid in handling service worker registration, updates, and
+ * reacting to service worker lifecycle events.
+ *
+ * @fires {@link workbox-window.Workbox#message}
+ * @fires {@link workbox-window.Workbox#installed}
+ * @fires {@link workbox-window.Workbox#waiting}
+ * @fires {@link workbox-window.Workbox#controlling}
+ * @fires {@link workbox-window.Workbox#activated}
+ * @fires {@link workbox-window.Workbox#redundant}
+ * @memberof workbox-window
+ */
+declare class Workbox extends WorkboxEventTarget {
+    private readonly _scriptURL;
+    private readonly _registerOptions;
+    private _updateFoundCount;
+    private readonly _swDeferred;
+    private readonly _activeDeferred;
+    private readonly _controllingDeferred;
+    private _registrationTime;
+    private _isUpdate?;
+    private _compatibleControllingSW?;
+    private _registration?;
+    private _sw?;
+    private readonly _ownSWs;
+    private _externalSW?;
+    private _waitingTimeout?;
+    /**
+     * Creates a new Workbox instance with a script URL and service worker
+     * options. The script URL and options are the same as those used when
+     * calling [navigator.serviceWorker.register(scriptURL, options)](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/register).
+     *
+     * @param {string|TrustedScriptURL} scriptURL The service worker script
+     *     associated with this instance. Using a
+     *     [`TrustedScriptURL`](https://web.dev/trusted-types/) is supported.
+     * @param {Object} [registerOptions] The service worker options associated
+     *     with this instance.
+     */
+    constructor(scriptURL: string | TrustedScriptURL, registerOptions?: {});
+    /**
+     * Registers a service worker for this instances script URL and service
+     * worker options. By default this method delays registration until after
+     * the window has loaded.
+     *
+     * @param {Object} [options]
+     * @param {Function} [options.immediate=false] Setting this to true will
+     *     register the service worker immediately, even if the window has
+     *     not loaded (not recommended).
+     */
+    register({ immediate }?: {
+        immediate?: boolean | undefined;
+    }): Promise<ServiceWorkerRegistration | undefined>;
+    /**
+     * Checks for updates of the registered service worker.
+     */
+    update(): Promise<void>;
+    /**
+     * Resolves to the service worker registered by this instance as soon as it
+     * is active. If a service worker was already controlling at registration
+     * time then it will resolve to that if the script URLs (and optionally
+     * script versions) match, otherwise it will wait until an update is found
+     * and activates.
+     *
+     * @return {Promise<ServiceWorker>}
+     */
+    get active(): Promise<ServiceWorker>;
+    /**
+     * Resolves to the service worker registered by this instance as soon as it
+     * is controlling the page. If a service worker was already controlling at
+     * registration time then it will resolve to that if the script URLs (and
+     * optionally script versions) match, otherwise it will wait until an update
+     * is found and starts controlling the page.
+     * Note: the first time a service worker is installed it will active but
+     * not start controlling the page unless `clients.claim()` is called in the
+     * service worker.
+     *
+     * @re

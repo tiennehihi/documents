@@ -1,0 +1,4 @@
+;
+      }));
+      defineProperty(SymbolPolyfill.prototype, SymbolPolyfill.toStringTag, d('c', 'Symbol'));
+      defineProper

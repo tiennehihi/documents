@@ -1,0 +1,38 @@
+/**
+ * @fileoverview Rule to flag non-matching identifiers
+ * @author Matthieu Larcher
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Rule Definition
+//------------------------------------------------------------------------------
+
+/** @type {import('../shared/types').Rule} */
+module.exports = {
+    meta: {
+        type: "suggestion",
+
+        docs: {
+            description: "Require identifiers to match a specified regular expression",
+            recommended: false,
+            url: "https://eslint.org/docs/latest/rules/id-match"
+        },
+
+        schema: [
+            {
+                type: "string"
+            },
+            {
+                type: "object",
+                properties: {
+                    properties: {
+                        type: "boolean",
+                        default: false
+                    },
+                    classFields: {
+                        type: "boolean",
+                        default: false
+                    },
+                    onlyDeclarations:

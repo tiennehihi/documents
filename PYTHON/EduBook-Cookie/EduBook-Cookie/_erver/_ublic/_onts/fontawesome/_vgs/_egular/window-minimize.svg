@@ -1,0 +1,10 @@
+before {
+  content: "\f0ab"; }
+
+.fa-arrow-circle-down::before {
+  content: "\f0ab"; }
+
+.fa-file-import::before {
+  content: "\f56f"; }
+
+.fa-arrow-right-to-file::before 

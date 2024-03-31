@@ -1,0 +1,237 @@
+let parser = require('postcss-value-parser')
+let list = require('postcss').list
+
+let uniq = require('../utils').uniq
+let escapeRegexp = require('../utils').escapeRegexp
+let splitSelector = require('../utils').splitSelector
+
+function convert(value) {
+  if (
+    value &&
+    value.length === 2 &&
+    value[0] === 'span' &&
+    parseInt(value[1], 10) > 0
+  ) {
+    return [false, parseInt(value[1], 10)]
+  }
+
+  if (value && value.length === 1 && parseInt(value[0], 10) > 0) {
+    return [parseInt(value[0], 10), false]
+  }
+
+  return [false, false]
+}
+
+exports.translate = translate
+
+function translate(values, startIndex, endIndex) {
+  let startValue = values[startIndex]
+  let endValue = values[endIndex]
+
+  if (!startValue) {
+    return [false, false]
+  }
+
+  let [start, spanStart] = convert(startValue)
+  let [end, spanEnd] = convert(endValue)
+
+  if (start && !endValue) {
+    return [start, false]
+  }
+
+  if (spanStart && end) {
+    return [end - spanStart, spanStart]
+  }
+
+  if (start && spanEnd) {
+    return [start, spanEnd]
+  }
+
+  if (start && end) {
+    return [start, end - start]
+  }
+
+  return [false, false]
+}
+
+exports.parse = parse
+
+function parse(decl) {
+  let node = parser(decl.value)
+
+  let values = []
+  let current = 0
+  values[current] = []
+
+  for (let i of node.nodes) {
+    if (i.type === 'div') {
+      current += 1
+      values[current] = []
+    } else if (i.type === 'word') {
+      values[current].push(i.value)
+    }
+  }
+
+  return values
+}
+
+exports.insertDecl = insertDecl
+
+function insertDecl(decl, prop, value) {
+  if (value && !decl.parent.some(i => i.prop === `-ms-${prop}`)) {
+    decl.cloneBefore({
+      prop: `-ms-${prop}`,
+      value: value.toString()
+    })
+  }
+}
+
+// Track transforms
+
+exports.prefixTrackProp = prefixTrackProp
+
+function prefixTrackProp({ prefix, prop }) {
+  return prefix + prop.replace('template-', '')
+}
+
+function transformRepeat({ nodes }, { gap }) {
+  let { count, size } = nodes.reduce(
+    (result, node) => {
+      if (node.type === 'div' && node.value === ',') {
+        result.key = 'size'
+      } else {
+        result[result.key].push(parser.stringify(node))
+      }
+      return result
+    },
+    {
+      count: [],
+      key: 'count',
+      size: []
+    }
+  )
+
+  // insert gap values
+  if (gap) {
+    size = size.filter(i => i.trim())
+    let val = []
+    for (let i = 1; i <= count; i++) {
+      size.forEach((item, index) => {
+        if (index > 0 || i > 1) {
+          val.push(gap)
+        }
+        val.push(item)
+      })
+    }
+
+    return val.join(' ')
+  }
+
+  return `(${size.join('')})[${count.join('')}]`
+}
+
+exports.prefixTrackValue = prefixTrackValue
+
+function prefixTrackValue({ gap, value }) {
+  let result = parser(value).nodes.reduce((nodes, node) => {
+    if (node.type === 'function' && node.value === 'repeat') {
+      return nodes.concat({
+        type: 'word',
+        value: transformRepeat(node, { gap })
+      })
+    }
+    if (gap && node.type === 'space') {
+      return nodes.concat(
+        {
+          type: 'space',
+          value: ' '
+        },
+        {
+          type: 'word',
+          value: gap
+        },
+        node
+      )
+    }
+    return nodes.concat(node)
+  }, [])
+
+  return parser.stringify(result)
+}
+
+// Parse grid-template-areas
+
+let DOTS = /^\.+$/
+
+function track(start, end) {
+  return { end, span: end - start, start }
+}
+
+function getColumns(line) {
+  return line.trim().split(/\s+/g)
+}
+
+exports.parseGridAreas = parseGridAreas
+
+function parseGridAreas({ gap, rows }) {
+  return rows.reduce((areas, line, rowIndex) => {
+    if (gap.row) rowIndex *= 2
+
+    if (line.trim() === '') return areas
+
+    getColumns(line).forEach((area, columnIndex) => {
+      if (DOTS.test(area)) return
+
+      if (gap.column) columnIndex *= 2
+
+      if (typeof areas[area] === 'undefined') {
+        areas[area] = {
+          column: track(columnIndex + 1, columnIndex + 2),
+          row: track(rowIndex + 1, rowIndex + 2)
+        }
+      } else {
+        let { column, row } = areas[area]
+
+        column.start = Math.min(column.start, columnIndex + 1)
+        column.end = Math.max(column.end, columnIndex + 2)
+        column.span = column.end - column.start
+
+        row.start = Math.min(row.start, rowIndex + 1)
+        row.end = Math.max(row.end, rowIndex + 2)
+        row.span = row.end - row.start
+      }
+    })
+
+    return areas
+  }, {})
+}
+
+// Parse grid-template
+
+function testTrack(node) {
+  return node.type === 'word' && /^\[.+]$/.test(node.value)
+}
+
+function verifyRowSize(result) {
+  if (result.areas.length > result.rows.length) {
+    result.rows.push('auto')
+  }
+  return result
+}
+
+exports.parseTemplate = parseTemplate
+
+function parseTemplate({ decl, gap }) {
+  let gridTemplate = parser(decl.value).nodes.reduce(
+    (result, node) => {
+      let { type, value } = node
+
+      if (testTrack(node) || type === 'space') return result
+
+      // area
+      if (type === 'string') {
+        result = verifyRowSize(result)
+        result.areas.push(value)
+      }
+
+      // values and fu

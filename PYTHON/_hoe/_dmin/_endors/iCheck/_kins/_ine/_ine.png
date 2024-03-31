@@ -1,0 +1,28 @@
+/// <reference types="node" />
+
+import type { Blob } from 'buffer'
+import type { MessagePort } from 'worker_threads'
+import {
+  EventTarget,
+  Event,
+  EventInit,
+  EventListenerOptions,
+  AddEventListenerOptions,
+  EventListenerOrEventListenerObject
+} from './patch'
+import Dispatcher from './dispatcher'
+import { HeadersInit } from './fetch'
+
+export type BinaryType = 'blob' | 'arraybuffer'
+
+interface WebSocketEventMap {
+  close: CloseEvent
+  error: Event
+  message: MessageEvent
+  open: Event
+}
+
+interface WebSocket extends EventTarget {
+  binaryType: BinaryType
+  
+  readonly buffere

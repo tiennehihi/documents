@@ -1,0 +1,209 @@
+0, util_1.createError)(EMFILE, 'open', link.getPath());
+        }
+        // Resolve symlinks.
+        let realLink = link;
+        if (resolveSymlinks)
+            realLink = this.resolveSymlinks(link);
+        if (!realLink)
+            throw (0, util_1.createError)(ENOENT, 'open', link.getPath());
+        const node = realLink.getNode();
+        // Check whether node is a directory
+        if (node.isDirectory()) {
+            if ((flagsNum & (O_RDONLY | O_RDWR | O_WRONLY)) !== O_RDONLY)
+                throw (0, util_1.createError)(EISDIR, 'open', link.getPath());
+        }
+        else {
+            if (flagsNum & O_DIRECTORY)
+                throw (0, util_1.createError)(ENOTDIR, 'open', link.getPath());
+        }
+        // Check node permissions
+        if (!(flagsNum & O_WRONLY)) {
+            if (!node.canRead()) {
+                throw (0, util_1.createError)(EACCES, 'open', link.getPath());
+            }
+        }
+        if (flagsNum & O_RDWR) {
+        }
+        const file = new this.props.File(link, node, flagsNum, this.newFdNumber());
+        this.fds[file.fd] = file;
+        this.openFiles++;
+        if (flagsNum & O_TRUNC)
+            file.truncate();
+        return file;
+    }
+    openFile(filename, flagsNum, modeNum, resolveSymlinks = true) {
+        const steps = filenameToSteps(filename);
+        let link = resolveSymlinks ? this.getResolvedLink(steps) : this.getLink(steps);
+        if (link && flagsNum & O_EXCL)
+            throw (0, util_1.createError)(EEXIST, 'open', filename);
+        // Try creating a new file, if it does not exist.
+        if (!link && flagsNum & O_CREAT) {
+            // const dirLink: Link = this.getLinkParent(steps);
+            const dirLink = this.getResolvedLink(steps.slice(0, steps.length - 1));
+            // if(!dirLink) throw createError(ENOENT, 'open', filename);
+            if (!dirLink)
+                throw (0, util_1.createError)(ENOENT, 'open', sep + steps.join(sep));
+            if (flagsNum & O_CREAT && typeof modeNum === 'number') {
+                link = this.createLink(dirLink, steps[steps.length - 1], false, modeNum);
+            }
+        }
+        if (link)
+            return this.openLink(link, flagsNum, resolveSymlinks);
+        throw (0, util_1.createError)(ENOENT, 'open', filename);
+    }
+    openBase(filename, flagsNum, modeNum, resolveSymlinks = true) {
+        const file = this.openFile(filename, flagsNum, modeNum, resolveSymlinks);
+        if (!file)
+            throw (0, util_1.createError)(ENOENT, 'open', filename);
+        return file.fd;
+    }
+    openSync(path, flags, mode = 438 /* MODE.DEFAULT */) {
+        // Validate (1) mode; (2) path; (3) flags - in that order.
+        const modeNum = (0, util_1.modeToNumber)(mode);
+        const fileName = (0, util_1.pathToFilename)(path);
+        const flagsNum = (0, util_1.flagsToNumber)(flags);
+        return this.openBase(fileName, flagsNum, modeNum, !(flagsNum & O_SYMLINK));
+    }
+    open(path, flags, a, b) {
+        let mode = a;
+        let callback = b;
+        if (typeof a === 'function') {
+            mode = 438 /* MODE.DEFAULT */;
+            callback = a;
+        }
+        mode = mode || 438 /* MODE.DEFAULT */;
+        const modeNum = (0, util_1.modeToNumber)(mode);
+        const fileName = (0, util_1.pathToFilename)(path);
+        const flagsNum = (0, util_1.flagsToNumber)(flags);
+        this.wrapAsync(this.openBase, [fileName, flagsNum, modeNum, !(flagsNum & O_SYMLINK)], callback);
+    }
+    closeFile(file) {
+        if (!this.fds[file.fd])
+            return;
+        this.openFiles--;
+        delete this.fds[file.fd];
+        this.releasedFds.push(file.fd);
+    }
+    closeSync(fd) {
+        (0, util_1.validateFd)(fd);
+        const file = this.getFileByFdOrThrow(fd, 'close');
+        this.closeFile(file);
+    }
+    close(fd, callback) {
+        (0, util_1.validateFd)(fd);
+        this.wrapAsync(this.closeSync, [fd], callback);
+    }
+    openFileOrGetById(id, flagsNum, modeNum) {
+        if (typeof id === 'number') {
+            const file = this.fds[id];
+            if (!file)
+                throw (0, util_1.createError)(ENOENT);
+            return file;
+        }
+        else {
+            return this.openFile((0, util_1.pathToFilename)(id), flagsNum, modeNum);
+        }
+    }
+    readBase(fd, buffer, offset, length, position) {
+        if (buffer.byteLength < length) {
+            throw (0, util_1.createError)(ERR_OUT_OF_RANGE, 'read', undefined, undefined, RangeError);
+        }
+        const file = this.getFileByFdOrThrow(fd);
+        if (file.node.isSymlink()) {
+            throw (0, util_1.createError)(EPERM, 'read', file.link.getPath());
+        }
+        return file.read(buffer, Number(offset), Number(length), position === -1 || typeof position !== 'number' ? undefined : position);
+    }
+    readSync(fd, buffer, offset, length, position) {
+        (0, util_1.validateFd)(fd);
+        return this.readBase(fd, buffer, offset, length, position);
+    }
+    read(fd, buffer, offset, length, position, callback) {
+        (0, util_1.validateCallback)(callback);
+        // This `if` branch is from Node.js
+        if (length === 0) {
+            return (0, queueMicrotask_1.default)(() => {
+                if (callback)
+                    callback(null, 0, buffer);
+            });
+        }
+        (0, setImmediate_1.default)(() => {
+            try {
+                const bytes = this.readBase(fd, buffer, offset, length, position);
+                callback(null, bytes, buffer);
+            }
+            catch (err) {
+                callback(err);
+            }
+        });
+    }
+    readvBase(fd, buffers, position) {
+        const file = this.getFileByFdOrThrow(fd);
+        let p = position !== null && position !== void 0 ? position : undefined;
+        if (p === -1) {
+            p = undefined;
+        }
+        let bytesRead = 0;
+        for (const buffer of buffers) {
+            const bytes = file.read(buffer, 0, buffer.byteLength, p);
+            p = undefined;
+            bytesRead += bytes;
+            if (bytes < buffer.byteLength)
+                break;
+        }
+        return bytesRead;
+    }
+    readv(fd, buffers, a, b) {
+        let position = a;
+        let callback = b;
+        if (typeof a === 'function') {
+            position = null;
+            callback = a;
+        }
+        (0, util_1.validateCallback)(callback);
+        (0, setImmediate_1.default)(() => {
+            try {
+                const bytes = this.readvBase(fd, buffers, position);
+                callback(null, bytes, buffers);
+            }
+            catch (err) {
+                callback(err);
+            }
+        });
+    }
+    readvSync(fd, buffers, position) {
+        (0, util_1.validateFd)(fd);
+        return this.readvBase(fd, buffers, position);
+    }
+    readFileBase(id, flagsNum, encoding) {
+        let result;
+        const isUserFd = typeof id === 'number';
+        const userOwnsFd = isUserFd && (0, util_1.isFd)(id);
+        let fd;
+        if (userOwnsFd)
+            fd = id;
+        else {
+            const filename = (0, util_1.pathToFilename)(id);
+            const steps = filenameToSteps(filename);
+            const link = this.getResolvedLink(steps);
+            if (link) {
+                const node = link.getNode();
+                if (node.isDirectory())
+                    throw (0, util_1.createError)(EISDIR, 'open', link.getPath());
+            }
+            fd = this.openSync(id, flagsNum);
+        }
+        try {
+            result = (0, util_1.bufferToEncoding)(this.getFileByFdOrThrow(fd).getBuffer(), encoding);
+        }
+        finally {
+            if (!userOwnsFd) {
+                this.closeSync(fd);
+            }
+        }
+        return result;
+    }
+    readFileSync(file, options) {
+        const opts = (0, options_1.getReadFileOptions)(options);
+        const flagsNum = (0, util_1.flagsToNumber)(opts.flag);
+        return this.readF

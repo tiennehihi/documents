@@ -1,0 +1,50 @@
+/**
+ * @fileoverview Rule that warns when identifier names that are
+ * specified in the configuration are used.
+ * @author Keith Cirkel (http://keithcirkel.co.uk)
+ * @deprecated in ESLint v7.5.0
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Helpers
+//------------------------------------------------------------------------------
+
+/**
+ * Checks whether the given node represents assignment target in a normal assignment or destructuring.
+ * @param {ASTNode} node The node to check.
+ * @returns {boolean} `true` if the node is assignment target.
+ */
+function isAssignmentTarget(node) {
+    const parent = node.parent;
+
+    return (
+
+        // normal assignment
+        (
+            parent.type === "AssignmentExpression" &&
+            parent.left === node
+        ) ||
+
+        // destructuring
+        parent.type === "ArrayPattern" ||
+        parent.type === "RestElement" ||
+        (
+            parent.type === "Property" &&
+            parent.value === node &&
+            parent.parent.type === "ObjectPattern"
+        ) ||
+        (
+            parent.type === "AssignmentPattern" &&
+            parent.left === node
+        )
+    );
+}
+
+/**
+ * Checks whether the given node represents an imported name that is renamed in the same import/export specifier.
+ *
+ * Examples:
+ * import { a as b } from 'mod'; // node `a` is renamed import
+ * export { a as b

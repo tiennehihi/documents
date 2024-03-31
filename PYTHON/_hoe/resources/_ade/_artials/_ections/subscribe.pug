@@ -1,0 +1,23 @@
+  if (areStringsEqualCaseInsensitive(string, state.value)) {
+                    while (tokenIndex < lastTokenIndex) {
+                        addTokenToMatch();
+                    }
+
+                    state = MATCH;
+                } else {
+                    state = MISMATCH;
+                }
+
+                break;
+
+            default:
+                throw new Error('Unknown node type: ' + state.type);
+        }
+    }
+
+    totalIterationCount += iterationCount;
+
+    switch (exitReason) {
+        case null:
+            console.warn('[csstree-match] BREAK after ' + ITERATION_LIMIT + ' iterations');
+        

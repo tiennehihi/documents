@@ -1,0 +1,18 @@
+ntent: "\f2d0"; }
+
+.fa-face-frown::before {
+  content: "\f119"; }
+
+.fa-frown::before {
+  content: "\f119"; }
+
+.fa-prescription::before {
+  content: "\f5b1"; }
+
+.fa-shop::before {
+  content: "\f54f"; }
+
+.fa-store-alt::before {
+  content: "\f54f"; }
+
+.fa-floppy-disk::be

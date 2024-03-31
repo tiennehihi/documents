@@ -1,0 +1,17 @@
+w RegExp(`(\\s${name}\\s*=\\s*)(?:(?:'([^']*)')|(?:"([^"]*)"))`, "im");
+  namedArgRegExCache.set(name, result);
+  return result;
+}
+var tripleSlashXMLCommentStartRegEx = /^\/\/\/\s*<(\S+)\s.*?\/>/im;
+var singleLinePragmaRegEx = /^\/\/\/?\s*@([^\s:]+)(.*)\s*$/im;
+function extractPragmas(pragmas, range, text) {
+  const tripleSlash = range.kind === 2 /* SingleLineCommentTrivia */ && tripleSlashXMLCommentStartRegEx.exec(text);
+  if (tripleSlash) {
+    const name = tripleSlash[1].toLowerCase();
+    const pragma = commentPragmas[name];
+    if (!pragma || !(pragma.kind & 1 /* TripleSlashXML */)) {
+      return;
+    }
+    if (pragma.args) {
+      const argument = {};
+      for (const arg of pragma.args)

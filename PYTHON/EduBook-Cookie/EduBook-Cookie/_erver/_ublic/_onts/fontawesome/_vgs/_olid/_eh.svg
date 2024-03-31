@@ -1,0 +1,20 @@
+ 370.9 48 256 48z"
+        }
+      }
+    },
+    "familyStylesByLicense": {
+      "free": [
+        {
+          "family": "classic",
+          "style": "regular"
+        },
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        },

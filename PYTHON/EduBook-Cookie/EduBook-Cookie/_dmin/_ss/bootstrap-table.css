@@ -1,0 +1,163 @@
+bel = defineLabel();
+    markLabel(startLabel);
+    beginBlock({
+      kind: 1 /* With */,
+      expression,
+      startLabel,
+      endLabel
+    });
+  }
+  function endWithBlock() {
+    Debug.assert(peekBlockKind() === 1 /* With */);
+    const block = endBlock();
+    markLabel(block.endLabel);
+  }
+  function beginExceptionBlock() {
+    const startLabel = defineLabel();
+    const endLabel = defineLabel();
+    markLabel(startLabel);
+    beginBlock({
+      kind: 0 /* Exception */,
+      state: 0 /* Try */,
+      startLabel,
+      endLabel
+    });
+    emitNop();
+    return endLabel;
+  }
+  function beginCatchBlock(variable) {
+    Debug.assert(peekBlockKind() === 0 /* Exception */);
+    let name;
+    if (isGeneratedIdentifier(variable.name)) {
+      name = variable.name;
+      hoistVariableDeclaration(variable.name);
+    } else {
+      const text = idText(variable.name);
+      name = declareLocal(text);
+      if (!renamedCatchVariables) {
+        renamedCatchVariables = /* @__PURE__ */ new Map();
+        renamedCatchVariableDeclarations = [];
+        context.enableSubstitution(80 /* Identifier */);
+      }
+      renamedCatchVariables.set(text, true);
+      renamedCatchVariableDeclarations[getOriginalNodeId(variable)] = name;
+    }
+    const exception = peekBlock();
+    Debug.assert(exception.state < 1 /* Catch */);
+    const endLabel = exception.endLabel;
+    emitBreak(endLabel);
+    const catchLabel = defineLabel();
+    markLabel(catchLabel);
+    exception.state = 1 /* Catch */;
+    exception.catchVariable = name;
+    exception.catchLabel = catchLabel;
+    emitAssignment(name, factory2.createCallExpression(
+      factory2.createPropertyAccessExpression(state, "sent"),
+      /*typeArguments*/
+      void 0,
+      []
+    ));
+    emitNop();
+  }
+  function beginFinallyBlock() {
+    Debug.assert(peekBlockKind() === 0 /* Exception */);
+    const exception = peekBlock();
+    Debug.assert(exception.state < 2 /* Finally */);
+    const endLabel = exception.endLabel;
+    emitBreak(endLabel);
+    const finallyLabel = defineLabel();
+    markLabel(finallyLabel);
+    exception.state = 2 /* Finally */;
+    exception.finallyLabel = finallyLabel;
+  }
+  function endExceptionBlock() {
+    Debug.assert(peekBlockKind() === 0 /* Exception */);
+    const exception = endBlock();
+    const state2 = exception.state;
+    if (state2 < 2 /* Finally */) {
+      emitBreak(exception.endLabel);
+    } else {
+      emitEndfinally();
+    }
+    markLabel(exception.endLabel);
+    emitNop();
+    exception.state = 3 /* Done */;
+  }
+  function beginScriptLoopBlock() {
+    beginBlock({
+      kind: 3 /* Loop */,
+      isScript: true,
+      breakLabel: -1,
+      continueLabel: -1
+    });
+  }
+  function beginLoopBlock(continueLabel) {
+    const breakLabel = defineLabel();
+    beginBlock({
+      kind: 3 /* Loop */,
+      isScript: false,
+      breakLabel,
+      continueLabel
+    });
+    return breakLabel;
+  }
+  function endLoopBlock() {
+    Debug.assert(peekBlockKind() === 3 /* Loop */);
+    const block = endBlock();
+    const breakLabel = block.breakLabel;
+    if (!block.isScript) {
+      markLabel(breakLabel);
+    }
+  }
+  function beginScriptSwitchBlock() {
+    beginBlock({
+      kind: 2 /* Switch */,
+      isScript: true,
+      breakLabel: -1
+    });
+  }
+  function beginSwitchBlock() {
+    const breakLabel = defineLabel();
+    beginBlock({
+      kind: 2 /* Switch */,
+      isScript: false,
+      breakLabel
+    });
+    return breakLabel;
+  }
+  function endSwitchBlock() {
+    Debug.assert(peekBlockKind() === 2 /* Switch */);
+    const block = endBlock();
+    const breakLabel = block.breakLabel;
+    if (!block.isScript) {
+      markLabel(breakLabel);
+    }
+  }
+  function beginScriptLabeledBlock(labelText) {
+    beginBlock({
+      kind: 4 /* Labeled */,
+      isScript: true,
+      labelText,
+      breakLabel: -1
+    });
+  }
+  function beginLabeledBlock(labelText) {
+    const breakLabel = defineLabel();
+    beginBlock({
+      kind: 4 /* Labeled */,
+      isScript: false,
+      labelText,
+      breakLabel
+    });
+  }
+  function endLabeledBlock() {
+    Debug.assert(peekBlockKind() === 4 /* Labeled */);
+    const block = endBlock();
+    if (!block.isScript) {
+      markLabel(block.breakLabel);
+    }
+  }
+  function supportsUnlabeledBreak(block) {
+    return block.kind === 2 /* Switch */ || block.kind === 3 /* Loop */;
+  }
+  function

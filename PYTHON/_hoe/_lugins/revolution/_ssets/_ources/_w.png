@@ -1,0 +1,221 @@
+ */ || numElements === 0) || every(elements, isOmittedExpression)) {
+    const reuseIdentifierExpressions = !isDeclarationBindingElement(parent) || numElements !== 0;
+    value = ensureIdentifier(flattenContext, value, reuseIdentifierExpressions, location);
+  }
+  let bindingElements;
+  let restContainingElements;
+  for (let i = 0; i < numElements; i++) {
+    const element = elements[i];
+    if (flattenContext.level >= 1 /* ObjectRest */) {
+      if (element.transformFlags & 65536 /* ContainsObjectRestOrSpread */ || flattenContext.hasTransformedPriorElement && !isSimpleBindingOrAssignmentElement(element)) {
+        flattenContext.hasTransformedPriorElement = true;
+        const temp = flattenContext.context.factory.createTempVariable(
+          /*recordTempVariable*/
+          void 0
+        );
+        if (flattenContext.hoistTempVariables) {
+          flattenContext.context.hoistVariableDeclaration(temp);
+        }
+        restContainingElements = append(restContainingElements, [temp, element]);
+        bindingElements = append(bindingElements, flattenContext.createArrayBindingOrAssignmentElement(temp));
+      } else {
+        bindingElements = append(bindingElements, element);
+      }
+    } else if (isOmittedExpression(element)) {
+      continue;
+    } else if (!getRestIndicatorOfBindingOrAssignmentElement(element)) {
+      const rhsValue = flattenContext.context.factory.createElementAccessExpression(value, i);
+      flattenBindingOrAssignmentElement(
+        flattenContext,
+        element,
+        rhsValue,
+        /*location*/
+        element
+      );
+    } else if (i === numElements - 1) {
+      const rhsValue = flattenContext.context.factory.createArraySliceCall(value, i);
+      flattenBindingOrAssignmentElement(
+        flattenContext,
+        element,
+        rhsValue,
+        /*location*/
+        element
+      );
+    }
+  }
+  if (bindingElements) {
+    flattenContext.emitBindingOrAssignment(flattenContext.createArrayBindingOrAssignmentPattern(bindingElements), value, location, pattern);
+  }
+  if (restContainingElements) {
+    for (const [id, element] of restContainingElements) {
+      flattenBindingOrAssignmentElement(flattenContext, element, id, element);
+    }
+  }
+}
+function isSimpleBindingOrAssignmentElement(element) {
+  const target = getTargetOfBindingOrAssignmentElement(element);
+  if (!target || isOmittedExpression(target))
+    return true;
+  const propertyName = tryGetPropertyNameOfBindingOrAssignmentElement(element);
+  if (propertyName && !isPropertyNameLiteral(propertyName))
+    return false;
+  const initializer = getInitializerOfBindingOrAssignmentElement(element);
+  if (initializer && !isSimpleInlineableExpression(initializer))
+    return false;
+  if (isBindingOrAssignmentPattern(target))
+    return every(getElementsOfBindingOrAssignmentPattern(target), isSimpleBindingOrAssignmentElement);
+  return isIdentifier(target);
+}
+function createDefaultValueCheck(flattenContext, value, defaultValue, location) {
+  value = ensureIdentifier(
+    flattenContext,
+    value,
+    /*reuseIdentifierExpressions*/
+    true,
+    location
+  );
+  return flattenContext.context.factory.createConditionalExpression(
+    flattenContext.context.factory.createTypeCheck(value, "undefined"),
+    /*questionToken*/
+    void 0,
+    defaultValue,
+    /*colonToken*/
+    void 0,
+    value
+  );
+}
+function createDestructuringPropertyAccess(flattenContext, value, propertyName) {
+  const { factory: factory2 } = flattenContext.context;
+  if (isComputedPropertyName(propertyName)) {
+    const argumentExpression = ensureIdentifier(
+      flattenContext,
+      Debug.checkDefined(visitNode(propertyName.expression, flattenContext.visitor, isExpression)),
+      /*reuseIdentifierExpressions*/
+      false,
+      /*location*/
+      propertyName
+    );
+    return flattenContext.context.factory.createElementAccessExpression(value, argumentExpression);
+  } else if (isStringOrNumericLiteralLike(propertyName)) {
+    const argumentExpression = factory2.cloneNode(propertyName);
+    return flattenContext.context.factory.createElementAccessExpression(value, argumentExpression);
+  } else {
+    const name = flattenContext.context.factory.createIdentifier(idText(propertyName));
+    return flattenContext.context.factory.createPropertyAccessExpression(value, name);
+  }
+}
+function ensureIdentifier(flattenContext, value, reuseIdentifierExpressions, location) {
+  if (isIdentifier(value) && reuseIdentifierExpressions) {
+    return value;
+  } else {
+    const temp = flattenContext.context.factory.createTempVariable(
+      /*recordTempVariable*/
+      void 0
+    );
+    if (flattenContext.hoistTempVariables) {
+      flattenContext.context.hoistVariableDeclaration(temp);
+      flattenContext.emitExpression(setTextRange(flattenContext.context.factory.createAssignment(temp, value), location));
+    } else {
+      flattenContext.emitBindingOrAssignment(
+        temp,
+        value,
+        location,
+        /*original*/
+        void 0
+      );
+    }
+    return temp;
+  }
+}
+function makeArrayBindingPattern(factory2, elements) {
+  Debug.assertEachNode(elements, isArrayBindingElement);
+  return factory2.createArrayBindingPattern(elements);
+}
+function makeArrayAssignmentPattern(factory2, elements) {
+  Debug.assertEachNode(elements, isArrayBindingOrAssignmentElement);
+  return factory2.createArrayLiteralExpression(map(elements, factory2.converters.convertToArrayAssignmentElement));
+}
+function makeObjectBindingPattern(factory2, elements) {
+  Debug.assertEachNode(elements, isBindingElement);
+  return factory2.createObjectBindingPattern(elements);
+}
+function makeObjectAssignmentPattern(factory2, elements) {
+  Debug.assertEachNode(elements, isObjectBindingOrAssignmentElement);
+  return factory2.createObjectLiteralExpression(map(elements, factory2.converters.convertToObjectAssignmentElement));
+}
+function makeBindingElement(factory2, name) {
+  return factory2.createBindingElement(
+    /*dotDotDotToken*/
+    void 0,
+    /*propertyName*/
+    void 0,
+    name
+  );
+}
+function makeAssignmentElement(name) {
+  return name;
+}
+
+// src/compiler/transformers/classThis.ts
+function createClassThisAssignmentBlock(factory2, classThis, thisExpression = factory2.createThis()) {
+  const expression = factory2.createAssignment(classThis, thisExpression);
+  const statement = factory2.createExpressionStatement(expression);
+  const body = factory2.createBlock(
+    [statement],
+    /*multiLine*/
+    false
+  );
+  const block = factory2.createClassStaticBlockDeclaration(body);
+  getOrCreateEmitNode(block).classThis = classThis;
+  return block;
+}
+function isClassThisAssignmentBlock(node) {
+  var _a;
+  if (!isClassStaticBlockDeclaration(node) || node.body.statements.length !== 1) {
+    return false;
+  }
+  const statement = node.body.statements[0];
+  return isExpressionStatement(statement) && isAssignmentExpression(
+    statement.expression,
+    /*excludeCompoundAssignment*/
+    true
+  ) && isIdentifier(statement.expression.left) && ((_a = node.emitNode) == null ? void 0 : _a.classThis) === statement.expression.left && statement.expression.right.kind === 110 /* ThisKeyword */;
+}
+function classHasClassThisAssignment(node) {
+  var _a;
+  return !!((_a = node.emitNode) == null ? void 0 : _a.classThis) && some(node.members, isClassThisAssignmentBlock);
+}
+function injectClassThisAssignmentIfMissing(factory2, node, classThis, thisExpression) {
+  if (classHasClassThisAssignment(node)) {
+    return node;
+  }
+  const staticBlock = createClassThisAssignmentBlock(factory2, classThis, thisExpression);
+  if (node.name) {
+    setSourceMapRange(staticBlock.body.statements[0], node.name);
+  }
+  const members = factory2.createNodeArray([staticBlock, ...node.members]);
+  setTextRange(members, node.members);
+  const updatedNode = isClassDeclaration(node) ? factory2.updateClassDeclaration(
+    node,
+    node.modifiers,
+    node.name,
+    node.typeParameters,
+    node.heritageClauses,
+    members
+  ) : factory2.updateClassExpression(
+    node,
+    node.modifiers,
+    node.name,
+    node.typeParameters,
+    node.heritageClauses,
+    members
+  );
+  getOrCreateEmitNode(updatedNode).classThis = classThis;
+  return updatedNode;
+}
+
+// src/compiler/transformers/namedEvaluation.ts
+function getAssignedNameOfIdentifier(factory2, name, expression) {
+  const original = getOriginalNode(skipOuterExpressions(expression));
+  if ((isClassDeclaration(original) || isFunctionDeclaration(original)) && !original.name && hasSyntacticModifier(original, 2048 /* Default */)) {
+    return factory2.createStringLiteral("default")

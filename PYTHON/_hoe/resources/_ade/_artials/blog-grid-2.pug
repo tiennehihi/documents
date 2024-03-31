@@ -1,0 +1,52 @@
+        state = MISMATCH;
+                }
+
+                break;
+
+            default:
+                throw new Error('Unknown node type: ' + state.type);
+        }
+    }
+
+    totalIterationCount += iterationCount;
+
+    switch (exitReason) {
+        case null:
+            console.warn('[csstree-match] BREAK after ' + ITERATION_LIMIT + ' iterations');
+            exitReason = EXIT_REASON_ITERATION_LIMIT;
+            matchStack = null;
+            break;
+
+        case EXIT_REASON_MATCH:
+            while (syntaxStack !== null) {
+                closeSyntax();
+            }
+            break;
+
+        default:
+            matchStack = null;
+    }
+
+    return {
+        tokens: tokens,
+        reason: exitReason,
+        iterations: iterationCount,
+        match: matchStack,
+        longestMatch: longestMatch
+    };
+}
+
+function matchAsList(tokens, matchGraph, syntaxes) {
+    var matchResult = internalMatch(tokens, matchGraph, syntaxes || {});
+
+    if (matchResult.match !== null) {
+        var item = reverseList(matchResult.match).prev;
+
+        matchResult.match = [];
+
+        while (item !== null) {
+            switch (item.type) {
+                case STUB:
+                    break;
+
+                case OP

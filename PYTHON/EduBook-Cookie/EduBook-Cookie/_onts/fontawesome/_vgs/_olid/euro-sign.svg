@@ -1,0 +1,30 @@
+erty(classCandidate, context))
+
+  let candidatePrefix = classCandidate
+  let negative = false
+
+  const twConfigPrefix = context.tailwindConfig.prefix
+
+  const twConfigPrefixLen = twConfigPrefix.length
+
+  const hasMatchingPrefix =
+    candidatePrefix.startsWith(twConfigPrefix) || candidatePrefix.startsWith(`-${twConfigPrefix}`)
+
+  if (candidatePrefix[twConfigPrefixLen] === '-' && hasMatchingPrefix) {
+    negative = true
+    candidatePrefix = twConfigPrefix + candidatePrefix.slice(twConfigPrefixLen + 1)
+  }
+
+  if (negative && context.candidateRuleMap.has(candidatePrefix)) {
+    yield [context.candidateRuleMap.get(candidatePrefix), '-DEFAULT']
+  }
+
+  for (let [prefix, modifier] of candidatePermutations(candidatePrefix)) {
+    if (context.candidateRuleMap.has(prefix)) {
+      yield [context.candidateRuleMap.get(prefix), negative ? `-${modifier}` : modifier]
+    }
+  }
+}
+
+function splitWithSeparator(input, separator) {
+  if (input === sharedState.NOT

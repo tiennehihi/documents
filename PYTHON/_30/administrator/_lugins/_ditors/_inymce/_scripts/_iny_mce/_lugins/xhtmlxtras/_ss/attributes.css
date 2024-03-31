@@ -1,0 +1,1 @@
+"module"===function(url){return getPackageScopeConfig(url).type}(url)?"module":"commonjs";const format=extensionFormatMap[ext];if(format)return format;if(ignoreErrors)return;const filepa

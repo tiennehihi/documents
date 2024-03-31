@@ -1,0 +1,7 @@
+'use strict';
+const { list } = require('postcss');
+const stylehacks = require('stylehacks');
+const insertCloned = require('../insertCloned.js');
+const parseTrbl = require('../parseTrbl.js');
+const hasAllProps = require('../hasAllProps.js');
+const getDecls = require

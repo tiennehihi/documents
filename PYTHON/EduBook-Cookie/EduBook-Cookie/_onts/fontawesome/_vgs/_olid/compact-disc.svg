@@ -1,0 +1,15 @@
+/**
+ * @fileoverview Globals for ecmaVersion/sourceType
+ * @author Nicholas C. Zakas
+ */
+
+"use strict";
+
+//-----------------------------------------------------------------------------
+// Globals
+//-----------------------------------------------------------------------------
+
+const commonjs = {
+    exports: true,
+    global: false,
+    module: 

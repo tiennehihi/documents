@@ -1,0 +1,15 @@
+ro:
+      - family: classic
+        style: solid
+      - family: classic
+        style: regular
+  label: Face grin tongue
+  unicode: f589
+  voted: false
+face-grin-tongue-squint:
+  aliases:
+    names:
+      - grin-tongue-squint
+    unicodes:
+      composite:
+        - 1f6

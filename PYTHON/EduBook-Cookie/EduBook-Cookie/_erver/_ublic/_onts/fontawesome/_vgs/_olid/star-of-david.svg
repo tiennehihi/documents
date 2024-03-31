@@ -1,0 +1,26 @@
+iases": {
+      "unicodes": {
+        "secondary": [
+          "10f517"
+        ]
+      }
+    },
+    "changes": [
+      "5.0.13",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid"
+    ],
+    "unicode": "f517",
+    "label": "Blender",
+    "voted": false,
+    "svg": {
+      "solid": {
+        "last_modified": 1660321785,
+        "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 64C0 28.7 28.7 0 64 0h64 32H470.1c21.1 0 36.4 20.1 30.9 40.4L494.5 64H336c-8.8 0-16 7.2-16 16s7.2 16 16 16H485.8l-17.5 64H336c-8.8 0-16 7.2-16 16s7.2 16 16 16H459.6l-17.5 64H336c-8.8 0-16 7.2-16 16s7.2 16 16 16h97.5L416 352H160l-8.7

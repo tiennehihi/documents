@@ -1,0 +1,5 @@
+'use strict';
+const BasePlugin = require('../plugin');
+const { IE_6 } = require('../dictionary/browsers');
+const { PROPERTY } = require('../dictionary/identifiers');
+const { DECL } = require('../diction

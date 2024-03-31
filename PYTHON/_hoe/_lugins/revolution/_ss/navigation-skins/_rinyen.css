@@ -1,0 +1,177 @@
+/**
+ * The `node:v8` module exposes APIs that are specific to the version of [V8](https://developers.google.com/v8/) built into the Node.js binary. It can be accessed using:
+ *
+ * ```js
+ * const v8 = require('node:v8');
+ * ```
+ * @see [source](https://github.com/nodejs/node/blob/v20.11.0/lib/v8.js)
+ */
+declare module "v8" {
+    import { Readable } from "node:stream";
+    interface HeapSpaceInfo {
+        space_name: string;
+        space_size: number;
+        space_used_size: number;
+        space_available_size: number;
+        physical_space_size: number;
+    }
+    // ** Signifies if the --zap_code_space option is enabled or not.  1 == enabled, 0 == disabled. */
+    type DoesZapCodeSpaceFlag = 0 | 1;
+    interface HeapInfo {
+        total_heap_size: number;
+        total_heap_size_executable: number;
+        total_physical_size: number;
+        total_available_size: number;
+        used_heap_size: number;
+        heap_size_limit: number;
+        malloced_memory: number;
+        peak_malloced_memory: number;
+        does_zap_garbage: DoesZapCodeSpaceFlag;
+        number_of_native_contexts: number;
+        number_of_detached_contexts: number;
+        total_global_handles_size: number;
+        used_global_handles_size: number;
+        external_memory: number;
+    }
+    interface HeapCodeStatistics {
+        code_and_metadata_size: number;
+        bytecode_and_metadata_size: number;
+        external_script_source_size: number;
+    }
+    interface HeapSnapshotOptions {
+        /**
+         * If true, expose internals in the heap snapshot.
+         * @default false
+         */
+        exposeInternals?: boolean;
+        /**
+         * If true, expose numeric values in artificial fields.
+         * @default false
+         */
+        exposeNumericValues?: boolean;
+    }
+    /**
+     * Returns an integer representing a version tag derived from the V8 version,
+     * command-line flags, and detected CPU features. This is useful for determining
+     * whether a `vm.Script` `cachedData` buffer is compatible with this instance
+     * of V8.
+     *
+     * ```js
+     * console.log(v8.cachedDataVersionTag()); // 3947234607
+     * // The value returned by v8.cachedDataVersionTag() is derived from the V8
+     * // version, command-line flags, and detected CPU features. Test that the value
+     * // does indeed update when flags are toggled.
+     * v8.setFlagsFromString('--allow_natives_syntax');
+     * console.log(v8.cachedDataVersionTag()); // 183726201
+     * ```
+     * @since v8.0.0
+     */
+    function cachedDataVersionTag(): number;
+    /**
+     * Returns an object with the following properties:
+     *
+     * `does_zap_garbage` is a 0/1 boolean, which signifies whether the`--zap_code_space` option is enabled or not. This makes V8 overwrite heap
+     * garbage with a bit pattern. The RSS footprint (resident set size) gets bigger
+     * because it continuously touches all heap pages and that makes them less likely
+     * to get swapped out by the operating system.
+     *
+     * `number_of_native_contexts` The value of native\_context is the number of the
+     * top-level contexts currently active. Increase of this number over time indicates
+     * a memory leak.
+     *
+     * `number_of_detached_contexts` The value of detached\_context is the number
+     * of contexts that were detached and not yet garbage collected. This number
+     * being non-zero indicates a potential memory leak.
+     *
+     * `total_global_handles_size` The value of total\_global\_handles\_size is the
+     * total memory size of V8 global handles.
+     *
+     * `used_global_handles_size` The value of used\_global\_handles\_size is the
+     * used memory size of V8 global handles.
+     *
+     * `external_memory` The value of external\_memory is the memory size of array
+     * buffers and external strings.
+     *
+     * ```js
+     * {
+     *   total_heap_size: 7326976,
+     *   total_heap_size_executable: 4194304,
+     *   total_physical_size: 7326976,
+     *   total_available_size: 1152656,
+     *   used_heap_size: 3476208,
+     *   heap_size_limit: 1535115264,
+     *   malloced_memory: 16384,
+     *   peak_malloced_memory: 1127496,
+     *   does_zap_garbage: 0,
+     *   number_of_native_contexts: 1,
+     *   number_of_detached_contexts: 0,
+     *   total_global_handles_size: 8192,
+     *   used_global_handles_size: 3296,
+     *   external_memory: 318824
+     * }
+     * ```
+     * @since v1.0.0
+     */
+    function getHeapStatistics(): HeapInfo;
+    /**
+     * Returns statistics about the V8 heap spaces, i.e. the segments which make up
+     * the V8 heap. Neither the ordering of heap spaces, nor the availability of a
+     * heap space can be guaranteed as the statistics are provided via the
+     * V8 [`GetHeapSpaceStatistics`](https://v8docs.nodesource.com/node-13.2/d5/dda/classv8_1_1_isolate.html#ac673576f24fdc7a33378f8f57e1d13a4) function and may change from one V8 version to the
+     * next.
+     *
+     * The value returned is an array of objects containing the following properties:
+     *
+     * ```json
+     * [
+     *   {
+     *     "space_name": "new_space",
+     *     "space_size": 2063872,
+     *     "space_used_size": 951112,
+     *     "space_available_size": 80824,
+     *     "physical_space_size": 2063872
+     *   },
+     *   {
+     *     "space_name": "old_space",
+     *     "space_size": 3090560,
+     *     "space_used_size": 2493792,
+     *     "space_available_size": 0,
+     *     "physical_space_size": 3090560
+     *   },
+     *   {
+     *     "space_name": "code_space",
+     *     "space_size": 1260160,
+     *     "space_used_size": 644256,
+     *     "space_available_size": 960,
+     *     "physical_space_size": 1260160
+     *   },
+     *   {
+     *     "space_name": "map_space",
+     *     "space_size": 1094160,
+     *     "space_used_size": 201608,
+     *     "space_available_size": 0,
+     *     "physical_space_size": 1094160
+     *   },
+     *   {
+     *     "space_name": "large_object_space",
+     *     "space_size": 0,
+     *     "space_used_size": 0,
+     *     "space_available_size": 1490980608,
+     *     "physical_space_size": 0
+     *   }
+     * ]
+     * ```
+     * @since v6.0.0
+     */
+    function getHeapSpaceStatistics(): HeapSpaceInfo[];
+    /**
+     * The `v8.setFlagsFromString()` method can be used to programmatically set
+     * V8 command-line flags. This method should be used with care. Changing settings
+     * after the VM has started may result in unpredictable behavior, including
+     * crashes and data loss; or it may simply do nothing.
+     *
+     * The V8 options available for a version of Node.js may be determined by running`node --v8-options`.
+     *
+     * Usage:
+     *
+     * ```j

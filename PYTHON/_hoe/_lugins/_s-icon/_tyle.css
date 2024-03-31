@@ -1,0 +1,49 @@
+ via [#214], configured via [`import/cache` setting]
+
+## [1.1.0] - 2016-03-15
+
+### Added
+- Added an [`ignore`](./docs/rules/no-unresolved.md#ignore) option to [`no-unresolved`] for those pesky files that no resolver can find. (still prefer enhancing the Webpack and Node resolvers to using it, though). See [#89] for details.
+
+## [1.0.4] - 2016-03-11
+
+### Changed
+- respect hoisting for deep namespaces ([`namespace`]/[`no-deprecated`]) ([#211])
+
+### Fixed
+- don't crash on self references ([#210])
+- correct cache behavior in `eslint_d` for deep namespaces ([#200])
+
+## [1.0.3] - 2016-02-26
+
+### Changed
+- no-deprecated follows deep namespaces ([#191])
+
+### Fixed
+- [`namespace`] no longer flags modules with only a default export as having no names. (ns.default is valid ES6)
+
+## [1.0.2] - 2016-02-26
+
+### Fixed
+- don't parse imports with no specifiers ([#192])
+
+## [1.0.1] - 2016-02-25
+
+### Fixed
+- export `stage-0` shared config
+- documented [`no-deprecated`]
+- deep namespaces are traversed regardless of how they get imported ([#189])
+
+## [1.0.0] - 2016-02-24
+
+### Added
+- [`no-deprecated`]: WIP rule to let you know at lint time if you're using deprecated functions, constants, classes, or modules.
+
+### Changed
+- [`namespace`]: support deep namespaces ([#119] via [#157])
+
+## [1.0.0-beta.0] - 2016-02-13
+
+### Changed
+- support for (only) ESLint 2.x
+- no longer needs/refers to `import/parser` or `import/parse-options`. Inste

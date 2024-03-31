@@ -1,0 +1,3 @@
+n_must_be_either_void_or_any: diag(1237, 1 /* Error */, "The_return_type_of_a_parameter_decorator_function_must_be_either_void_or_any_1237", "The return type of a parameter decorator function must be either 'void' or 'any'."),
+  Unable_to_resolve_signature_of_class_decorator_when_called_as_an_expression: diag(1238, 1 /* Error */, "Unable_to_resolve_signature_of_class_decorator_when_called_as_an_expression_1238", "Unable to resolve signature of class decorator when called as an expression."),
+  Unable_to_resolve_signature_of_parameter_decorator_when_called_as_an_expression: diag(1239, 1 /* Error */, "Unable_to_resolve_signature_of_parameter_decorator_when_called_as_an_expression_1239", "Unable to resolve signature of parameter decorator whe

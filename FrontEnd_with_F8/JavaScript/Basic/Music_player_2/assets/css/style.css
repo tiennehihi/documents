@@ -1,0 +1,310 @@
+:root {
+    --primary-color: #ec1f55;
+    --text-color: #333;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: inherit;
+}
+
+/* body {
+    background: linear-gradient(135deg, #a6ebfd, #f8f5c0, #fdbed5);
+} */
+
+html {
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+.player {
+    position: absolute;
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #a6ebfd, #f8f5c0, #fdbed5);
+}
+
+.player .icon-pause {
+    display: none;
+}
+
+.player.playing .icon-pause {
+    display: inline-block;
+}
+
+.player.playing .icon-play {
+    display: none;
+}
+
+.dashboard {
+    /* padding: 16px 16px 14px;
+    background-color: #fff;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    max-width: 480px;
+    border-bottom: 1px solid #ebebeb; */
+    max-width: 50%;
+    height: 50vh;
+    width: 500px;
+    margin: 0;
+    background-color: #eef3db;
+    padding: 4px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+/* HEADER */
+header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+header h4 {
+    color: var(--primary-color);
+    font-size: 12px;
+}
+
+header h2 {
+    color: var(--text-color);
+    font-size: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* CD */
+.cd {
+    display: flex;
+    flex-wrap: wrap;
+    width: 400px;
+    margin: auto;
+}
+
+.cd-thumb {
+    display: block;
+    width: 80%;
+    margin: auto;
+    height: 180px;
+    margin-top: 35px;
+    text-align: center;
+    /* margin-bottom: -10px; */
+    border-radius: 7px;
+    background-color: #333;
+    background-size: cover;
+    background-position: center 10%;
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+    transform-origin: top left; /* Đặt điểm gốc của transform */
+    /* object-fit: cover;
+    transform: translate(-50%, -50%); */
+    cursor: pointer;
+}
+
+/* CONTROL */
+.control {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 18px 0 8px 0;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.control .btn {
+    color: #666;
+    padding: 18px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.control .btn.active {
+    color: var(--primary-color);
+}
+
+.control .btn-toggle-play {
+    width: 56px;
+    height: 56px;
+    /* border-radius: 50%; */
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* background-color: var(--primary-color); */
+}
+
+.control .btn-repeat,
+.control .btn-prev,
+.control .btn-toggle-play,
+.control .btn-next,
+.control .btn-random {
+    color: #000;
+}
+
+.control .btn-repeat i,
+.control .btn-prev i,
+.control .btn-next i,
+.control .btn-random i {
+    font-size: 24px;
+}
+
+.control .btn-toggle-play {
+    font-size: 46px;
+}
+
+.progress {
+    -webkit-appearance: none;
+    max-width: 100%;
+    height: 6px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: 0.2s;
+    transition: opacity 0.2s;
+    width: 70%;
+    margin: auto;
+    display: flex;
+}
+
+.progress::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 6px;
+    background-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.progress:hover {
+    opacity: 0.8;
+    box-shadow: 0 2px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+/* PLAYLIST */
+.playlist {
+    /* margin-top: 408px; */
+    max-width: 50%;
+    margin: 0;
+    padding: 0 12px;
+    max-height: 50vh;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: #eef3db;
+    scroll-behavior: none;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding-bottom: 15px;
+}
+
+.playlist::-webkit-scrollbar {
+    display: none;
+    /* bỏ thanh cuộn */
+}
+
+.up-next {
+    /* position: fixed;
+    margin-bottom: 50px;
+    z-index: 1;
+    background-color: var(--background-color);
+    padding: 5px 0px 10px 0px;
+    min-width: 62%;
+    border-top-right-radius: 8px;
+    margin-left: -1px;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'Quicksand Semi-Bold', sans-serif; */
+    position: fixed;
+    z-index: 334;
+    background-color: #eef3db;
+    padding: 10px 0px 10px 0px;
+    max-width: 100%;
+    width: 415px;
+    border-top-right-radius: 8px;
+    margin-left: -1px;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'Quicksand Semi-Bold', sans-serif;
+}
+
+.song {
+    /* display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    background-color: #fff;
+    padding: 8px 16px;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1); */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    line-height: 20px;
+    background-color: rgba(255, 255, 255, 0.295);
+    padding: 10px 14px;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all ease-in 0.1s;
+    position: relative;
+    z-index: 1;
+}
+
+.song:nth-child(2) {
+    margin-top: 45px;
+}
+
+.song.active {
+    background-color: var(--primary-color);
+}
+
+.song:active {
+    opacity: 0.8;
+}
+
+.song.active .option,
+.song.active .author,
+.song.active .title {
+    color: #fff;
+}
+
+.song .thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-size: cover;
+    margin: 0 8px;
+}
+
+.song .body {
+    flex: 1;
+    padding: 0 16px;
+}
+
+.song .title {
+    font-size: 18px;
+    color: var(--text-color);
+}
+
+.song .author {
+    font-size: 12px;
+    color: #999;
+}
+
+.song .option {
+    padding: 16px 8px;
+    color: #999;
+    font-size: 18px;
+}
+

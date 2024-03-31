@@ -1,0 +1,14 @@
+/**
+ * @fileoverview Prevent multiple component definition per file
+ * @author Yannick Croissant
+ */
+
+'use strict';
+
+const values = require('object.values');
+
+const Components = require('../util/Components');
+const docsUrl = require('../util/docsUrl');
+const report = require('../util/report');
+
+// ------------------

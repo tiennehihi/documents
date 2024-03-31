@@ -1,0 +1,19 @@
+import { Scalar } from '../../nodes/Scalar.js';
+import { map } from '../common/map.js';
+import { seq } from '../common/seq.js';
+
+function intIdentify(value) {
+    return typeof value === 'bigint' || Number.isInteger(value);
+}
+const stringifyJSON = ({ value }) => JSON.stringify(value);
+const jsonScalars = [
+    {
+        identify: value => typeof value === 'string',
+        default: true,
+        tag: 'tag:yaml.org,2002:str',
+        resolve: str => str,
+        stringify: stringifyJSON
+    },
+    {
+        identify: value => value == null,
+        createNode: () => new 

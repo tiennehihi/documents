@@ -1,0 +1,1330 @@
+xpressionFlow();
+  return bindSourceFile2;
+  function createDiagnosticForNode2(node, message, ...args) {
+    return createDiagnosticForNodeInSourceFile(getSourceFileOfNode(node) || file, node, message, ...args);
+  }
+  function bindSourceFile2(f, opts) {
+    var _a, _b;
+    file = f;
+    options = opts;
+    languageVersion = getEmitScriptTarget(options);
+    inStrictMode = bindInStrictMode(file, opts);
+    classifiableNames = /* @__PURE__ */ new Set();
+    symbolCount = 0;
+    Symbol47 = objectAllocator.getSymbolConstructor();
+    Debug.attachFlowNodeDebugInfo(unreachableFlow);
+    Debug.attachFlowNodeDebugInfo(reportedUnreachableFlow);
+    if (!file.locals) {
+      (_a = tracing) == null ? void 0 : _a.push(
+        tracing.Phase.Bind,
+        "bindSourceFile",
+        { path: file.path },
+        /*separateBeginAndEnd*/
+        true
+      );
+      bind(file);
+      (_b = tracing) == null ? void 0 : _b.pop();
+      file.symbolCount = symbolCount;
+      file.classifiableNames = classifiableNames;
+      delayedBindJSDocTypedefTag();
+    }
+    file = void 0;
+    options = void 0;
+    languageVersion = void 0;
+    parent2 = void 0;
+    container = void 0;
+    thisParentContainer = void 0;
+    blockScopeContainer = void 0;
+    lastContainer = void 0;
+    delayedTypeAliases = void 0;
+    seenThisKeyword = false;
+    currentFlow = void 0;
+    currentBreakTarget = void 0;
+    currentContinueTarget = void 0;
+    currentReturnTarget = void 0;
+    currentTrueTarget = void 0;
+    currentFalseTarget = void 0;
+    currentExceptionTarget = void 0;
+    activeLabelList = void 0;
+    hasExplicitReturn = false;
+    inAssignmentPattern = false;
+    emitFlags = 0 /* None */;
+  }
+  function bindInStrictMode(file2, opts) {
+    if (getStrictOptionValue(opts, "alwaysStrict") && !file2.isDeclarationFile) {
+      return true;
+    } else {
+      return !!file2.externalModuleIndicator;
+    }
+  }
+  function createSymbol(flags, name) {
+    symbolCount++;
+    return new Symbol47(flags, name);
+  }
+  function addDeclarationToSymbol(symbol, node, symbolFlags) {
+    symbol.flags |= symbolFlags;
+    node.symbol = symbol;
+    symbol.declarations = appendIfUnique(symbol.declarations, node);
+    if (symbolFlags & (32 /* Class */ | 384 /* Enum */ | 1536 /* Module */ | 3 /* Variable */) && !symbol.exports) {
+      symbol.exports = createSymbolTable();
+    }
+    if (symbolFlags & (32 /* Class */ | 64 /* Interface */ | 2048 /* TypeLiteral */ | 4096 /* ObjectLiteral */) && !symbol.members) {
+      symbol.members = createSymbolTable();
+    }
+    if (symbol.constEnumOnlyModule && symbol.flags & (16 /* Function */ | 32 /* Class */ | 256 /* RegularEnum */)) {
+      symbol.constEnumOnlyModule = false;
+    }
+    if (symbolFlags & 111551 /* Value */) {
+      setValueDeclaration(symbol, node);
+    }
+  }
+  function getDeclarationName(node) {
+    if (node.kind === 277 /* ExportAssignment */) {
+      return node.isExportEquals ? "export=" /* ExportEquals */ : "default" /* Default */;
+    }
+    const name = getNameOfDeclaration(node);
+    if (name) {
+      if (isAmbientModule(node)) {
+        const moduleName = getTextOfIdentifierOrLiteral(name);
+        return isGlobalScopeAugmentation(node) ? "__global" : `"${moduleName}"`;
+      }
+      if (name.kind === 167 /* ComputedPropertyName */) {
+        const nameExpression = name.expression;
+        if (isStringOrNumericLiteralLike(nameExpression)) {
+          return escapeLeadingUnderscores(nameExpression.text);
+        }
+        if (isSignedNumericLiteral(nameExpression)) {
+          return tokenToString(nameExpression.operator) + nameExpression.operand.text;
+        } else {
+          Debug.fail("Only computed properties with literal names have declaration names");
+        }
+      }
+      if (isPrivateIdentifier(name)) {
+        const containingClass = getContainingClass(node);
+        if (!containingClass) {
+          return void 0;
+        }
+        const containingClassSymbol = containingClass.symbol;
+        return getSymbolNameForPrivateIdentifier(containingClassSymbol, name.escapedText);
+      }
+      if (isJsxNamespacedName(name)) {
+        return getEscapedTextOfJsxNamespacedName(name);
+      }
+      return isPropertyNameLiteral(name) ? getEscapedTextOfIdentifierOrLiteral(name) : void 0;
+    }
+    switch (node.kind) {
+      case 176 /* Constructor */:
+        return "__constructor" /* Constructor */;
+      case 184 /* FunctionType */:
+      case 179 /* CallSignature */:
+      case 330 /* JSDocSignature */:
+        return "__call" /* Call */;
+      case 185 /* ConstructorType */:
+      case 180 /* ConstructSignature */:
+        return "__new" /* New */;
+      case 181 /* IndexSignature */:
+        return "__index" /* Index */;
+      case 278 /* ExportDeclaration */:
+        return "__export" /* ExportStar */;
+      case 312 /* SourceFile */:
+        return "export=" /* ExportEquals */;
+      case 226 /* BinaryExpression */:
+        if (getAssignmentDeclarationKind(node) === 2 /* ModuleExports */) {
+          return "export=" /* ExportEquals */;
+        }
+        Debug.fail("Unknown binary declaration kind");
+        break;
+      case 324 /* JSDocFunctionType */:
+        return isJSDocConstructSignature(node) ? "__new" /* New */ : "__call" /* Call */;
+      case 169 /* Parameter */:
+        Debug.assert(node.parent.kind === 324 /* JSDocFunctionType */, "Impossible parameter parent kind", () => `parent is: ${Debug.formatSyntaxKind(node.parent.kind)}, expected JSDocFunctionType`);
+        const functionType = node.parent;
+        const index = functionType.parameters.indexOf(node);
+        return "arg" + index;
+    }
+  }
+  function getDisplayName(node) {
+    return isNamedDeclaration(node) ? declarationNameToString(node.name) : unescapeLeadingUnderscores(Debug.checkDefined(getDeclarationName(node)));
+  }
+  function declareSymbol(symbolTable, parent3, node, includes, excludes, isReplaceableByMethod, isComputedName) {
+    Debug.assert(isComputedName || !hasDynamicName(node));
+    const isDefaultExport = hasSyntacticModifier(node, 2048 /* Default */) || isExportSpecifier(node) && node.name.escapedText === "default";
+    const name = isComputedName ? "__computed" /* Computed */ : isDefaultExport && parent3 ? "default" /* Default */ : getDeclarationName(node);
+    let symbol;
+    if (name === void 0) {
+      symbol = createSymbol(0 /* None */, "__missing" /* Missing */);
+    } else {
+      symbol = symbolTable.get(name);
+      if (includes & 2885600 /* Classifiable */) {
+        classifiableNames.add(name);
+      }
+      if (!symbol) {
+        symbolTable.set(name, symbol = createSymbol(0 /* None */, name));
+        if (isReplaceableByMethod)
+          symbol.isReplaceableByMethod = true;
+      } else if (isReplaceableByMethod && !symbol.isReplaceableByMethod) {
+        return symbol;
+      } else if (symbol.flags & excludes) {
+        if (symbol.isReplaceableByMethod) {
+          symbolTable.set(name, symbol = createSymbol(0 /* None */, name));
+        } else if (!(includes & 3 /* Variable */ && symbol.flags & 67108864 /* Assignment */)) {
+          if (isNamedDeclaration(node)) {
+            setParent(node.name, node);
+          }
+          let message = symbol.flags & 2 /* BlockScopedVariable */ ? Diagnostics.Cannot_redeclare_block_scoped_variable_0 : Diagnostics.Duplicate_identifier_0;
+          let messageNeedsName = true;
+          if (symbol.flags & 384 /* Enum */ || includes & 384 /* Enum */) {
+            message = Diagnostics.Enum_declarations_can_only_merge_with_namespace_or_other_enum_declarations;
+            messageNeedsName = false;
+          }
+          let multipleDefaultExports = false;
+          if (length(symbol.declarations)) {
+            if (isDefaultExport) {
+              message = Diagnostics.A_module_cannot_have_multiple_default_exports;
+              messageNeedsName = false;
+              multipleDefaultExports = true;
+            } else {
+              if (symbol.declarations && symbol.declarations.length && (node.kind === 277 /* ExportAssignment */ && !node.isExportEquals)) {
+                message = Diagnostics.A_module_cannot_have_multiple_default_exports;
+                messageNeedsName = false;
+                multipleDefaultExports = true;
+              }
+            }
+          }
+          const relatedInformation = [];
+          if (isTypeAliasDeclaration(node) && nodeIsMissing(node.type) && hasSyntacticModifier(node, 32 /* Export */) && symbol.flags & (2097152 /* Alias */ | 788968 /* Type */ | 1920 /* Namespace */)) {
+            relatedInformation.push(createDiagnosticForNode2(node, Diagnostics.Did_you_mean_0, `export type { ${unescapeLeadingUnderscores(node.name.escapedText)} }`));
+          }
+          const declarationName = getNameOfDeclaration(node) || node;
+          forEach(symbol.declarations, (declaration, index) => {
+            const decl = getNameOfDeclaration(declaration) || declaration;
+            const diag3 = messageNeedsName ? createDiagnosticForNode2(decl, message, getDisplayName(declaration)) : createDiagnosticForNode2(decl, message);
+            file.bindDiagnostics.push(
+              multipleDefaultExports ? addRelatedInfo(diag3, createDiagnosticForNode2(declarationName, index === 0 ? Diagnostics.Another_export_default_is_here : Diagnostics.and_here)) : diag3
+            );
+            if (multipleDefaultExports) {
+              relatedInformation.push(createDiagnosticForNode2(decl, Diagnostics.The_first_export_default_is_here));
+            }
+          });
+          const diag2 = messageNeedsName ? createDiagnosticForNode2(declarationName, message, getDisplayName(node)) : createDiagnosticForNode2(declarationName, message);
+          file.bindDiagnostics.push(addRelatedInfo(diag2, ...relatedInformation));
+          symbol = createSymbol(0 /* None */, name);
+        }
+      }
+    }
+    addDeclarationToSymbol(symbol, node, includes);
+    if (symbol.parent) {
+      Debug.assert(symbol.parent === parent3, "Existing symbol parent should match new one");
+    } else {
+      symbol.parent = parent3;
+    }
+    return symbol;
+  }
+  function declareModuleMember(node, symbolFlags, symbolExcludes) {
+    const hasExportModifier = !!(getCombinedModifierFlags(node) & 32 /* Export */) || jsdocTreatAsExported(node);
+    if (symbolFlags & 2097152 /* Alias */) {
+      if (node.kind === 281 /* ExportSpecifier */ || node.kind === 271 /* ImportEqualsDeclaration */ && hasExportModifier) {
+        return declareSymbol(container.symbol.exports, container.symbol, node, symbolFlags, symbolExcludes);
+      } else {
+        Debug.assertNode(container, canHaveLocals);
+        return declareSymbol(
+          container.locals,
+          /*parent*/
+          void 0,
+          node,
+          symbolFlags,
+          symbolExcludes
+        );
+      }
+    } else {
+      if (isJSDocTypeAlias(node))
+        Debug.assert(isInJSFile(node));
+      if (!isAmbientModule(node) && (hasExportModifier || container.flags & 128 /* ExportContext */)) {
+        if (!canHaveLocals(container) || !container.locals || hasSyntacticModifier(node, 2048 /* Default */) && !getDeclarationName(node)) {
+          return declareSymbol(container.symbol.exports, container.symbol, node, symbolFlags, symbolExcludes);
+        }
+        const exportKind = symbolFlags & 111551 /* Value */ ? 1048576 /* ExportValue */ : 0;
+        const local = declareSymbol(
+          container.locals,
+          /*parent*/
+          void 0,
+          node,
+          exportKind,
+          symbolExcludes
+        );
+        local.exportSymbol = declareSymbol(container.symbol.exports, container.symbol, node, symbolFlags, symbolExcludes);
+        node.localSymbol = local;
+        return local;
+      } else {
+        Debug.assertNode(container, canHaveLocals);
+        return declareSymbol(
+          container.locals,
+          /*parent*/
+          void 0,
+          node,
+          symbolFlags,
+          symbolExcludes
+        );
+      }
+    }
+  }
+  function jsdocTreatAsExported(node) {
+    if (node.parent && isModuleDeclaration(node)) {
+      node = node.parent;
+    }
+    if (!isJSDocTypeAlias(node))
+      return false;
+    if (!isJSDocEnumTag(node) && !!node.fullName)
+      return true;
+    const declName = getNameOfDeclaration(node);
+    if (!declName)
+      return false;
+    if (isPropertyAccessEntityNameExpression(declName.parent) && isTopLevelNamespaceAssignment(declName.parent))
+      return true;
+    if (isDeclaration(declName.parent) && getCombinedModifierFlags(declName.parent) & 32 /* Export */)
+      return true;
+    return false;
+  }
+  function bindContainer(node, containerFlags) {
+    const saveContainer = container;
+    const saveThisParentContainer = thisParentContainer;
+    const savedBlockScopeContainer = blockScopeContainer;
+    if (containerFlags & 1 /* IsContainer */) {
+      if (node.kind !== 219 /* ArrowFunction */) {
+        thisParentContainer = container;
+      }
+      container = blockScopeContainer = node;
+      if (containerFlags & 32 /* HasLocals */) {
+        container.locals = createSymbolTable();
+        addToContainerChain(container);
+      }
+    } else if (containerFlags & 2 /* IsBlockScopedContainer */) {
+      blockScopeContainer = node;
+      if (containerFlags & 32 /* HasLocals */) {
+        blockScopeContainer.locals = void 0;
+      }
+    }
+    if (containerFlags & 4 /* IsControlFlowContainer */) {
+      const saveCurrentFlow = currentFlow;
+      const saveBreakTarget = currentBreakTarget;
+      const saveContinueTarget = currentContinueTarget;
+      const saveReturnTarget = currentReturnTarget;
+      const saveExceptionTarget = currentExceptionTarget;
+      const saveActiveLabelList = activeLabelList;
+      const saveHasExplicitReturn = hasExplicitReturn;
+      const isImmediatelyInvoked = containerFlags & 16 /* IsFunctionExpression */ && !hasSyntacticModifier(node, 1024 /* Async */) && !node.asteriskToken && !!getImmediatelyInvokedFunctionExpression(node) || node.kind === 175 /* ClassStaticBlockDeclaration */;
+      if (!isImmediatelyInvoked) {
+        currentFlow = initFlowNode({ flags: 2 /* Start */ });
+        if (containerFlags & (16 /* IsFunctionExpression */ | 128 /* IsObjectLiteralOrClassExpressionMethodOrAccessor */)) {
+          currentFlow.node = node;
+        }
+      }
+      currentReturnTarget = isImmediatelyInvoked || node.kind === 176 /* Constructor */ || isInJSFile(node) && (node.kind === 262 /* FunctionDeclaration */ || node.kind === 218 /* FunctionExpression */) ? createBranchLabel() : void 0;
+      currentExceptionTarget = void 0;
+      currentBreakTarget = void 0;
+      currentContinueTarget = void 0;
+      activeLabelList = void 0;
+      hasExplicitReturn = false;
+      bindChildren(node);
+      node.flags &= ~5632 /* ReachabilityAndEmitFlags */;
+      if (!(currentFlow.flags & 1 /* Unreachable */) && containerFlags & 8 /* IsFunctionLike */ && nodeIsPresent(node.body)) {
+        node.flags |= 512 /* HasImplicitReturn */;
+        if (hasExplicitReturn)
+          node.flags |= 1024 /* HasExplicitReturn */;
+        node.endFlowNode = currentFlow;
+      }
+      if (node.kind === 312 /* SourceFile */) {
+        node.flags |= emitFlags;
+        node.endFlowNode = currentFlow;
+      }
+      if (currentReturnTarget) {
+        addAntecedent(currentReturnTarget, currentFlow);
+        currentFlow = finishFlowLabel(currentReturnTarget);
+        if (node.kind === 176 /* Constructor */ || node.kind === 175 /* ClassStaticBlockDeclaration */ || isInJSFile(node) && (node.kind === 262 /* FunctionDeclaration */ || node.kind === 218 /* FunctionExpression */)) {
+          node.returnFlowNode = currentFlow;
+        }
+      }
+      if (!isImmediatelyInvoked) {
+        currentFlow = saveCurrentFlow;
+      }
+      currentBreakTarget = saveBreakTarget;
+      currentContinueTarget = saveContinueTarget;
+      currentReturnTarget = saveReturnTarget;
+      currentExceptionTarget = saveExceptionTarget;
+      activeLabelList = saveActiveLabelList;
+      hasExplicitReturn = saveHasExplicitReturn;
+    } else if (containerFlags & 64 /* IsInterface */) {
+      seenThisKeyword = false;
+      bindChildren(node);
+      Debug.assertNotNode(node, isIdentifier);
+      node.flags = seenThisKeyword ? node.flags | 256 /* ContainsThis */ : node.flags & ~256 /* ContainsThis */;
+    } else {
+      bindChildren(node);
+    }
+    container = saveContainer;
+    thisParentContainer = saveThisParentContainer;
+    blockScopeContainer = savedBlockScopeContainer;
+  }
+  function bindEachFunctionsFirst(nodes) {
+    bindEach(nodes, (n) => n.kind === 262 /* FunctionDeclaration */ ? bind(n) : void 0);
+    bindEach(nodes, (n) => n.kind !== 262 /* FunctionDeclaration */ ? bind(n) : void 0);
+  }
+  function bindEach(nodes, bindFunction = bind) {
+    if (nodes === void 0) {
+      return;
+    }
+    forEach(nodes, bindFunction);
+  }
+  function bindEachChild(node) {
+    forEachChild(node, bind, bindEach);
+  }
+  function bindChildren(node) {
+    const saveInAssignmentPattern = inAssignmentPattern;
+    inAssignmentPattern = false;
+    if (checkUnreachable(node)) {
+      bindEachChild(node);
+      bindJSDoc(node);
+      inAssignmentPattern = saveInAssignmentPattern;
+      return;
+    }
+    if (node.kind >= 243 /* FirstStatement */ && node.kind <= 259 /* LastStatement */ && !options.allowUnreachableCode) {
+      node.flowNode = currentFlow;
+    }
+    switch (node.kind) {
+      case 247 /* WhileStatement */:
+        bindWhileStatement(node);
+        break;
+      case 246 /* DoStatement */:
+        bindDoStatement(node);
+        break;
+      case 248 /* ForStatement */:
+        bindForStatement(node);
+        break;
+      case 249 /* ForInStatement */:
+      case 250 /* ForOfStatement */:
+        bindForInOrForOfStatement(node);
+        break;
+      case 245 /* IfStatement */:
+        bindIfStatement(node);
+        break;
+      case 253 /* ReturnStatement */:
+      case 257 /* ThrowStatement */:
+        bindReturnOrThrow(node);
+        break;
+      case 252 /* BreakStatement */:
+      case 251 /* ContinueStatement */:
+        bindBreakOrContinueStatement(node);
+        break;
+      case 258 /* TryStatement */:
+        bindTryStatement(node);
+        break;
+      case 255 /* SwitchStatement */:
+        bindSwitchStatement(node);
+        break;
+      case 269 /* CaseBlock */:
+        bindCaseBlock(node);
+        break;
+      case 296 /* CaseClause */:
+        bindCaseClause(node);
+        break;
+      case 244 /* ExpressionStatement */:
+        bindExpressionStatement(node);
+        break;
+      case 256 /* LabeledStatement */:
+        bindLabeledStatement(node);
+        break;
+      case 224 /* PrefixUnaryExpression */:
+        bindPrefixUnaryExpressionFlow(node);
+        break;
+      case 225 /* PostfixUnaryExpression */:
+        bindPostfixUnaryExpressionFlow(node);
+        break;
+      case 226 /* BinaryExpression */:
+        if (isDestructuringAssignment(node)) {
+          inAssignmentPattern = saveInAssignmentPattern;
+          bindDestructuringAssignmentFlow(node);
+          return;
+        }
+        bindBinaryExpressionFlow(node);
+        break;
+      case 220 /* DeleteExpression */:
+        bindDeleteExpressionFlow(node);
+        break;
+      case 227 /* ConditionalExpression */:
+        bindConditionalExpressionFlow(node);
+        break;
+      case 260 /* VariableDeclaration */:
+        bindVariableDeclarationFlow(node);
+        break;
+      case 211 /* PropertyAccessExpression */:
+      case 212 /* ElementAccessExpression */:
+        bindAccessExpressionFlow(node);
+        break;
+      case 213 /* CallExpression */:
+        bindCallExpressionFlow(node);
+        break;
+      case 235 /* NonNullExpression */:
+        bindNonNullExpressionFlow(node);
+        break;
+      case 353 /* JSDocTypedefTag */:
+      case 345 /* JSDocCallbackTag */:
+      case 347 /* JSDocEnumTag */:
+        bindJSDocTypeAlias(node);
+        break;
+      case 312 /* SourceFile */: {
+        bindEachFunctionsFirst(node.statements);
+        bind(node.endOfFileToken);
+        break;
+      }
+      case 241 /* Block */:
+      case 268 /* ModuleBlock */:
+        bindEachFunctionsFirst(node.statements);
+        break;
+      case 208 /* BindingElement */:
+        bindBindingElementFlow(node);
+        break;
+      case 169 /* Parameter */:
+        bindParameterFlow(node);
+        break;
+      case 210 /* ObjectLiteralExpression */:
+      case 209 /* ArrayLiteralExpression */:
+      case 303 /* PropertyAssignment */:
+      case 230 /* SpreadElement */:
+        inAssignmentPattern = saveInAssignmentPattern;
+      default:
+        bindEachChild(node);
+        break;
+    }
+    bindJSDoc(node);
+    inAssignmentPattern = saveInAssignmentPattern;
+  }
+  function isNarrowingExpression(expr) {
+    switch (expr.kind) {
+      case 80 /* Identifier */:
+      case 81 /* PrivateIdentifier */:
+      case 110 /* ThisKeyword */:
+      case 211 /* PropertyAccessExpression */:
+      case 212 /* ElementAccessExpression */:
+        return containsNarrowableReference(expr);
+      case 213 /* CallExpression */:
+        return hasNarrowableArgument(expr);
+      case 217 /* ParenthesizedExpression */:
+        if (isJSDocTypeAssertion(expr)) {
+          return false;
+        }
+      case 235 /* NonNullExpression */:
+        return isNarrowingExpression(expr.expression);
+      case 226 /* BinaryExpression */:
+        return isNarrowingBinaryExpression(expr);
+      case 224 /* PrefixUnaryExpression */:
+        return expr.operator === 54 /* ExclamationToken */ && isNarrowingExpression(expr.operand);
+      case 221 /* TypeOfExpression */:
+        return isNarrowingExpression(expr.expression);
+    }
+    return false;
+  }
+  function isNarrowableReference(expr) {
+    return isDottedName(expr) || (isPropertyAccessExpression(expr) || isNonNullExpression(expr) || isParenthesizedExpression(expr)) && isNarrowableReference(expr.expression) || isBinaryExpression(expr) && expr.operatorToken.kind === 28 /* CommaToken */ && isNarrowableReference(expr.right) || isElementAccessExpression(expr) && (isStringOrNumericLiteralLike(expr.argumentExpression) || isEntityNameExpression(expr.argumentExpression)) && isNarrowableReference(expr.expression) || isAssignmentExpression(expr) && isNarrowableReference(expr.left);
+  }
+  function containsNarrowableReference(expr) {
+    return isNarrowableReference(expr) || isOptionalChain(expr) && containsNarrowableReference(expr.expression);
+  }
+  function hasNarrowableArgument(expr) {
+    if (expr.arguments) {
+      for (const argument of expr.arguments) {
+        if (containsNarrowableReference(argument)) {
+          return true;
+        }
+      }
+    }
+    if (expr.expression.kind === 211 /* PropertyAccessExpression */ && containsNarrowableReference(expr.expression.expression)) {
+      return true;
+    }
+    return false;
+  }
+  function isNarrowingTypeofOperands(expr1, expr2) {
+    return isTypeOfExpression(expr1) && isNarrowableOperand(expr1.expression) && isStringLiteralLike(expr2);
+  }
+  function isNarrowingBinaryExpression(expr) {
+    switch (expr.operatorToken.kind) {
+      case 64 /* EqualsToken */:
+      case 76 /* BarBarEqualsToken */:
+      case 77 /* AmpersandAmpersandEqualsToken */:
+      case 78 /* QuestionQuestionEqualsToken */:
+        return containsNarrowableReference(expr.left);
+      case 35 /* EqualsEqualsToken */:
+      case 36 /* ExclamationEqualsToken */:
+      case 37 /* EqualsEqualsEqualsToken */:
+      case 38 /* ExclamationEqualsEqualsToken */:
+        return isNarrowableOperand(expr.left) || isNarrowableOperand(expr.right) || isNarrowingTypeofOperands(expr.right, expr.left) || isNarrowingTypeofOperands(expr.left, expr.right) || (isBooleanLiteral(expr.right) && isNarrowingExpression(expr.left) || isBooleanLiteral(expr.left) && isNarrowingExpression(expr.right));
+      case 104 /* InstanceOfKeyword */:
+        return isNarrowableOperand(expr.left);
+      case 103 /* InKeyword */:
+        return isNarrowingExpression(expr.right);
+      case 28 /* CommaToken */:
+        return isNarrowingExpression(expr.right);
+    }
+    return false;
+  }
+  function isNarrowableOperand(expr) {
+    switch (expr.kind) {
+      case 217 /* ParenthesizedExpression */:
+        return isNarrowableOperand(expr.expression);
+      case 226 /* BinaryExpression */:
+        switch (expr.operatorToken.kind) {
+          case 64 /* EqualsToken */:
+            return isNarrowableOperand(expr.left);
+          case 28 /* CommaToken */:
+            return isNarrowableOperand(expr.right);
+        }
+    }
+    return containsNarrowableReference(expr);
+  }
+  function createBranchLabel() {
+    return initFlowNode({ flags: 4 /* BranchLabel */, antecedents: void 0 });
+  }
+  function createLoopLabel() {
+    return initFlowNode({ flags: 8 /* LoopLabel */, antecedents: void 0 });
+  }
+  function createReduceLabel(target, antecedents, antecedent) {
+    return initFlowNode({ flags: 1024 /* ReduceLabel */, target, antecedents, antecedent });
+  }
+  function setFlowNodeReferenced(flow) {
+    flow.flags |= flow.flags & 2048 /* Referenced */ ? 4096 /* Shared */ : 2048 /* Referenced */;
+  }
+  function addAntecedent(label, antecedent) {
+    if (!(antecedent.flags & 1 /* Unreachable */) && !contains(label.antecedents, antecedent)) {
+      (label.antecedents || (label.antecedents = [])).push(antecedent);
+      setFlowNodeReferenced(antecedent);
+    }
+  }
+  function createFlowCondition(flags, antecedent, expression) {
+    if (antecedent.flags & 1 /* Unreachable */) {
+      return antecedent;
+    }
+    if (!expression) {
+      return flags & 32 /* TrueCondition */ ? antecedent : unreachableFlow;
+    }
+    if ((expression.kind === 112 /* TrueKeyword */ && flags & 64 /* FalseCondition */ || expression.kind === 97 /* FalseKeyword */ && flags & 32 /* TrueCondition */) && !isExpressionOfOptionalChainRoot(expression) && !isNullishCoalesce(expression.parent)) {
+      return unreachableFlow;
+    }
+    if (!isNarrowingExpression(expression)) {
+      return antecedent;
+    }
+    setFlowNodeReferenced(antecedent);
+    return initFlowNode({ flags, antecedent, node: expression });
+  }
+  function createFlowSwitchClause(antecedent, switchStatement, clauseStart, clauseEnd) {
+    setFlowNodeReferenced(antecedent);
+    return initFlowNode({ flags: 128 /* SwitchClause */, antecedent, switchStatement, clauseStart, clauseEnd });
+  }
+  function createFlowMutation(flags, antecedent, node) {
+    setFlowNodeReferenced(antecedent);
+    const result = initFlowNode({ flags, antecedent, node });
+    if (currentExceptionTarget) {
+      addAntecedent(currentExceptionTarget, result);
+    }
+    return result;
+  }
+  function createFlowCall(antecedent, node) {
+    setFlowNodeReferenced(antecedent);
+    return initFlowNode({ flags: 512 /* Call */, antecedent, node });
+  }
+  function finishFlowLabel(flow) {
+    const antecedents = flow.antecedents;
+    if (!antecedents) {
+      return unreachableFlow;
+    }
+    if (antecedents.length === 1) {
+      return antecedents[0];
+    }
+    return flow;
+  }
+  function isStatementCondition(node) {
+    const parent3 = node.parent;
+    switch (parent3.kind) {
+      case 245 /* IfStatement */:
+      case 247 /* WhileStatement */:
+      case 246 /* DoStatement */:
+        return parent3.expression === node;
+      case 248 /* ForStatement */:
+      case 227 /* ConditionalExpression */:
+        return parent3.condition === node;
+    }
+    return false;
+  }
+  function isLogicalExpression(node) {
+    while (true) {
+      if (node.kind === 217 /* ParenthesizedExpression */) {
+        node = node.expression;
+      } else if (node.kind === 224 /* PrefixUnaryExpression */ && node.operator === 54 /* ExclamationToken */) {
+        node = node.operand;
+      } else {
+        return isLogicalOrCoalescingBinaryExpression(node);
+      }
+    }
+  }
+  function isLogicalAssignmentExpression(node) {
+    return isLogicalOrCoalescingAssignmentExpression(skipParentheses(node));
+  }
+  function isTopLevelLogicalExpression(node) {
+    while (isParenthesizedExpression(node.parent) || isPrefixUnaryExpression(node.parent) && node.parent.operator === 54 /* ExclamationToken */) {
+      node = node.parent;
+    }
+    return !isStatementCondition(node) && !isLogicalExpression(node.parent) && !(isOptionalChain(node.parent) && node.parent.expression === node);
+  }
+  function doWithConditionalBranches(action, value, trueTarget, falseTarget) {
+    const savedTrueTarget = currentTrueTarget;
+    const savedFalseTarget = currentFalseTarget;
+    currentTrueTarget = trueTarget;
+    currentFalseTarget = falseTarget;
+    action(value);
+    currentTrueTarget = savedTrueTarget;
+    currentFalseTarget = savedFalseTarget;
+  }
+  function bindCondition(node, trueTarget, falseTarget) {
+    doWithConditionalBranches(bind, node, trueTarget, falseTarget);
+    if (!node || !isLogicalAssignmentExpression(node) && !isLogicalExpression(node) && !(isOptionalChain(node) && isOutermostOptionalChain(node))) {
+      addAntecedent(trueTarget, createFlowCondition(32 /* TrueCondition */, currentFlow, node));
+      addAntecedent(falseTarget, createFlowCondition(64 /* FalseCondition */, currentFlow, node));
+    }
+  }
+  function bindIterativeStatement(node, breakTarget, continueTarget) {
+    const saveBreakTarget = currentBreakTarget;
+    const saveContinueTarget = currentContinueTarget;
+    currentBreakTarget = breakTarget;
+    currentContinueTarget = continueTarget;
+    bind(node);
+    currentBreakTarget = saveBreakTarget;
+    currentContinueTarget = saveContinueTarget;
+  }
+  function setContinueTarget(node, target) {
+    let label = activeLabelList;
+    while (label && node.parent.kind === 256 /* LabeledStatement */) {
+      label.continueTarget = target;
+      label = label.next;
+      node = node.parent;
+    }
+    return target;
+  }
+  function bindWhileStatement(node) {
+    const preWhileLabel = setContinueTarget(node, createLoopLabel());
+    const preBodyLabel = createBranchLabel();
+    const postWhileLabel = createBranchLabel();
+    addAntecedent(preWhileLabel, currentFlow);
+    currentFlow = preWhileLabel;
+    bindCondition(node.expression, preBodyLabel, postWhileLabel);
+    currentFlow = finishFlowLabel(preBodyLabel);
+    bindIterativeStatement(node.statement, postWhileLabel, preWhileLabel);
+    addAntecedent(preWhileLabel, currentFlow);
+    currentFlow = finishFlowLabel(postWhileLabel);
+  }
+  function bindDoStatement(node) {
+    const preDoLabel = createLoopLabel();
+    const preConditionLabel = setContinueTarget(node, createBranchLabel());
+    const postDoLabel = createBranchLabel();
+    addAntecedent(preDoLabel, currentFlow);
+    currentFlow = preDoLabel;
+    bindIterativeStatement(node.statement, postDoLabel, preConditionLabel);
+    addAntecedent(preConditionLabel, currentFlow);
+    currentFlow = finishFlowLabel(preConditionLabel);
+    bindCondition(node.expression, preDoLabel, postDoLabel);
+    currentFlow = finishFlowLabel(postDoLabel);
+  }
+  function bindForStatement(node) {
+    const preLoopLabel = setContinueTarget(node, createLoopLabel());
+    const preBodyLabel = createBranchLabel();
+    const postLoopLabel = createBranchLabel();
+    bind(node.initializer);
+    addAntecedent(preLoopLabel, currentFlow);
+    currentFlow = preLoopLabel;
+    bindCondition(node.condition, preBodyLabel, postLoopLabel);
+    currentFlow = finishFlowLabel(preBodyLabel);
+    bindIterativeStatement(node.statement, postLoopLabel, preLoopLabel);
+    bind(node.incrementor);
+    addAntecedent(preLoopLabel, currentFlow);
+    currentFlow = finishFlowLabel(postLoopLabel);
+  }
+  function bindForInOrForOfStatement(node) {
+    const preLoopLabel = setContinueTarget(node, createLoopLabel());
+    const postLoopLabel = createBranchLabel();
+    bind(node.expression);
+    addAntecedent(preLoopLabel, currentFlow);
+    currentFlow = preLoopLabel;
+    if (node.kind === 250 /* ForOfStatement */) {
+      bind(node.awaitModifier);
+    }
+    addAntecedent(postLoopLabel, currentFlow);
+    bind(node.initializer);
+    if (node.initializer.kind !== 261 /* VariableDeclarationList */) {
+      bindAssignmentTargetFlow(node.initializer);
+    }
+    bindIterativeStatement(node.statement, postLoopLabel, preLoopLabel);
+    addAntecedent(preLoopLabel, currentFlow);
+    currentFlow = finishFlowLabel(postLoopLabel);
+  }
+  function bindIfStatement(node) {
+    const thenLabel = createBranchLabel();
+    const elseLabel = createBranchLabel();
+    const postIfLabel = createBranchLabel();
+    bindCondition(node.expression, thenLabel, elseLabel);
+    currentFlow = finishFlowLabel(thenLabel);
+    bind(node.thenStatement);
+    addAntecedent(postIfLabel, currentFlow);
+    currentFlow = finishFlowLabel(elseLabel);
+    bind(node.elseStatement);
+    addAntecedent(postIfLabel, currentFlow);
+    currentFlow = finishFlowLabel(postIfLabel);
+  }
+  function bindReturnOrThrow(node) {
+    bind(node.expression);
+    if (node.kind === 253 /* ReturnStatement */) {
+      hasExplicitReturn = true;
+      if (currentReturnTarget) {
+        addAntecedent(currentReturnTarget, currentFlow);
+      }
+    }
+    currentFlow = unreachableFlow;
+  }
+  function findActiveLabel(name) {
+    for (let label = activeLabelList; label; label = label.next) {
+      if (label.name === name) {
+        return label;
+      }
+    }
+    return void 0;
+  }
+  function bindBreakOrContinueFlow(node, breakTarget, continueTarget) {
+    const flowLabel = node.kind === 252 /* BreakStatement */ ? breakTarget : continueTarget;
+    if (flowLabel) {
+      addAntecedent(flowLabel, currentFlow);
+      currentFlow = unreachableFlow;
+    }
+  }
+  function bindBreakOrContinueStatement(node) {
+    bind(node.label);
+    if (node.label) {
+      const activeLabel = findActiveLabel(node.label.escapedText);
+      if (activeLabel) {
+        activeLabel.referenced = true;
+        bindBreakOrContinueFlow(node, activeLabel.breakTarget, activeLabel.continueTarget);
+      }
+    } else {
+      bindBreakOrContinueFlow(node, currentBreakTarget, currentContinueTarget);
+    }
+  }
+  function bindTryStatement(node) {
+    const saveReturnTarget = currentReturnTarget;
+    const saveExceptionTarget = currentExceptionTarget;
+    const normalExitLabel = createBranchLabel();
+    const returnLabel = createBranchLabel();
+    let exceptionLabel = createBranchLabel();
+    if (node.finallyBlock) {
+      currentReturnTarget = returnLabel;
+    }
+    addAntecedent(exceptionLabel, currentFlow);
+    currentExceptionTarget = exceptionLabel;
+    bind(node.tryBlock);
+    addAntecedent(normalExitLabel, currentFlow);
+    if (node.catchClause) {
+      currentFlow = finishFlowLabel(exceptionLabel);
+      exceptionLabel = createBranchLabel();
+      addAntecedent(exceptionLabel, currentFlow);
+      currentExceptionTarget = exceptionLabel;
+      bind(node.catchClause);
+      addAntecedent(normalExitLabel, currentFlow);
+    }
+    currentReturnTarget = saveReturnTarget;
+    currentExceptionTarget = saveExceptionTarget;
+    if (node.finallyBlock) {
+      const finallyLabel = createBranchLabel();
+      finallyLabel.antecedents = concatenate(concatenate(normalExitLabel.antecedents, exceptionLabel.antecedents), returnLabel.antecedents);
+      currentFlow = finallyLabel;
+      bind(node.finallyBlock);
+      if (currentFlow.flags & 1 /* Unreachable */) {
+        currentFlow = unreachableFlow;
+      } else {
+        if (currentReturnTarget && returnLabel.antecedents) {
+          addAntecedent(currentReturnTarget, createReduceLabel(finallyLabel, returnLabel.antecedents, currentFlow));
+        }
+        if (currentExceptionTarget && exceptionLabel.antecedents) {
+          addAntecedent(currentExceptionTarget, createReduceLabel(finallyLabel, exceptionLabel.antecedents, currentFlow));
+        }
+        currentFlow = normalExitLabel.antecedents ? createReduceLabel(finallyLabel, normalExitLabel.antecedents, currentFlow) : unreachableFlow;
+      }
+    } else {
+      currentFlow = finishFlowLabel(normalExitLabel);
+    }
+  }
+  function bindSwitchStatement(node) {
+    const postSwitchLabel = createBranchLabel();
+    bind(node.expression);
+    const saveBreakTarget = currentBreakTarget;
+    const savePreSwitchCaseFlow = preSwitchCaseFlow;
+    currentBreakTarget = postSwitchLabel;
+    preSwitchCaseFlow = currentFlow;
+    bind(node.caseBlock);
+    addAntecedent(postSwitchLabel, currentFlow);
+    const hasDefault = forEach(node.caseBlock.clauses, (c) => c.kind === 297 /* DefaultClause */);
+    node.possiblyExhaustive = !hasDefault && !postSwitchLabel.antecedents;
+    if (!hasDefault) {
+      addAntecedent(postSwitchLabel, createFlowSwitchClause(preSwitchCaseFlow, node, 0, 0));
+    }
+    currentBreakTarget = saveBreakTarget;
+    preSwitchCaseFlow = savePreSwitchCaseFlow;
+    currentFlow = finishFlowLabel(postSwitchLabel);
+  }
+  function bindCaseBlock(node) {
+    const clauses = node.clauses;
+    const isNarrowingSwitch = node.parent.expression.kind === 112 /* TrueKeyword */ || isNarrowingExpression(node.parent.expression);
+    let fallthroughFlow = unreachableFlow;
+    for (let i = 0; i < clauses.length; i++) {
+      const clauseStart = i;
+      while (!clauses[i].statements.length && i + 1 < clauses.length) {
+        if (fallthroughFlow === unreachableFlow) {
+          currentFlow = preSwitchCaseFlow;
+        }
+        bind(clauses[i]);
+        i++;
+      }
+      const preCaseLabel = createBranchLabel();
+      addAntecedent(preCaseLabel, isNarrowingSwitch ? createFlowSwitchClause(preSwitchCaseFlow, node.parent, clauseStart, i + 1) : preSwitchCaseFlow);
+      addAntecedent(preCaseLabel, fallthroughFlow);
+      currentFlow = finishFlowLabel(preCaseLabel);
+      const clause = clauses[i];
+      bind(clause);
+      fallthroughFlow = currentFlow;
+      if (!(currentFlow.flags & 1 /* Unreachable */) && i !== clauses.length - 1 && options.noFallthroughCasesInSwitch) {
+        clause.fallthroughFlowNode = currentFlow;
+      }
+    }
+  }
+  function bindCaseClause(node) {
+    const saveCurrentFlow = currentFlow;
+    currentFlow = preSwitchCaseFlow;
+    bind(node.expression);
+    currentFlow = saveCurrentFlow;
+    bindEach(node.statements);
+  }
+  function bindExpressionStatement(node) {
+    bind(node.expression);
+    maybeBindExpressionFlowIfCall(node.expression);
+  }
+  function maybeBindExpressionFlowIfCall(node) {
+    if (node.kind === 213 /* CallExpression */) {
+      const call = node;
+      if (call.expression.kind !== 108 /* SuperKeyword */ && isDottedName(call.expression)) {
+        currentFlow = createFlowCall(currentFlow, call);
+      }
+    }
+  }
+  function bindLabeledStatement(node) {
+    const postStatementLabel = createBranchLabel();
+    activeLabelList = {
+      next: activeLabelList,
+      name: node.label.escapedText,
+      breakTarget: postStatementLabel,
+      continueTarget: void 0,
+      referenced: false
+    };
+    bind(node.label);
+    bind(node.statement);
+    if (!activeLabelList.referenced && !options.allowUnusedLabels) {
+      errorOrSuggestionOnNode(unusedLabelIsError(options), node.label, Diagnostics.Unused_label);
+    }
+    activeLabelList = activeLabelList.next;
+    addAntecedent(postStatementLabel, currentFlow);
+    currentFlow = finishFlowLabel(postStatementLabel);
+  }
+  function bindDestructuringTargetFlow(node) {
+    if (node.kind === 226 /* BinaryExpression */ && node.operatorToken.kind === 64 /* EqualsToken */) {
+      bindAssignmentTargetFlow(node.left);
+    } else {
+      bindAssignmentTargetFlow(node);
+    }
+  }
+  function bindAssignmentTargetFlow(node) {
+    if (isNarrowableReference(node)) {
+      currentFlow = createFlowMutation(16 /* Assignment */, currentFlow, node);
+    } else if (node.kind === 209 /* ArrayLiteralExpression */) {
+      for (const e of node.elements) {
+        if (e.kind === 230 /* SpreadElement */) {
+          bindAssignmentTargetFlow(e.expression);
+        } else {
+          bindDestructuringTargetFlow(e);
+        }
+      }
+    } else if (node.kind === 210 /* ObjectLiteralExpression */) {
+      for (const p of node.properties) {
+        if (p.kind === 303 /* PropertyAssignment */) {
+          bindDestructuringTargetFlow(p.initializer);
+        } else if (p.kind === 304 /* ShorthandPropertyAssignment */) {
+          bindAssignmentTargetFlow(p.name);
+        } else if (p.kind === 305 /* SpreadAssignment */) {
+          bindAssignmentTargetFlow(p.expression);
+        }
+      }
+    }
+  }
+  function bindLogicalLikeExpression(node, trueTarget, falseTarget) {
+    const preRightLabel = createBranchLabel();
+    if (node.operatorToken.kind === 56 /* AmpersandAmpersandToken */ || node.operatorToken.kind === 77 /* AmpersandAmpersandEqualsToken */) {
+      bindCondition(node.left, preRightLabel, falseTarget);
+    } else {
+      bindCondition(node.left, trueTarget, preRightLabel);
+    }
+    currentFlow = finishFlowLabel(preRightLabel);
+    bind(node.operatorToken);
+    if (isLogicalOrCoalescingAssignmentOperator(node.operatorToken.kind)) {
+      doWithConditionalBranches(bind, node.right, trueTarget, falseTarget);
+      bindAssignmentTargetFlow(node.left);
+      addAntecedent(trueTarget, createFlowCondition(32 /* TrueCondition */, currentFlow, node));
+      addAntecedent(falseTarget, createFlowCondition(64 /* FalseCondition */, currentFlow, node));
+    } else {
+      bindCondition(node.right, trueTarget, falseTarget);
+    }
+  }
+  function bindPrefixUnaryExpressionFlow(node) {
+    if (node.operator === 54 /* ExclamationToken */) {
+      const saveTrueTarget = currentTrueTarget;
+      currentTrueTarget = currentFalseTarget;
+      currentFalseTarget = saveTrueTarget;
+      bindEachChild(node);
+      currentFalseTarget = currentTrueTarget;
+      currentTrueTarget = saveTrueTarget;
+    } else {
+      bindEachChild(node);
+      if (node.operator === 46 /* PlusPlusToken */ || node.operator === 47 /* MinusMinusToken */) {
+        bindAssignmentTargetFlow(node.operand);
+      }
+    }
+  }
+  function bindPostfixUnaryExpressionFlow(node) {
+    bindEachChild(node);
+    if (node.operator === 46 /* PlusPlusToken */ || node.operator === 47 /* MinusMinusToken */) {
+      bindAssignmentTargetFlow(node.operand);
+    }
+  }
+  function bindDestructuringAssignmentFlow(node) {
+    if (inAssignmentPattern) {
+      inAssignmentPattern = false;
+      bind(node.operatorToken);
+      bind(node.right);
+      inAssignmentPattern = true;
+      bind(node.left);
+    } else {
+      inAssignmentPattern = true;
+      bind(node.left);
+      inAssignmentPattern = false;
+      bind(node.operatorToken);
+      bind(node.right);
+    }
+    bindAssignmentTargetFlow(node.left);
+  }
+  function createBindBinaryExpressionFlow() {
+    return createBinaryExpressionTrampoline(
+      onEnter,
+      onLeft,
+      onOperator,
+      onRight,
+      onExit,
+      /*foldState*/
+      void 0
+    );
+    function onEnter(node, state) {
+      if (state) {
+        state.stackIndex++;
+        setParent(node, parent2);
+        const saveInStrictMode = inStrictMode;
+        bindWorker(node);
+        const saveParent = parent2;
+        parent2 = node;
+        state.skip = false;
+        state.inStrictModeStack[state.stackIndex] = saveInStrictMode;
+        state.parentStack[state.stackIndex] = saveParent;
+      } else {
+        state = {
+          stackIndex: 0,
+          skip: false,
+          inStrictModeStack: [void 0],
+          parentStack: [void 0]
+        };
+      }
+      const operator = node.operatorToken.kind;
+      if (isLogicalOrCoalescingBinaryOperator(operator) || isLogicalOrCoalescingAssignmentOperator(operator)) {
+        if (isTopLevelLogicalExpression(node)) {
+          const postExpressionLabel = createBranchLabel();
+          bindLogicalLikeExpression(node, postExpressionLabel, postExpressionLabel);
+          currentFlow = finishFlowLabel(postExpressionLabel);
+        } else {
+          bindLogicalLikeExpression(node, currentTrueTarget, currentFalseTarget);
+        }
+        state.skip = true;
+      }
+      return state;
+    }
+    function onLeft(left, state, node) {
+      if (!state.skip) {
+        const maybeBound = maybeBind2(left);
+        if (node.operatorToken.kind === 28 /* CommaToken */) {
+          maybeBindExpressionFlowIfCall(left);
+        }
+        return maybeBound;
+      }
+    }
+    function onOperator(operatorToken, state, _node) {
+      if (!state.skip) {
+        bind(operatorToken);
+      }
+    }
+    function onRight(right, state, node) {
+      if (!state.skip) {
+        const maybeBound = maybeBind2(right);
+        if (node.operatorToken.kind === 28 /* CommaToken */) {
+          maybeBindExpressionFlowIfCall(right);
+        }
+        return maybeBound;
+      }
+    }
+    function onExit(node, state) {
+      if (!state.skip) {
+        const operator = node.operatorToken.kind;
+        if (isAssignmentOperator(operator) && !isAssignmentTarget(node)) {
+          bindAssignmentTargetFlow(node.left);
+          if (operator === 64 /* EqualsToken */ && node.left.kind === 212 /* ElementAccessExpression */) {
+            const elementAccess = node.left;
+            if (isNarrowableOperand(elementAccess.expression)) {
+              currentFlow = createFlowMutation(256 /* ArrayMutation */, currentFlow, node);
+            }
+          }
+        }
+      }
+      const savedInStrictMode = state.inStrictModeStack[state.stackIndex];
+      const savedParent = state.parentStack[state.stackIndex];
+      if (savedInStrictMode !== void 0) {
+        inStrictMode = savedInStrictMode;
+      }
+      if (savedParent !== void 0) {
+        parent2 = savedParent;
+      }
+      state.skip = false;
+      state.stackIndex--;
+    }
+    function maybeBind2(node) {
+      if (node && isBinaryExpression(node) && !isDestructuringAssignment(node)) {
+        return node;
+      }
+      bind(node);
+    }
+  }
+  function bindDeleteExpressionFlow(node) {
+    bindEachChild(node);
+    if (node.expression.kind === 211 /* PropertyAccessExpression */) {
+      bindAssignmentTargetFlow(node.expression);
+    }
+  }
+  function bindConditionalExpressionFlow(node) {
+    const trueLabel = createBranchLabel();
+    const falseLabel = createBranchLabel();
+    const postExpressionLabel = createBranchLabel();
+    bindCondition(node.condition, trueLabel, falseLabel);
+    currentFlow = finishFlowLabel(trueLabel);
+    bind(node.questionToken);
+    bind(node.whenTrue);
+    addAntecedent(postExpressionLabel, currentFlow);
+    currentFlow = finishFlowLabel(falseLabel);
+    bind(node.colonToken);
+    bind(node.whenFalse);
+    addAntecedent(postExpressionLabel, currentFlow);
+    currentFlow = finishFlowLabel(postExpressionLabel);
+  }
+  function bindInitializedVariableFlow(node) {
+    const name = !isOmittedExpression(node) ? node.name : void 0;
+    if (isBindingPattern(name)) {
+      for (const child of name.elements) {
+        bindInitializedVariableFlow(child);
+      }
+    } else {
+      currentFlow = createFlowMutation(16 /* Assignment */, currentFlow, node);
+    }
+  }
+  function bindVariableDeclarationFlow(node) {
+    bindEachChild(node);
+    if (node.initializer || isForInOrOfStatement(node.parent.parent)) {
+      bindInitializedVariableFlow(node);
+    }
+  }
+  function bindBindingElementFlow(node) {
+    bind(node.dotDotDotToken);
+    bind(node.propertyName);
+    bindInitializer(node.initializer);
+    bind(node.name);
+  }
+  function bindParameterFlow(node) {
+    bindEach(node.modifiers);
+    bind(node.dotDotDotToken);
+    bind(node.questionToken);
+    bind(node.type);
+    bindInitializer(node.initializer);
+    bind(node.name);
+  }
+  function bindInitializer(node) {
+    if (!node) {
+      return;
+    }
+    const entryFlow = currentFlow;
+    bind(node);
+    if (entryFlow === unreachableFlow || entryFlow === currentFlow) {
+      return;
+    }
+    const exitFlow = createBranchLabel();
+    addAntecedent(exitFlow, entryFlow);
+    addAntecedent(exitFlow, currentFlow);
+    currentFlow = finishFlowLabel(exitFlow);
+  }
+  function bindJSDocTypeAlias(node) {
+    bind(node.tagName);
+    if (node.kind !== 347 /* JSDocEnumTag */ && node.fullName) {
+      setParent(node.fullName, node);
+      setParentRecursive(
+        node.fullName,
+        /*incremental*/
+        false
+      );
+    }
+    if (typeof node.comment !== "string") {
+      bindEach(node.comment);
+    }
+  }
+  function bindJSDocClassTag(node) {
+    bindEachChild(node);
+    const host = getHostSignatureFromJSDoc(node);
+    if (host && host.kind !== 174 /* MethodDeclaration */) {
+      addDeclarationToSymbol(host.symbol, host, 32 /* Class */);
+    }
+  }
+  function bindOptionalExpression(node, trueTarget, falseTarget) {
+    doWithConditionalBranches(bind, node, trueTarget, falseTarget);
+    if (!isOptionalChain(node) || isOutermostOptionalChain(node)) {
+      addAntecedent(trueTarget, createFlowCondition(32 /* TrueCondition */, currentFlow, node));
+      addAntecedent(falseTarget, createFlowCondition(64 /* FalseCondition */, currentFlow, node));
+    }
+  }
+  function bindOptionalChainRest(node) {
+    switch (node.kind) {
+      case 211 /* PropertyAccessExpression */:
+        bind(node.questionDotToken);
+        bind(node.name);
+        break;
+      case 212 /* ElementAccessExpression */:
+        bind(node.questionDotToken);
+        bind(node.argumentExpression);
+        break;
+      case 213 /* CallExpression */:
+        bind(node.questionDotToken);
+        bindEach(node.typeArguments);
+        bindEach(node.arguments);
+        break;
+    }
+  }
+  function bindOptionalChain(node, trueTarget, falseTarget) {
+    const preChainLabel = isOptionalChainRoot(node) ? createBranchLabel() : void 0;
+    bindOptionalExpression(node.expression, preChainLabel || trueTarget, falseTarget);
+    if (preChainLabel) {
+      currentFlow = finishFlowLabel(preChainLabel);
+    }
+    doWithConditionalBranches(bindOptionalChainRest, node, trueTarget, falseTarget);
+    if (isOutermostOptionalChain(node)) {
+      addAntecedent(trueTarget, createFlowCondition(32 /* TrueCondition */, currentFlow, node));
+      addAntecedent(falseTarget, createFlowCondition(64 /* FalseCondition */, currentFlow, node));
+    }
+  }
+  function bindOptionalChainFlow(node) {
+    if (isTopLevelLogicalExpression(node)) {
+      const postExpressionLabel = createBranchLabel();
+      bindOptionalChain(node, postExpressionLabel, postExpressionLabel);
+      currentFlow = finishFlowLabel(postExpressionLabel);
+    } else {
+      bindOptionalChain(node, currentTrueTarget, currentFalseTarget);
+    }
+  }
+  function bindNonNullExpressionFlow(node) {
+    if (isOptionalChain(node)) {
+      bindOptionalChainFlow(node);
+    } else {
+      bindEachChild(node);
+    }
+  }
+  function bindAccessExpressionFlow(node) {
+    if (isOptionalChain(node)) {
+      bindOptionalChainFlow(node);
+    } else {
+      bindEachChild(node);
+    }
+  }
+  function bindCallExpressionFlow(node) {
+    if (isOptionalChain(node)) {
+      bindOptionalChainFlow(node);
+    } else {
+      const expr = skipParentheses(node.expression);
+      if (expr.kind === 218 /* FunctionExpression */ || expr.kind === 219 /* ArrowFunction */) {
+        bindEach(node.typeArguments);
+        bindEach(node.arguments);
+        bind(node.expression);
+      } else {
+        bindEachChild(node);
+        if (node.expression.kind === 108 /* SuperKeyword */) {
+          currentFlow = createFlowCall(currentFlow, node);
+        }
+      }
+    }
+    if (node.expression.kind === 211 /* PropertyAccessExpression */) {
+      const propertyAccess = node.expression;
+      if (isIdentifier(propertyAccess.name) && isNarrowableOperand(propertyAccess.expression) && isPushOrUnshiftIdentifier(propertyAccess.name)) {
+        currentFlow = createFlowMutation(256 /* ArrayMutation */, currentFlow, node);
+      }
+    }
+  }
+  function addToContainerChain(next) {
+    if (lastContainer) {
+      lastContainer.nextContainer = next;
+    }
+    lastContainer = next;
+  }
+  function declareSymbolAndAddToSymbolTable(node, symbolFlags, symbolExcludes) {
+    switch (container.kind) {
+      case 267 /* ModuleDeclaration */:
+        return declareModuleMember(node, symbolFlags, symbolExcludes);
+      case 312 /* SourceFile */:
+        return declareSourceFileMember(node, symbolFlags, symbolExcludes);
+      case 231 /* ClassExpression */:
+      case 263 /* ClassDeclaration */:
+        return declareClassMember(node, symbolFlags, symbolExcludes);
+      case 266 /* EnumDeclaration */:
+        return declareSymbol(container.symbol.exports, container.symbol, node, symbolFlags, symbolExcludes);
+      case 187 /* TypeLiteral */:
+      case 329 /* JSDocTypeLiteral */:
+      case 210 /* ObjectLiteralExpression */:
+      case 264 /* InterfaceDeclaration */:
+      case 292 /* JsxAttributes */:
+        return declareSymbol(container.symbol.members, container.symbol, node, symbolFlags, symbolExcludes);
+      case 184 /* FunctionType */:
+      case 185 /* ConstructorType */:
+      case 179 /* CallSignature */:
+      case 180 /* ConstructSignature */:
+      case 330 /* JSDocSignature */:
+      case 181 /* IndexSignature */:
+      case 174 /* MethodDeclaration */:
+      case 173 /* MethodSignature */:
+      case 176 /* Constructor */:
+      case 177 /* GetAccessor */:
+      case 178 /* SetAccessor */:
+      case 262 /* FunctionDeclaration */:
+      case 218 /* FunctionExpression */:
+      case 219 /* ArrowFunction */:
+      case 324 /* JSDocFunctionType */:
+      case 175 /* ClassStaticBlockDeclaration */:
+      case 265 /* TypeAliasDeclaration */:
+      case 200 /* MappedType */:
+        if (container.locals)
+          Debug.assertNode(contain

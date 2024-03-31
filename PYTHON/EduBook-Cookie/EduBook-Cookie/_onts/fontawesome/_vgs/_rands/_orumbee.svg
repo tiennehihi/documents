@@ -1,0 +1,6 @@
+ON Schema standard:
+
+- [type](https://github.com/ajv-validator/ajv/blob/master/KEYWORDS.md#type)
+- [for numbers](https://github.com/ajv-validator/ajv/blob/master/KEYWORDS.md#keywords-for-numbers) - maximum, minimum, exclusiveMaximum, exclusiveMinimum, multipleOf
+- [for strings](https://github.com/ajv-validator/ajv/blob/master/KEYWORDS.md#keywords-for-strings) - maxLength, minLength, pattern, format
+- [for arrays](https://github.com/ajv-validator/ajv/blob/master/KEYWORDS.md#keywords-for-arrays) - maxItems, minItems, uniqueItems, items, additionalItems, [contains](https://github.com/ajv-validator/ajv/blob/master

@@ -1,0 +1,38 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = cloneNode;
+var _index = require("../definitions/index.js");
+var _index2 = require("../validators/generated/index.js");
+const {
+  hasOwn
+} = {
+  hasOwn: Function.call.bind(Object.prototype.hasOwnProperty)
+};
+function cloneIfNode(obj, deep, withoutLoc, commentsCache) {
+  if (obj && typeof obj.type === "string") {
+    return cloneNodeInternal(obj, deep, withoutLoc, commentsCache);
+  }
+  return obj;
+}
+function cloneIfNodeOrArray(obj, deep, withoutLoc, commentsCache) {
+  if (Array.isArray(obj)) {
+    return obj.map(node => cloneIfNode(node, deep, withoutLoc, commentsCache));
+  }
+  return cloneIfNode(obj, deep, withoutLoc, commentsCache);
+}
+function cloneNode(node, deep = true, withoutLoc = false) {
+  return cloneNodeInternal(node, deep, withoutLoc, new Map());
+}
+function cloneNodeInternal(node, deep = true, withoutLoc = false, commentsCache) {
+  if (!node) return node;
+  const {
+    type
+  } = node;
+  const newNode = {
+    type: node.type
+  };
+  if ((0, _index2.isIdentifier)(node)) {
+    new

@@ -1,0 +1,84 @@
+}
+// Message: Unexpected use of weak type "Object"
+
+type Foo = { (a: string): Function }
+// Message: Unexpected use of weak type "Function"
+
+function foo(thing: any) {}
+// Message: Unexpected use of weak type "any"
+
+function foo(thing: Object) {}
+// Message: Unexpected use of weak type "Object"
+
+var foo: Function
+// Message: Unexpected use of weak type "Function"
+
+var foo: Object
+// Message: Unexpected use of weak type "Object"
+
+class Foo { props: any }
+// Message: Unexpected use of weak type "any"
+
+class Foo { props: Object }
+// Message: Unexpected use of weak type "Object"
+
+var foo: any
+// Message: Unexpected use of weak type "any"
+
+// Options: [{"Function":false}]
+type X = any; type Y = Function; type Z = Object
+// Message: Unexpected use of weak type "any"
+// Message: Unexpected use of weak type "Object"
+
+// Options: [{"any":false,"Object":false}]
+type X = any; type Y = Function; type Z = Object
+// Message: Unexpected use of weak type "Function"
+```
+
+The following patterns are not considered problems:
+
+```js
+function foo(thing): string {}
+
+function foo(thing): Promise<string> {}
+
+function foo(thing): Promise<Promise<string>> {}
+
+(foo?: string) => {}
+
+(foo: ?string) => {}
+
+(foo: { a: string }) => {}
+
+(foo: { a: ?string }) => {}
+
+(foo: string[]) => {}
+
+type Foo = string
+
+type Foo = { a: string }
+
+type Foo = { (a: string): string }
+
+function foo(thing: string) {}
+
+var foo: string
+
+class Foo { props: string }
+
+// Options: [{"any":false,"Object":false}]
+type X = any; type Y = Object
+
+// Options: [{"Function":false}]
+type X = Function
+
+// Settings: {"flowtype":{"onlyFilesWithFlowAnnotation":true}}
+function foo(thing): Function {}
+```
+
+
+
+<a name="eslint-plugin-flowtype-rules-object-type-curly-spacing"></a>
+### <code>object-type-curly-spacing</code>
+
+_The

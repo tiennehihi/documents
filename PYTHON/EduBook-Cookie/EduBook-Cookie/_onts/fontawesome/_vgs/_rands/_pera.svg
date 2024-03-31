@@ -1,0 +1,19 @@
+,
+    /*solutionPerformance*/
+    void 0
+  );
+  cb(program);
+  return sys2.exit(exitStatus);
+}
+function performIncrementalCompilation2(sys2, cb, reportDiagnostic, config) {
+  const { options, fileNames, projectReferences } = config;
+  enableStatisticsAndTracing(
+    sys2,
+    options,
+    /*isBuildMode*/
+    false
+  );
+  const host = createIncrementalCompilerHost(options, sys2);
+  host.jsDocParsingMode = defaultJSDocParsingMode;
+  const exitStatus = performIncrementalCompilation({
+    host

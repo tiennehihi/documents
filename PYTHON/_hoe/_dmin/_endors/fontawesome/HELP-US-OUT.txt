@@ -1,0 +1,1 @@
+on pctEncChar(chr:string):string {\n\tconst c = chr.charCodeAt(0);\n\tlet e:string;\n\n\tif (c < 16) e = \"%0\" + c.toString(16).toUpperCase();\n\telse if (c < 128) e = \"%\" + c.toString(16).toUpperCase();\n\telse if (c < 2048) e = \"%\" + ((c >> 6) | 192).toString(16).toUpperCase() + \"%\" + ((c & 63) | 128).toStri

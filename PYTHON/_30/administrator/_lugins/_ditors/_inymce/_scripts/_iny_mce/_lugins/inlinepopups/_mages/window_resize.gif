@@ -1,0 +1,4 @@
+onstructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+f

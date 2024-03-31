@@ -1,0 +1,3 @@
+he_current_file_is_a_module_Consider_adding_an_import_instead_2686", "'{0}' refers to a UMD global, but the current file is a module. Consider adding an import instead."),
+  All_declarations_of_0_must_have_identical_modifiers: diag(2687, 1 /* Error */, "All_declarations_of_0_must_have_identical_modifiers_2687", "All declarations of '{0}' must have identical modifiers."),
+  Cannot_

@@ -1,0 +1,11 @@
+var assignValue = require('./_assignValue'),
+    castPath = require('./_castPath'),
+    isIndex = require('./_isIndex'),
+    isObject = require('./isObject'),
+    toKey = require('./_toKey');
+
+/**
+ * The base implementation of `_.set`.
+ *
+ * @private
+ * @param {Objec

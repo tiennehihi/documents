@@ -1,0 +1,72 @@
+# pretty-format
+
+Stringify any JavaScript value.
+
+- Serialize built-in JavaScript types.
+- Serialize application-specific data types with built-in or user-defined plugins.
+
+## Installation
+
+```sh
+$ yarn add pretty-format
+```
+
+## Usage
+
+```js
+const {format: prettyFormat} = require('pretty-format'); // CommonJS
+```
+
+```js
+import {format as prettyFormat} from 'pretty-format'; // ES2015 modules
+```
+
+```js
+const val = {object: {}};
+val.circularReference = val;
+val[Symbol('foo')] = 'foo';
+val.map = new Map([['prop', 'value']]);
+val.array = [-0, Infinity, NaN];
+
+console.log(prettyFormat(val));
+/*
+Object {
+  "array": Array [
+    -0,
+    Infinity,
+    NaN,
+  ],
+  "circularReference": [Circular],
+  "map": Map {
+    "prop" => "value",
+  },
+  "object": Object {},
+  Symbol(foo): "foo",
+}
+*/
+```
+
+## Usage with options
+
+```js
+function onClick() {}
+
+console.log(prettyFormat(onClick));
+/*
+[Function onClick]
+*/
+
+const options = {
+  printFunctionName: false,
+};
+console.log(prettyFormat(onClick, options));
+/*
+[Function]
+*/
+```
+
+<!-- prettier-ignore -->
+| key                   | type      | default    | description                                             |
+| :-------------------- | :-------- | :--------- | :------------------------------------------------------ |
+| `callToJSON`          | `boolean` | `true`     | call `toJSON` method (if it exists) on objects          |
+| `compareKeys`         | `fun

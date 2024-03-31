@@ -1,0 +1,269 @@
+      this._appendCharToCurrentCharacterToken(type, toChar(cp));
+    }
+
+    _emitSeveralCodePoints(codePoints) {
+        for (let i = 0; i < codePoints.length; i++) {
+            this._emitCodePoint(codePoints[i]);
+        }
+    }
+
+    //NOTE: used then we emit character explicitly. This is always a non-whitespace and a non-null character.
+    //So we can avoid additional checks here.
+    _emitChars(ch) {
+        this._appendCharToCurrentCharacterToken(Tokenizer.CHARACTER_TOKEN, ch);
+    }
+
+    // Character reference helpers
+    _matchNamedCharacterReference(startCp) {
+        let result = null;
+        let excess = 1;
+        let i = findNamedEntityTreeBranch(0, startCp);
+
+        this.tempBuff.push(startCp);
+
+        while (i > -1) {
+            const current = neTree[i];
+            const inNode = current < MAX_BRANCH_MARKER_VALUE;
+            const nodeWithData = inNode && current & HAS_DATA_FLAG;
+
+            if (nodeWithData) {
+                //NOTE: we use greedy search, so we continue lookup at this point
+                result = current & DATA_DUPLET_FLAG ? [neTree[++i], neTree[++i]] : [neTree[++i]];
+                excess = 0;
+            }
+
+            const cp = this._consume();
+
+            this.tempBuff.push(cp);
+            excess++;
+
+            if (cp === $.EOF) {
+                break;
+            }
+
+            if (inNode) {
+                i = current & HAS_BRANCHES_FLAG ? findNamedEntityTreeBranch(i, cp) : -1;
+            } else {
+                i = cp === current ? ++i : -1;
+            }
+        }
+
+        while (excess--) {
+            this.tempBuff.pop();
+            this._unconsume();
+        }
+
+        return result;
+    }
+
+    _isCharacterReferenceInAttribute() {
+        return (
+            this.returnState === ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE ||
+            this.returnState === ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE ||
+            this.returnState === ATTRIBUTE_VALUE_UNQUOTED_STATE
+        );
+    }
+
+    _isCharacterReferenceAttributeQuirk(withSemicolon) {
+        if (!withSemicolon && this._isCharacterReferenceInAttribute()) {
+            const nextCp = this._consume();
+
+            this._unconsume();
+
+            return nextCp === $.EQUALS_SIGN || isAsciiAlphaNumeric(nextCp);
+        }
+
+        return false;
+    }
+
+    _flushCodePointsConsumedAsCharacterReference() {
+        if (this._isCharacterReferenceInAttribute()) {
+            for (let i = 0; i < this.tempBuff.length; i++) {
+                this.currentAttr.value += toChar(this.tempBuff[i]);
+            }
+        } else {
+            this._emitSeveralCodePoints(this.tempBuff);
+        }
+
+        this.tempBuff = [];
+    }
+
+    // State machine
+
+    // Data state
+    //------------------------------------------------------------------
+    [DATA_STATE](cp) {
+        this.preprocessor.dropParsedChunk();
+
+        if (cp === $.LESS_THAN_SIGN) {
+            this.state = TAG_OPEN_STATE;
+        } else if (cp === $.AMPERSAND) {
+            this.returnState = DATA_STATE;
+            this.state = CHARACTER_REFERENCE_STATE;
+        } else if (cp === $.NULL) {
+            this._err(ERR.unexpectedNullCharacter);
+            this._emitCodePoint(cp);
+        } else if (cp === $.EOF) {
+            this._emitEOFToken();
+        } else {
+            this._emitCodePoint(cp);
+        }
+    }
+
+    //  RCDATA state
+    //------------------------------------------------------------------
+    [RCDATA_STATE](cp) {
+        this.preprocessor.dropParsedChunk();
+
+        if (cp === $.AMPERSAND) {
+            this.returnState = RCDATA_STATE;
+            this.state = CHARACTER_REFERENCE_STATE;
+        } else if (cp === $.LESS_THAN_SIGN) {
+            this.state = RCDATA_LESS_THAN_SIGN_STATE;
+        } else if (cp === $.NULL) {
+            this._err(ERR.unexpectedNullCharacter);
+            this._emitChars(unicode.REPLACEMENT_CHARACTER);
+        } else if (cp === $.EOF) {
+            this._emitEOFToken();
+        } else {
+            this._emitCodePoint(cp);
+        }
+    }
+
+    // RAWTEXT state
+    //------------------------------------------------------------------
+    [RAWTEXT_STATE](cp) {
+        this.preprocessor.dropParsedChunk();
+
+        if (cp === $.LESS_THAN_SIGN) {
+            this.state = RAWTEXT_LESS_THAN_SIGN_STATE;
+        } else if (cp === $.NULL) {
+            this._err(ERR.unexpectedNullCharacter);
+            this._emitChars(unicode.REPLACEMENT_CHARACTER);
+        } else if (cp === $.EOF) {
+            this._emitEOFToken();
+        } else {
+            this._emitCodePoint(cp);
+        }
+    }
+
+    // Script data state
+    //------------------------------------------------------------------
+    [SCRIPT_DATA_STATE](cp) {
+        this.preprocessor.dropParsedChunk();
+
+        if (cp === $.LESS_THAN_SIGN) {
+            this.state = SCRIPT_DATA_LESS_THAN_SIGN_STATE;
+        } else if (cp === $.NULL) {
+            this._err(ERR.unexpectedNullCharacter);
+            this._emitChars(unicode.REPLACEMENT_CHARACTER);
+        } else if (cp === $.EOF) {
+            this._emitEOFToken();
+        } else {
+            this._emitCodePoint(cp);
+        }
+    }
+
+    // PLAINTEXT state
+    //------------------------------------------------------------------
+    [PLAINTEXT_STATE](cp) {
+        this.preprocessor.dropParsedChunk();
+
+        if (cp === $.NULL) {
+            this._err(ERR.unexpectedNullCharacter);
+            this._emitChars(unicode.REPLACEMENT_CHARACTER);
+        } else if (cp === $.EOF) {
+            this._emitEOFToken();
+        } else {
+            this._emitCodePoint(cp);
+        }
+    }
+
+    // Tag open state
+    //------------------------------------------------------------------
+    [TAG_OPEN_STATE](cp) {
+        if (cp === $.EXCLAMATION_MARK) {
+            this.state = MARKUP_DECLARATION_OPEN_STATE;
+        } else if (cp === $.SOLIDUS) {
+            this.state = END_TAG_OPEN_STATE;
+        } else if (isAsciiLetter(cp)) {
+            this._createStartTagToken();
+            this._reconsumeInState(TAG_NAME_STATE);
+        } else if (cp === $.QUESTION_MARK) {
+            this._err(ERR.unexpectedQuestionMarkInsteadOfTagName);
+            this._createCommentToken();
+            this._reconsumeInState(BOGUS_COMMENT_STATE);
+        } else if (cp === $.EOF) {
+            this._err(ERR.eofBeforeTagName);
+            this._emitChars('<');
+            this._emitEOFToken();
+        } else {
+            this._err(ERR.invalidFirstCharacterOfTagName);
+            this._emitChars('<');
+            this._reconsumeInState(DATA_STATE);
+        }
+    }
+
+    // End tag open state
+    //------------------------------------------------------------------
+    [END_TAG_OPEN_STATE](cp) {
+        if (isAsciiLetter(cp)) {
+            this._createEndTagToken();
+            this._reconsumeInState(TAG_NAME_STATE);
+        } else if (cp === $.GREATER_THAN_SIGN) {
+            this._err(ERR.missingEndTagName);
+            this.state = DATA_STATE;
+        } else if (cp === $.EOF) {
+            this._err(ERR.eofBeforeTagName);
+            this._emitChars('</');
+            this._emitEOFToken();
+        } else {
+            this._err(ERR.invalidFirstCharacterOfTagName);
+            this._createCommentToken();
+            this._reconsumeInState(BOGUS_COMMENT_STATE);
+        }
+    }
+
+    // Tag name state
+    //------------------------------------------------------------------
+    [TAG_NAME_STATE](cp) {
+        if (isWhitespace(cp)) {
+            this.state = BEFORE_ATTRIBUTE_NAME_STATE;
+        } else if (cp === $.SOLIDUS) {
+            this.state = SELF_CLOSING_START_TAG_STATE;
+        } else if (cp === $.GREATER_THAN_SIGN) {
+            this.state = DATA_STATE;
+            this._emitCurrentToken();
+        } else if (isAsciiUpper(cp)) {
+            this.currentToken.tagName += toAsciiLowerChar(cp);
+        } else if (cp === $.NULL) {
+            this._err(ERR.unexpectedNullCharacter);
+            this.currentToken.tagName += unicode.REPLACEMENT_CHARACTER;
+        } else if (cp === $.EOF) {
+            this._err(ERR.eofInTag);
+            this._emitEOFToken();
+        } else {
+            this.currentToken.tagName += toChar(cp);
+        }
+    }
+
+    // RCDATA less-than sign state
+    //------------------------------------------------------------------
+    [RCDATA_LESS_THAN_SIGN_STATE](cp) {
+        if (cp === $.SOLIDUS) {
+            this.tempBuff = [];
+            this.state = RCDATA_END_TAG_OPEN_STATE;
+        } else {
+            this._emitChars('<');
+            this._reconsumeInState(RCDATA_STATE);
+        }
+    }
+
+    // RCDATA end tag open state
+    //------------------------------------------------------------------
+    [RCDATA_END_TAG_OPEN_STATE](cp) {
+        if (isAsciiLetter(cp)) {
+            this._createEndTagToken();
+            this._reconsumeInState(RCDATA_END_TAG_NAME_STATE);
+        } else {
+    

@@ -1,0 +1,44 @@
+/**
+ * Module dependencies.
+ */
+
+var tty = require('tty');
+var util = require('util');
+
+/**
+ * This is the Node.js implementation of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = require('./debug');
+exports.init = init;
+exports.log = log;
+exports.formatArgs = formatArgs;
+exports.save = save;
+exports.load = load;
+exports.useColors = useColors;
+
+/**
+ * Colors.
+ */
+
+exports.colors = [6, 2, 3, 4, 5, 1];
+
+/**
+ * Build up the default `inspectOpts` object from the environment variables.
+ *
+ *   $ DEBUG_COLORS=no DEBUG_DEPTH=10 DEBUG_SHOW_HIDDEN=enabled node script.js
+ */
+
+exports.inspectOpts = Object.keys(process.env).filter(function (key) {
+  return /^debug_/i.test(key);
+}).reduce(function (obj, key) {
+  // camel-case
+  var prop = key
+    .substring(6)
+    .toLowerCase()
+    .replace(/_([a-z])/g, function (_, k) { return k.toUpperCase() });
+
+  // coerce string value into JS value
+  var val = process.env[ke

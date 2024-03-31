@@ -1,0 +1,8 @@
+eDepth++;
+  parseFunctionParams();
+  parseFunctionBodyAndFinish(functionStart);
+  const endTokenIndex = state.tokens.length;
+  // In addition to the block scope of the function body, we need a separate function-style scope
+  // that includes the params.
+  state.scopes.push(new Scope(startTokenIndex, endTokenIndex, true));
+  state

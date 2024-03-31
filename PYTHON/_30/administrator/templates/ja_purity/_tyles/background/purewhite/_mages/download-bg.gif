@@ -1,0 +1,52 @@
+ serialized.allowSpecialUseDomain,
+      prefixSecurity: serialized.prefixSecurity
+    });
+    jar._importCookies(serialized, err => {
+      if (err) {
+        return cb(err);
+      }
+      cb(null, jar);
+    });
+  }
+
+  static deserializeSync(strOrObj, store) {
+    const serialized =
+      typeof strOrObj === "string" ? JSON.parse(strOrObj) : strOrObj;
+    const jar = new CookieJar(store, {
+      rejectPublicSuffixes: serialized.rejectPublicSuffixes,
+      looseMode: serialized.enableLooseMode
+    });
+
+    // catch this mistake early:
+    if (!jar.store.synchronous) {
+      throw new Error(
+        "CookieJar store is not synchronous; use async API instead."
+      );
+    }
+
+    jar._importCookiesSync(serialized);
+    return jar;
+  }
+}
+CookieJar.fromJSON = CookieJar.deserializeSync;
+
+[
+  "_importCookies",
+  "clone",
+  "getCookies",
+  "getCookieString",
+  "getSetCookieStrings",
+  "removeAllCookies",
+  "serialize",
+  "setCookie"
+].forEach(name => {
+  CookieJar.prototype[name] = fromCallback(CookieJar.prototype[name]);
+});
+CookieJar.deserialize = fromCallback(CookieJar.deserialize);
+
+// Use a closure to provide a true imperative API for synchronous stores.
+function syncWrap(method) {
+  return function(...args) {
+    if (!this.store.synchronous) {
+      throw new Error(
+        "Cookie

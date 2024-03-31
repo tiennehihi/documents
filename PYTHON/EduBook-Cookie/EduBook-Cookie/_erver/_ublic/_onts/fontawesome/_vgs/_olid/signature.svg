@@ -1,0 +1,42 @@
+    pro:
+      - family: classic
+        style: solid
+  label: Box
+  unicode: f466
+  voted: false
+box-archive:
+  aliases:
+    names:
+      - archive
+    unicodes:
+      secondary:
+        - 10f187
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 5.0.9
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Box archive
+  unicode: f187
+  voted: false
+box-open:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f49e
+  changes:
+    - 5.0.9
+    - 5.7.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  familyStylesByLicense:
+    f

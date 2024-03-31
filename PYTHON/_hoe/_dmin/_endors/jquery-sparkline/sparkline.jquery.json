@@ -1,0 +1,33 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.needsParens = needsParens;
+exports.needsWhitespace = needsWhitespace;
+exports.needsWhitespaceAfter = needsWhitespaceAfter;
+exports.needsWhitespaceBefore = needsWhitespaceBefore;
+var whitespace = require("./whitespace.js");
+var parens = require("./parentheses.js");
+var _t = require("@babel/types");
+const {
+  FLIPPED_ALIAS_KEYS,
+  isCallExpression,
+  isExpressionStatement,
+  isMemberExpression,
+  isNewExpression
+} = _t;
+function expandAliases(obj) {
+  const map = new Map();
+  function add(type, func) {
+    const fn = map.get(type);
+    map.set(type, fn ? function (node, parent, stack) {
+      var _fn;
+      return (_fn = fn(node, parent, stack)) != null ? _fn : func(node, parent, stack);
+    } : func);
+  }
+  for (const type of Object.keys(obj)) {
+    const aliases = FLIPPED_ALIAS_KEYS[type];
+    if (aliases) {
+      for (const alias of aliases) {
+       

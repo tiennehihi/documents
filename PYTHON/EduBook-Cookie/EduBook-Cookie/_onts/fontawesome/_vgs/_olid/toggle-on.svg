@@ -1,0 +1,9 @@
+:
+      return node.parent;
+    case 283 /* ExternalModuleReference */:
+      return node.parent.parent;
+    case 213 /* CallExpression */:
+      return isImportCall(node.parent) || isRequireCall(
+        node.parent,
+        /*requireStringLiteralLikeArgument*/
+     

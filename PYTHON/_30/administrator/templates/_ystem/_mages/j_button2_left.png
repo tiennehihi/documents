@@ -1,0 +1,18 @@
+tate = 'decimalInteger';
+	            return
+
+	        case 'I':
+	            read();
+	            literal('nfinity');
+	            return newToken('numeric', Infinity)
+
+	        case 'N':
+	            read();
+	            literal('aN');
+	            return newToken('numeric', NaN)
+
+	        case '"':
+	        case "'":
+	            doubleQuote = (read() === '"');
+	            buffer = '';
+	            lexS

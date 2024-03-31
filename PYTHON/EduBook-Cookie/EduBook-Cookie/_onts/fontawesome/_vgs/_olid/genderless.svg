@@ -1,0 +1,2 @@
+0_95019", "Add initializer to property '{0}'"),
+  Add_definite_assignment_assertion_to_property_0: diag(95020, 3 /* Message */, "Add_definite_assignment_assertion_to_property_0_95020", "Add definite assignment assertion to property 

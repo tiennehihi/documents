@@ -1,0 +1,8 @@
+ct_with_additional_settings);
+  const cliCommands = simpleOptions.filter((opt) => opt.isCommandLineOnly || opt.category === Diagnostics.Command_line_Options);
+  const configOpts = simpleOptions.filter((opt) => !contains(cliCommands, opt));
+  output = [
+    ...output,
+    ...generateSectionOptionsOutput(
+      sys2,
+      getDiagnost

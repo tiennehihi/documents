@@ -1,0 +1,6 @@
+/// <reference types="node" />
+
+import http = require("http");
+
+export interface ServerOptions {
+    sockjs_u

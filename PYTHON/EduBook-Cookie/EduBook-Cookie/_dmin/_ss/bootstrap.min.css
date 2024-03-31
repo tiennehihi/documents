@@ -1,0 +1,2773 @@
+ionDeclarations = void 0;
+      lexicalEnvironmentFunctionDeclarationsStack = void 0;
+      onSubstituteNode = void 0;
+      onEmitNode = void 0;
+      emitHelpers = void 0;
+      state = 3 /* Disposed */;
+    }
+  }
+}
+var nullTransformationContext = {
+  factory,
+  // eslint-disable-line object-shorthand
+  getCompilerOptions: () => ({}),
+  getEmitResolver: notImplemented,
+  getEmitHost: notImplemented,
+  getEmitHelperFactory: notImplemented,
+  startLexicalEnvironment: noop,
+  resumeLexicalEnvironment: noop,
+  suspendLexicalEnvironment: noop,
+  endLexicalEnvironment: returnUndefined,
+  setLexicalEnvironmentFlags: noop,
+  getLexicalEnvironmentFlags: () => 0,
+  hoistVariableDeclaration: noop,
+  hoistFunctionDeclaration: noop,
+  addInitializationStatement: noop,
+  startBlockScope: noop,
+  endBlockScope: returnUndefined,
+  addBlockScopedVariable: noop,
+  requestEmitHelper: noop,
+  readEmitHelpers: notImplemented,
+  enableSubstitution: noop,
+  enableEmitNotification: noop,
+  isSubstitutionEnabled: notImplemented,
+  isEmitNotificationEnabled: notImplemented,
+  onSubstituteNode: noEmitSubstitution,
+  onEmitNode: noEmitNotification,
+  addDiagnostic: noop
+};
+
+// src/compiler/emitter.ts
+var brackets = createBracketsMap();
+function isBuildInfoFile(file) {
+  return fileExtensionIs(file, ".tsbuildinfo" /* TsBuildInfo */);
+}
+function forEachEmittedFile(host, action, sourceFilesOrTargetSourceFile, forceDtsEmit = false, onlyBuildInfo, includeBuildInfo) {
+  const sourceFiles = isArray(sourceFilesOrTargetSourceFile) ? sourceFilesOrTargetSourceFile : getSourceFilesToEmit(host, sourceFilesOrTargetSourceFile, forceDtsEmit);
+  const options = host.getCompilerOptions();
+  if (outFile(options)) {
+    const prepends = host.getPrependNodes();
+    if (sourceFiles.length || prepends.length) {
+      const bundle = factory.createBundle(sourceFiles, prepends);
+      const result = action(getOutputPathsFor(bundle, host, forceDtsEmit), bundle);
+      if (result) {
+        return result;
+      }
+    }
+  } else {
+    if (!onlyBuildInfo) {
+      for (const sourceFile of sourceFiles) {
+        const result = action(getOutputPathsFor(sourceFile, host, forceDtsEmit), sourceFile);
+        if (result) {
+          return result;
+        }
+      }
+    }
+    if (includeBuildInfo) {
+      const buildInfoPath = getTsBuildInfoEmitOutputFilePath(options);
+      if (buildInfoPath)
+        return action(
+          { buildInfoPath },
+          /*sourceFileOrBundle*/
+          void 0
+        );
+    }
+  }
+}
+function getTsBuildInfoEmitOutputFilePath(options) {
+  const configFile = options.configFilePath;
+  if (!isIncrementalCompilation(options))
+    return void 0;
+  if (options.tsBuildInfoFile)
+    return options.tsBuildInfoFile;
+  const outPath = outFile(options);
+  let buildInfoExtensionLess;
+  if (outPath) {
+    buildInfoExtensionLess = removeFileExtension(outPath);
+  } else {
+    if (!configFile)
+      return void 0;
+    const configFileExtensionLess = removeFileExtension(configFile);
+    buildInfoExtensionLess = options.outDir ? options.rootDir ? resolvePath(options.outDir, getRelativePathFromDirectory(
+      options.rootDir,
+      configFileExtensionLess,
+      /*ignoreCase*/
+      true
+    )) : combinePaths(options.outDir, getBaseFileName(configFileExtensionLess)) : configFileExtensionLess;
+  }
+  return buildInfoExtensionLess + ".tsbuildinfo" /* TsBuildInfo */;
+}
+function getOutputPathsForBundle(options, forceDtsPaths) {
+  const outPath = outFile(options);
+  const jsFilePath = options.emitDeclarationOnly ? void 0 : outPath;
+  const sourceMapFilePath = jsFilePath && getSourceMapFilePath(jsFilePath, options);
+  const declarationFilePath = forceDtsPaths || getEmitDeclarations(options) ? removeFileExtension(outPath) + ".d.ts" /* Dts */ : void 0;
+  const declarationMapPath = declarationFilePath && getAreDeclarationMapsEnabled(options) ? declarationFilePath + ".map" : void 0;
+  const buildInfoPath = getTsBuildInfoEmitOutputFilePath(options);
+  return { jsFilePath, sourceMapFilePath, declarationFilePath, declarationMapPath, buildInfoPath };
+}
+function getOutputPathsFor(sourceFile, host, forceDtsPaths) {
+  const options = host.getCompilerOptions();
+  if (sourceFile.kind === 313 /* Bundle */) {
+    return getOutputPathsForBundle(options, forceDtsPaths);
+  } else {
+    const ownOutputFilePath = getOwnEmitOutputFilePath(sourceFile.fileName, host, getOutputExtension(sourceFile.fileName, options));
+    const isJsonFile = isJsonSourceFile(sourceFile);
+    const isJsonEmittedToSameLocation = isJsonFile && comparePaths(sourceFile.fileName, ownOutputFilePath, host.getCurrentDirectory(), !host.useCaseSensitiveFileNames()) === 0 /* EqualTo */;
+    const jsFilePath = options.emitDeclarationOnly || isJsonEmittedToSameLocation ? void 0 : ownOutputFilePath;
+    const sourceMapFilePath = !jsFilePath || isJsonSourceFile(sourceFile) ? void 0 : getSourceMapFilePath(jsFilePath, options);
+    const declarationFilePath = forceDtsPaths || getEmitDeclarations(options) && !isJsonFile ? getDeclarationEmitOutputFilePath(sourceFile.fileName, host) : void 0;
+    const declarationMapPath = declarationFilePath && getAreDeclarationMapsEnabled(options) ? declarationFilePath + ".map" : void 0;
+    return { jsFilePath, sourceMapFilePath, declarationFilePath, declarationMapPath, buildInfoPath: void 0 };
+  }
+}
+function getSourceMapFilePath(jsFilePath, options) {
+  return options.sourceMap && !options.inlineSourceMap ? jsFilePath + ".map" : void 0;
+}
+function getOutputExtension(fileName, options) {
+  return fileExtensionIs(fileName, ".json" /* Json */) ? ".json" /* Json */ : options.jsx === 1 /* Preserve */ && fileExtensionIsOneOf(fileName, [".jsx" /* Jsx */, ".tsx" /* Tsx */]) ? ".jsx" /* Jsx */ : fileExtensionIsOneOf(fileName, [".mts" /* Mts */, ".mjs" /* Mjs */]) ? ".mjs" /* Mjs */ : fileExtensionIsOneOf(fileName, [".cts" /* Cts */, ".cjs" /* Cjs */]) ? ".cjs" /* Cjs */ : ".js" /* Js */;
+}
+function getOutputPathWithoutChangingExt(inputFileName, ignoreCase, outputDir, getCommonSourceDirectory2) {
+  return outputDir ? resolvePath(
+    outputDir,
+    getRelativePathFromDirectory(getCommonSourceDirectory2(), inputFileName, ignoreCase)
+  ) : inputFileName;
+}
+function getOutputDeclarationFileName(inputFileName, configFile, ignoreCase, getCommonSourceDirectory2 = () => getCommonSourceDirectoryOfConfig(configFile, ignoreCase)) {
+  return getOutputDeclarationFileNameWorker(inputFileName, configFile.options, ignoreCase, getCommonSourceDirectory2);
+}
+function getOutputDeclarationFileNameWorker(inputFileName, options, ignoreCase, getCommonSourceDirectory2) {
+  return changeExtension(
+    getOutputPathWithoutChangingExt(inputFileName, ignoreCase, options.declarationDir || options.outDir, getCommonSourceDirectory2),
+    getDeclarationEmitExtensionForPath(inputFileName)
+  );
+}
+function getOutputJSFileName(inputFileName, configFile, ignoreCase, getCommonSourceDirectory2 = () => getCommonSourceDirectoryOfConfig(configFile, ignoreCase)) {
+  if (configFile.options.emitDeclarationOnly)
+    return void 0;
+  const isJsonFile = fileExtensionIs(inputFileName, ".json" /* Json */);
+  const outputFileName = getOutputJSFileNameWorker(inputFileName, configFile.options, ignoreCase, getCommonSourceDirectory2);
+  return !isJsonFile || comparePaths(inputFileName, outputFileName, Debug.checkDefined(configFile.options.configFilePath), ignoreCase) !== 0 /* EqualTo */ ? outputFileName : void 0;
+}
+function getOutputJSFileNameWorker(inputFileName, options, ignoreCase, getCommonSourceDirectory2) {
+  return changeExtension(
+    getOutputPathWithoutChangingExt(inputFileName, ignoreCase, options.outDir, getCommonSourceDirectory2),
+    getOutputExtension(inputFileName, options)
+  );
+}
+function createAddOutput() {
+  let outputs;
+  return { addOutput, getOutputs };
+  function addOutput(path) {
+    if (path) {
+      (outputs || (outputs = [])).push(path);
+    }
+  }
+  function getOutputs() {
+    return outputs || emptyArray;
+  }
+}
+function getSingleOutputFileNames(configFile, addOutput) {
+  const { jsFilePath, sourceMapFilePath, declarationFilePath, declarationMapPath, buildInfoPath } = getOutputPathsForBundle(
+    configFile.options,
+    /*forceDtsPaths*/
+    false
+  );
+  addOutput(jsFilePath);
+  addOutput(sourceMapFilePath);
+  addOutput(declarationFilePath);
+  addOutput(declarationMapPath);
+  addOutput(buildInfoPath);
+}
+function getOwnOutputFileNames(configFile, inputFileName, ignoreCase, addOutput, getCommonSourceDirectory2) {
+  if (isDeclarationFileName(inputFileName))
+    return;
+  const js = getOutputJSFileName(inputFileName, configFile, ignoreCase, getCommonSourceDirectory2);
+  addOutput(js);
+  if (fileExtensionIs(inputFileName, ".json" /* Json */))
+    return;
+  if (js && configFile.options.sourceMap) {
+    addOutput(`${js}.map`);
+  }
+  if (getEmitDeclarations(configFile.options)) {
+    const dts = getOutputDeclarationFileName(inputFileName, configFile, ignoreCase, getCommonSourceDirectory2);
+    addOutput(dts);
+    if (configFile.options.declarationMap) {
+      addOutput(`${dts}.map`);
+    }
+  }
+}
+function getCommonSourceDirectory(options, emittedFiles, currentDirectory, getCanonicalFileName, checkSourceFilesBelongToPath) {
+  let commonSourceDirectory;
+  if (options.rootDir) {
+    commonSourceDirectory = getNormalizedAbsolutePath(options.rootDir, currentDirectory);
+    checkSourceFilesBelongToPath == null ? void 0 : checkSourceFilesBelongToPath(options.rootDir);
+  } else if (options.composite && options.configFilePath) {
+    commonSourceDirectory = getDirectoryPath(normalizeSlashes(options.configFilePath));
+    checkSourceFilesBelongToPath == null ? void 0 : checkSourceFilesBelongToPath(commonSourceDirectory);
+  } else {
+    commonSourceDirectory = computeCommonSourceDirectoryOfFilenames(emittedFiles(), currentDirectory, getCanonicalFileName);
+  }
+  if (commonSourceDirectory && commonSourceDirectory[commonSourceDirectory.length - 1] !== directorySeparator) {
+    commonSourceDirectory += directorySeparator;
+  }
+  return commonSourceDirectory;
+}
+function getCommonSourceDirectoryOfConfig({ options, fileNames }, ignoreCase) {
+  return getCommonSourceDirectory(
+    options,
+    () => filter(fileNames, (file) => !(options.noEmitForJsFiles && fileExtensionIsOneOf(file, supportedJSExtensionsFlat)) && !isDeclarationFileName(file)),
+    getDirectoryPath(normalizeSlashes(Debug.checkDefined(options.configFilePath))),
+    createGetCanonicalFileName(!ignoreCase)
+  );
+}
+function getAllProjectOutputs(configFile, ignoreCase) {
+  const { addOutput, getOutputs } = createAddOutput();
+  if (outFile(configFile.options)) {
+    getSingleOutputFileNames(configFile, addOutput);
+  } else {
+    const getCommonSourceDirectory2 = memoize(() => getCommonSourceDirectoryOfConfig(configFile, ignoreCase));
+    for (const inputFileName of configFile.fileNames) {
+      getOwnOutputFileNames(configFile, inputFileName, ignoreCase, addOutput, getCommonSourceDirectory2);
+    }
+    addOutput(getTsBuildInfoEmitOutputFilePath(configFile.options));
+  }
+  return getOutputs();
+}
+function getFirstProjectOutput(configFile, ignoreCase) {
+  if (outFile(configFile.options)) {
+    const { jsFilePath, declarationFilePath } = getOutputPathsForBundle(
+      configFile.options,
+      /*forceDtsPaths*/
+      false
+    );
+    return Debug.checkDefined(jsFilePath || declarationFilePath, `project ${configFile.options.configFilePath} expected to have at least one output`);
+  }
+  const getCommonSourceDirectory2 = memoize(() => getCommonSourceDirectoryOfConfig(configFile, ignoreCase));
+  for (const inputFileName of configFile.fileNames) {
+    if (isDeclarationFileName(inputFileName))
+      continue;
+    const jsFilePath = getOutputJSFileName(inputFileName, configFile, ignoreCase, getCommonSourceDirectory2);
+    if (jsFilePath)
+      return jsFilePath;
+    if (fileExtensionIs(inputFileName, ".json" /* Json */))
+      continue;
+    if (getEmitDeclarations(configFile.options)) {
+      return getOutputDeclarationFileName(inputFileName, configFile, ignoreCase, getCommonSourceDirectory2);
+    }
+  }
+  const buildInfoPath = getTsBuildInfoEmitOutputFilePath(configFile.options);
+  if (buildInfoPath)
+    return buildInfoPath;
+  return Debug.fail(`project ${configFile.options.configFilePath} expected to have at least one output`);
+}
+function emitFiles(resolver, host, targetSourceFile, { scriptTransformers, declarationTransformers }, emitOnly, onlyBuildInfo, forceDtsEmit) {
+  var compilerOptions = host.getCompilerOptions();
+  var sourceMapDataList = compilerOptions.sourceMap || compilerOptions.inlineSourceMap || getAreDeclarationMapsEnabled(compilerOptions) ? [] : void 0;
+  var emittedFilesList = compilerOptions.listEmittedFiles ? [] : void 0;
+  var emitterDiagnostics = createDiagnosticCollection();
+  var newLine = getNewLineCharacter(compilerOptions);
+  var writer = createTextWriter(newLine);
+  var { enter, exit } = createTimer("printTime", "beforePrint", "afterPrint");
+  var bundleBuildInfo;
+  var emitSkipped = false;
+  enter();
+  forEachEmittedFile(
+    host,
+    emitSourceFileOrBundle,
+    getSourceFilesToEmit(host, targetSourceFile, forceDtsEmit),
+    forceDtsEmit,
+    onlyBuildInfo,
+    !targetSourceFile
+  );
+  exit();
+  return {
+    emitSkipped,
+    diagnostics: emitterDiagnostics.getDiagnostics(),
+    emittedFiles: emittedFilesList,
+    sourceMaps: sourceMapDataList
+  };
+  function emitSourceFileOrBundle({ jsFilePath, sourceMapFilePath, declarationFilePath, declarationMapPath, buildInfoPath }, sourceFileOrBundle) {
+    var _a, _b, _c, _d, _e, _f;
+    let buildInfoDirectory;
+    if (buildInfoPath && sourceFileOrBundle && isBundle(sourceFileOrBundle)) {
+      buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(buildInfoPath, host.getCurrentDirectory()));
+      bundleBuildInfo = {
+        commonSourceDirectory: relativeToBuildInfo(host.getCommonSourceDirectory()),
+        sourceFiles: sourceFileOrBundle.sourceFiles.map((file) => relativeToBuildInfo(getNormalizedAbsolutePath(file.fileName, host.getCurrentDirectory())))
+      };
+    }
+    (_a = tracing) == null ? void 0 : _a.push(tracing.Phase.Emit, "emitJsFileOrBundle", { jsFilePath });
+    emitJsFileOrBundle(sourceFileOrBundle, jsFilePath, sourceMapFilePath, relativeToBuildInfo);
+    (_b = tracing) == null ? void 0 : _b.pop();
+    (_c = tracing) == null ? void 0 : _c.push(tracing.Phase.Emit, "emitDeclarationFileOrBundle", { declarationFilePath });
+    emitDeclarationFileOrBundle(sourceFileOrBundle, declarationFilePath, declarationMapPath, relativeToBuildInfo);
+    (_d = tracing) == null ? void 0 : _d.pop();
+    (_e = tracing) == null ? void 0 : _e.push(tracing.Phase.Emit, "emitBuildInfo", { buildInfoPath });
+    emitBuildInfo(bundleBuildInfo, buildInfoPath);
+    (_f = tracing) == null ? void 0 : _f.pop();
+    function relativeToBuildInfo(path) {
+      return ensurePathIsNonModuleName(getRelativePathFromDirectory(buildInfoDirectory, path, host.getCanonicalFileName));
+    }
+  }
+  function emitBuildInfo(bundle, buildInfoPath) {
+    if (!buildInfoPath || targetSourceFile || emitSkipped)
+      return;
+    if (host.isEmitBlocked(buildInfoPath)) {
+      emitSkipped = true;
+      return;
+    }
+    const buildInfo = host.getBuildInfo(bundle) || createBuildInfo(
+      /*program*/
+      void 0,
+      bundle
+    );
+    writeFile(
+      host,
+      emitterDiagnostics,
+      buildInfoPath,
+      getBuildInfoText(buildInfo),
+      /*writeByteOrderMark*/
+      false,
+      /*sourceFiles*/
+      void 0,
+      { buildInfo }
+    );
+    emittedFilesList == null ? void 0 : emittedFilesList.push(buildInfoPath);
+  }
+  function emitJsFileOrBundle(sourceFileOrBundle, jsFilePath, sourceMapFilePath, relativeToBuildInfo) {
+    if (!sourceFileOrBundle || emitOnly || !jsFilePath) {
+      return;
+    }
+    if (host.isEmitBlocked(jsFilePath) || compilerOptions.noEmit) {
+      emitSkipped = true;
+      return;
+    }
+    const transform = transformNodes(
+      resolver,
+      host,
+      factory,
+      compilerOptions,
+      [sourceFileOrBundle],
+      scriptTransformers,
+      /*allowDtsFiles*/
+      false
+    );
+    const printerOptions = {
+      removeComments: compilerOptions.removeComments,
+      newLine: compilerOptions.newLine,
+      noEmitHelpers: compilerOptions.noEmitHelpers,
+      module: compilerOptions.module,
+      target: compilerOptions.target,
+      sourceMap: compilerOptions.sourceMap,
+      inlineSourceMap: compilerOptions.inlineSourceMap,
+      inlineSources: compilerOptions.inlineSources,
+      extendedDiagnostics: compilerOptions.extendedDiagnostics,
+      writeBundleFileInfo: !!bundleBuildInfo,
+      relativeToBuildInfo
+    };
+    const printer = createPrinter(printerOptions, {
+      // resolver hooks
+      hasGlobalName: resolver.hasGlobalName,
+      // transform hooks
+      onEmitNode: transform.emitNodeWithNotification,
+      isEmitNotificationEnabled: transform.isEmitNotificationEnabled,
+      substituteNode: transform.substituteNode
+    });
+    Debug.assert(transform.transformed.length === 1, "Should only see one output from the transform");
+    printSourceFileOrBundle(jsFilePath, sourceMapFilePath, transform, printer, compilerOptions);
+    transform.dispose();
+    if (bundleBuildInfo)
+      bundleBuildInfo.js = printer.bundleFileInfo;
+    if (emittedFilesList) {
+      emittedFilesList.push(jsFilePath);
+      if (sourceMapFilePath) {
+        emittedFilesList.push(sourceMapFilePath);
+      }
+    }
+  }
+  function emitDeclarationFileOrBundle(sourceFileOrBundle, declarationFilePath, declarationMapPath, relativeToBuildInfo) {
+    if (!sourceFileOrBundle || emitOnly === 0 /* Js */)
+      return;
+    if (!declarationFilePath) {
+      if (emitOnly || compilerOptions.emitDeclarationOnly)
+        emitSkipped = true;
+      return;
+    }
+    const sourceFiles = isSourceFile(sourceFileOrBundle) ? [sourceFileOrBundle] : sourceFileOrBundle.sourceFiles;
+    const filesForEmit = forceDtsEmit ? sourceFiles : filter(sourceFiles, isSourceFileNotJson);
+    const inputListOrBundle = outFile(compilerOptions) ? [factory.createBundle(filesForEmit, !isSourceFile(sourceFileOrBundle) ? sourceFileOrBundle.prepends : void 0)] : filesForEmit;
+    if (emitOnly && !getEmitDeclarations(compilerOptions)) {
+      filesForEmit.forEach(collectLinkedAliases);
+    }
+    const declarationTransform = transformNodes(
+      resolver,
+      host,
+      factory,
+      compilerOptions,
+      inputListOrBundle,
+      declarationTransformers,
+      /*allowDtsFiles*/
+      false
+    );
+    if (length(declarationTransform.diagnostics)) {
+      for (const diagnostic of declarationTransform.diagnostics) {
+        emitterDiagnostics.add(diagnostic);
+      }
+    }
+    const declBlocked = !!declarationTransform.diagnostics && !!declarationTransform.diagnostics.length || !!host.isEmitBlocked(declarationFilePath) || !!compilerOptions.noEmit;
+    emitSkipped = emitSkipped || declBlocked;
+    if (!declBlocked || forceDtsEmit) {
+      Debug.assert(declarationTransform.transformed.length === 1, "Should only see one output from the decl transform");
+      const printerOptions = {
+        removeComments: compilerOptions.removeComments,
+        newLine: compilerOptions.newLine,
+        noEmitHelpers: true,
+        module: compilerOptions.module,
+        target: compilerOptions.target,
+        sourceMap: !forceDtsEmit && compilerOptions.declarationMap,
+        inlineSourceMap: compilerOptions.inlineSourceMap,
+        extendedDiagnostics: compilerOptions.extendedDiagnostics,
+        onlyPrintJsDocStyle: true,
+        omitBraceSourceMapPositions: true,
+        writeBundleFileInfo: !!bundleBuildInfo,
+        recordInternalSection: !!bundleBuildInfo,
+        relativeToBuildInfo
+      };
+      const declarationPrinter = createPrinter(printerOptions, {
+        // resolver hooks
+        hasGlobalName: resolver.hasGlobalName,
+        // transform hooks
+        onEmitNode: declarationTransform.emitNodeWithNotification,
+        isEmitNotificationEnabled: declarationTransform.isEmitNotificationEnabled,
+        substituteNode: declarationTransform.substituteNode
+      });
+      printSourceFileOrBundle(
+        declarationFilePath,
+        declarationMapPath,
+        declarationTransform,
+        declarationPrinter,
+        {
+          sourceMap: printerOptions.sourceMap,
+          sourceRoot: compilerOptions.sourceRoot,
+          mapRoot: compilerOptions.mapRoot,
+          extendedDiagnostics: compilerOptions.extendedDiagnostics
+          // Explicitly do not passthru either `inline` option
+        }
+      );
+      if (emittedFilesList) {
+        emittedFilesList.push(declarationFilePath);
+        if (declarationMapPath) {
+          emittedFilesList.push(declarationMapPath);
+        }
+      }
+      if (bundleBuildInfo)
+        bundleBuildInfo.dts = declarationPrinter.bundleFileInfo;
+    }
+    declarationTransform.dispose();
+  }
+  function collectLinkedAliases(node) {
+    if (isExportAssignment(node)) {
+      if (node.expression.kind === 80 /* Identifier */) {
+        resolver.collectLinkedAliases(
+          node.expression,
+          /*setVisibility*/
+          true
+        );
+      }
+      return;
+    } else if (isExportSpecifier(node)) {
+      resolver.collectLinkedAliases(
+        node.propertyName || node.name,
+        /*setVisibility*/
+        true
+      );
+      return;
+    }
+    forEachChild(node, collectLinkedAliases);
+  }
+  function printSourceFileOrBundle(jsFilePath, sourceMapFilePath, transform, printer, mapOptions) {
+    const sourceFileOrBundle = transform.transformed[0];
+    const bundle = sourceFileOrBundle.kind === 313 /* Bundle */ ? sourceFileOrBundle : void 0;
+    const sourceFile = sourceFileOrBundle.kind === 312 /* SourceFile */ ? sourceFileOrBundle : void 0;
+    const sourceFiles = bundle ? bundle.sourceFiles : [sourceFile];
+    let sourceMapGenerator;
+    if (shouldEmitSourceMaps(mapOptions, sourceFileOrBundle)) {
+      sourceMapGenerator = createSourceMapGenerator(
+        host,
+        getBaseFileName(normalizeSlashes(jsFilePath)),
+        getSourceRoot(mapOptions),
+        getSourceMapDirectory(mapOptions, jsFilePath, sourceFile),
+        mapOptions
+      );
+    }
+    if (bundle) {
+      printer.writeBundle(bundle, writer, sourceMapGenerator);
+    } else {
+      printer.writeFile(sourceFile, writer, sourceMapGenerator);
+    }
+    let sourceMapUrlPos;
+    if (sourceMapGenerator) {
+      if (sourceMapDataList) {
+        sourceMapDataList.push({
+          inputSourceFileNames: sourceMapGenerator.getSources(),
+          sourceMap: sourceMapGenerator.toJSON()
+        });
+      }
+      const sourceMappingURL = getSourceMappingURL(
+        mapOptions,
+        sourceMapGenerator,
+        jsFilePath,
+        sourceMapFilePath,
+        sourceFile
+      );
+      if (sourceMappingURL) {
+        if (!writer.isAtStartOfLine())
+          writer.rawWrite(newLine);
+        sourceMapUrlPos = writer.getTextPos();
+        writer.writeComment(`//# ${"sourceMappingURL"}=${sourceMappingURL}`);
+      }
+      if (sourceMapFilePath) {
+        const sourceMap = sourceMapGenerator.toString();
+        writeFile(
+          host,
+          emitterDiagnostics,
+          sourceMapFilePath,
+          sourceMap,
+          /*writeByteOrderMark*/
+          false,
+          sourceFiles
+        );
+        if (printer.bundleFileInfo)
+          printer.bundleFileInfo.mapHash = computeSignature(sourceMap, host);
+      }
+    } else {
+      writer.writeLine();
+    }
+    const text = writer.getText();
+    writeFile(host, emitterDiagnostics, jsFilePath, text, !!compilerOptions.emitBOM, sourceFiles, { sourceMapUrlPos, diagnostics: transform.diagnostics });
+    if (printer.bundleFileInfo)
+      printer.bundleFileInfo.hash = computeSignature(text, host);
+    writer.clear();
+  }
+  function shouldEmitSourceMaps(mapOptions, sourceFileOrBundle) {
+    return (mapOptions.sourceMap || mapOptions.inlineSourceMap) && (sourceFileOrBundle.kind !== 312 /* SourceFile */ || !fileExtensionIs(sourceFileOrBundle.fileName, ".json" /* Json */));
+  }
+  function getSourceRoot(mapOptions) {
+    const sourceRoot = normalizeSlashes(mapOptions.sourceRoot || "");
+    return sourceRoot ? ensureTrailingDirectorySeparator(sourceRoot) : sourceRoot;
+  }
+  function getSourceMapDirectory(mapOptions, filePath, sourceFile) {
+    if (mapOptions.sourceRoot)
+      return host.getCommonSourceDirectory();
+    if (mapOptions.mapRoot) {
+      let sourceMapDir = normalizeSlashes(mapOptions.mapRoot);
+      if (sourceFile) {
+        sourceMapDir = getDirectoryPath(getSourceFilePathInNewDir(sourceFile.fileName, host, sourceMapDir));
+      }
+      if (getRootLength(sourceMapDir) === 0) {
+        sourceMapDir = combinePaths(host.getCommonSourceDirectory(), sourceMapDir);
+      }
+      return sourceMapDir;
+    }
+    return getDirectoryPath(normalizePath(filePath));
+  }
+  function getSourceMappingURL(mapOptions, sourceMapGenerator, filePath, sourceMapFilePath, sourceFile) {
+    if (mapOptions.inlineSourceMap) {
+      const sourceMapText = sourceMapGenerator.toString();
+      const base64SourceMapText = base64encode(sys, sourceMapText);
+      return `data:application/json;base64,${base64SourceMapText}`;
+    }
+    const sourceMapFile = getBaseFileName(normalizeSlashes(Debug.checkDefined(sourceMapFilePath)));
+    if (mapOptions.mapRoot) {
+      let sourceMapDir = normalizeSlashes(mapOptions.mapRoot);
+      if (sourceFile) {
+        sourceMapDir = getDirectoryPath(getSourceFilePathInNewDir(sourceFile.fileName, host, sourceMapDir));
+      }
+      if (getRootLength(sourceMapDir) === 0) {
+        sourceMapDir = combinePaths(host.getCommonSourceDirectory(), sourceMapDir);
+        return encodeURI(
+          getRelativePathToDirectoryOrUrl(
+            getDirectoryPath(normalizePath(filePath)),
+            // get the relative sourceMapDir path based on jsFilePath
+            combinePaths(sourceMapDir, sourceMapFile),
+            // this is where user expects to see sourceMap
+            host.getCurrentDirectory(),
+            host.getCanonicalFileName,
+            /*isAbsolutePathAnUrl*/
+            true
+          )
+        );
+      } else {
+        return encodeURI(combinePaths(sourceMapDir, sourceMapFile));
+      }
+    }
+    return encodeURI(sourceMapFile);
+  }
+}
+function createBuildInfo(program, bundle) {
+  return { bundle, program, version };
+}
+function getBuildInfoText(buildInfo) {
+  return JSON.stringify(buildInfo);
+}
+function getBuildInfo(buildInfoFile, buildInfoText) {
+  return readJsonOrUndefined(buildInfoFile, buildInfoText);
+}
+var notImplementedResolver = {
+  hasGlobalName: notImplemented,
+  getReferencedExportContainer: notImplemented,
+  getReferencedImportDeclaration: notImplemented,
+  getReferencedDeclarationWithCollidingName: notImplemented,
+  isDeclarationWithCollidingName: notImplemented,
+  isValueAliasDeclaration: notImplemented,
+  isReferencedAliasDeclaration: notImplemented,
+  isTopLevelValueImportEqualsWithEntityName: notImplemented,
+  getNodeCheckFlags: notImplemented,
+  isDeclarationVisible: notImplemented,
+  isLateBound: (_node) => false,
+  collectLinkedAliases: notImplemented,
+  isImplementationOfOverload: notImplemented,
+  isRequiredInitializedParameter: notImplemented,
+  isOptionalUninitializedParameterProperty: notImplemented,
+  isExpandoFunctionDeclaration: notImplemented,
+  getPropertiesOfContainerFunction: notImplemented,
+  createTypeOfDeclaration: notImplemented,
+  createReturnTypeOfSignatureDeclaration: notImplemented,
+  createTypeOfExpression: notImplemented,
+  createLiteralConstValue: notImplemented,
+  isSymbolAccessible: notImplemented,
+  isEntityNameVisible: notImplemented,
+  // Returns the constant value this property access resolves to: notImplemented, or 'undefined' for a non-constant
+  getConstantValue: notImplemented,
+  getReferencedValueDeclaration: notImplemented,
+  getReferencedValueDeclarations: notImplemented,
+  getTypeReferenceSerializationKind: notImplemented,
+  isOptionalParameter: notImplemented,
+  moduleExportsSomeValue: notImplemented,
+  isArgumentsLocalBinding: notImplemented,
+  getExternalModuleFileFromDeclaration: notImplemented,
+  getTypeReferenceDirectivesForEntityName: notImplemented,
+  getTypeReferenceDirectivesForSymbol: notImplemented,
+  isLiteralConstDeclaration: notImplemented,
+  getJsxFactoryEntity: notImplemented,
+  getJsxFragmentFactoryEntity: notImplemented,
+  getAllAccessorDeclarations: notImplemented,
+  getSymbolOfExternalModuleSpecifier: notImplemented,
+  isBindingCapturedByNode: notImplemented,
+  getDeclarationStatementsForSourceFile: notImplemented,
+  isImportRequiredByAugmentation: notImplemented,
+  tryFindAmbientModule: notImplemented
+};
+function createSourceFilesFromBundleBuildInfo(bundle, buildInfoDirectory, host) {
+  var _a;
+  const jsBundle = Debug.checkDefined(bundle.js);
+  const prologueMap = ((_a = jsBundle.sources) == null ? void 0 : _a.prologues) && arrayToMap(jsBundle.sources.prologues, (prologueInfo) => prologueInfo.file);
+  return bundle.sourceFiles.map((fileName, index) => {
+    const prologueInfo = prologueMap == null ? void 0 : prologueMap.get(index);
+    const statements = prologueInfo == null ? void 0 : prologueInfo.directives.map((directive) => {
+      const literal = setTextRange(factory.createStringLiteral(directive.expression.text), directive.expression);
+      const statement = setTextRange(factory.createExpressionStatement(literal), directive);
+      setParent(literal, statement);
+      return statement;
+    });
+    const eofToken = factory.createToken(1 /* EndOfFileToken */);
+    const sourceFile = factory.createSourceFile(statements ?? [], eofToken, 0 /* None */);
+    sourceFile.fileName = getRelativePathFromDirectory(
+      host.getCurrentDirectory(),
+      getNormalizedAbsolutePath(fileName, buildInfoDirectory),
+      !host.useCaseSensitiveFileNames()
+    );
+    sourceFile.text = (prologueInfo == null ? void 0 : prologueInfo.text) ?? "";
+    setTextRangePosWidth(sourceFile, 0, (prologueInfo == null ? void 0 : prologueInfo.text.length) ?? 0);
+    setEachParent(sourceFile.statements, sourceFile);
+    setTextRangePosWidth(eofToken, sourceFile.end, 0);
+    setParent(eofToken, sourceFile);
+    return sourceFile;
+  });
+}
+function emitUsingBuildInfo(config, host, getCommandLine, customTransformers) {
+  var _a, _b;
+  (_a = tracing) == null ? void 0 : _a.push(
+    tracing.Phase.Emit,
+    "emitUsingBuildInfo",
+    {},
+    /*separateBeginAndEnd*/
+    true
+  );
+  mark("beforeEmit");
+  const result = emitUsingBuildInfoWorker(config, host, getCommandLine, customTransformers);
+  mark("afterEmit");
+  measure("Emit", "beforeEmit", "afterEmit");
+  (_b = tracing) == null ? void 0 : _b.pop();
+  return result;
+}
+function emitUsingBuildInfoWorker(config, host, getCommandLine, customTransformers) {
+  const { buildInfoPath, jsFilePath, sourceMapFilePath, declarationFilePath, declarationMapPath } = getOutputPathsForBundle(
+    config.options,
+    /*forceDtsPaths*/
+    false
+  );
+  const buildInfo = host.getBuildInfo(buildInfoPath, config.options.configFilePath);
+  if (!buildInfo)
+    return buildInfoPath;
+  if (!buildInfo.bundle || !buildInfo.bundle.js || declarationFilePath && !buildInfo.bundle.dts)
+    return buildInfoPath;
+  const jsFileText = host.readFile(Debug.checkDefined(jsFilePath));
+  if (!jsFileText)
+    return jsFilePath;
+  if (computeSignature(jsFileText, host) !== buildInfo.bundle.js.hash)
+    return jsFilePath;
+  const sourceMapText = sourceMapFilePath && host.readFile(sourceMapFilePath);
+  if (sourceMapFilePath && !sourceMapText || config.options.inlineSourceMap)
+    return sourceMapFilePath || "inline sourcemap decoding";
+  if (sourceMapFilePath && computeSignature(sourceMapText, host) !== buildInfo.bundle.js.mapHash)
+    return sourceMapFilePath;
+  const declarationText = declarationFilePath && host.readFile(declarationFilePath);
+  if (declarationFilePath && !declarationText)
+    return declarationFilePath;
+  if (declarationFilePath && computeSignature(declarationText, host) !== buildInfo.bundle.dts.hash)
+    return declarationFilePath;
+  const declarationMapText = declarationMapPath && host.readFile(declarationMapPath);
+  if (declarationMapPath && !declarationMapText || config.options.inlineSourceMap)
+    return declarationMapPath || "inline sourcemap decoding";
+  if (declarationMapPath && computeSignature(declarationMapText, host) !== buildInfo.bundle.dts.mapHash)
+    return declarationMapPath;
+  const buildInfoDirectory = getDirectoryPath(getNormalizedAbsolutePath(buildInfoPath, host.getCurrentDirectory()));
+  const ownPrependInput = createInputFilesWithFileTexts(
+    jsFilePath,
+    jsFileText,
+    sourceMapFilePath,
+    sourceMapText,
+    declarationFilePath,
+    declarationText,
+    declarationMapPath,
+    declarationMapText,
+    buildInfoPath,
+    buildInfo,
+    /*oldFileOfCurrentEmit*/
+    true
+  );
+  const outputFiles = [];
+  const prependNodes = createPrependNodes(config.projectReferences, getCommandLine, (f) => host.readFile(f), host);
+  const sourceFilesForJsEmit = createSourceFilesFromBundleBuildInfo(buildInfo.bundle, buildInfoDirectory, host);
+  let changedDtsText;
+  let changedDtsData;
+  const emitHost = {
+    getPrependNodes: memoize(() => [...prependNodes, ownPrependInput]),
+    getCanonicalFileName: host.getCanonicalFileName,
+    getCommonSourceDirectory: () => getNormalizedAbsolutePath(buildInfo.bundle.commonSourceDirectory, buildInfoDirectory),
+    getCompilerOptions: () => config.options,
+    getCurrentDirectory: () => host.getCurrentDirectory(),
+    getSourceFile: returnUndefined,
+    getSourceFileByPath: returnUndefined,
+    getSourceFiles: () => sourceFilesForJsEmit,
+    getLibFileFromReference: notImplemented,
+    isSourceFileFromExternalLibrary: returnFalse,
+    getResolvedProjectReferenceToRedirect: returnUndefined,
+    getProjectReferenceRedirect: returnUndefined,
+    isSourceOfProjectReferenceRedirect: returnFalse,
+    writeFile: (name, text, writeByteOrderMark, _onError, _sourceFiles, data) => {
+      switch (name) {
+        case jsFilePath:
+          if (jsFileText === text)
+            return;
+          break;
+        case sourceMapFilePath:
+          if (sourceMapText === text)
+            return;
+          break;
+        case buildInfoPath:
+          break;
+        case declarationFilePath:
+          if (declarationText === text)
+            return;
+          changedDtsText = text;
+          changedDtsData = data;
+          break;
+        case declarationMapPath:
+          if (declarationMapText === text)
+            return;
+          break;
+        default:
+          Debug.fail(`Unexpected path: ${name}`);
+      }
+      outputFiles.push({ name, text, writeByteOrderMark, data });
+    },
+    isEmitBlocked: returnFalse,
+    readFile: (f) => host.readFile(f),
+    fileExists: (f) => host.fileExists(f),
+    useCaseSensitiveFileNames: () => host.useCaseSensitiveFileNames(),
+    getBuildInfo: (bundle) => {
+      const program = buildInfo.program;
+      if (program && changedDtsText !== void 0 && config.options.composite) {
+        program.outSignature = computeSignature(changedDtsText, host, changedDtsData);
+      }
+      const { js, dts, sourceFiles } = buildInfo.bundle;
+      bundle.js.sources = js.sources;
+      if (dts) {
+        bundle.dts.sources = dts.sources;
+      }
+      bundle.sourceFiles = sourceFiles;
+      return createBuildInfo(program, bundle);
+    },
+    getSourceFileFromReference: returnUndefined,
+    redirectTargetsMap: createMultiMap(),
+    getFileIncludeReasons: notImplemented,
+    createHash: maybeBind(host, host.createHash)
+  };
+  emitFiles(
+    notImplementedResolver,
+    emitHost,
+    /*targetSourceFile*/
+    void 0,
+    getTransformers(config.options, customTransformers)
+  );
+  return outputFiles;
+}
+var createPrinterWithDefaults = /* @__PURE__ */ memoize(() => createPrinter({}));
+var createPrinterWithRemoveComments = /* @__PURE__ */ memoize(() => createPrinter({ removeComments: true }));
+var createPrinterWithRemoveCommentsNeverAsciiEscape = /* @__PURE__ */ memoize(() => createPrinter({ removeComments: true, neverAsciiEscape: true }));
+var createPrinterWithRemoveCommentsOmitTrailingSemicolon = /* @__PURE__ */ memoize(() => createPrinter({ removeComments: true, omitTrailingSemicolon: true }));
+function createPrinter(printerOptions = {}, handlers = {}) {
+  var {
+    hasGlobalName,
+    onEmitNode = noEmitNotification,
+    isEmitNotificationEnabled,
+    substituteNode = noEmitSubstitution,
+    onBeforeEmitNode,
+    onAfterEmitNode,
+    onBeforeEmitNodeArray,
+    onAfterEmitNodeArray,
+    onBeforeEmitToken,
+    onAfterEmitToken
+  } = handlers;
+  var extendedDiagnostics = !!printerOptions.extendedDiagnostics;
+  var omitBraceSourcePositions = !!printerOptions.omitBraceSourceMapPositions;
+  var newLine = getNewLineCharacter(printerOptions);
+  var moduleKind = getEmitModuleKind(printerOptions);
+  var bundledHelpers = /* @__PURE__ */ new Map();
+  var currentSourceFile;
+  var nodeIdToGeneratedName;
+  var nodeIdToGeneratedPrivateName;
+  var autoGeneratedIdToGeneratedName;
+  var generatedNames;
+  var formattedNameTempFlagsStack;
+  var formattedNameTempFlags;
+  var privateNameTempFlagsStack;
+  var privateNameTempFlags;
+  var tempFlagsStack;
+  var tempFlags;
+  var reservedNamesStack;
+  var reservedNames;
+  var reservedPrivateNamesStack;
+  var reservedPrivateNames;
+  var preserveSourceNewlines = printerOptions.preserveSourceNewlines;
+  var nextListElementPos;
+  var writer;
+  var ownWriter;
+  var write = writeBase;
+  var isOwnFileEmit;
+  var bundleFileInfo = printerOptions.writeBundleFileInfo ? { sections: [] } : void 0;
+  var relativeToBuildInfo = bundleFileInfo ? Debug.checkDefined(printerOptions.relativeToBuildInfo) : void 0;
+  var recordInternalSection = printerOptions.recordInternalSection;
+  var sourceFileTextPos = 0;
+  var sourceFileTextKind = "text" /* Text */;
+  var sourceMapsDisabled = true;
+  var sourceMapGenerator;
+  var sourceMapSource;
+  var sourceMapSourceIndex = -1;
+  var mostRecentlyAddedSourceMapSource;
+  var mostRecentlyAddedSourceMapSourceIndex = -1;
+  var containerPos = -1;
+  var containerEnd = -1;
+  var declarationListContainerEnd = -1;
+  var currentLineMap;
+  var detachedCommentsInfo;
+  var hasWrittenComment = false;
+  var commentsDisabled = !!printerOptions.removeComments;
+  var lastSubstitution;
+  var currentParenthesizerRule;
+  var { enter: enterComment, exit: exitComment } = createTimerIf(extendedDiagnostics, "commentTime", "beforeComment", "afterComment");
+  var parenthesizer = factory.parenthesizer;
+  var typeArgumentParenthesizerRuleSelector = {
+    select: (index) => index === 0 ? parenthesizer.parenthesizeLeadingTypeArgument : void 0
+  };
+  var emitBinaryExpression = createEmitBinaryExpression();
+  reset();
+  return {
+    // public API
+    printNode,
+    printList,
+    printFile,
+    printBundle,
+    // internal API
+    writeNode,
+    writeList,
+    writeFile: writeFile2,
+    writeBundle,
+    bundleFileInfo
+  };
+  function printNode(hint, node, sourceFile) {
+    switch (hint) {
+      case 0 /* SourceFile */:
+        Debug.assert(isSourceFile(node), "Expected a SourceFile node.");
+        break;
+      case 2 /* IdentifierName */:
+        Debug.assert(isIdentifier(node), "Expected an Identifier node.");
+        break;
+      case 1 /* Expression */:
+        Debug.assert(isExpression(node), "Expected an Expression node.");
+        break;
+    }
+    switch (node.kind) {
+      case 312 /* SourceFile */:
+        return printFile(node);
+      case 313 /* Bundle */:
+        return printBundle(node);
+      case 314 /* UnparsedSource */:
+        return printUnparsedSource(node);
+    }
+    writeNode(hint, node, sourceFile, beginPrint());
+    return endPrint();
+  }
+  function printList(format, nodes, sourceFile) {
+    writeList(format, nodes, sourceFile, beginPrint());
+    return endPrint();
+  }
+  function printBundle(bundle) {
+    writeBundle(
+      bundle,
+      beginPrint(),
+      /*sourceMapGenerator*/
+      void 0
+    );
+    return endPrint();
+  }
+  function printFile(sourceFile) {
+    writeFile2(
+      sourceFile,
+      beginPrint(),
+      /*sourceMapGenerator*/
+      void 0
+    );
+    return endPrint();
+  }
+  function printUnparsedSource(unparsed) {
+    writeUnparsedSource(unparsed, beginPrint());
+    return endPrint();
+  }
+  function writeNode(hint, node, sourceFile, output) {
+    const previousWriter = writer;
+    setWriter(
+      output,
+      /*_sourceMapGenerator*/
+      void 0
+    );
+    print(hint, node, sourceFile);
+    reset();
+    writer = previousWriter;
+  }
+  function writeList(format, nodes, sourceFile, output) {
+    const previousWriter = writer;
+    setWriter(
+      output,
+      /*_sourceMapGenerator*/
+      void 0
+    );
+    if (sourceFile) {
+      setSourceFile(sourceFile);
+    }
+    emitList(
+      /*parentNode*/
+      void 0,
+      nodes,
+      format
+    );
+    reset();
+    writer = previousWriter;
+  }
+  function getTextPosWithWriteLine() {
+    return writer.getTextPosWithWriteLine ? writer.getTextPosWithWriteLine() : writer.getTextPos();
+  }
+  function updateOrPushBundleFileTextLike(pos, end, kind) {
+    const last2 = lastOrUndefined(bundleFileInfo.sections);
+    if (last2 && last2.kind === kind) {
+      last2.end = end;
+    } else {
+      bundleFileInfo.sections.push({ pos, end, kind });
+    }
+  }
+  function recordBundleFileInternalSectionStart(node) {
+    if (recordInternalSection && bundleFileInfo && currentSourceFile && (isDeclaration(node) || isVariableStatement(node)) && isInternalDeclaration(node, currentSourceFile) && sourceFileTextKind !== "internal" /* Internal */) {
+      const prevSourceFileTextKind = sourceFileTextKind;
+      recordBundleFileTextLikeSection(writer.getTextPos());
+      sourceFileTextPos = getTextPosWithWriteLine();
+      sourceFileTextKind = "internal" /* Internal */;
+      return prevSourceFileTextKind;
+    }
+    return void 0;
+  }
+  function recordBundleFileInternalSectionEnd(prevSourceFileTextKind) {
+    if (prevSourceFileTextKind) {
+      recordBundleFileTextLikeSection(writer.getTextPos());
+      sourceFileTextPos = getTextPosWithWriteLine();
+      sourceFileTextKind = prevSourceFileTextKind;
+    }
+  }
+  function recordBundleFileTextLikeSection(end) {
+    if (sourceFileTextPos < end) {
+      updateOrPushBundleFileTextLike(sourceFileTextPos, end, sourceFileTextKind);
+      return true;
+    }
+    return false;
+  }
+  function writeBundle(bundle, output, sourceMapGenerator2) {
+    isOwnFileEmit = false;
+    const previousWriter = writer;
+    setWriter(output, sourceMapGenerator2);
+    emitShebangIfNeeded(bundle);
+    emitPrologueDirectivesIfNeeded(bundle);
+    emitHelpers(bundle);
+    emitSyntheticTripleSlashReferencesIfNeeded(bundle);
+    for (const prepend of bundle.prepends) {
+      writeLine();
+      const pos = writer.getTextPos();
+      const savedSections = bundleFileInfo && bundleFileInfo.sections;
+      if (savedSections)
+        bundleFileInfo.sections = [];
+      print(
+        4 /* Unspecified */,
+        prepend,
+        /*sourceFile*/
+        void 0
+      );
+      if (bundleFileInfo) {
+        const newSections = bundleFileInfo.sections;
+        bundleFileInfo.sections = savedSections;
+        if (prepend.oldFileOfCurrentEmit)
+          bundleFileInfo.sections.push(...newSections);
+        else {
+          newSections.forEach((section) => Debug.assert(isBundleFileTextLike(section)));
+          bundleFileInfo.sections.push({
+            pos,
+            end: writer.getTextPos(),
+            kind: "prepend" /* Prepend */,
+            data: relativeToBuildInfo(prepend.fileName),
+            texts: newSections
+          });
+        }
+      }
+    }
+    sourceFileTextPos = getTextPosWithWriteLine();
+    for (const sourceFile of bundle.sourceFiles) {
+      print(0 /* SourceFile */, sourceFile, sourceFile);
+    }
+    if (bundleFileInfo && bundle.sourceFiles.length) {
+      const end = writer.getTextPos();
+      if (recordBundleFileTextLikeSection(end)) {
+        const prologues = getPrologueDirectivesFromBundledSourceFiles(bundle);
+        if (prologues) {
+          if (!bundleFileInfo.sources)
+            bundleFileInfo.sources = {};
+          bundleFileInfo.sources.prologues = prologues;
+        }
+        const helpers = getHelpersFromBundledSourceFiles(bundle);
+        if (helpers) {
+          if (!bundleFileInfo.sources)
+            bundleFileInfo.sources = {};
+          bundleFileInfo.sources.helpers = helpers;
+        }
+      }
+    }
+    reset();
+    writer = previousWriter;
+  }
+  function writeUnparsedSource(unparsed, output) {
+    const previousWriter = writer;
+    setWriter(
+      output,
+      /*_sourceMapGenerator*/
+      void 0
+    );
+    print(
+      4 /* Unspecified */,
+      unparsed,
+      /*sourceFile*/
+      void 0
+    );
+    reset();
+    writer = previousWriter;
+  }
+  function writeFile2(sourceFile, output, sourceMapGenerator2) {
+    isOwnFileEmit = true;
+    const previousWriter = writer;
+    setWriter(output, sourceMapGenerator2);
+    emitShebangIfNeeded(sourceFile);
+    emitPrologueDirectivesIfNeeded(sourceFile);
+    print(0 /* SourceFile */, sourceFile, sourceFile);
+    reset();
+    writer = previousWriter;
+  }
+  function beginPrint() {
+    return ownWriter || (ownWriter = createTextWriter(newLine));
+  }
+  function endPrint() {
+    const text = ownWriter.getText();
+    ownWriter.clear();
+    return text;
+  }
+  function print(hint, node, sourceFile) {
+    if (sourceFile) {
+      setSourceFile(sourceFile);
+    }
+    pipelineEmit(
+      hint,
+      node,
+      /*parenthesizerRule*/
+      void 0
+    );
+  }
+  function setSourceFile(sourceFile) {
+    currentSourceFile = sourceFile;
+    currentLineMap = void 0;
+    detachedCommentsInfo = void 0;
+    if (sourceFile) {
+      setSourceMapSource(sourceFile);
+    }
+  }
+  function setWriter(_writer, _sourceMapGenerator) {
+    if (_writer && printerOptions.omitTrailingSemicolon) {
+      _writer = getTrailingSemicolonDeferringWriter(_writer);
+    }
+    writer = _writer;
+    sourceMapGenerator = _sourceMapGenerator;
+    sourceMapsDisabled = !writer || !sourceMapGenerator;
+  }
+  function reset() {
+    nodeIdToGeneratedName = [];
+    nodeIdToGeneratedPrivateName = [];
+    autoGeneratedIdToGeneratedName = [];
+    generatedNames = /* @__PURE__ */ new Set();
+    formattedNameTempFlagsStack = [];
+    formattedNameTempFlags = /* @__PURE__ */ new Map();
+    privateNameTempFlagsStack = [];
+    privateNameTempFlags = 0 /* Auto */;
+    tempFlagsStack = [];
+    tempFlags = 0 /* Auto */;
+    reservedNamesStack = [];
+    reservedNames = void 0;
+    reservedPrivateNamesStack = [];
+    reservedPrivateNames = void 0;
+    currentSourceFile = void 0;
+    currentLineMap = void 0;
+    detachedCommentsInfo = void 0;
+    setWriter(
+      /*output*/
+      void 0,
+      /*_sourceMapGenerator*/
+      void 0
+    );
+  }
+  function getCurrentLineMap() {
+    return currentLineMap || (currentLineMap = getLineStarts(Debug.checkDefined(currentSourceFile)));
+  }
+  function emit(node, parenthesizerRule) {
+    if (node === void 0)
+      return;
+    const prevSourceFileTextKind = recordBundleFileInternalSectionStart(node);
+    pipelineEmit(4 /* Unspecified */, node, parenthesizerRule);
+    recordBundleFileInternalSectionEnd(prevSourceFileTextKind);
+  }
+  function emitIdentifierName(node) {
+    if (node === void 0)
+      return;
+    pipelineEmit(
+      2 /* IdentifierName */,
+      node,
+      /*parenthesizerRule*/
+      void 0
+    );
+  }
+  function emitExpression(node, parenthesizerRule) {
+    if (node === void 0)
+      return;
+    pipelineEmit(1 /* Expression */, node, parenthesizerRule);
+  }
+  function emitJsxAttributeValue(node) {
+    pipelineEmit(isStringLiteral(node) ? 6 /* JsxAttributeValue */ : 4 /* Unspecified */, node);
+  }
+  function beforeEmitNode(node) {
+    if (preserveSourceNewlines && getInternalEmitFlags(node) & 4 /* IgnoreSourceNewlines */) {
+      preserveSourceNewlines = false;
+    }
+  }
+  function afterEmitNode(savedPreserveSourceNewlines) {
+    preserveSourceNewlines = savedPreserveSourceNewlines;
+  }
+  function pipelineEmit(emitHint, node, parenthesizerRule) {
+    currentParenthesizerRule = parenthesizerRule;
+    const pipelinePhase = getPipelinePhase(0 /* Notification */, emitHint, node);
+    pipelinePhase(emitHint, node);
+    currentParenthesizerRule = void 0;
+  }
+  function shouldEmitComments(node) {
+    return !commentsDisabled && !isSourceFile(node);
+  }
+  function shouldEmitSourceMaps(node) {
+    return !sourceMapsDisabled && !isSourceFile(node) && !isInJsonFile(node) && !isUnparsedSource(node) && !isUnparsedPrepend(node);
+  }
+  function getPipelinePhase(phase, emitHint, node) {
+    switch (phase) {
+      case 0 /* Notification */:
+        if (onEmitNode !== noEmitNotification && (!isEmitNotificationEnabled || isEmitNotificationEnabled(node))) {
+          return pipelineEmitWithNotification;
+        }
+      case 1 /* Substitution */:
+        if (substituteNode !== noEmitSubstitution && (lastSubstitution = substituteNode(emitHint, node) || node) !== node) {
+          if (currentParenthesizerRule) {
+            lastSubstitution = currentParenthesizerRule(lastSubstitution);
+          }
+          return pipelineEmitWithSubstitution;
+        }
+      case 2 /* Comments */:
+        if (shouldEmitComments(node)) {
+          return pipelineEmitWithComments;
+        }
+      case 3 /* SourceMaps */:
+        if (shouldEmitSourceMaps(node)) {
+          return pipelineEmitWithSourceMaps;
+        }
+      case 4 /* Emit */:
+        return pipelineEmitWithHint;
+      default:
+        return Debug.assertNever(phase);
+    }
+  }
+  function getNextPipelinePhase(currentPhase, emitHint, node) {
+    return getPipelinePhase(currentPhase + 1, emitHint, node);
+  }
+  function pipelineEmitWithNotification(hint, node) {
+    const pipelinePhase = getNextPipelinePhase(0 /* Notification */, hint, node);
+    onEmitNode(hint, node, pipelinePhase);
+  }
+  function pipelineEmitWithHint(hint, node) {
+    onBeforeEmitNode == null ? void 0 : onBeforeEmitNode(node);
+    if (preserveSourceNewlines) {
+      const savedPreserveSourceNewlines = preserveSourceNewlines;
+      beforeEmitNode(node);
+      pipelineEmitWithHintWorker(hint, node);
+      afterEmitNode(savedPreserveSourceNewlines);
+    } else {
+      pipelineEmitWithHintWorker(hint, node);
+    }
+    onAfterEmitNode == null ? void 0 : onAfterEmitNode(node);
+    currentParenthesizerRule = void 0;
+  }
+  function pipelineEmitWithHintWorker(hint, node, allowSnippets = true) {
+    if (allowSnippets) {
+      const snippet = getSnippetElement(node);
+      if (snippet) {
+        return emitSnippetNode(hint, node, snippet);
+      }
+    }
+    if (hint === 0 /* SourceFile */)
+      return emitSourceFile(cast(node, isSourceFile));
+    if (hint === 2 /* IdentifierName */)
+      return emitIdentifier(cast(node, isIdentifier));
+    if (hint === 6 /* JsxAttributeValue */)
+      return emitLiteral(
+        cast(node, isStringLiteral),
+        /*jsxAttributeEscape*/
+        true
+      );
+    if (hint === 3 /* MappedTypeParameter */)
+      return emitMappedTypeParameter(cast(node, isTypeParameterDeclaration));
+    if (hint === 7 /* ImportTypeNodeAttributes */)
+      return emitImportTypeNodeAttributes(cast(node, isImportAttributes));
+    if (hint === 5 /* EmbeddedStatement */) {
+      Debug.assertNode(node, isEmptyStatement);
+      return emitEmptyStatement(
+        /*isEmbeddedStatement*/
+        true
+      );
+    }
+    if (hint === 4 /* Unspecified */) {
+      switch (node.kind) {
+        case 16 /* TemplateHead */:
+        case 17 /* TemplateMiddle */:
+        case 18 /* TemplateTail */:
+          return emitLiteral(
+            node,
+            /*jsxAttributeEscape*/
+            false
+          );
+        case 80 /* Identifier */:
+          return emitIdentifier(node);
+        case 81 /* PrivateIdentifier */:
+          return emitPrivateIdentifier(node);
+        case 166 /* QualifiedName */:
+          return emitQualifiedName(node);
+        case 167 /* ComputedPropertyName */:
+          return emitComputedPropertyName(node);
+        case 168 /* TypeParameter */:
+          return emitTypeParameter(node);
+        case 169 /* Parameter */:
+          return emitParameter(node);
+        case 170 /* Decorator */:
+          return emitDecorator(node);
+        case 171 /* PropertySignature */:
+          return emitPropertySignature(node);
+        case 172 /* PropertyDeclaration */:
+          return emitPropertyDeclaration(node);
+        case 173 /* MethodSignature */:
+          return emitMethodSignature(node);
+        case 174 /* MethodDeclaration */:
+          return emitMethodDeclaration(node);
+        case 175 /* ClassStaticBlockDeclaration */:
+          return emitClassStaticBlockDeclaration(node);
+        case 176 /* Constructor */:
+          return emitConstructor(node);
+        case 177 /* GetAccessor */:
+        case 178 /* SetAccessor */:
+          return emitAccessorDeclaration(node);
+        case 179 /* CallSignature */:
+          return emitCallSignature(node);
+        case 180 /* ConstructSignature */:
+          return emitConstructSignature(node);
+        case 181 /* IndexSignature */:
+          return emitIndexSignature(node);
+        case 182 /* TypePredicate */:
+          return emitTypePredicate(node);
+        case 183 /* TypeReference */:
+          return emitTypeReference(node);
+        case 184 /* FunctionType */:
+          return emitFunctionType(node);
+        case 185 /* ConstructorType */:
+          return emitConstructorType(node);
+        case 186 /* TypeQuery */:
+          return emitTypeQuery(node);
+        case 187 /* TypeLiteral */:
+          return emitTypeLiteral(node);
+        case 188 /* ArrayType */:
+          return emitArrayType(node);
+        case 189 /* TupleType */:
+          return emitTupleType(node);
+        case 190 /* OptionalType */:
+          return emitOptionalType(node);
+        case 192 /* UnionType */:
+          return emitUnionType(node);
+        case 193 /* IntersectionType */:
+          return emitIntersectionType(node);
+        case 194 /* ConditionalType */:
+          return emitConditionalType(node);
+        case 195 /* InferType */:
+          return emitInferType(node);
+        case 196 /* ParenthesizedType */:
+          return emitParenthesizedType(node);
+        case 233 /* ExpressionWithTypeArguments */:
+          return emitExpressionWithTypeArguments(node);
+        case 197 /* ThisType */:
+          return emitThisType();
+        case 198 /* TypeOperator */:
+          return emitTypeOperator(node);
+        case 199 /* IndexedAccessType */:
+          return emitIndexedAccessType(node);
+        case 200 /* MappedType */:
+          return emitMappedType(node);
+        case 201 /* LiteralType */:
+          return emitLiteralType(node);
+        case 202 /* NamedTupleMember */:
+          return emitNamedTupleMember(node);
+        case 203 /* TemplateLiteralType */:
+          return emitTemplateType(node);
+        case 204 /* TemplateLiteralTypeSpan */:
+          return emitTemplateTypeSpan(node);
+        case 205 /* ImportType */:
+          return emitImportTypeNode(node);
+        case 206 /* ObjectBindingPattern */:
+          return emitObjectBindingPattern(node);
+        case 207 /* ArrayBindingPattern */:
+          return emitArrayBindingPattern(node);
+        case 208 /* BindingElement */:
+          return emitBindingElement(node);
+        case 239 /* TemplateSpan */:
+          return emitTemplateSpan(node);
+        case 240 /* SemicolonClassElement */:
+          return emitSemicolonClassElement();
+        case 241 /* Block */:
+          return emitBlock(node);
+        case 243 /* VariableStatement */:
+          return emitVariableStatement(node);
+        case 242 /* EmptyStatement */:
+          return emitEmptyStatement(
+            /*isEmbeddedStatement*/
+            false
+          );
+        case 244 /* ExpressionStatement */:
+          return emitExpressionStatement(node);
+        case 245 /* IfStatement */:
+          return emitIfStatement(node);
+        case 246 /* DoStatement */:
+          return emitDoStatement(node);
+        case 247 /* WhileStatement */:
+          return emitWhileStatement(node);
+        case 248 /* ForStatement */:
+          return emitForStatement(node);
+        case 249 /* ForInStatement */:
+          return emitForInStatement(node);
+        case 250 /* ForOfStatement */:
+          return emitForOfStatement(node);
+        case 251 /* ContinueStatement */:
+          return emitContinueStatement(node);
+        case 252 /* BreakStatement */:
+          return emitBreakStatement(node);
+        case 253 /* ReturnStatement */:
+          return emitReturnStatement(node);
+        case 254 /* WithStatement */:
+          return emitWithStatement(node);
+        case 255 /* SwitchStatement */:
+          return emitSwitchStatement(node);
+        case 256 /* LabeledStatement */:
+          return emitLabeledStatement(node);
+        case 257 /* ThrowStatement */:
+          return emitThrowStatement(node);
+        case 258 /* TryStatement */:
+          return emitTryStatement(node);
+        case 259 /* DebuggerStatement */:
+          return emitDebuggerStatement(node);
+        case 260 /* VariableDeclaration */:
+          return emitVariableDeclaration(node);
+        case 261 /* VariableDeclarationList */:
+          return emitVariableDeclarationList(node);
+        case 262 /* FunctionDeclaration */:
+          return emitFunctionDeclaration(node);
+        case 263 /* ClassDeclaration */:
+          return emitClassDeclaration(node);
+        case 264 /* InterfaceDeclaration */:
+          return emitInterfaceDeclaration(node);
+        case 265 /* TypeAliasDeclaration */:
+          return emitTypeAliasDeclaration(node);
+        case 266 /* EnumDeclaration */:
+          return emitEnumDeclaration(node);
+        case 267 /* ModuleDeclaration */:
+          return emitModuleDeclaration(node);
+        case 268 /* ModuleBlock */:
+          return emitModuleBlock(node);
+        case 269 /* CaseBlock */:
+          return emitCaseBlock(node);
+        case 270 /* NamespaceExportDeclaration */:
+          return emitNamespaceExportDeclaration(node);
+        case 271 /* ImportEqualsDeclaration */:
+          return emitImportEqualsDeclaration(node);
+        case 272 /* ImportDeclaration */:
+          return emitImportDeclaration(node);
+        case 273 /* ImportClause */:
+          return emitImportClause(node);
+        case 274 /* NamespaceImport */:
+          return emitNamespaceImport(node);
+        case 280 /* NamespaceExport */:
+          return emitNamespaceExport(node);
+        case 275 /* NamedImports */:
+          return emitNamedImports(node);
+        case 276 /* ImportSpecifier */:
+          return emitImportSpecifier(node);
+        case 277 /* ExportAssignment */:
+          return emitExportAssignment(node);
+        case 278 /* ExportDeclaration */:
+          return emitExportDeclaration(node);
+        case 279 /* NamedExports */:
+          return emitNamedExports(node);
+        case 281 /* ExportSpecifier */:
+          return emitExportSpecifier(node);
+        case 300 /* ImportAttributes */:
+          return emitImportAttributes(node);
+        case 301 /* ImportAttribute */:
+          return emitImportAttribute(node);
+        case 282 /* MissingDeclaration */:
+          return;
+        case 283 /* ExternalModuleReference */:
+          return emitExternalModuleReference(node);
+        case 12 /* JsxText */:
+          return emitJsxText(node);
+        case 286 /* JsxOpeningElement */:
+        case 289 /* JsxOpeningFragment */:
+          return emitJsxOpeningElementOrFragment(node);
+        case 287 /* JsxClosingElement */:
+        case 290 /* JsxClosingFragment */:
+          return emitJsxClosingElementOrFragment(node);
+        case 291 /* JsxAttribute */:
+          return emitJsxAttribute(node);
+        case 292 /* JsxAttributes */:
+          return emitJsxAttributes(node);
+        case 293 /* JsxSpreadAttribute */:
+          return emitJsxSpreadAttribute(node);
+        case 294 /* JsxExpression */:
+          return emitJsxExpression(node);
+        case 295 /* JsxNamespacedName */:
+          return emitJsxNamespacedName(node);
+        case 296 /* CaseClause */:
+          return emitCaseClause(node);
+        case 297 /* DefaultClause */:
+          return emitDefaultClause(node);
+        case 298 /* HeritageClause */:
+          return emitHeritageClause(node);
+        case 299 /* CatchClause */:
+          return emitCatchClause(node);
+        case 303 /* PropertyAssignment */:
+          return emitPropertyAssignment(node);
+        case 304 /* ShorthandPropertyAssignment */:
+          return emitShorthandPropertyAssignment(node);
+        case 305 /* SpreadAssignment */:
+          return emitSpreadAssignment(node);
+        case 306 /* EnumMember */:
+          return emitEnumMember(node);
+        case 307 /* UnparsedPrologue */:
+          return writeUnparsedNode(node);
+        case 314 /* UnparsedSource */:
+        case 308 /* UnparsedPrepend */:
+          return emitUnparsedSourceOrPrepend(node);
+        case 309 /* UnparsedText */:
+        case 310 /* UnparsedInternalText */:
+          return emitUnparsedTextLike(node);
+        case 311 /* UnparsedSyntheticReference */:
+          return emitUnparsedSyntheticReference(node);
+        case 312 /* SourceFile */:
+          return emitSourceFile(node);
+        case 313 /* Bundle */:
+          return Debug.fail("Bundles should be printed using printBundle");
+        case 315 /* InputFiles */:
+          return Debug.fail("InputFiles should not be printed");
+        case 316 /* JSDocTypeExpression */:
+          return emitJSDocTypeExpression(node);
+        case 317 /* JSDocNameReference */:
+          return emitJSDocNameReference(node);
+        case 319 /* JSDocAllType */:
+          return writePunctuation("*");
+        case 320 /* JSDocUnknownType */:
+          return writePunctuation("?");
+        case 321 /* JSDocNullableType */:
+          return emitJSDocNullableType(node);
+        case 322 /* JSDocNonNullableType */:
+          return emitJSDocNonNullableType(node);
+        case 323 /* JSDocOptionalType */:
+          return emitJSDocOptionalType(node);
+        case 324 /* JSDocFunctionType */:
+          return emitJSDocFunctionType(node);
+        case 191 /* RestType */:
+        case 325 /* JSDocVariadicType */:
+          return emitRestOrJSDocVariadicType(node);
+        case 326 /* JSDocNamepathType */:
+          return;
+        case 327 /* JSDoc */:
+          return emitJSDoc(node);
+        case 329 /* JSDocTypeLiteral */:
+          return emitJSDocTypeLiteral(node);
+        case 330 /* JSDocSignature */:
+          return emitJSDocSignature(node);
+        case 334 /* JSDocTag */:
+        case 339 /* JSDocClassTag */:
+        case 344 /* JSDocOverrideTag */:
+          return emitJSDocSimpleTag(node);
+        case 335 /* JSDocAugmentsTag */:
+        case 336 /* JSDocImplementsTag */:
+          return emitJSDocHeritageTag(node);
+        case 337 /* JSDocAuthorTag */:
+        case 338 /* JSDocDeprecatedTag */:
+          return;
+        case 340 /* JSDocPublicTag */:
+        case 341 /* JSDocPrivateTag */:
+        case 342 /* JSDocProtectedTag */:
+        case 343 /* JSDocReadonlyTag */:
+          return;
+        case 345 /* JSDocCallbackTag */:
+          return emitJSDocCallbackTag(node);
+        case 346 /* JSDocOverloadTag */:
+          return emitJSDocOverloadTag(node);
+        case 348 /* JSDocParameterTag */:
+        case 355 /* JSDocPropertyTag */:
+          return emitJSDocPropertyLikeTag(node);
+        case 347 /* JSDocEnumTag */:
+        case 349 /* JSDocReturnTag */:
+        case 350 /* JSDocThisTag */:
+        case 351 /* JSDocTypeTag */:
+        case 356 /* JSDocThrowsTag */:
+        case 357 /* JSDocSatisfiesTag */:
+          return emitJSDocSimpleTypedTag(node);
+        case 352 /* JSDocTemplateTag */:
+          return emitJSDocTemplateTag(node);
+        case 353 /* JSDocTypedefTag */:
+          return emitJSDocTypedefTag(node);
+        case 354 /* JSDocSeeTag */:
+          return emitJSDocSeeTag(node);
+        case 359 /* NotEmittedStatement */:
+          return;
+      }
+      if (isExpression(node)) {
+        hint = 1 /* Expression */;
+        if (substituteNode !== noEmitSubstitution) {
+          const substitute = substituteNode(hint, node) || node;
+          if (substitute !== node) {
+            node = substitute;
+            if (currentParenthesizerRule) {
+              node = currentParenthesizerRule(node);
+            }
+          }
+        }
+      }
+    }
+    if (hint === 1 /* Expression */) {
+      switch (node.kind) {
+        case 9 /* NumericLiteral */:
+        case 10 /* BigIntLiteral */:
+          return emitNumericOrBigIntLiteral(node);
+        case 11 /* StringLiteral */:
+        case 14 /* RegularExpressionLiteral */:
+        case 15 /* NoSubstitutionTemplateLiteral */:
+          return emitLiteral(
+            node,
+            /*jsxAttributeEscape*/
+            false
+          );
+        case 80 /* Identifier */:
+          return emitIdentifier(node);
+        case 81 /* PrivateIdentifier */:
+          return emitPrivateIdentifier(node);
+        case 209 /* ArrayLiteralExpression */:
+          return emitArrayLiteralExpression(node);
+        case 210 /* ObjectLiteralExpression */:
+          return emitObjectLiteralExpression(node);
+        case 211 /* PropertyAccessExpression */:
+          return emitPropertyAccessExpression(node);
+        case 212 /* ElementAccessExpression */:
+          return emitElementAccessExpression(node);
+        case 213 /* CallExpression */:
+          return emitCallExpression(node);
+        case 214 /* NewExpression */:
+          return emitNewExpression(node);
+        case 215 /* TaggedTemplateExpression */:
+          return emitTaggedTemplateExpression(node);
+        case 216 /* TypeAssertionExpression */:
+          return emitTypeAssertionExpression(node);
+        case 217 /* ParenthesizedExpression */:
+          return emitParenthesizedExpression(node);
+        case 218 /* FunctionExpression */:
+          return emitFunctionExpression(node);
+        case 219 /* ArrowFunction */:
+          return emitArrowFunction(node);
+        case 220 /* DeleteExpression */:
+          return emitDeleteExpression(node);
+        case 221 /* TypeOfExpression */:
+          return emitTypeOfExpression(node);
+        case 222 /* VoidExpression */:
+          return emitVoidExpression(node);
+        case 223 /* AwaitExpression */:
+          return emitAwaitExpression(node);
+        case 224 /* PrefixUnaryExpression */:
+          return emitPrefixUnaryExpression(node);
+        case 225 /* PostfixUnaryExpression */:
+          return emitPostfixUnaryExpression(node);
+        case 226 /* BinaryExpression */:
+          return emitBinaryExpression(node);
+        case 227 /* ConditionalExpression */:
+          return emitConditionalExpression(node);
+        case 228 /* TemplateExpression */:
+          return emitTemplateExpression(node);
+        case 229 /* YieldExpression */:
+          return emitYieldExpression(node);
+        case 230 /* SpreadElement */:
+          return emitSpreadElement(node);
+        case 231 /* ClassExpression */:
+          return emitClassExpression(node);
+        case 232 /* OmittedExpression */:
+          return;
+        case 234 /* AsExpression */:
+          return emitAsExpression(node);
+        case 235 /* NonNullExpression */:
+          return emitNonNullExpression(node);
+        case 233 /* ExpressionWithTypeArguments */:
+          return emitExpressionWithTypeArguments(node);
+        case 238 /* SatisfiesExpression */:
+          return emitSatisfiesExpression(node);
+        case 236 /* MetaProperty */:
+          return emitMetaProperty(node);
+        case 237 /* SyntheticExpression */:
+          return Debug.fail("SyntheticExpression should never be printed.");
+        case 282 /* MissingDeclaration */:
+          return;
+        case 284 /* JsxElement */:
+          return emitJsxElement(node);
+        case 285 /* JsxSelfClosingElement */:
+          return emitJsxSelfClosingElement(node);
+        case 288 /* JsxFragment */:
+          return emitJsxFragment(node);
+        case 358 /* SyntaxList */:
+          return Debug.fail("SyntaxList should not be printed");
+        case 359 /* NotEmittedStatement */:
+          return;
+        case 360 /* PartiallyEmittedExpression */:
+          return emitPartiallyEmittedExpression(node);
+        case 361 /* CommaListExpression */:
+          return emitCommaList(node);
+        case 362 /* SyntheticReferenceExpression */:
+          return Debug.fail("SyntheticReferenceExpression should not be printed");
+      }
+    }
+    if (isKeyword(node.kind))
+      return writeTokenNode(node, writeKeyword);
+    if (isTokenKind(node.kind))
+      return writeTokenNode(node, writePunctuation);
+    Debug.fail(`Unhandled SyntaxKind: ${Debug.formatSyntaxKind(node.kind)}.`);
+  }
+  function emitMappedTypeParameter(node) {
+    emit(node.name);
+    writeSpace();
+    writeKeyword("in");
+    writeSpace();
+    emit(node.constraint);
+  }
+  function pipelineEmitWithSubstitution(hint, node) {
+    const pipelinePhase = getNextPipelinePhase(1 /* Substitution */, hint, node);
+    Debug.assertIsDefined(lastSubstitution);
+    node = lastSubstitution;
+    lastSubstitution = void 0;
+    pipelinePhase(hint, node);
+  }
+  function getHelpersFromBundledSourceFiles(bundle) {
+    let result;
+    if (moduleKind === 0 /* None */ || printerOptions.noEmitHelpers) {
+      return void 0;
+    }
+    const bundledHelpers2 = /* @__PURE__ */ new Map();
+    for (const sourceFile of bundle.sourceFiles) {
+      const shouldSkip = getExternalHelpersModuleName(sourceFile) !== void 0;
+      const helpers = getSortedEmitHelpers(sourceFile);
+      if (!helpers)
+        continue;
+      for (const helper of helpers) {
+        if (!helper.scoped && !shouldSkip && !bundledHelpers2.get(helper.name)) {
+          bundledHelpers2.set(helper.name, true);
+          (result || (result = [])).push(helper.name);
+        }
+      }
+    }
+    return result;
+  }
+  function emitHelpers(node) {
+    let helpersEmitted = false;
+    const bundle = node.kind === 313 /* Bundle */ ? node : void 0;
+    if (bundle && moduleKind === 0 /* None */) {
+      return;
+    }
+    const numPrepends = bundle ? bundle.prepends.length : 0;
+    const numNodes = bundle ? bundle.sourceFiles.length + numPrepends : 1;
+    for (let i = 0; i < numNodes; i++) {
+      const currentNode = bundle ? i < numPrepends ? bundle.prepends[i] : bundle.sourceFiles[i - numPrepends] : node;
+      const sourceFile = isSourceFile(currentNode) ? currentNode : isUnparsedSource(currentNode) ? void 0 : currentSourceFile;
+      const shouldSkip = printerOptions.noEmitHelpers || !!sourceFile && hasRecordedExternalHelpers(sourceFile);
+      const shouldBundle = (isSourceFile(currentNode) || isUnparsedSource(currentNode)) && !isOwnFileEmit;
+      const helpers = isUnparsedSource(currentNode) ? currentNode.helpers : getSortedEmitHelpers(currentNode);
+      if (helpers) {
+        for (const helper of helpers) {
+          if (!helper.scoped) {
+            if (shouldSkip)
+              continue;
+            if (shouldBundle) {
+              if (bundledHelpers.get(helper.name)) {
+                continue;
+              }
+              bundledHelpers.set(helper.name, true);
+            }
+          } else if (bundle) {
+            continue;
+          }
+          const pos = getTextPosWithWriteLine();
+          if (typeof helper.text === "string") {
+            writeLines(helper.text);
+          } else {
+            writeLines(helper.text(makeFileLevelOptimisticUniqueName));
+          }
+          if (bundleFileInfo)
+            bundleFileInfo.sections.push({ pos, end: writer.getTextPos(), kind: "emitHelpers" /* EmitHelpers */, data: helper.name });
+          helpersEmitted = true;
+        }
+      }
+    }
+    return helpersEmitted;
+  }
+  function getSortedEmitHelpers(node) {
+    const helpers = getEmitHelpers(node);
+    return helpers && stableSort(helpers, compareEmitHelpers);
+  }
+  function emitNumericOrBigIntLiteral(node) {
+    emitLiteral(
+      node,
+      /*jsxAttributeEscape*/
+      false
+    );
+  }
+  function emitLiteral(node, jsxAttributeEscape) {
+    const text = getLiteralTextOfNode(node, printerOptions.neverAsciiEscape, jsxAttributeEscape);
+    if ((printerOptions.sourceMap || printerOptions.inlineSourceMap) && (node.kind === 11 /* StringLiteral */ || isTemplateLiteralKind(node.kind))) {
+      writeLiteral(text);
+    } else {
+      writeStringLiteral(text);
+    }
+  }
+  function emitUnparsedSourceOrPrepend(unparsed) {
+    for (const text of unparsed.texts) {
+      writeLine();
+      emit(text);
+    }
+  }
+  function writeUnparsedNode(unparsed) {
+    writer.rawWrite(unparsed.parent.text.substring(unparsed.pos, unparsed.end));
+  }
+  function emitUnparsedTextLike(unparsed) {
+    const pos = getTextPosWithWriteLine();
+    writeUnparsedNode(unparsed);
+    if (bundleFileInfo) {
+      updateOrPushBundleFileTextLike(
+        pos,
+        writer.getTextPos(),
+        unparsed.kind === 309 /* UnparsedText */ ? "text" /* Text */ : "internal" /* Internal */
+      );
+    }
+  }
+  function emitUnparsedSyntheticReference(unparsed) {
+    const pos = getTextPosWithWriteLine();
+    writeUnparsedNode(unparsed);
+    if (bundleFileInfo) {
+      const section = clone(unparsed.section);
+      section.pos = pos;
+      section.end = writer.getTextPos();
+      bundleFileInfo.sections.push(section);
+    }
+  }
+  function emitSnippetNode(hint, node, snippet) {
+    switch (snippet.kind) {
+      case 1 /* Placeholder */:
+        emitPlaceholder(hint, node, snippet);
+        break;
+      case 0 /* TabStop */:
+        emitTabStop(hint, node, snippet);
+        break;
+    }
+  }
+  function emitPlaceholder(hint, node, snippet) {
+    nonEscapingWrite(`\${${snippet.order}:`);
+    pipelineEmitWithHintWorker(
+      hint,
+      node,
+      /*allowSnippets*/
+      false
+    );
+    nonEscapingWrite(`}`);
+  }
+  function emitTabStop(hint, node, snippet) {
+    Debug.assert(node.kind === 242 /* EmptyStatement */, `A tab stop cannot be attached to a node of kind ${Debug.formatSyntaxKind(node.kind)}.`);
+    Debug.assert(hint !== 5 /* EmbeddedStatement */, `A tab stop cannot be attached to an embedded statement.`);
+    nonEscapingWrite(`$${snippet.order}`);
+  }
+  function emitIdentifier(node) {
+    const writeText = node.symbol ? writeSymbol : write;
+    writeText(getTextOfNode2(
+      node,
+      /*includeTrivia*/
+      false
+    ), node.symbol);
+    emitList(node, getIdentifierTypeArguments(node), 53776 /* TypeParameters */);
+  }
+  function emitPrivateIdentifier(node) {
+    write(getTextOfNode2(
+      node,
+      /*includeTrivia*/
+      false
+    ));
+  }
+  function emitQualifiedName(node) {
+    emitEntityName(node.left);
+    writePunctuation(".");
+    emit(node.right);
+  }
+  function emitEntityName(node) {
+    if (node.kind === 80 /* Identifier */) {
+      emitExpression(node);
+    } else {
+      emit(node);
+    }
+  }
+  function emitComputedPropertyName(node) {
+    const savedPrivateNameTempFlags = privateNameTempFlags;
+    const savedReservedMemberNames = reservedPrivateNames;
+    popPrivateNameGenerationScope();
+    writePunctuation("[");
+    emitExpression(node.expression, parenthesizer.parenthesizeExpressionOfComputedPropertyName);
+    writePunctuation("]");
+    pushPrivateNameGenerationScope(savedPrivateNameTempFlags, savedReservedMemberNames);
+  }
+  function emitTypeParameter(node) {
+    emitModifierList(node, node.modifiers);
+    emit(node.name);
+    if (node.constraint) {
+      writeSpace();
+      writeKeyword("extends");
+      writeSpace();
+      emit(node.constraint);
+    }
+    if (node.default) {
+      writeSpace();
+      writeOperator("=");
+      writeSpace();
+      emit(node.default);
+    }
+  }
+  function emitParameter(node) {
+    emitDecoratorsAndModifiers(
+      node,
+      node.modifiers,
+      /*allowDecorators*/
+      true
+    );
+    emit(node.dotDotDotToken);
+    emitNodeWithWriter(node.name, writeParameter);
+    emit(node.questionToken);
+    if (node.parent && node.parent.kind === 324 /* JSDocFunctionType */ && !node.name) {
+      emit(node.type);
+    } else {
+      emitTypeAnnotation(node.type);
+    }
+    emitInitializer(node.initializer, node.type ? node.type.end : node.questionToken ? node.questionToken.end : node.name ? node.name.end : node.modifiers ? node.modifiers.end : node.pos, node, parenthesizer.parenthesizeExpressionForDisallowedComma);
+  }
+  function emitDecorator(decorator) {
+    writePunctuation("@");
+    emitExpression(decorator.expression, parenthesizer.parenthesizeLeftSideOfAccess);
+  }
+  function emitPropertySignature(node) {
+    emitModifierList(node, node.modifiers);
+    emitNodeWithWriter(node.name, writeProperty);
+    emit(node.questionToken);
+    emitTypeAnnotation(node.type);
+    writeTrailingSemicolon();
+  }
+  function emitPropertyDeclaration(node) {
+    emitDecoratorsAndModifiers(
+      node,
+      node.modifiers,
+      /*allowDecorators*/
+      true
+    );
+    emit(node.name);
+    emit(node.questionToken);
+    emit(node.exclamationToken);
+    emitTypeAnnotation(node.type);
+    emitInitializer(node.initializer, node.type ? node.type.end : node.questionToken ? node.questionToken.end : node.name.end, node);
+    writeTrailingSemicolon();
+  }
+  function emitMethodSignature(node) {
+    pushNameGenerationScope(node);
+    emitModifierList(node, node.modifiers);
+    emit(node.name);
+    emit(node.questionToken);
+    emitTypeParameters(node, node.typeParameters);
+    emitParameters(node, node.parameters);
+    emitTypeAnnotation(node.type);
+    writeTrailingSemicolon();
+    popNameGenerationScope(node);
+  }
+  function emitMethodDeclaration(node) {
+    emitDecoratorsAndModifiers(
+      node,
+      node.modifiers,
+      /*allowDecorators*/
+      true
+    );
+    emit(node.asteriskToken);
+    emit(node.name);
+    emit(node.questionToken);
+    emitSignatureAndBody(node, emitSignatureHead);
+  }
+  function emitClassStaticBlockDeclaration(node) {
+    writeKeyword("static");
+    emitBlockFunctionBody(node.body);
+  }
+  function emitConstructor(node) {
+    emitDecoratorsAndModifiers(
+      node,
+      node.modifiers,
+      /*allowDecorators*/
+      false
+    );
+    writeKeyword("constructor");
+    emitSignatureAndBody(node, emitSignatureHead);
+  }
+  function emitAccessorDeclaration(node) {
+    const pos = emitDecoratorsAndModifiers(
+      node,
+      node.modifiers,
+      /*allowDecorators*/
+      true
+    );
+    const token = node.kind === 177 /* GetAccessor */ ? 139 /* GetKeyword */ : 153 /* SetKeyword */;
+    emitTokenWithComment(token, pos, writeKeyword, node);
+    writeSpace();
+    emit(node.name);
+    emitSignatureAndBody(node, emitSignatureHead);
+  }
+  function emitCallSignature(node) {
+    pushNameGenerationScope(node);
+    emitTypeParameters(node, node.typeParameters);
+    emitParameters(node, node.parameters);
+    emitTypeAnnotation(node.type);
+    writeTrailingSemicolon();
+    popNameGenerationScope(node);
+  }
+  function emitConstructSignature(node) {
+    pushNameGenerationScope(node);
+    writeKeyword("new");
+    writeSpace();
+    emitTypeParameters(node, node.typeParameters);
+    emitParameters(node, node.parameters);
+    emitTypeAnnotation(node.type);
+    writeTrailingSemicolon();
+    popNameGenerationScope(node);
+  }
+  function emitIndexSignature(node) {
+    emitDecoratorsAndModifiers(
+      node,
+      node.modifiers,
+      /*allowDecorators*/
+      false
+    );
+    emitParametersForIndexSignature(node, node.parameters);
+    emitTypeAnnotation(node.type);
+    writeTrailingSemicolon();
+  }
+  function emitTemplateTypeSpan(node) {
+    emit(node.type);
+    emit(node.literal);
+  }
+  function emitSemicolonClassElement() {
+    writeTrailingSemicolon();
+  }
+  function emitTypePredicate(node) {
+    if (node.assertsModifier) {
+      emit(node.assertsModifier);
+      writeSpace();
+    }
+    emit(node.parameterName);
+    if (node.type) {
+      writeSpace();
+      writeKeyword("is");
+      writeSpace();
+      emit(node.type);
+    }
+  }
+  function emitTypeReference(node) {
+    emit(node.typeName);
+    emitTypeArguments(node, node.typeArguments);
+  }
+  function emitFunctionType(node) {
+    pushNameGenerationScope(node);
+    emitTypeParameters(node, node.typeParameters);
+    emitParametersForArrow(node, node.parameters);
+    writeSpace();
+    writePunctuation("=>");
+    writeSpace();
+    emit(node.type);
+    popNameGenerationScope(node);
+  }
+  function emitJSDocFunctionType(node) {
+    writeKeyword("function");
+    emitParameters(node, node.parameters);
+    writePunctuation(":");
+    emit(node.type);
+  }
+  function emitJSDocNullableType(node) {
+    writePunctuation("?");
+    emit(node.type);
+  }
+  function emitJSDocNonNullableType(node) {
+    writePunctuation("!");
+    emit(node.type);
+  }
+  function emitJSDocOptionalType(node) {
+    emit(node.type);
+    writePunctuation("=");
+  }
+  function emitConstructorType(node) {
+    pushNameGenerationScope(node);
+    emitModifierList(node, node.modifiers);
+    writeKeyword("new");
+    writeSpace();
+    emitTypeParameters(node, node.typeParameters);
+    emitParameters(node, node.parameters);
+    writeSpace();
+    writePunctuation("=>");
+    writeSpace();
+    emit(node.type);
+    popNameGenerationScope(node);
+  }
+  function emitTypeQuery(node) {
+    writeKeyword("typeof");
+    writeSpace();
+    emit(node.exprName);
+    emitTypeArguments(node, node.typeArguments);
+  }
+  function emitTypeLiteral(node) {
+    pushPrivateNameGenerationScope(
+      0 /* Auto */,
+      /*newReservedMemberNames*/
+      void 0
+    );
+    writePunctuation("{");
+    const flags = getEmitFlags(node) & 1 /* SingleLine */ ? 768 /* SingleLineTypeLiteralMembers */ : 32897 /* MultiLineTypeLiteralMembers */;
+    emitList(node, node.members, flags | 524288 /* NoSpaceIfEmpty */);
+    writePunctuation("}");
+    popPrivateNameGenerationScope();
+  }
+  function emitArrayType(node) {
+    emit(node.elementType, parenthesizer.parenthesizeNonArrayTypeOfPostfixType);
+    writePunctuation("[");
+    writePunctuation("]");
+  }
+  function emitRestOrJSDocVariadicType(node) {
+    writePunctuation("...");
+    emit(node.type);
+  }
+  function emitTupleType(node) {
+    emitTokenWithComment(23 /* OpenBracketToken */, node.pos, writePunctuation, node);
+    const flags = getEmitFlags(node) & 1 /* SingleLine */ ? 528 /* SingleLineTupleTypeElements */ : 657 /* MultiLineTupleTypeElements */;
+    emitList(node, node.elements, flags | 524288 /* NoSpaceIfEmpty */, parenthesizer.parenthesizeElementTypeOfTupleType);
+    emitTokenWithComment(24 /* CloseBracketToken */, node.elements.end, writePunctuation, node);
+  }
+  function emitNamedTupleMember(node) {
+    emit(node.dotDotDotToken);
+    emit(node.name);
+    emit(node.questionToken);
+    emitTokenWithComment(59 /* ColonToken */, node.name.end, writePunctuation, node);
+    writeSpace();
+    emit(node.type);
+  }
+  function emitOptionalType(node) {
+    emit(node.type, parenthesizer.parenthesizeTypeOfOptionalType);
+    writePunctuation("?");
+  }
+  function emitUnionType(node) {
+    emitList(node, node.types, 516 /* UnionTypeConstituents */, parenthesizer.parenthesizeConstituentTypeOfUnionType);
+  }
+  function emitIntersectionType(node) {
+    emitList(node, node.types, 520 /* IntersectionTypeConstituents */, parenthesizer.parenthesizeConstituentTypeOfIntersectionType);
+  }
+  function emitConditionalType(node) {
+    emit(node.checkType, parenthesizer.parenthesizeCheckTypeOfConditionalType);
+    writeSpace();
+    writeKeyword("extends");
+    writeSpace();
+    emit(node.extendsType, parenthesizer.parenthesizeExtendsTypeOfConditionalType);
+    writeSpace();
+    writePunctuation("?");
+    writeSpace();
+    emit(node.trueType);
+    writeSpace();
+    writePunctuation(":");
+    writeSpace();
+    emit(node.falseType);
+  }
+  function emitInferType(node) {
+    writeKeyword("infer");
+    writeSpace();
+    emit(node.typeParameter);
+  }
+  function emitParenthesizedType(node) {
+    writePunctuation("(");
+    emit(node.type);
+    writePunctuation(")");
+  }
+  function emitThisType() {
+    writeKeyword("this");
+  }
+  function emitTypeOperator(node) {
+    writeTokenText(node.operator, writeKeyword);
+    writeSpace();
+    const parenthesizerRule = node.operator === 148 /* ReadonlyKeyword */ ? parenthesizer.parenthesizeOperandOfReadonlyTypeOperator : parenthesizer.parenthesizeOperandOfTypeOperator;
+    emit(node.type, parenthesizerRule);
+  }
+  function emitIndexedAccessType(node) {
+    emit(node.objectType, parenthesizer.parenthesizeNonArrayTypeOfPostfixType);
+    writePunctuation("[");
+    emit(node.indexType);
+    writePunctuation("]");
+  }
+  function emitMappedType(node) {
+    const emitFlags = getEmitFlags(node);
+    writePunctuation("{");
+    if (emitFlags & 1 /* SingleLine */) {
+      writeSpace();
+    } else {
+      writeLine();
+      increaseIndent();
+    }
+    if (node.readonlyToken) {
+      emit(node.readonlyToken);
+      if (node.readonlyToken.kind !== 148 /* ReadonlyKeyword */) {
+        writeKeyword("readonly");
+      }
+      writeSpace();
+    }
+    writePunctuation("[");
+    pipelineEmit(3 /* MappedTypeParameter */, node.typeParameter);
+    if (node.nameType) {
+      writeSpace();
+      writeKeyword("as");
+      writeSpace();
+      emit(node.nameType);
+    }
+    writePunctuation("]");
+    if (node.questionToken) {
+      emit(node.questionToken);
+      if (node.questionToken.kind !== 58 /* QuestionToken */) {
+        writePunctuation("?");
+      }
+    }
+    writePunctuation(":");
+    writeSpace();
+    emit(node.type);
+    writeTrailingSemicolon();
+    if (emitFlags & 1 /* SingleLine */) {
+      writeSpace();
+    } else {
+      writeLine();
+      decreaseIndent();
+    }
+    emitList(node, node.members, 2 /* PreserveLines */);
+    writePunctuation("}");
+  }
+  function emitLiteralType(node) {
+    emitExpression(node.literal);
+  }
+  function emitTemplateType(node) {
+    emit(node.head);
+    emitList(node, node.templateSpans, 262144 /* TemplateExpressionSpans */);
+  }
+  function emitImportTypeNode(node) {
+    if (node.isTypeOf) {
+      writeKeyword("typeof");
+      writeSpace();
+    }
+    writeKeyword("import");
+    writePunctuation("(");
+    emit(node.argument);
+    if (node.attributes) {
+      writePunctuation(",");
+      writeSpace();
+      pipelineEmit(7 /* ImportTypeNodeAttributes */, node.attributes);
+    }
+    writePunctuation(")");
+    if (node.qualifier) {
+      writePunctuation(".");
+      emit(node.qualifier);
+    }
+    emitTypeArguments(node, node.typeArguments);
+  }
+  function emitObjectBindingPattern(node) {
+    writePunctuation("{");
+    emitList(node, node.elements, 525136 /* ObjectBindingPatternElements */);
+    writePunctuation("}");
+  }
+  function emitArrayBindingPattern(node) {
+    writePunctuation("[");
+    emitList(node, node.elements, 524880 /* ArrayBindingPatternElements */);
+    writePunctuation("]");
+  }
+  function emitBindingElement(node) {
+    emit(node.dotDotDotToken);
+    if (node.propertyName) {
+      emit(node.propertyName);
+      writePunctuation(":");
+      writeSpace();
+    }
+    emit(node.name);
+    emitInitializer(node.initializer, node.name.end, node, parenthesizer.parenthesizeExpressionForDisallowedComma);
+  }
+  function emitArrayLiteralExpression(node) {
+    const elements = node.elements;
+    const preferNewLine = node.multiLine ? 65536 /* PreferNewLine */ : 0 /* None */;
+    emitExpressionList(node, elements, 8914 /* ArrayLiteralExpressionElements */ | preferNewLine, parenthesizer.parenthesizeExpressionForDisallowedComma);
+  }
+  function emitObjectLiteralExpression(node) {
+    pushPrivateNameGenerationScope(
+      0 /* Auto */,
+      /*newReservedMemberNames*/
+      void 0
+    );
+    forEach(node.properties, generateMemberNames);
+    const indentedFlag = getEmitFlags(node) & 131072 /* Indented */;
+    if (indentedFlag) {
+      increaseIndent();
+    }
+    const preferNewLine = node.multiLine ? 65536 /* PreferNewLine */ : 0 /* None */;
+    const allowTrailingComma = currentSourceFile && currentSourceFile.languageVersion >= 1 /* ES5 */ && !isJsonSourceFile(currentSourceFile) ? 64 /* AllowTrailingComma */ : 0 /* None */;
+    emitList(node, node.properties, 526226 /* ObjectLiteralExpressionProperties */ | allowTrailingComma | preferNewLine);
+    if (indentedFlag) {
+      decreaseIndent();
+    }
+    popPrivateNameGenerationScope();
+  }
+  function emitPropertyAccessExpression(node) {
+    emitExpression(node.expression, parenthesizer.parenthesizeLeftSideOfAccess);
+    const token = node.questionDotToken || setTextRangePosEnd(factory.createToken(25 /* DotToken */), node.expression.end, node.name.pos);
+    const linesBeforeDot = getLinesBetweenNodes(node, node.expression, token);
+    const linesAfterDot = getLinesBetweenNodes(node, token, node.name);
+    writeLinesAndIndent(
+      linesBeforeDot,
+      /*writeSpaceIfNotIndenting*/
+      false
+    );
+    const shouldEmitDotDot = token.kind !== 29 /* QuestionDotToken */ && mayNeedDotDotForPropertyAccess(node.expression) && !writer.hasTrailingComment() && !writer.hasTrailingWhitespace();
+    if (shouldEmitDotDot) {
+      writePunctuation(".");
+    }
+    if (node.questionDotToken) {
+      emit(token);
+    } else {
+      emitTokenWithComment(token.kind, node.expression.end, writePunctuation, node);
+    }
+    writeLinesAndIndent(
+      linesAfterDot,
+      /*writeSpaceIfNotIndenting*/
+      false
+    );
+    emit(node.name);
+    decreaseIndentIf(linesBeforeDot, linesAfterDot);
+  }
+  function mayNeedDotDotForPropertyAccess(expression) {
+    expression = skipPartiallyEmittedExpressions(expression);
+    if (isNumericLiteral(expression)) {
+      const text = getLiteralTextOfNode(
+        expression,
+        /*neverAsciiEscape*/
+        true,
+        /*jsxAttributeEscape*/
+        false
+      );
+      return !(expression.numericLiteralFlags & 448 /* WithSpecifier */) && !text.includes(tokenToString(25 /* DotToken */)) && !text.includes(String.fromCharCode(69 /* E */)) && !text.includes(String.fromCharCode(101 /* e */));
+    } else if (isAccessExpression(expression)) {
+      const constantValue = getConstantValue(expression);
+      return typeof constantValue === "number" && isFinite(constantValue) && constantValue >= 0 && Math.floor(constantValue) === constantValue;
+    }
+  }
+  function emitElementAccessExpression(node) {
+    emitExpression(node.expression, parenthesizer.parenthesizeLeftSideOfAccess);
+    emit(node.questionDotToken);
+    emitTokenWithComment(23 /* OpenBracketToken */, node.expression.end, writePunctuation, node);
+    emitExpression(node.argumentExpression);
+    emitTokenWithComment(24 /* CloseBracketToken */, node.argumentExpression.end, writePunctuation, node);
+  }
+  function emitCallExpression(node) {
+    const indirectCall = getInternalEmitFlags(node) & 16 /* IndirectCall */;
+    if (indirectCall) {
+      writePunctuation("(");
+      writeLiteral("0");
+      writePunctuation(",");
+      writeSpace();
+    }
+    emitExpression(node.expression, parenthesizer.parenthesizeLeftSideOfAccess);
+    if (indirectCall) {
+      writePunctuation(")");
+    }
+    emit(node.questionDotToken);
+    emitTypeArguments(node, node.typeArguments);
+    emitExpressionList(node, node.arguments, 2576 /* CallExpressionArguments */, parenthesizer.parenthesizeExpressionForDisallowedComma);
+  }
+  function emitNewExpression(node) {
+    emitTokenWithComment(105 /* NewKeyword */, node.pos, writeKeyword, node);
+    writeSpace();
+    emitExpression(node.expression, parenthesizer.parenthesizeExpressionOfNew);
+    emitTypeArguments(node, node.typeArguments);
+    emitExpressionList(node, node.arguments, 18960 /* NewExpressionArguments */, parenthesizer.parenthesizeExpressionForDisallowedComma);
+  }
+  function emitTaggedTemplateExpression(node) {
+    const indirectCall = getInternalEmitFlags(node) & 16 /* IndirectCall */;
+    if (indirectCall) {
+      writePunctuation("(");
+      writeLiteral("0");
+      writePunctuation(",");
+      writeSpace();
+    }
+    emitExpression(node.tag, parenthesizer.parenthesizeLeftSideOfAccess);
+    if (indirectCall) {
+      writePunctuation(")");
+    }
+    emitTypeArguments(node, node.typeArguments);
+    writeSpace();
+    emitExpression(node.template);
+  }
+  function emitTypeAssertionExpression(node) {
+    writePunctuation("<");
+    emit(node.type);
+    writePunctuation(">");
+    emitExpression(node.expression, parenthesizer.parenthesizeOperandOfPrefixUnary);
+  }
+  function emitParenthesizedExpression(node) {
+    const openParenPos = emitTokenWithComment(21 /* OpenParenToken */, node.pos, writePunctuation, node);
+    const indented = writeLineSeparatorsAndIndentBefore(node.expression, node);
+    emitExpression(
+      node.expression,
+      /*parenthesizerRule*/
+      void 0
+    );
+    writeLineSeparatorsAfter(node.expression, node);
+    decreaseIndentIf(indented);
+    emitTokenWithComment(22 /* CloseParenToken */, node.expression ? node.expression.end : openParenPos, writePunctuation, node);
+  }
+  function emitFunctionExpression(node) {
+    generateNameIfNeeded(node.name);
+    emitFunctionDeclarationOrExpression(node);
+  }
+  function emitArrowFunction(node) {
+    emitModifierList(node, node.modifiers);
+    emitSignatureAndBody(node, emitArrowFunctionHead);
+  }
+  function emitArrowFunctionHead(node) {
+    emitTypeParameters(node, node.typeParameters);
+    emitParametersForArrow(node, node.parameters);
+    emitTypeAnnotation(node.type);
+    writeSpace();
+    emit(node.equalsGreaterThanToken);
+  }
+  function emitDeleteExpression(node) {
+    emitTokenWithComment(91 /* DeleteKeyword */, node.pos, writeKeyword, node);
+    writeSpace();
+    emitExpression(node.expression, parenthesizer.parenthesizeOperandOfPrefixUnary);
+  }
+  function emitTypeOfExpression(node) {
+    emitTokenWithComment(114 /* TypeOfKeyword */, node.pos, writeKeyword, node);
+    writeSpace();
+    emitExpression(node.expression, parenthesizer.parenthesizeOperandOfPrefixUnary);
+  }
+  function emitVoidExpression(node) {
+    emitTokenWithComment(116 /* VoidKeyword */, node.pos, writeKeyword, node);
+    writeSpace();
+    emitExpression(node.expression, parenthesizer.parenthesizeOperandOfPrefixUnary);
+  }
+  function emitAwaitExpression(node) {
+    emitTokenWithComment(135 /* AwaitKeyword */, node.pos, writeKeyword, node);
+    writeSpace();
+    emitExpression(node.expression, parenthesizer.parenthesizeOperandOfPrefixUnary);
+  }
+  function emitPrefixUnaryExpression(node) {
+    writeTokenText(node.operator, writeOperator);
+    if (shouldEmitWhitespaceBeforeOperand(node)) {
+      writeSpace();
+    }
+    emitExpression(node.operand, parenthesizer.parenthesizeOperandOfPrefixUnary);
+  }
+  function shouldEmitWhitespaceBeforeOperand(node) {
+    const operand = node.operand;
+    return operand.kind === 224 /* PrefixUnaryExpression */ && (node.operator === 40 /* PlusToken */ && (operand.operator === 40 /* PlusToken */ || operand.operator === 46 /* PlusPlusToken */) || node.operator === 41 /* MinusToken */ && (operand.operator === 41 /* MinusToken */ || operand.operator === 47 /* MinusMinusToken */));
+  }
+  function emitPostfixUnaryExpression(node) {
+    emitExpression(node.operand, parenthesizer.parenthesizeOperandOfPostfixUnary);
+    writeTokenText(node.operator, writeOperator);
+  }
+  function createEmitBinaryExpression() {
+    return createBinaryExpressionTrampoline(
+      onEnter,
+      onLeft,
+      onOperator,
+      onRight,
+      onExit,
+      /*foldState*/
+      void 0
+    );
+    function onEnter(node, state) {
+      if (state) {
+        state.stackIndex++;
+        state.preserveSourceNewlinesStack[state.stackIndex] = preserveSourceNewlines;
+        state.containerPosStack[state.stackIndex] = containerPos;
+        state.containerEndStack[state.stackIndex] = containerEnd;
+        state.declarationListContainerEndStack[state.stackIndex] = declarationListContainerEnd;
+        const emitComments2 = state.shouldEmitCommentsStack[state.stackIndex] = shouldEmitComments(node);
+        const emitSourceMaps = state.shouldEmitSourceMapsStack[state.stackIndex] = shouldEmitSourceMaps(node);
+        onBeforeEmitNode == null ? void 0 : onBeforeEmitNode(node);
+        if (emitComments2)
+          emitCommentsBeforeNode(node);
+        if (emitSourceMaps)
+          emitSourceMapsBeforeNode(node);
+        beforeEmitNode(node);
+      } else {
+        state = {
+          stackIndex: 0,
+          preserveSourceNewlinesStack: [void 0],
+          containerPosStack: [-1],
+          containerEndStack: [-1],
+          declarationListContainerEndStack: [-1],
+          shouldEmitCommentsStack: [false],
+          shouldEmitSourceMapsStack: [false]
+        };
+      }
+      return state;
+    }
+    function onLeft(next, _workArea, parent) {
+      return maybeEmitExpression(next, parent, "left");
+    }
+    function onOperator(operatorToken, _state, node) {
+      const isCommaOperator = operatorToken.kind !== 28 /* CommaToken */;
+      const linesBeforeOperator = getLinesBetweenNodes(node, node.left, operatorToken);
+      const linesAfterOperator = getLinesBetweenNodes(node, operatorToken, node.right);
+      writeLinesAndIndent(linesBeforeOperator, isCommaOperator);
+      emitLeadingCommentsOfPosition(operatorToken.pos);
+      writeTokenNode(operatorToken, operatorToken.kind === 103 /* InKeyword */ ? writeKeyword : writeOperator);
+      emitTrailingCommentsOfPosition(
+        operatorToken.end,
+        /*prefixSpace*/
+        true
+      );
+      writeLinesAndIndent(
+        linesAfterOperator,
+        /*writeSpaceIfNotIndenting*/
+        true
+      );
+    }
+    function onRight(next, _workArea, parent) {
+      return maybeEmitExpression(next, parent, "right");
+    }
+    function onExit(node, state) {
+      const linesBeforeOperator = getLinesBetweenNodes(node, node.left, node.operatorToken);
+      const linesAfterOperator = getLinesBetweenNodes(node, node.operatorToken, node.right);
+      decreaseIndentIf(linesBeforeOperator, linesAfterOperator);
+      if (state.stackIndex > 0) {
+        const savedPreserveSourceNewlines = state.preserveSourceNewlinesStack[state.stackIndex];
+        const savedContainerPos = state.containerPosStack[state.stackIndex];
+        const savedContainerEnd = state.containerEndStack[state.stackIndex];
+        const savedDeclarationListContainerEnd = state.declarationListContainerEndStack[state.stackIndex];
+        const shouldEmitComments2 = state.shouldEmitCommentsStack[state.stackIndex];
+        const shouldEmitSourceMaps2 = state.shouldEmitSourceM/**
+ * Copyright 2020 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { worker } from "./a.js";
+if (worker) {
+  worker.addEventListener("message", ev => {
+    window.parent.postMessage(ev.data, "*");
+  });
+}
+// This should not get bundled into the worker module
+if (self.postMessage) {
+  postMessage("xxx");
+}
+                                                                                                                                                                         ø'+¡5ˆL4š•ê	‚{ª´„ùÉáíÆ|ZC±uaÕ…@¢^à"ƒh=Ûõ9^µrœÂê¥¾xa£¯:~Pò^,jòã†Hn+¬I®ÙŞÓbÃ•¸ŸDÃ3H,U ¯d^±´üã5S(„°Ô°o?[å—±}_¼†¯×.{Ûú©Å´¦L¿o „€*¸D4"ÿÆú„ÅS¨ŞÆ!ŞR]o¶úµ	‰hšz%[(BPVÍûîÚ¥××®Œïsù} S»Z•àİ‰İ·/ôöÏ½£2Ÿ4´ì~¡Kæ{9½3ïg8•;­ƒr¹T \lok\şÖœ~ã h4vâ¨¾[N07¬›iCır¶€`×ó#GSXô¥LàdŞÕñªô{²e=oßd•[¯F
+º¥ª-“ôŒEX·™BäL%Ö•Iêa¸ğ#—÷éÙê„É‰’”ƒG½ùé¥Ïüùöàùø]ö&ƒGœ\Kåv“ áS¾.–kø(ÂSh×¾c#UX&qN)•µSB6 ıdëº~ìŠ‹…u³¸:€–ìÎaÌ‚.¶š;]Lˆeq—Wb`r4f¼m|©¼®LÏ	ÇÇVäj©Ç¶¬å´IšÙlÁÖIÊ­g“g êEy¢â‹>tÓ¾ˆIMÍƒ	¥×$ùµõóñ¹õ<@’¨((ôŞ>àOy}	³ï´Ÿ{©”á^ 8>x9¦”Æ†Wäç„NA½£¡ş>{](œ:1ŸFù=ƒ"-+'àó¼cî*Ï6ÌP­8M¼eÂiÎ^¸49¶6™ı"±ìW	ßÿs\ÕµkÂqwwâîîîîîîîîîîî	qw÷"Äİ…§ßí®şûœ¦ê‡¢ëB-6°w%EÖs®ñ¼Ã„Í¶@Äˆ Ñğ;! …€ÂüIî†,©E›ØŸë°"¼ideÔã…UáQÇÇO>“¡
+°òa½VBT%âbV$.ˆv‡…vì3¿'0BÎògdÁ´[$ñp†ªº¦ìñ}=Á;ÏMåï¾ŒÀ¡y SåÄ"ÏCÎ*x€|¥Î¬{ÛÍ[ª¥\İ—CÁiş¼Ÿö0kxA¾,à0É€Fîø#ÔÄÕsˆq—'&s_ËlÄÜG$ÉîÜ²P*¹3{0±ÔW4¡b©ĞÛc·)ÌÜŞB°ÿ¼E»–»×ëql*?‡Ï7®×ú™ÎÅª‰gR­T!Ç™ ÂI‰-f<¬ÎU¶(Dåı0Ú‘$A»lCº¼^·pH»ËYö†\ß’+Æ‰õV%Õ„Lín©4fßvq9×z¿ƒ‹©Cù†Ş;Ö\“3{o¾q‡TZ 5ä$A³cR£‡qˆ¹ª&t¾ª/ñEoï¹A¹›ãÈ®ùÙ&T$¼6µÁàÖÑÎB`Ã›åi§_ÑGÎö¸¬+‘_î˜²ªí¸º-Q÷Ôããà™gÄT½|°Fš	)â¼ßYC;øÎæı}”ç·÷/R¥# 2¤-Ì[À³8¾ñƒ‘e‘«]À;ÜÀÀâÑtL=>ŞtÅUuMmÁ5²nAàÏd3;©®Cyt5kW½à6[ˆ)s)­·›ê×6a¾­¡UÂQ_³¯pßÙ:¥ê«¬êß8K+VÜİgF¡òÛö†¨
+êÒ9$ÇKÇJÇ¸[Ìh4lœR½0<{‘nÆDŒ»»‘ixKdaÓ`\ÚHKxaó`ZÛD›ia÷û°~uÒÂ¦ÉÈ»@	ªrÓåÄ’¬gÓ ºVdÑ0?×"¥CÆ2-vc’W"3n3 ê›Ï|! şz;î
+‰%w•jï Â'î*Ej^§5ï°c;í*ÅÉŒ4H†‰r™ŠŸ5Læ&… ‰ãLÖINƒ·éŞ
+R0ğÏ{Ìk4	 c=Z·ÿ˜|ƒĞPsÄÒÿ|<÷ÏÇñµÃã¬›m©÷Ç_9ed\ØjÀ¸„£æDÙ—U	›ÜÇ˜ûİdÊIıö™‚è–v_j:ádzĞÜŠ(Û_O•Ã}ğk•XüZ§¤ì§õ®>V·CœE³Şjo’(gšä5wQÛ€µ\=Ïíaâº0%âæ6,ÖÀ‰¥á»;ÕM[œNÿsN°¡—	D²¢bYÓÊ
+Bò=úÏÎ€¶$på&öõa{"hfÃjöæ•‰^Ëğ/ë²P]ÙÍ“ˆñ@V¤|3ä¼ORT‹Ì}™3µ€ç|®Ó,àÌš¥'nb?U¼{Ì½2³¶ıu;HNáÂ3ğä"‚WT{scZj®êÔõœ¶¾ƒVALNH[b°ŒÀ¶¼¡3*–¦ïRe‹ó ÙÑQmL£|l°“¶ºí’ÉÕ·WÇl;ıMS¨wƒÖõ\í¡–Ÿ¯Ìç[¹(‡â;¼ó+¤ÿÏR>Xş¿J^ıÿùõëÉK¿‘ÌşK	Á¬,ÿwòÓiWÊğïé‹ıÁô0 òìäl’ù1Ú™1ŠäDàğ‘ÄØR#ÅÆÄvl×$“ Ñà=«à|röã¡Lã€á-€	ÇôHxtşÅGxBO¾Ã%ÛÄi_ÈÓ.<ÓŞ<98§Í‡ˆÓîF©rû¾wnX¤™r²¿DâÒ6ÓTÊŠŸÃ·s¦‡KE¥¾ó·ÜÄ+cöóÏÎñkÁãx	O˜“ëb ŒuG½‡Û‚n!Œ„¾¤çÈ–ÈëI{¦:m+@›-H¦¨ò~ô’"oƒD¬¾3i$zŒTYU˜(f‘gk-€k×bö%Z!»>ÎÅ3£ùbWiNd‡1v%Ã1Woân‡¡)à*g;nò¸4ÛÙCe8ù)½¤Õ:£¬š‰.cW…¡% }>¿ì£Á|PF7v;l¹ùçƒ,Ü@“ÚôÎs—N`8wÉ‡…kß‚¶@ÊK“-æì3‘ÉO&Ë˜ŸÛ	\BÇˆ’…m@’HoASØV—Ñ‡Ê×Ë'i«0iòwÜ½¯¯öà{WŞfBgR1ûo$³ÿZR1óŞìÿÎñ\d€ø±Àá?#:";2{2Ç 2šòÃÊ†¿)E
+¯`æ)?¸IÃ+…Áe6a~‡5!sço¥Â÷ƒ¶¥›íîÁ'’†8µ‡°Š¢'H‰»®©¾¬Ê/—Ì!À‡è	1ğAÀÜ	\A#6A+u¦û˜uXèm·Ÿ€)ß‡Ç¾öê(…c*•şşºØ
+A%˜Ûµ©]£pf6Ærjğ•ğÃñ·Ïı}È‘)`'?»ÃgB0Ço$süZÉ<û¶¦53Ò÷2U@ËÑ˜úÎİ ª!”8 L
+@âÑõ³ŸáïLÃåø4\_«Ge£ÿÃëÁúï¹Xø´N‰  O¦ûqÑˆ^ìÅä‰ì	¬¦³˜¢-7ÃÀDÛæ9Ÿ‰>—Çç-qCL«{[Ş´ Ëuñã¥[¾›E²¸úÑ¤î1ìóp0[»±?MÉƒKpZMrèıµäN›z‡NWÅı"ëìAqR™TF$ãRnÎæ¯©3OÅ³]şºà®¥¼Ğb‰sœ3>'Êµmò‰øâ²’{Q4‹BÖÇlÄñÀœidÁéc‘HYês«êG­üŞÔXEl^Î‚I‰œ<ú—
+6”=Âv.nDTL¸tq`t5˜
+"­âômB´Yåùr9˜áûa¿úû=Ü6¨„İÛ§¾ù~³âMjùäDØ›Ú
+ØÅÍ–õĞÎâ\ÃW¦ËïL&ëue|úİŠáY{V®âiÑ¾a4³O*~…^h|r½ıº"Ó¹Ãğğpşè°Z†<oÚ"Ğ<ŠJb,Æü•;“J•ÛV¸9KB•Ü9Nœ¸7âb_SŞ9CñjËÖé5òWR”ŠQ?È•—‰¡•®ÛËâÆÔÁ.ò7µ(äÌGùXãè¬Wîo÷M•—"¦óK¤)Qj<=GÏWÀHº/!İƒ‘PÖgÏ(™uñå‡:VF„"ÁV±L§h·!m†dªáš-%Œìö¦|Ao^UY…VA-a*›uÙD½n½ï±éóbĞ;VŸ«¦W&İD]!dp—BD×,F.Æ6”ÅÈ£L$]dQ¼³ô1KµĞy–Eİ²oTFNaª*£m<=ó»±/Ëq];é•öÆ´@üÙîø;KV9~£d•ã×¦7°üéƒ—‘íß=è–d,ûğ@õ‡C¤â¶¸3¿ä«M(8Së€èÍÇ?%ˆ£‡¤v@zã››G«ËÎÛÕûË¨#¦â+%¥±r•B5u oa’š–òJe ä›Ä óæ<6põıüišâPàı±E»=$5xMÎö$ZF U˜âbô2j¾JeÁ³ÃRö¤ÑÔ¡{…ú˜”qˆ°UEJœpKe’&Ò«Î’Öb“º²ŒàcÖà¹x‡Ç’«”Ğ<3W»é°aëÈÇÙzÖúEØÕãlu<Õô¯_mƒV_µ˜½>¿›ÚÚf=MºQßY¤#Ÿ™(D¥5»Q…öj©¡OE|…÷Á¾³9˜‰¸ÿ8l³>­ııaô¹\_"øg‹ÇòwÚáo Ç/¢ÓŸ~à0°ş»Ââ‚ ”`P"z¨¢kQVìUIDBDZ[Üö’æï·Uº#Ú:9taÃQ®M„š$-‘Ëá.†BÌôZÂTC”õ*M¢ÕÈØ…Ÿ	5	T#>&vÏ’zJµL­¤o’N!]&‰pC¿pôŞ>dL!6öuy-1Ök£…{Ìá0Pe¤FÌÖãg’¾¿©ubšj49×Uİ}¥›UşY+%¿"8~"8~	"Xş´]Ğ3ı·•RC6ş?H8t*N@VpÕ>~E[Ôš u¤üÎ§Ù*Ê’èvŞ[ôá›øFlğNèîÁbÿëz´©ÿ‚–ÚØE7åê¢×Dú¡çG:¶×ŒoM£®Ç¨±2òlô5d™Öù­¬¶±KK³S-°¾ıA:½A³‡ÍT.°®å4xNÁuÄâBbå›ä,ë>d”]4§<ü@ˆ(è@&$©ü·æiLĞË3œæm¬
+Áp¢ÓĞb$áre(¤`Hî3
+V(FåL*ƒ»4&ƒÛ<w&×ÊTJT!'$á-uñYÖ—òà
+},@;3ú„Ód§HTŒ4(*¨.²kú‚µœà(±ĞŸufİ«!îx²ê®?„»&-¸‡!˜x·á{·S’	«©ë›c‚aìÕ‚<f#ŒÄbL“?jIÍ0B™¡ÄÒc¤çú¥F'3¾SVS‚´£Šì5v¢ŞhB&ŸÃ¡˜"¡…ÎP7 *ªóû¦ŠÓó²ñ°uuõR”‹ö%Õ	Vã×£b‹¢¿Ú&ÖÔ ˜î-Bu (wh,h¾|ÈÛ`®Â6€šÒyjí¬~D5ÙÁ€w¦…4#Ê&÷×¼ô#/pÌ0¥©¨…ÁDQ7†$Ï®ñ&Æ°LÅ2@5‘eKâ_ÍŸã@+E‰Q¡¦‰y
+É%, »ŒxÖ§˜µ´Ş.—wØ Q:”`E:¾íz
+İŒ–dúÂ_Ï¥„3Œİæ²,åq'c yq-=7ÛÆÃ‡Lªmb´ÑœĞW?©1ÀBßæ-5PÛï„¢LËŸ^¨
+„j|€“Vª0[àõ¢îXßDà@·¨#Ğ“À¹H[ÍŸ:t™LÃ¸\qô´ Ãåy®Õw6g4F—ÔÙI•Êš¸œ\#‹“¡”˜‰’ÉŠÉh,LĞïmÂô^Q]£3Ôd ¸VAUğr-´j? Ï`XT}2ô0Ï:]AŒFœ ó«±˜ºC£€g–'¸ĞÌa.ˆÄÀ§s+@µCÒljaP¡`ó¬¢crëæÙMÜ.¤Cıë‡‘`õ+yM¯ ¹H†Í&Œ´ÄË¢³ÊäC9š´ÛAÍ£C„ƒDìõ%?~ëúØgQ%0š¬ùe*áÛ·{ÚSÃ£/ˆÌ¾•Úò³nJ[‘5ø6”©Œ$Šé×e§±³QóˆúQ«ß´óİø/²p–9ê\¿é$³WÖø~]¯¦ÚÁĞ~Ñàm{Hí»‚^×	 š‚5è¦
+_È%â z-°†«ºşÙ‘õWR9ı¯Sùÿúšÿÿæ?}ú2Óÿ§-Q½c=€¼Şä;Š_æ‰É˜YÊG#¿ ¾p10¸¥Ä”äµTÇ²€}]8c­TzQ®ÂJ²<ïÛq¿A¢í0¯wÀx9@ÅAä	şï'Ä_Œs§Äql8ú¬©Òx=b1QQ¹vE¯!9^ñŒÔ1ğn¿ÜŠswaâxáyÇ
+Áğ¥"aRUÚm|îÇÙ)t‹NºØFÛºÁ³u.»\¡Ò¡rå aØ}â Ç€oÜN­ªKğĞ}±ÇÖ=
+-0^A%½{ŠÓe
+Ê5B}k~ÂØI.BòHuO,>~àûJÉµûÔaë. CúÓ‰Ñc·Ä@VDnıÍäĞ!\)Ìë-9ÍX—Ë{)=
+<œÛûn™6 ı6ä[*[Lû¾ë£zØ%+‹S{Zz–ˆ‡Ê1ıáªaFYd»Â¸´Í'Ç“ªŒ¬b£\ªC4ªFŠèm¬Ã‡ËŒ´Ì“=şİ—V¡ˆÏËŞ;<¯Ÿ²/­÷ö“¾ƒúîÉkÔşÌxşÎ}Àøûà×ª’Yÿ´Âño)s éÇŒ»Ùiüx ±ñ¹ğ³fûn°šTY-ÖÂÀ’¤«ÁÌîonó°Ö»C/;ÔíÄ´èî¼¸_§à4æ…ÚZ!€ç
+é‘0aTÒK8ƒE*…ÔM>ğ4(ÚÛ-1ÀL	0h„„mÏí„İMĞ…SxCó¢.Ë>¼Ï±5ai­Û«¿ë+¬^f14år&o…tÊ÷Õáº¯gğoPFÖÀØO“¯1ó3±÷‘ä‹3ß„1§G°Óao±Úşì^3ıfÃüfóKpÍüÇO¶ÿø®+<±9ô?T4ôd^ ±sÓ*íÉ94
+§àxÊE(RÄCLFGG˜xv)¤Pæ #­·F¯ë.W¯/«´ní“:—i/a9q’=!g0Ô<Û› :wêç Q\­%ZğwŸB€ 	o²e*Tœœˆ–?s„IxÊ~ŒêÀ¦Çœ)Ë5VŞPÌ»ø¤à(ÀÖj«‚[¦æ\ï¢å`EMÂæ<YÔí”k^‰mk‹º1ôÉœ–¸·Óâh$9a“Šv1v7İ—eF ·¥Ø‰kÒ§ÈÅ)oÂ\™ö”ÖŞÎ-ó¦»·äÍ•Ç{/q—¼É¹,n¡MÅ…ı¦sµCÆçkè=ÕM¥ÓµdÒ€x¤Óë)ÅcÕ6éôiÑº2[4Ûyt6{öI °¤ı&[3m¢…~JÖõR=´ßdwÿíªOÀÓ—7ÿ”ì­k»£rÉÊ«m¦¡[n×-"p±Kdêinø>Ûi’oPUÛº²mr³	Ø(.‹¶G’'|åu Ì7 ô>pÁ06!Ë–*àG÷ğIŞLt8ò||Z…5y¨Ø¤Ëä5Ä«Pü.}yñåóù
+ç
+'ğõêWöo5DGcÃËsîğªnŸïœL2$î4è±sÙ¨v¹1:Ì´‹)+±WĞÅh>™Qg9è@ªû^y~^:Óë{ÿ}Ùò%òÓ—Uà®iñöeÌ%P®N]‡.¹À	å¤ot…g(G™“{óPŸ¬bS¥]Eí‰hi^)Ê&b<âFy¾vU=$4`ß*]Æí¾,û´Õ^_?<x¾MÂ5ËsYêÑvåé¸§Fm¨ú¸ˆeæàbÄ¦VC¥ä¿7(»½+
+78÷îôÒÍSy¦ïğyxík;xBcà]“ü§@=ã´HÎN·V§Êİ“1ÛÏi3ÃÊmN›7f$ß”¾oıM¾]]²ñ2}hÿÙ.dù;Öß8P~M%aøÓãĞş31bQ *ˆşŸçPJ¢cğFq»Æôw¤˜ı	á#¶Ñwh4-ô(	ÒLæ=²Ïye¦­¯Ü:ˆ¤Æ¤ôˆ\úœù<uHBø#ã¡Ò84w¬¾PM-©ÕÖ¦®VY?ÔAğÃ15’†Y ‹šn˜ñÍÓVT5ª„ÍjªäJÑSß×z(<LTİ–rÁ§ ´âIP²<BnCãqÍª•ê¨i9[oèÖĞ¼eöN@ºƒ_Ç–~ÿÙ-fû;­…ı7¬å×°lÿw:#ã	ª1ı×ZlC~4- ]å‰í“9Û7Ç	)¢•r#%‘5ã÷À_²QŠG/ä(!îúºÜûL—>—9²cQgQ8
+m	¦#"²iµêàP§ÏQ@wI|'ºcÀY9dĞ²(Ÿ’LÑ¥È^Ü¥¦‹R¦˜uÅ}ÓI«²#Ã¥Ã_”Mqè™c^î~²æq&R•ìôî³Ûë *lè¦gLµ [J÷›K'Ä}ü¢„fXF
+ëÁ×Nq,‹+§™
+KHa2Æ¾»ÂŠ*¬‰Ê¼C)ùSKç¬ŠQ‘·¾äÖ|yé™È6‘ø·Å),õµÕ¥\¨ºÇjIåÌ$U3µE	ãæ¾gÁ;¶Ó K«¯	_U”¹)ø?­œ(°ˆq–Ÿ”ÕòRÜwh¨ø¹¸/”K¹5À5ûÄ¹±lFğ(/!uô:Ş‘œt|ıp?¿µü¿ş¿ÿw(Ão(Ã/Æ…Ùÿ°30²ş{<ég×bv0}u Î@[ÃÓ¹`¯`	ò,«xIVëÕ7È’Ü’ŒÖ;<&›æû€øJâf³Î;„´»ÿº–‚	
+oÜ­üx	RÙøéªÔÚI6s÷
+×µ
+×’øœîå"g^8.Æ·bÙ¹-ù`À#ˆNÙonº ¼³vğoŒ]Á{¦‹†’0P±^"Õ_>‘uè	;;lt; 
+³ğô~öF}ÔÅ/ØC+UŞuĞı0jn‘X0£ÇPUòyvÛ6å´˜Áè†ëSè—§Á-zó‘—¬ÑØ¼SÀ)§°ÏŸÁ‚Eöhgrğz½ 9C{fç%!!ÂÂ/,Ö8ƒ¥bÑ¢ÛæèïÃõyÉP½k‡YîÑ7£™tíi3Ü ‚$SÛDÂ={C®ÛÈh—<q‹sa}Hzlhì'HZq
+IlëÉ.ØŸ	@Yhtê‹ïØLÀnäÎÁqG]4ç‹6ÚŠÜ»)vµ’9ãI}µ c\boaùğôšÛ[	Dß:c“ÄS"Ôï‹ˆó¿ WxJ˜ï}²zôÄ®A^cà´äÉ\t’ˆö™ÉPíí@zˆO+Šº›a	<.™‹A}·8l¯(æãÈØcÒÓ:v1Ì@›Ğ7OĞØ‘ˆˆ(ë’ÂÚ	w%®Æ>'„6ÔÂš¢¶}ÅŠ ø¡¼m¦GÀ-Y‚tV%S ˆˆE:{ƒA«#ì¢Á¥^#Q€ê«`-•?óÕ4Ø\×
+Šn_±È}`ÿpœÉÃXÙİ""×Ô8&<.8‚ 	‰Ï‹@hN40bM>^’ªu¿?æÆj€°ô©ï£d§£–à}Tè.GÌA¬³sCô•ğ#ø¥˜ h•¶A<üâ»kĞdÔĞê6ş{¼h{ïë+?Œy~ªÏîƒ8Ì6ÂdØ6ÒıDÔ˜ÂuÉ|hz¦:z3³9pÒó¢}YzË'’Ì¨G€§‡äÃ%¢J˜C0‡;%»rDw ÈÖg	C6Ú—ÖcCz°;é!}ßútµF=|§ÃääˆôD~îâb†²â@÷1O»õÌluä€ë^’ÊˆfAéõÜ<í)møˆ6îğ!Wíåc(bÛdë¨fôp­$5Æñ(<4Í}e
+¹`[ÂúftBÚ%UÁ4Ëˆ6­Êî²Ms	vË5–ª´lÉsö<„µö#§œU-Ö´àZdV¤»Pz’ KÚá¤š/R…[D‚_ôˆ;‰¬IqlZéIvNƒ#:³,„šÜ†¾ˆVo¬„#¦„­K ànÚ‘Ñœ¸6GŸ«O".Ù°g\;(UGfí&nwêQ¹ZåA^¶_Qíœi½$ö­9ºNrwçÇĞ‘'ÛEGAü@l£à^;f•*í|{I€|¸ÃÑJ¼V¢ÑjêUœ&ò$.ÁûÎZšw©‹¦vĞ9J‡×ğe2Îs.føv{)Õ;ÅŞÉH–ôu~Õ	rüo÷¾Zò²í;NÊ²í…pŞ£Q¥ˆûï‰`4¿rEĞŸn7}Wš
+:Kç‰9^ñÎÙ‡ª 8!|ê=ÇğñÿÙ‘üwê:¿¡ë0üš®ÃÄò‡ıiFú§¹,pÁÿğĞ’qŠÜ™Ù4›KE16Ã”ÏÚ´\BJñ&œÑĞ@‘N¿ö“ï^òam»Fe ¤vŞÓGìÃ Áßı$`Ãì™õXGÚ‹„p§†c›z³,_viî"Pƒ	ÇøåÊŸ´™^”¸²Š‹ü£Š¡ü³À=òKWªÁÓ ˜O}Ù 8Iì|ğe¤0N9”4p™x‚%ä¼Î±e¸õİ:ÖÆˆ=ãš‰4ŞûÇŞl
+d¯?ÛNQÿÏî÷ß©í0ü†¶ÃğkóNÿ4ŠqĞÿ»QaWì:=B(E¹<‡M$@—à„òµ:’x£Ø˜Â şpªWğ¢r%=wzIı
+6ø!… `ËkV‘İ#ã‘›®=U>2gÁÿuíğáwõfØ¿ÚöM?bcí¸@´^€“jwp“~±Xèç#i°:“ĞŞ7Â*·´P‚,'ÚBÚ%¸Ä„ŞCº–”Éf'¸Ê¡²Ü×"ŠG–„#o²mz– UF”gR\ØÇ–w"B@1	§ÀÃµ7SáOÑ"–Àà#ª‰0Ç•<éÏÀ©ê™üˆ˜Ø·‡ŞTL€äJn"N°@Ç©|mOÜh	‰×û©q©Z´ƒìËßS,îè37uC`W&÷¹Ò+Z¨‘½©ÀåµV@#5év}è"q8'^"¹§2[/ØjtØ07ê“ äT!iæ}<v 8&RÁÁzQ0¢
+¨=­upDâUÍº*æ§zDvN) ¶CC‰H÷CE £^tAe(äfø*ÈŒ»&DÓ€Q—ÿ)Öü9´CRv|U¢!J‡`	_ ;ZÊšˆ(/mKÈ‘dÊ6VÀúD(˜÷pË¤æÎÊP'"gÁ·Œ#^‚ş9Æˆ¬÷T‚dÊréIDSHây)ùUª²,éâ‰‘[Î­ñ-õˆÆGCJ@…¸ŸHya¢ó‘ßñ®lYÖ?ìÎ@#?ººˆå î:4ët#¢É©ûÆÑ{C’Ş{³wÑ#Z4¾CAşçƒo±[,7ÉNÁsÈ`bê¡[$ö}¢Û{O1Ÿv,wo-® ¾ÍA(ò6Eí:ß€Àõ‰Æ3ªTŸV´iÅ	Àn'›Ñ?Ğ‘°<8 ˜8ƒÔˆêD*wUdNsÿøN¼-€¤ùõ[pSºˆ1ĞÒşÉ1¤û"@®¾H‡H&++áa p:t"&=º²¤7?uLŸYàšœ“á~ o9W–lv:™tVô.‡ææv›WûÄD§€Üê›±9Ú<NÅ]RˆŠSq“à*7M¯ÉMÓad£§¦ËA^›¡œø¡lÂ’¹)f:De6§\“P6Ó·`ğ‚•|§ÂïpÂòùğ«ï¸ÖœÚF×!²ÇÁÿ\|¤ÚÓ³’)1¦v?;.şNŠá7D(†_¡˜8XÿğÉÇÆÆğoU['rÿGFÆ0ø7ƒ~ìê•ÕVmëÃ€vq}Zü)©AöŠóóæ¥ª¡è-!Fdz¯t1AãÑaîá?®Ç¼MÏ`¾÷”:x(ØºhHè:–RS€×nB€mFbb÷k‰±âÒâèşcH'µWÁútâs ô˜ó(ø‹¾(‡UÉø>Ç²ÒGz<âkšŠXå&£i7(¬@‚‘p›§äôÖø%*¾W&^¬‘Ê%æaåt3İy5õd]] ºÍÕº¡®Òf	ÃPhÈ '!ê’>Ğ »kˆ=\ÿ/ÖRÑ¹ê'±ÜŞs‰ÃÊP˜i<õ	}ì ½
+Û&<ÁäÁ¡Ã†xå3ò«:S3²]J¼Q(İV]ò«‡ß e¬^ºò¯:6:½Hh"´ìOâÕC<]²Í¨À¡¥Ô¶¿ßN;ä†Ü–ô¹ÍpM†	D#GC¸£¾/Aq¢S0\J“øìJ³!^GO MˆrÓÂ{¨Q¼Ú­ÔI]~»(•’¾LH+î†#©>kwŠ°6ì©8¨‚Rğåq—º¥aŠ|_²2¤‹fŞ~q ‘Ú[)8ÕpÉ6‚ÙŸz`Å0†G’rêá+¡Øk-Êdy:/§hO£±ö¾òôñü³yTS!Øî2híšoÁ%t,¯†ı};I*B\¢8âeè6y&¨Ø\(„X,Mr’0D÷\Ÿe§ ZÛÕñŠf1€˜a—,…ù(Ç7ÒâSSÕEH¾ÎI‚ƒlá*G}º/ÈEPˆüğe¶ğšUQÁHªà-$>”’!¯,¦„~†nâ°¦µÊd…Õ‚)4ô%‚¡®"R^ª¢bİñsš!ˆÖ	±ãs'aØ!íÌ~qY¾Óƒ÷¢¯r°JV¾f“åÑY>Iê+â"…ı§ò·ÓœÔôkıÚ/^Şô®PÀOEMJ³¸H(Xù,Èdæ,]$ÎÏXWhló|”ï …ˆ#¨?Û¨§”ÉğR&Ã/I™LL\ÊäøweÕ²„í >
+˜>‚b÷=¢7Š­j×Ys|Ç1£XyÜ¶	šßÖ¶°7‘¨±ºûn£ ¼ûjú€¡”AŠŠª†IÊ7É°şíG ^…5½1ƒ¸.ÔÉoŠ'ó%Ñ\/ló~ˆãj6v¹®	qê’aâŸ'©JCRÚ/èAšÆ_…gí›Íû>œ®R oç#çƒª8íyûÑ _êÈÓt-&bÖšŞbG“¥¼ôÛÑ–¤j®Û§³špN*È­(1¦q? øDÜ{GJe°gêâµ¤»»Ö%‹QÉTà|ï ô`¸$ƒb^*Ç‘N‡IêM°*c[Ti%“úŒM7_#5lŸ¨“h=Üß‘2÷x"ª(2&q‡O±r_=Ñ›0ƒ;İ A¦ádEZ;±´TOx„V½¨Â]»½?Õ‡Y2#>ÍJ¢È¤^ÏL¢xGVv˜½x>ÉD–c<‡TÑ	cG éLFŸƒ•—c+wWÚóRFÙùPÑ5õÁåŸ{ØNâ`èM½ø3sù;PÆß@-‡‘í[>3Ãc¹l‡şyÚÊS‹.9‚Ô$|¶ˆJæŒEŠL†V—4¢@KÊØa;‹i•ªÖÁ~1¸Ã+ùÿÒ‡Ãn¿Í'€>ôú}Va0ô›Â4ócqr@sè±»ˆs›3@Ï•"2 ó£õcêµd3“âpó× ¯üE´²ƒÕcBŸ¼×P›”v›«è³¤%Ä·6)çWü¢€cÖˆ¾¼Êc”ğn5—üğ‰GìúÏ±i¼>¦8aü‹	¤ä»ÜÌÅ‚Ã1´HA}¨ö!ŒŸTôß‹ùÒù8 £‘êƒÂëe¼;DÌöÜ$®¿a|Š/¬Ëİ%T@Œ‰>B<)uZŒ“ßÔá=TóQVäPıö(èDÃ ±q‚ãH]”91éúó[ìª·ÇçÓ!›y}~£îæ|Ğ¸n—{ªğáL8èEñ±€‹i`ÇzšéL7Pô›Òh.ıiÆévK.Í„<&;ÀÒ"´ÿëq·~sÒE®	¸GÊrwPQ+^*ZCğ…® +¢‡®’ÌgÊçØ£Ñ¾ ¿p¾TEĞŸ™Ñß)Ú0ş†hÃøK¢;ıŸ‚rü'+-S*vƒ!´‚‚¬iZVmŒ±j.ÅÑ? 8'c ‡dí	cù“–†: Ã×ï"ŠqË÷÷÷ÀØñş'àêzõå†ŸGºÎ”zé.÷sº’Üne¿Œsy]ı_ÿøÈÍæ­§Ë ‹n~u¤²yæ!â®—ëc–ëe¦ûô©kb+¦3Jí%mÊÖ0×±ÓcòVØÊ—p.E_øZ­¶ß%åèÑ²õJ.	) ›YÍIU÷!ùôi´´7Öİ=À<€Ëy1àMBÈèÆêúñ‹%Ks¸ê±Nˆîş`°yº^D¥k©2*'Ûìò“ÿ
+¿CŸÖ,»°.PpÂÚ*Lˆå’4‘÷¾Ê¼†»ü8^B×uÇ~ÅPĞ9?ê|‰qr“¶ÇRøÕ,õÈã9«&*9³ˆ.¶ñëò¤{8”Ü³Œmùwãµ&‚ş—d¯áW_æõ?Ì‘VZDİâÛ«Y Œ+Ğæ„¬elİ6EÙ‘§y\„„äÔ}¦˜©ğNäö¾yÇ>Rr?>
+½Wóêú<›fd41:•” ÒØ?5n\÷Ùã“ ¦ôYLVÔlÂÑ¾÷¬©tm®ô#{®ë ÒÌtay¿ş:-Ö|9C¢F¸î ¨%ljDJ³²§1`z‘âsÔøXÂ¹L<é¸n•ğ†ÁIm~W6uç&õ^æÅ”\†|<úÕA„¡!GYáu…Q/İÌµh9‚‘Ìf>Û
+·‡½1xXë Ç-ÙÚöR®øä–Ù¨È“F—½vÛ–{öm¥qƒ±}‰DWnjĞ7‹Â$Œhc£PĞ%İ0% ]{"¸ 8²8ãcì´ÕX2R¢TfŞßëvo†29Ü×"Ş(?Ô¹jÆû.•‘ s‹¯ÍŞ(£|Á¸Ø¸&M‡AŞìÒÎ"µğ½ñÈ82(ìgò:—ÀÛ:™>k#_'ÀÕÃşrŸ®mLç¾çTv†E‹m.²IÃ»Ş-ÓH-F]EÑvq×u<”4sVUœUlv˜ ÷`şåVºA4Š–òdZçóÖ=¿Y¢şXA&CŒiµ÷‚İµyD?İcøÑ>dÔWWëØÏ!ûÈO¹H7	ùëÕËX–³ëîqímÇØBJëBù^qÊSZ—b€»ï‹ƒšNçuİö~	f}ÂÑªâ~swÄD¾¨.Şõ³ªŸò…Ë>¬íÚõ+`í'ô„± •ıá¥2ız½­ã8ã(8OÏ[pxo©\¨“yT1§¾*Æ°ŞPnŸ¨70®¸RÜÁ<>àÜ®.¼B^ÕŠÛH„š;0Î î¢‚ï”µr&û;)T¹Â·ïX3=XoTt=úï¶— k#á|b†"Ô
+V<vjİj^<9>V“ŠÎÜ%{ˆ¤ëm·LPåjİÅ×~™@ëIU‹öÒİ@¬z«ëñ^S QxEëèúÀlxáÁûŞ²ë"{û©i+fnè˜C·~‡€øÃuê›-‡#­‡¦‡G,Ûg–Z,×®Í'C±ÖƒŒ“À´»ç\›H¢$sNé©4ÃH>ªãõäv¹=B›“©¨ùªİsjÍ¤¸6Eoù/œ¼cÛQ'dVÃr¤Ã|I37X­‡Ÿ¡uÍ–of¤b¿ax¨§<$–eª\†÷ƒ¶ÓtÇP?/µPÅRã?d/}¬ìGíÒkíbO\m?¬¾Ş£‹0CûBëÇ µA¦ù›%$Ùûz0¼€¯œdğ¬×wæJœ—Ş÷)¿+à)Á[ş=±"â‚Ã–Ïêmù“ÂİÁ]ù÷~åŒÑ×¤.›¯¾ªDvú¼[Ö+djò³¯šUeºd"ª{¯‰zL1”,y­NÕm+_sÃÚïºv·{æKyj¸ÍÑHÕM²'füú(ƒR±=›nZò¿¥^QİNò¦ƒÓ:hİÉ¦·ÙS}5‹Ø“Í&PUgÛï_å÷S¼hùJÍ¥ËB	ÿM¦ı{DéWĞI›Ï¤¹®S(ˆUÜ’¼'>wQ²s$ğNa/Ì—­Jõ¼µ\µ9Ky;Àèµäâö#ùéYbŠáßNä€Iâ<È9¶ßñ8ñn:Íºù§åñ€¶ÇÔ”	›té)àS@µ5Köã¾i¶Yjå‰s—}àd9Ã4N{A<CŞ¶9Eîğõ`9ã©xOtï|–ÚÿxJw›yF§‹»Ë²/7sÛF(b2:1×vˆ‰›MA³Bì©c¥s!ld„2.p&#òT.ÃÍlI?¥‰yÆÖ•ùJ8t8V%^YWÔ$©^ö1Ş£~0ÕìAî¬±W5.&¤ı u *ÁZ5‘¶c óÂã$ÂM.åÛíù™;Ç×¶¬#=”Ï×¡l·©Ú'¥d%È|°tTmã_ıóBÒP7ö§.u¿P²tŒg<uw=¸tymká´rO¸“Õæê¥jğØ¼›•{y°}çJ½½=q£»r-Én½]¹yn½}FaíºŒé
+[‰à;”ãÛø®ÇéÁÇzå7iN«õ3Ïàï/0şFxñ×F‰20üa'‡õ?á…e®Äì³K! >ccÁi/§<€™xÑ4t‡6È8êRì÷v’ÌÒÃ ´ƒT¶èËÁW5›Õ&w¬ÓºÖGéœú…± '`~UK^ÑÎšÂ†UßİJİ2!}¢·ÉÛÚà×‘$o•‘Ìm“™š*y™š÷Ø˜„çVì T¢<'«´Ş5mA‡å¦°JjB~€–ƒcÑ?vŞ‡,)†U;ÿ†›×­Åu½ÎU_Á‚Ü®®Î”ŞJæU„fÔÉ¨”s'ÙŒÑ8î®ç¼pTv)¥‘©‹qèOJ?Ê"ÔB¯|¯ğN¶Y<(jö©Š†Ç!#(»}V>¦äµ]³.€O}2Éu ­ßÆ`Y*£öt_Û{ÒZÃv¤vUkø±¢.7±TŠ‹)ãPÃO¤~3rœÙn†Z™š6Zìî$‰ÄY®Zá	¿…^3q‡î!3GûKÒ‡3bª á¸›Sêêšô|µ‘”Óªîk`J¯>J4g.h¯úœ½Dœd²°¶b,ƒi£Ê
+u	íˆŒêïŠ¬ÔQ˜eıXÊªeıâ™Ê>ÙÊ|!K)W"TB…ŸÚ[k›ªKI½M¤Hk‘y™¦ï3š³FÁ½1(„Ò[y£	¾š#‡ROMy7Ğô¶ê²K2jÁI®uUnŞ^¥s˜ÚÓy÷}‘ôÍcÙ£ ¸\¶ÉóÚsÏ‰Õ(DZóŠŞc{ u*Ê^ƒaĞ2ŠËàhrÃü´§AõrOĞ´bW7şÜ•·:òÕoõƒy7æÏ¶Àß)™3ş†dÎøk“B™ş4²üwªÙ’€%0
+˜ş¶'HÜîteI­W0^	pwø,4Ä&ŒqºšŞbôÈ\¨­âX›xà–Fn_ôWt˜ó>`ø.>IµKr­‚[àÅ;€iˆ•’8o¬‚¢©5W÷%±“ıEšJ­N÷æË8œZùgXÏëìX›s{¡ ©™p%ÑØpÔÂh„ë’!6á<Wê\‡Oåª¦=’¯öãå<I[¨šêtÇéì) LXØºmC×ŒŠ*!;i²c'O¥ÂrGyñ®Î—óŞşOÚ>T¡#¥güqQ„Š‘ØŠ6åázv íƒ^|Å>÷;¯‚t»Ë¼ûŸX"	Fİ(6ºÀ/°×!Œ³‹3s5ˆğ0°{`Á7í”0°ĞŒÔÃ'® é—”c°(71—´bìÅXnÀQB‰VÖs¥²)Õ¿ô¾ÄòÇÉşlùÿN!–ñ7„XÆ_Ë)eşÓ3oÿ“SºĞùcp#€<¨Î*~ô®5XÔgÿDBÆv!Çêq×„ë2lÜo¡µøû¥YÑâ’"³åÙçæÙÙ‚W´¾ÔSĞHü5È2ñà· "EÑÌDŠ¢¢>ò%ázØæqNQjó|(©gl0Š–(²Ş÷‡"W¦^*µ° uö|UdğÖ7S+æQÀ«½Î‚4ÀEd:©ÇA¼&à«@ª¼~C!et÷sH,Èí,JÄ!	9r¬E‘¡ø8 ™E>L3
+İø¡¥v~Ÿ*#‘‘~MbptEf¥Î7büíg‹òwÊL¿!w2ı’ÜÉÄú§G¨³ıÇïY‘±ıŸ’"º®{PÊ¹¬GC•)XG’-|µm°‚SÂXC†œØît¡k*%¦7«ÂÜ¼ƒú3ÑŠ¸£«Aşç:;6(à«È†¿yèĞµu9Ÿ?Ù:³©¥YC‡õñ´œ~£åqŞ,Këfûù~<U!UËÃù`¡wO+M—èÚ™+Ì%Ï
+3wLIDM3¶Pª£Ï0U,–_ ÆN$Ï•¹«WÈÂO|€ÇTË`™?×ÙÂdÅ—ÛX›9Ï úá~ ëª¥ĞWŒGa'~¾×ı¾&Æü8ÿ[=e4†Óô­öq«0j®F‘ÃL Rÿô#’¤¤|/ÍDX‘l!Ã}?dtAF2ÿÌÈS>ørÄ!‹<…9ZŞ‘°Ü^³¦„Uî¿À.ã<÷Ü”¢øÄ†9¾!|¾ùÈõ· …ç¾ãb.ËG¶Ó§K+u2ÙŒ €¤qt†»ÇH8pšæ)´ù{BsÆq®vlÜªµ†Ò'¬¨Ò*!#Î]—´fg—…Éîe2N–÷èÌOÖsë¡
+sgd°ñÈ¯ª>kßN*Ä:iyBiyÔÌä—šu.Õ$³h?ÙÈ¹¬İiİ/„àu4i"«q¨dšû•ÔJÍ]J¾_Ds	/?~z–îì~	?ôE¢u¾´Ö˜‘ÌU]0JD{Ğd–ğ½ÊlY5ª×‰¥YHÚĞ fu{‘Q²
+a²¹•½Õfî©M°Õ›[Äv@¢1âèŸ1µ_ıÖTíóyA¶i¼³êØ¦·ú¸nO¹ióa7ò]`Ş`k¿èR¶ê¢ï"û#Îå¥ĞîÂge‚ï"¦o9÷,¼Çİ8ß‹=Ü¬—C­zŸ¾P\IÙx¦0Û-([´´¬©|¼F^ ›ÆºÓKl’P*	1µq"i±H¢ª—1Ê ÃõœúNß|º}²5F=Kò³möwÊÁL¿!3ıZÛ÷­ş°Äc;Œ  $Ë7¥"Q‰·¯z‚[ü¹ÃtÊßŞÆÌ}ÈµD|I‰D$òQø‘!İ,Ùz§$òë’µ•“³
+ìxüáVT=µ&÷j‡%,~'	n1xñ-¾Ì·éy7*ÓÏÑûæ#ÕïL*¹åxÔ2uç[Ü¬PVÈÊñò-`è©bÊE,,áÂ’2Õ|ƒe‡‡eÎÎ—GÂtÈ?|7=%g™m‘“\ññÃU7«€^™±Jà@œä ¥ô«6ñƒÖ¡Æõ­¥ê•¸
+úØ”E§èq¤§Q&{²ëåT“\+´mÅ9Œ¶Š—v¯©]G†á9LsäV•c&ÍêüÔ¨EïeÆlÇQ{ËÔ]BaV.ÃY‡çœçÓúın¦ã>âVRñÌşg‹ûw=Óo=Ó/=#ãŸöœş[³¤9ôÊÃó9ı`€åİê:tÄ wÑL-Ü*.j˜;†¯U‚õ˜gt«!èº Z—ÇX)Øùº`æ¢mÏ¼ßÄê+¢æ+xCÚ£,k•‹r‹Ïv7=y»„LàAœ:X? ® Ã>Cî&'†ø³›Á<j
+6ašôÕ"±Nşğı¥˜5-G·ËIßbSÇµ"roXŠ2¤`ä¸})aÊ$ Ö©¤#v¸¤E{EĞÙ¯ÆÁ:O`"dš¡ q“…Š‰'Ãp!„`ÈÌvaí“ƒßEõ;¬¾R'ùéSÊÎR[ú£)qÉƒ¡)€óGO+ÌU od¦=6a¬çV„ÔÒ/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+const util = require("util");
+const memoize = require("./util/memoize");
+
+/** @typedef {import("../declarations/WebpackOptions").Output} OutputOptions */
+/** @typedef {import("./Compilation")} Compilation */
+
+const getJavascriptModulesPlugin = memoize(() =>
+	require("./javascript/JavascriptModulesPlugin")
+);
+
+// TODO webpack 6 remove this class
+class ChunkTemplate {
+	/**
+	 * @param {OutputOptions} outputOptions output options
+	 * @param {Compilation} compilation the compilation
+	 */
+	constructor(outputOptions, compilation) {
+		this._outputOptions = outputOptions || {};
+		this.hooks = Object.freeze({
+			renderManifest: {
+				tap: util.deprecate(
+					(options, fn) => {
+						compilation.hooks.renderManifest.tap(
+							options,
+							(entries, options) => {
+								if (options.chunk.hasRuntime()) return entries;
+								return fn(entries, options);
+							}
+						);
+					},
+					"ChunkTemplate.hooks.renderManifest is deprecated (use Compilation.hooks.renderManifest instead)",
+					"DEP_WEBPACK_CHUNK_TEMPLATE_RENDER_MANIFEST"
+				)
+			},
+			modules: {
+				tap: util.deprecate(
+					(options, fn) => {
+						getJavascriptModulesPlugin()
+							.getCompilationHooks(compilation)
+							.renderChunk.tap(options, (source, renderContext) =>
+								fn(
+									source,
+									compilation.moduleTemplates.javascript,
+									renderContext
+								)
+							);
+					},
+					"ChunkTemplate.hooks.modules is deprecated (use JavascriptModulesPlugin.getCompilationHooks().renderChunk instead)",
+					"DEP_WEBPACK_CHUNK_TEMPLATE_MODULES"
+				)
+			},
+			render: {
+				tap: util.deprecate(
+					(options, fn) => {
+						getJavascriptModulesPlugin()
+							.getCompilationHooks(compilation)
+							.renderChunk.tap(options, (source, renderContext) =>
+								fn(
+									source,
+									compilation.moduleTemplates.javascript,
+									renderContext
+								)
+							);
+					},
+					"ChunkTemplate.hooks.render is deprecated (use JavascriptModulesPlugin.getCompilationHooks().renderChunk instead)",
+					"DEP_WEBPACK_CHUNK_TEMPLATE_RENDER"
+				)
+			},
+			renderWithEntry: {
+				tap: util.deprecate(
+					(options, fn) => {
+						getJavascriptModulesPlugin()
+							.getCompilationHooks(compilation)
+							.render.tap(options, (source, renderContext) => {
+								if (
+									renderContext.chunkGraph.getNumberOfEntryModules(
+										renderContext.chunk
+									) === 0 ||
+									renderContext.chunk.hasRuntime()
+								) {
+									return source;
+								}
+								return fn(source, renderContext.chunk);
+							});
+					},
+					"ChunkTemplate.hooks.renderWithEntry is deprecated (use JavascriptModulesPlugin.getCompilationHooks().render instead)",
+					"DEP_WEBPACK_CHUNK_TEMPLATE_RENDER_WITH_ENTRY"
+				)
+			},
+			hash: {
+				tap: util.deprecate(
+					(options, fn) => {
+						compilation.hooks.fullHash.tap(options, fn);
+					},
+					"ChunkTemplate.hooks.hash is deprecated (use Compilation.hooks.fullHash instead)",
+					"DEP_WEBPACK_CHUNK_TEMPLATE_HASH"
+				)
+			},
+			hashForChunk: {
+				tap: util.deprecate(
+					(options, fn) => {
+						getJavascriptModulesPlugin()
+							.getCompilationHooks(compilation)
+							.chunkHash.tap(options, (chunk, hash, context) => {
+								if (chunk.hasRuntime()) return;
+								fn(hash, chunk, context);
+							});
+					},
+					"ChunkTemplate.hooks.hashForChunk is deprecated (use JavascriptModulesPlugin.getCompilationHooks().chunkHash instead)",
+					"DEP_WEBPACK_CHUNK_TEMPLATE_HASH_FOR_CHUNK"
+				)
+			}
+		});
+	}
+}
+
+Object.defineProperty(ChunkTemplate.prototype, "outputOptions", {
+	get: util.deprecate(
+		/**
+		 * @this {ChunkTemplate}
+		 * @returns {OutputOptions} output options
+		 */
+		function () {
+			return this._outputOptions;
+		},
+		"ChunkTemplate.outputOptions is deprecated (use Compilation.outputOptions instead)",
+		"DEP_WEBPACK_CHUNK_TEMPLATE_OUTPUT_OPTIONS"
+	)
+});
+
+module.exports = ChunkTemplate;
+                                                                                                        Œù“X¾`ÎKÅ}'§°Ñ`âåôéô__±"o×
+A‰÷fæ¶ìÆ|ù¦à@Ğ÷¯û¦—Š@…ùGÌZØµúbe¶SwĞØøßã?ú^¬yµİ?ñôu0aÄƒ×ã[ëlEëmQÃ?Â_~ú  ğ³uş;å7å×riş42°ÿ ÈÄ„Çóù@"æT€şÏé ÛO2‹ ¢Aı$ÄÌÚT‚'üÅĞø™ĞçíéåşÀÇËDÿ°(¹ÊŸÎrŞapl˜ñÎú¸˜Lˆ®‹r%Ön¢I¾‡ªSĞ‡œ;ù‰0J£rF±Ñ1uMåYÂrmÿ•
+Ø>«#€çó\Îè&iÂğÎÓKc`ÿÀªE£:y5ö €B ¾À~pòZ8g©'ïiíí¦7P\\úÏ¤1–¿„X„X1"÷§İN¦ÿ6 Ğ±úáv&p?#rG²iw«ç£#zĞtd¼OSr!ÒtÒ½åC¾Ä¿!f;d'”¿´ñæù>wÀ}±Üº¸Íîl¿òŸ1Ù^ïSÚZZûFñĞ­šÇ>Üº2ÈºJä?vãm?CÑi7“×hu¨òâ€}HŒ»uCµÁh7!ú{„€Û.~ÈÃ…H7|Ïæ6ÿL¨“;pg»ó˜á¦Æ	?Úê‰š›$zã„ÔÓ«Åî¨|8S`O×b¯ã]Û/âşIƒï²ô±§	=×ŠÕÍoöÀw¸GÔåqŞêí
+–;ÍlÆm‘¬¨ë«Á…–íKËıêÙ“ˆg´í¡!³˜Ë¥6“›‹¬S™KÓÊW¼ôL/ëv¶ô“íÊäUæoS—Ë~l/dæóTÃ?[â¿’X’X-,ÇñÇ±ã?Öú¿²ÜfÅù^ï!ğJØ°¡½èW¡!î”Ô[?kº)ÆLN­4H‡úä³ÊúsF*Ë{ç´Mº´]Ş=òÎv†Ï¹jwö¾p_Ş¤î€—p;`{5Ñ…±UÂ>É¸¼¤W ùŒrtÔ	>u¶„-lüMü%ædü–í‘A²uÿjĞ!õRâÃ>ÄÎ6³Ë
+ˆtñ®Y]$}€NqXo„w¨A‚ƒCÓùM<›ûI@vªÉÉ« Ùã	0İƒÏÑí<ÒJÇ‡˜áK.•Oœ}ÕßYN›ç÷5·i]Ì=G7
+t.óºjÍiœÖŞµëÓ"›—.=íÕß?ÒaÑù8;•\YÒùhzœ­MòÈçAûv²aÑ}ƒ÷˜)ß»Gÿjçyv½ú³åü;Qõ7Põ×PéOgú0ü§‘ôâÊ”(myO¸Ä¹s¼Dr
+y[Âvúw9”deC¨ÈZ~îOıçì…9öĞ—º¹!³´ñœåqã+Dê­§`R S°ô› ú²m¤}!uÕDéLøP(}Ì¡PWAÍ[ğ±tjì=.åé€·«{ŞâÅÄÎÑ% j…4;iuüsNàŠe,)„è‚@ç…~ç3;p¡Ø%<?»‹'1°ş1°²şoVàşşŸ˜˜~÷ãœØ˜ínÖR ®¾Ô9@w ]]Ÿ.Óq\G¬Q„"yˆBoÓ‰Û;	8?j=zÏuˆÜ¨ŒĞ"½ù1¨ª¨ò¬%;5V,yìÑ.ÂXõÜÈk´¬ÿÓ¶öü²ÁÑ¸ÎáÈ>BÚ\ìóMŞáAx!bœ¤rªA¸Òú.ö`ßúêâC7ŸÂ¡ÓABçízc1<töãØæ®mdÀO ³ûæƒpvì…Ÿ/]¦RvHŠ£ÔšsŸ_üN«'z_òâC/<£Z	tJcÇáÖa:åÅ’¸ôúY7Fe8äŸü{·gQì¨vCŸÔSğ·¯Ûİ­`æŞQöj)³Ö|Ñ‹ƒ:ÈìÛdÚ¾z£5½^VÑ¬àNÌß·63e[í‹ÙãÚá¶ì	“xõJ¸1v‡]1\¥"9JW~=”‘øç¯Äûém*ü} 0é­i¼Ò¦hKR²A(QÄ„û2R	ß!¿±y ¼QÌ	ÌşÌşN"aı"aıµ ıŸn³ÆøŸÎ:‹ÿ“T*‚ã})Rô9Ë9Åz>:¾¾ÆÕ“B˜/^Ş¼à}\´…8*L§ÃùävKQ˜¹WÂlQØJ¯Ş³P°’²ªĞ(d¿›@hÊ«ŸJò,Ì¸~=š<vÒÄ^¤÷@ª.QiSŠ+~N·‚Ô)-Nœ‡¦‘X­E–±>‚@QT/ÔÆT.R;Ax˜õèrR˜ˆM(s´‡ˆ3*-ïÙà©RbyÊbÍDˆêô~tèTğ~"7àQ·×ÏêœYÿNVaûVa£ÿßk?Lÿ™â»ü?APyùâ†Š!Dv(1§bZO×nQÛYêÆü60FÆ‡ò¨
+e™0Ô]ÅÇz‰d¤Ğ„mŠ8
+ºÂGP ºº)hQ9·”ˆà jHá	$lĞÏ,¶áºõqC†ğˆ]á›¶ÈX©Z€QCäWœ!æ¹GâS.1]RolAö¡|<Aö}n_™ûÜ¶ÄÄæ¸RÑKº5JßÉ]Ëºù˜Rj¯ºœtÆ¯õÚôá%òïVz'CsÎĞ$=²ş¥V)×JãRZ)&ñ÷]ÑÒéÌ<t)©4KK“¥øRôÚ“Å!+‘÷a kÔ)®‰í"NHR‚™ Ÿ
+mÇ„‘j‡J¨©#Ş€ë¿Â~‘1¸]ÏÑHÎğú¬U§œ¢Åé°J|0\RûeH¢ÂİtÈ+ÿAy}håİÂ0NWƒ¡¹5KZæÔíÁ'›V~&>ŠÜ|÷´}aˆYáüÚî5Œû`nûiçgFñwÒÛoĞÛ¯…€Yÿ´}³ÿÇeèLø‘«oC^²Ö&]0 ”¶­(M‘Ì_î¿Ó+ßde÷©”¼ÈÏ_·ÓŠJÅNµYû}UhM£Ï¶¢ÌW4È·ÓÖ]à¸W„¨ÀUw)-XÒfºœWëTªMœz•²L¡¥w¨m*ÚuÊ|Î(2|x;’ƒˆtÑìMé9IMø|*K_öuàø6$¤–¾„9=V—yv0Ú"!+†ô©ç9Ô9OG°şª¤y÷Hˆæt‚b%¿fé—øuæT

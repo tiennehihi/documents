@@ -1,0 +1,23 @@
+/**
+ * @fileoverview Enforce stateless components to be written as a pure function
+ * @author Yannick Croissant
+ * @author Alberto Rodríguez
+ * @copyright 2015 Alberto Rodríguez. All rights reserved.
+ */
+
+'use strict';
+
+const values = require('object.values');
+
+const Components = require('../util/Components');
+const testReactVersion = require('../util/version').testReactVersion;
+const astUtil = require('../util/ast');
+const componentUtil = require('../util/componentUtil');
+const docsUrl = require('../util/docsUrl');
+const report = require('../util/report');
+
+// ------------------------------------------------------------------------------
+// Rule Definition
+// ------------------------------------------------------------------------------
+
+const m

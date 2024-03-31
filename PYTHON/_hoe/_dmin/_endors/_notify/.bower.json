@@ -1,0 +1,60 @@
+import {
+  Document,
+  Node,
+  Plugin,
+  ProcessOptions,
+  Root,
+  SourceMap,
+  TransformCallback,
+  Warning,
+  WarningOptions
+} from './postcss.js'
+import Processor from './processor.js'
+
+declare namespace Result {
+  export interface Message {
+    [others: string]: any
+
+    /**
+     * Source PostCSS plugin name.
+     */
+    plugin?: string
+
+    /**
+     * Message type.
+     */
+    type: string
+  }
+
+  export interface ResultOptions extends ProcessOptions {
+    /**
+     * The CSS node that was the source of the warning.
+     */
+    node?: Node
+
+    /**
+     * Name of plugin that created this warning. `Result#warn` will fill it
+     * automatically with `Plugin#postcssPlugin` value.
+     */
+    plugin?: string
+  }
+
+
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  export { Result_ as default }
+}
+
+/**
+ * Provides the result of the PostCSS transformations.
+ *
+ * A Result instance is returned by `LazyResult#then`
+ * or `Root#toResult` methods.
+ *
+ * ```js
+ * postcss([autoprefixer]).process(css).then(result => {
+ *  console.log(result.css)
+ * })
+ * ```
+ *
+ * ```js
+ * con

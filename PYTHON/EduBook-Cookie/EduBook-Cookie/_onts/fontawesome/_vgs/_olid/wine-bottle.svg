@@ -1,0 +1,14 @@
+# import/order
+
+🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
+
+<!-- end auto-generated rule header -->
+
+Enforce a convention in the order of `require()` / `import` statements.
+
+With the [`groups`](#groups-array) option set to `["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"]` the order is as shown in the following example:
+
+```ts
+// 1. node "builtin" modules
+import fs from 'fs';
+import pat

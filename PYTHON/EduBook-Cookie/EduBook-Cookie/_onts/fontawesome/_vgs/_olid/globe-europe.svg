@@ -1,0 +1,29 @@
+|| kind === 244 /* ExpressionStatement */ || kind === 242 /* EmptyStatement */ || kind === 249 /* ForInStatement */ || kind === 250 /* ForOfStatement */ || kind === 248 /* ForStatement */ || kind === 245 /* IfStatement */ || kind === 256 /* LabeledStatement */ || kind === 253 /* ReturnStatement */ || kind === 255 /* SwitchStatement */ || kind === 257 /* ThrowStatement */ || kind === 258 /* TryStatement */ || kind === 243 /* VariableStatement */ || kind === 247 /* WhileStatement */ || kind === 254 /* WithStatement */ || kind === 359 /* NotEmittedStatement */;
+}
+function isDeclaration(node) {
+  if (node.kind === 168 /* TypeParameter */) {
+    return node.parent && node.parent.kind !== 352 /* JSDocTemplateTag */ || isInJSFile(node);
+  }
+  return isDeclarationKind(node.kind);
+}
+function isDeclarationStatement(node) {
+  return isDeclarationStatementKind(node.kind);
+}
+function isStatementButNotDeclaration(node) {
+  return isStatementKindButNotDeclarationKind(node.kind);
+}
+function isStatement(node) {
+  const kind = node.kind;
+  return isStatementKindButNotDeclarationKind(kind) || isDeclarationStatementKind(kind) || isBlockStatement(node);
+}
+function isBlockStatement(node) {
+  if (node.kind !== 241 /* Block */)
+    return false;
+  if (node.parent !== void 0) {
+    if (node.parent.kind === 258 /* TryStatement */ || node.parent.kind === 299 /* CatchClause */) {
+      return false;
+    }
+  }
+  return !isFunctionBlock(node);
+}
+function isStateme

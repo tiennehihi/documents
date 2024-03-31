@@ -1,0 +1,1 @@
+m = pattern.match(starDotStarRE))) {\n      fastTest = options.dot ? starDotStarTestDot : starDotStarTest\n    } else if ((m = pattern.match(dotStarRE))) {\n      fastTest = dotStarTest\n    }\n\n    const re = AST.fromGlob(pattern, this.optio

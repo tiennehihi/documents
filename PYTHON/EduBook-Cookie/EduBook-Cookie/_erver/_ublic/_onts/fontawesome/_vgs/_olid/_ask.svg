@@ -1,0 +1,41 @@
+  "free": [
+        {
+          "family": "classic",
+          "style": "regular"
+        },
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        },
+        {
+          "family": "classic",
+          "style": "regular"
+        }
+      ]
+    }
+  },
+  "face-grin-beam": {
+    "aliases": {
+      "names": [
+        "grin-beam"
+      ],
+      "unicodes": {
+        "composite": [
+          "1f604"
+        ],
+        "secondary": [
+          "10f582"
+        ]
+      }
+    },
+    "changes": [
+      "5.1.0",
+      "5.11.0",
+      "5.11.1",
+     

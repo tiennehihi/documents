@@ -1,0 +1,5 @@
+'none' && content !== '') {
+        var _content = styles.getPropertyValue('content');
+
+        var family = ~['Sharp'].indexOf(fontFamily[2]) ? FAMILY_SHARP : FAMILY_CLASSIC;
+        var prefix = ~['Solid', 'Regular', 'Light', 'Thi

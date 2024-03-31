@@ -1,0 +1,25 @@
+import colors from 'picocolors'
+import log from './util/log'
+
+let defaults = {
+  optimizeUniversalDefaults: false,
+  generalizedModifiers: true,
+  get disableColorOpacityUtilitiesByDefault() {
+    return __OXIDE__
+  },
+  get relativeContentPathsByDefault() {
+    return __OXIDE__
+  },
+}
+
+let featureFlags = {
+  future: [
+    'hoverOnlyWhenSupported',
+    'respectDefaultRingColorOpacity',
+    'disableColorOpacityUtilitiesByDefault',
+    'relativeContentPathsByDefault',
+  ],
+  experimental: ['optimizeUniversalDefaults', 'generalizedModifiers'],
+}
+
+exp

@@ -1,0 +1,26 @@
+"use strict";
+
+const conversions = require("webidl-conversions");
+const utils = require("./utils.js");
+
+const FocusEventInit = require("./FocusEventInit.js");
+const implSymbol = utils.implSymbol;
+const ctorRegistrySymbol = utils.ctorRegistrySymbol;
+const UIEvent = require("./UIEvent.js");
+
+const interfaceName = "FocusEvent";
+
+exports.is = value => {
+  return utils.isObject(value) && utils.hasOwn(value, implSymbol) && value[implSymbol] instanceof Impl.implementation;
+};
+exports.isImpl = value => {
+  return utils.isObject(value) && value instanceof Impl.implementation;
+};
+exports.convert = (value, { context = "The provided value" } = {}) => {
+  if (exports.is(value)) {
+    return utils.implForWrapper(value);
+  }
+  throw new TypeError(`${context} is not of type 'FocusEvent'.`);
+};
+
+function makeWrapp

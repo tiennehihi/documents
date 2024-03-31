@@ -1,0 +1,118 @@
+ean | void} true when handled
+		 */
+		const processResolveContext = (expr, param, weak) => {
+			const dep = ContextDependencyHelpers.create(
+				RequireResolveContextDependency,
+				/** @type {Range} */ (param.range),
+				param,
+				expr,
+				options,
+				{
+					category: "commonjs",
+					mode: weak ? "weak" : "sync"
+				},
+				parser,
+				getContext()
+			);
+			if (!dep) return;
+			dep.loc = /** @type {DependencyLocation} */ (expr.loc);
+			dep.optional = !!parser.scope.inTry;
+			parser.state.current.addDependency(dep);
+			return true;
+		};
+
+		parser.hooks.call
+			.for("require.resolve")
+			.tap("CommonJsImportsParserPlugin", expr => {
+				return processResolve(expr, false);
+			});
+		parser.hooks.call
+			.for("require.resolveWeak")
+			.tap("CommonJsImportsParserPlugin", expr => {
+				return processResolve(expr, true);
+			});
+		//#endregion
+
+		//#region Create require
+
+		if (!options.createRequire) return;
+
+		/** @type {ImportSource[]} */
+		let moduleName = [];
+		/** @type {string | undefined} */
+		let specifierName;
+
+		if (options.createRequire === true) {
+			moduleName = ["module", "node:module"];
+			specifierName = "createRequire";
+		} else {
+			let moduleName;
+			const match = /^(.*) from (.*)$/.exec(options.createRequire);
+			if (match) {
+				[, specifierName, moduleName] = match;
+			}
+			if (!specifierName || !moduleName) {
+				const err = new WebpackError(
+					`Parsing javascript parser option "createRequire" failed, got ${JSON.stringify(
+						options.createRequire
+					)}`
+				);
+				err.details =
+					'Expected string in format "createRequire from module", where "createRequire" is specifier name and "module" name of the module';
+				throw err;
+			}
+		}
+
+		tapRequireExpressionTag(createdRequireIdentifierTag);
+		tapRequireExpressionTag(createRequireSpecifierTag);
+		parser.hooks.evaluateCallExpression
+			.for(createRequireSpecifierTag)
+			.tap("CommonJsImportsParserPlugin", expr => {
+				const context = parseCreateRequireArguments(expr);
+				if (context === undefined) return;
+				const ident = parser.evaluatedVariable({
+					tag: createdRequireIdentifierTag,
+					data: { context },
+					next: undefined
+				});
+				return new BasicEvaluatedExpression()
+					.setIdentifier(
+						/** @type {TODO} */ (ident),
+						/** @type {TODO} */ (ident),
+						() => []
+					)
+					.setSideEffects(false)
+					.setRange(/** @type {Range} */ (expr.range));
+			});
+		parser.hooks.unhandledExpressionMemberChain
+			.for(createdRequireIdentifierTag)
+			.tap("CommonJsImportsParserPlugin", (expr, members) => {
+				return expressionIsUnsupported(
+					parser,
+					`createRequire().${members.join(".")} is not supported by webpack.`
+				)(expr);
+			});
+		parser.hooks.canRename
+			.for(createdRequireIdentifierTag)
+			.tap("CommonJsImportsParserPlugin", () => true);
+		parser.hooks.canRename
+			.for(createRequireSpecifierTag)
+			.tap("CommonJsImportsParserPlugin", () => true);
+		parser.hooks.rename
+			.for(createRequireSpecifierTag)
+			.tap("CommonJsImportsParserPlugin", defineUndefined);
+		parser.hooks.expression
+			.for(createdRequireIdentifierTag)
+			.tap("CommonJsImportsParserPlugin", requireAsExpressionHandler);
+		parser.hooks.call
+			.for(createdRequireIdentifierTag)
+			.tap("CommonJsImportsParserPlugin", createRequireHandler(false));
+		/**
+		 * @param {CallExpression} expr call expression
+		 * @returns {string | void} context
+		 */
+		const parseCreateRequireArguments = expr => {
+			const args = expr.arguments;
+			if (args.length !== 1) {
+				const err = new WebpackError(
+					"module.createRequire supports only one argu

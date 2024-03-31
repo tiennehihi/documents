@@ -1,0 +1,19 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = mapValues;
+
+var _mapValuesLimit = require('./mapValuesLimit.js');
+
+var _mapValuesLimit2 = _interopRequireDefault(_mapValuesLimit);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * A relative of [`map`]{@link module:Collections.map}, designed for use with objects.
+ *
+ * Produces a new Object by mapping each value of `obj` through the `iteratee`
+ * function. The `iteratee` is called each `value` and `key` from `obj` and a
+ * callback for when it has finished processing. 

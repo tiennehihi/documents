@@ -1,0 +1,26 @@
+/**
+ * @fileoverview Rule that warns when identifier names that are
+ * specified in the configuration are used.
+ * @author Keith Cirkel (http://keithcirkel.co.uk)
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Helpers
+//------------------------------------------------------------------------------
+
+/**
+ * Checks whether the given node represents assignment target in a normal assignment or destructuring.
+ * @param {ASTNode} node The node to check.
+ * @returns {boolean} `true` if the node is assignment target.
+ */
+function isAssignmentTarget(node) {
+    const parent = node.parent;
+
+    return (
+
+        // normal assignment
+        (
+            parent.type === "AssignmentExpression" &&
+ 

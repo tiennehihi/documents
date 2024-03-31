@@ -1,0 +1,19 @@
+n event.movementX;
+      }
+
+      updateMouseMovementPolyfillState(event);
+      return lastMovementX;
+    },
+    movementY: function (event) {
+      if ('movementY' in event) {
+        return event.movementY;
+      } // Don't need to call updateMouseMovementPolyfillState() here
+      // because it's guaranteed to have already run when movementX
+      // was copied.
+
+
+      return lastMovementY;
+    }
+  });
+
+  var SyntheticMou

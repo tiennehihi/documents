@@ -1,0 +1,2 @@
+eSize = (k, v, size, sizeCalculation) => {
+      

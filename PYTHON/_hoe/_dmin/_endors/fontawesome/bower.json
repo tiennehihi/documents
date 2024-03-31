@@ -1,0 +1,7 @@
+tunately Node.js cannot change
+         * this since it would violate the web standard. Additionally, the original
+         * API makes it easy to forget to remove listeners.
+         *
+         * This API allows safely using `AbortSignal`s in Node.js APIs by solving these
+         * two issues by listening to the event such that `stopImmediatePropagation` does
+         * not prevent the listener fro

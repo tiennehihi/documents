@@ -1,0 +1,28 @@
+"use strict";
+const DOMException = require("domexception/webidl2js-wrapper");
+
+const reportException = require("../helpers/runtime-script-errors");
+const idlUtils = require("../generated/utils");
+const { nodeRoot } = require("../helpers/node");
+const {
+  isNode, isShadowRoot, isSlotable, getEventTargetParent,
+  isShadowInclusiveAncestor, retarget
+} = require("../helpers/shadow-dom");
+
+const MouseEvent = require("../generated/MouseEvent");
+
+const EVENT_PHASE = {
+  NONE: 0,
+  CAPTURING_PHASE: 1,
+  AT_TARGET: 2,
+  BUBBLING_PHASE: 3
+};
+
+class EventTargetImpl {
+  constructor(globalObject) {
+    this._globalObject = globalObject;
+    this._eventListeners = Object.create(null);
+  }
+
+  addEventListener(type, callback, options) {
+    options = normalizeEventHandlerOptions(options, ["capture", "once", "

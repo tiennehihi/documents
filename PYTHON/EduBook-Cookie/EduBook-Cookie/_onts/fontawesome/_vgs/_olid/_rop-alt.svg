@@ -1,0 +1,17 @@
+ull);
+				}
+				newAssets[file] = assets[file];
+				savedAssets.add(file);
+			}
+			return newAssets;
+		};
+		processAssetsHook.intercept({
+			name: "Compilation",
+			call: () => {
+				savedAssets = new Set(Object.keys(this.assets));
+			},
+			register: tap => {
+				const { type, name } = tap;
+				const { fn, additionalAssets, ...remainingTap } = tap;
+				const additionalAssetsFn =
+					additiona

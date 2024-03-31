@@ -1,0 +1,10 @@
+module.exports = function (rows_, opts) {
+    if (!opts) opts = {};
+    var hsep = opts.hsep === undefined ? '  ' : opts.hsep;
+    var align = opts.align || [];
+    var stringLength = opts.stringLength
+        || function (s) { return String(s).length; }
+    ;
+    
+    var dotsizes = reduce(rows_, function (acc, row) {
+        forEach(row, function (c, ix) {

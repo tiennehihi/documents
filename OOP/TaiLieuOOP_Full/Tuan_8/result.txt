@@ -1,0 +1,3 @@
+Tong so la: 8
+Tong la: 38
+Trung binh la: 4.75

@@ -1,0 +1,139 @@
+'none' && content !== '') {
+        var _content = styles.getPropertyValue('content');
+
+        var family = ~['Sharp'].indexOf(fontFamily[2]) ? FAMILY_SHARP : FAMILY_CLASSIC;
+        var prefix = ~['Solid', 'Regular', 'Light', 'Thin', 'Duotone', 'Brands', 'Kit'].indexOf(fontFamily[2]) ? STYLE_TO_PREFIX[family][fontFamily[2].toLowerCase()] : FONT_WEIGHT_TO_PREFIX[family][fontWeight];
+
+        var _hexValueFromContent = hexValueFromContent(_content),
+            hexValue = _hexValueFromContent.value,
+            isSecondary = _hexValueFromContent.isSecondary;
+
+        var isV4 = fontFamily[0].startsWith('FontAwesome');
+        var iconName = byUnicode(prefix, hexValue);
+        var iconIdentifier = iconName;
+
+        if (isV4) {
+          var iconName4 = byOldUnicode(hexValue);
+
+          if (iconName4.iconName && iconName4.prefix) {
+            iconName = iconName4.iconName;
+            prefix = iconName4.prefix;
+          }
+        } // Only convert the pseudo element in this ::before/::after position into an icon if we haven't
+        // already done so with the same prefix and iconName
+
+
+        if (iconName && !isSecondary && (!alreadyProcessedPseudoElement || alreadyProcessedPseudoElement.getAttribute(DATA_PREFIX) !== prefix || alreadyProcessedPseudoElement.getAttribute(DATA_ICON) !== iconIdentifier)) {
+          node.setAttribute(pendingAttribute, iconIdentifier);
+
+          if (alreadyProcessedPseudoElement) {
+            // Delete the old one, since we're replacing it with a new one
+            node.removeChild(alreadyProcessedPseudoElement);
+          }
+
+          var meta = blankMeta();
+          var extra = meta.extra;
+          extra.attributes[DATA_FA_PSEUDO_ELEMENT] = position;
+          findIcon(iconName, prefix).then(function (main) {
+            var abstract = makeInlineSvgAbstract(_objectSpread2(_objectSpread2({}, meta), {}, {
+              icons: {
+                main: main,
+                mask: emptyCanonicalIcon()
+              },
+              prefix: prefix,
+              iconName: iconIdentifier,
+              extra: extra,
+              watchable: true
+            }));
+            var element = DOCUMENT.createElement('svg');
+
+            if (position === '::before') {
+              node.insertBefore(element, node.firstChild);
+            } else {
+              node.appendChild(element);
+            }
+
+            element.outerHTML = abstract.map(function (a) {
+              return toHtml(a);
+            }).join('\n');
+            node.removeAttribute(pendingAttribute);
+            resolve();
+          }).catch(reject);
+        } else {
+          resolve();
+        }
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  function replace(node) {
+    return Promise.all([replaceForPosition(node, '::before'), replaceForPosition(node, '::after')]);
+  }
+
+  function processable(node) {
+    return node.parentNode !== document.head && !~TAGNAMES_TO_SKIP_FOR_PSEUDOELEMENTS.indexOf(node.tagName.toUpperCase()) && !node.getAttribute(DATA_FA_PSEUDO_ELEMENT) && (!node.parentNode || node.parentNode.tagName !== 'svg');
+  }
+
+  function searchPseudoElements(root) {
+    if (!IS_DOM) return;
+    return new Promise(function (resolve, reject) {
+      var operations = toArray(root.querySelectorAll('*')).filter(processable).map(replace);
+      var end = perf.begin('searchPseudoElements');
+      disableObservation();
+      Promise.all(operations).then(function () {
+        end();
+        enableObservation();
+        resolve();
+      }).catch(function () {
+        end();
+        enableObservation();
+        reject();
+      });
+    });
+  }
+
+  var PseudoElements = {
+    hooks: function hooks() {
+      return {
+        mutationObserverCallbacks: function mutationObserverCallbacks(accumulator) {
+          accumulator.pseudoElementsCallback = searchPseudoElements;
+          return accumulator;
+        }
+      };
+    },
+    provides: function provides(providers$$1) {
+      providers$$1.pseudoElements2svg = function (params) {
+        var _params$node = params.node,
+            node = _params$node === void 0 ? DOCUMENT : _params$node;
+
+        if (config.searchPseudoElements) {
+          searchPseudoElements(node);
+        }
+      };
+    }
+  };
+
+  var _unwatched = false;
+  var MutationObserver$1 = {
+    mixout: function mixout() {
+      return {
+        dom: {
+          unwatch: function unwatch() {
+            disableObservation();
+            _unwatched = true;
+          }
+        }
+      };
+    },
+    hooks: function hooks() {
+      return {
+        bootstrap: function bootstrap() {
+          observe(chainHooks('mutationObserverCallbacks', {}));
+        },
+        noAuto: function noAuto() {
+          disconnect();
+        },
+        watch: function watch(params) {
+          var obs

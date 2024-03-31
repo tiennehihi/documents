@@ -1,0 +1,28 @@
+s": {
+      "unicodes": {
+        "secondary": [
+          "10f2a1"
+        ]
+      }
+    },
+    "changes": [
+      "4.6.0",
+      "5.0.0",
+      "6.0.0-beta1",
+      "6.0.0",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid"
+    ],
+    "unicode": "f2a1",
+    "label": "Braille",
+    "voted": false,
+    "svg": {
+      "solid": {
+        "last_modified": 1660321788,
+        "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 512\"><path d=\"M128 96c0 35.3-28.7 64-64 64S0 131.3 0 96S28.7 32 64 32s64 28.7 64 64zm96 176c8.8 0 16-7.2 16-16s-7.2-16-16-16s-16 7.2-16 16s7.2 16 16 16zm0 48c-35.3 0-64-28.7-64-64s28.7-64 64-64s64 28.

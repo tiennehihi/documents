@@ -1,0 +1,17 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+const InitFragment = require("../InitFragment");
+const makeSerializable = require("../util/makeSerializable");
+const propertyAccess = require("../util/propertyAccess");
+const { handleDependencyBase } = require("./CommonJsDependencyHelpers");
+const NullDependency = require("./NullDependency");
+
+/** @typedef {import("webpack-sources").ReplaceSource} ReplaceSource */
+/** @typedef {import("../Dependency")} Dependency */
+/** @typedef {import("../Dependency").ExportsSpec} ExportsSpec */
+/** @typedef {import("../DependencyTemplate").DependencyTemplateContext} Dependenc

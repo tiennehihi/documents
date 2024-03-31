@@ -1,0 +1,9 @@
+/**
+ * @fileoverview Enforce no duplicate props
+ * @author Markus Ånöstam
+ */
+
+'use strict';
+
+const has = require('object.hasown/polyfill')();
+const docsUrl = require('../u

@@ -1,0 +1,51 @@
+/* Mobile: width < 740px */
+@media only screen and (max-width: 46.1875em) { 
+    /* Product */
+    .main__product-img {
+        width: 95%;
+        padding-top: 95%;
+    }
+    /* Course */
+    .column-layout__container {
+        width: 100%;
+    }
+    .column-layout__category {
+        display: none;
+    }
+    .column-item {
+        width: 100%;
+        text-align: center;
+    }
+    /* Layout */
+    .feature-layout {
+        flex-direction: column;
+    }
+}
+
+/* Tablet: width >= 740px and width < 1024px */
+@media only screen and (min-width: 46.25em) and (max-width: 63.9375em) {
+    /* Product */
+    .main__product-img {
+        width: 85%;
+        padding-top: 85%;
+    }
+    /* Course */
+    .column-item {
+        width: 33.3333%;
+    }
+    /* Layout */
+    
+}
+
+/* Mobile & Tablet */
+@media only screen and (max-width: 63.9375em) {
+    .main__product {
+        flex-direction: column-reverse; /*column-reverse: đổi trục ngang thành dọc, phần tử sau nhảy lên bên trên*/
+    }  
+    .main__product-info {
+        width: 100%;
+    }
+    .main__product-desc {
+        display: none;
+    }
+}

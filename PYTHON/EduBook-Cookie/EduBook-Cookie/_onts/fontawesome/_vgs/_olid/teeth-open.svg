@@ -1,0 +1,29 @@
+face FunctionDeclaration extends BaseNode {
+    type: "FunctionDeclaration";
+    id?: Identifier | null;
+    params: Array<Identifier | Pattern | RestElement>;
+    body: BlockStatement;
+    generator: boolean;
+    async: boolean;
+    declare?: boolean | null;
+    predicate?: DeclaredPredicate | InferredPredicate | null;
+    returnType?: TypeAnnotation | TSTypeAnnotation | Noop | null;
+    typeParameters?: TypeParameterDeclaration | TSTypeParameterDeclaration | Noop | null;
+}
+interface FunctionExpression extends BaseNode {
+    type: "FunctionExpression";
+    id?: Identifier | null;
+    params: Array<Identifier | Pattern | RestElement>;
+    body: BlockStatement;
+    generator: boolean;
+    async: boolean;
+    predicate?: DeclaredPredicate | InferredPredicate | null;
+    returnType?: TypeAnnotation | TSTypeAnnotation | Noop | null;
+    typeParameters?: TypeParameterDeclaration | TSTypeParameterDeclaration | Noop | null;
+}
+interface Identifier extends BaseNode {
+    type: "Identifier";
+    name: string;
+    decorators?: Array<Decorator> | null;
+    optional?: boolean | null;
+    typ

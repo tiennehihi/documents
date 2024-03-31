@@ -1,0 +1,32 @@
+import {
+	ImmerState,
+	Drafted,
+	ES5ArrayState,
+	ES5ObjectState,
+	each,
+	has,
+	isDraft,
+	latest,
+	DRAFT_STATE,
+	is,
+	loadPlugin,
+	ImmerScope,
+	ProxyType,
+	getCurrentScope,
+	die,
+	markChanged,
+	objectTraps,
+	ownKeys,
+	getOwnPropertyDescriptors
+} from "../internal"
+
+type ES5State = ES5ArrayState | ES5ObjectState
+
+export function enableES5() {
+	function willFinalizeES5_(
+		scope: ImmerScope,
+		result: any,
+		isReplaced: boolean
+	) {
+		if (!isReplaced) {
+			if (scope.patche

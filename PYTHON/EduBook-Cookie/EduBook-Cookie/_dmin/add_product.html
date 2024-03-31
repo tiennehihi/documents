@@ -1,0 +1,179 @@
+* VariableDeclaration */:
+        return node.parent.name === node && resolver.isDeclarationWithCollidingName(node.parent);
+    }
+    return false;
+  }
+  function substituteExpression(node) {
+    switch (node.kind) {
+      case 80 /* Identifier */:
+        return substituteExpressionIdentifier(node);
+      case 110 /* ThisKeyword */:
+        return substituteThisKeyword(node);
+    }
+    return node;
+  }
+  function substituteExpressionIdentifier(node) {
+    if (enabledSubstitutions & 2 /* BlockScopedBindings */ && !isInternalName(node)) {
+      const declaration = resolver.getReferencedDeclarationWithCollidingName(node);
+      if (declaration && !(isClassLike(declaration) && isPartOfClassBody(declaration, node))) {
+        return setTextRange(factory2.getGeneratedNameForNode(getNameOfDeclaration(declaration)), node);
+      }
+    }
+    return node;
+  }
+  function isPartOfClassBody(declaration, node) {
+    let currentNode = getParseTreeNode(node);
+    if (!currentNode || currentNode === declaration || currentNode.end <= declaration.pos || currentNode.pos >= declaration.end) {
+      return false;
+    }
+    const blockScope = getEnclosingBlockScopeContainer(declaration);
+    while (currentNode) {
+      if (currentNode === blockScope || currentNode === declaration) {
+        return false;
+      }
+      if (isClassElement(currentNode) && currentNode.parent === declaration) {
+        return true;
+      }
+      currentNode = currentNode.parent;
+    }
+    return false;
+  }
+  function substituteThisKeyword(node) {
+    if (enabledSubstitutions & 1 /* CapturedThis */ && hierarchyFacts & 16 /* CapturesThis */) {
+      return setTextRange(createCapturedThis(), node);
+    }
+    return node;
+  }
+  function getClassMemberPrefix(node, member) {
+    return isStatic(member) ? factory2.getInternalName(node) : factory2.createPropertyAccessExpression(factory2.getInternalName(node), "prototype");
+  }
+  function hasSynthesizedDefaultSuperCall(constructor, hasExtendsClause) {
+    if (!constructor || !hasExtendsClause) {
+      return false;
+    }
+    if (some(constructor.parameters)) {
+      return false;
+    }
+    const statement = firstOrUndefined(constructor.body.statements);
+    if (!statement || !nodeIsSynthesized(statement) || statement.kind !== 244 /* ExpressionStatement */) {
+      return false;
+    }
+    const statementExpression = statement.expression;
+    if (!nodeIsSynthesized(statementExpression) || statementExpression.kind !== 213 /* CallExpression */) {
+      return false;
+    }
+    const callTarget = statementExpression.expression;
+    if (!nodeIsSynthesized(callTarget) || callTarget.kind !== 108 /* SuperKeyword */) {
+      return false;
+    }
+    const callArgument = singleOrUndefined(statementExpression.arguments);
+    if (!callArgument || !nodeIsSynthesized(callArgument) || callArgument.kind !== 230 /* SpreadElement */) {
+      return false;
+    }
+    const expression = callArgument.expression;
+    return isIdentifier(expression) && expression.escapedText === "arguments";
+  }
+}
+
+// src/compiler/transformers/es5.ts
+function transformES5(context) {
+  const { factory: factory2 } = context;
+  const compilerOptions = context.getCompilerOptions();
+  let previousOnEmitNode;
+  let noSubstitution;
+  if (compilerOptions.jsx === 1 /* Preserve */ || compilerOptions.jsx === 3 /* ReactNative */) {
+    previousOnEmitNode = context.onEmitNode;
+    context.onEmitNode = onEmitNode;
+    context.enableEmitNotification(286 /* JsxOpeningElement */);
+    context.enableEmitNotification(287 /* JsxClosingElement */);
+    context.enableEmitNotification(285 /* JsxSelfClosingElement */);
+    noSubstitution = [];
+  }
+  const previousOnSubstituteNode = context.onSubstituteNode;
+  context.onSubstituteNode = onSubstituteNode;
+  context.enableSubstitution(211 /* PropertyAccessExpression */);
+  context.enableSubstitution(303 /* PropertyAssignment */);
+  return chainBundle(context, transformSourceFile);
+  function transformSourceFile(node) {
+    return node;
+  }
+  function onEmitNode(hint, node, emitCallback) {
+    switch (node.kind) {
+      case 286 /* JsxOpeningElement */:
+      case 287 /* JsxClosingElement */:
+      case 285 /* JsxSelfClosingElement */:
+        const tagName = node.tagName;
+        noSubstitution[getOriginalNodeId(tagName)] = true;
+        break;
+    }
+    previousOnEmitNode(hint, node, emitCallback);
+  }
+  function onSubstituteNode(hint, node) {
+    if (node.id && noSubstitution && noSubstitution[node.id]) {
+      return previousOnSubstituteNode(hint, node);
+    }
+    node = previousOnSubstituteNode(hint, node);
+    if (isPropertyAccessExpression(node)) {
+      return substitutePropertyAccessExpression(node);
+    } else if (isPropertyAssignment(node)) {
+      return substitutePropertyAssignment(node);
+    }
+    return node;
+  }
+  function substitutePropertyAccessExpression(node) {
+    if (isPrivateIdentifier(node.name)) {
+      return node;
+    }
+    const literalName = trySubstituteReservedName(node.name);
+    if (literalName) {
+      return setTextRange(factory2.createElementAccessExpression(node.expression, literalName), node);
+    }
+    return node;
+  }
+  function substitutePropertyAssignment(node) {
+    const literalName = isIdentifier(node.name) && trySubstituteReservedName(node.name);
+    if (literalName) {
+      return factory2.updatePropertyAssignment(node, literalName, node.initializer);
+    }
+    return node;
+  }
+  function trySubstituteReservedName(name) {
+    const token = identifierToKeywordKind(name);
+    if (token !== void 0 && token >= 83 /* FirstReservedWord */ && token <= 118 /* LastReservedWord */) {
+      return setTextRange(factory2.createStringLiteralFromNode(name), name);
+    }
+    return void 0;
+  }
+}
+
+// src/compiler/transformers/generators.ts
+function getInstructionName(instruction) {
+  switch (instruction) {
+    case 2 /* Return */:
+      return "return";
+    case 3 /* Break */:
+      return "break";
+    case 4 /* Yield */:
+      return "yield";
+    case 5 /* YieldStar */:
+      return "yield*";
+    case 7 /* Endfinally */:
+      return "endfinally";
+    default:
+      return void 0;
+  }
+}
+function transformGenerators(context) {
+  const {
+    factory: factory2,
+    getEmitHelperFactory: emitHelpers,
+    resumeLexicalEnvironment,
+    endLexicalEnvironment,
+    hoistFunctionDeclaration,
+    hoistVariableDeclaration
+  } = context;
+  const compilerOptions = context.getCompilerOptions();
+  const languageVersion = getEmitScriptTarget(compilerOptions);
+  const resolver = context.getEmitResolver();
+  const previousOnSubstituteNode = context.onSubstituteNode;
+  context.onSubstituteNode = onSubstituteNo

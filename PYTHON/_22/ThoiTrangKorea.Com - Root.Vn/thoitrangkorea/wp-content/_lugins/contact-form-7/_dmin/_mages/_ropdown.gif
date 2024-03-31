@@ -1,0 +1,2 @@
+brown fox jumps over the lazy dog');
+console.log(md.digest().toHex(

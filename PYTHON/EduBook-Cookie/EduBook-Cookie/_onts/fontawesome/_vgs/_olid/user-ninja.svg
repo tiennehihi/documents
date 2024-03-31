@@ -1,0 +1,12 @@
+"use strict";
+const FocusEvent = require("../generated/FocusEvent.js");
+const idlUtils = require("../generated/utils.js");
+const { isDisabled } = require("./form-controls.js");
+const { firstChildWithLocalName } = require("./traversal");
+const { createAnEvent } = require("./events");
+const { HTML_NS, SVG_NS } = require("./namespaces");
+const { isRenderedElement } = require("./svg/render");
+
+const focusableFormElements = new Set(["input", "select", "textarea", "button"]);
+
+// https:

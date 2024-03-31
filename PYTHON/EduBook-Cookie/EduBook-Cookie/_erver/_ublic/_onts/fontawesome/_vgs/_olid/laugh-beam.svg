@@ -1,0 +1,37 @@
+    "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "car-battery": {
+    "aliases": {
+      "names": [
+        "battery-car"
+      ],
+      "unicodes": {
+        "secondary": [
+          "10f5df"
+        ]
+      }
+    },
+    "changes": [
+      "5.2.0",
+      "6.0.0-beta1",
+      "6.0.0-beta3",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f5df",
+    "label": "Car Battery",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastM

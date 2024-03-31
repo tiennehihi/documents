@@ -1,0 +1,387 @@
+emplateLiteralContextualType(type) {
+    return !!(type.flags & (128 /* StringLiteral */ | 134217728 /* TemplateLiteral */) || type.flags & 58982400 /* InstantiableNonPrimitive */ && maybeTypeOfKind(getBaseConstraintOfType(type) || unknownType, 402653316 /* StringLike */));
+  }
+  function getContextNode2(node) {
+    if (isJsxAttributes(node) && !isJsxSelfClosingElement(node.parent)) {
+      return node.parent.parent;
+    }
+    return node;
+  }
+  function checkExpressionWithContextualType(node, contextualType, inferenceContext, checkMode) {
+    const contextNode = getContextNode2(node);
+    pushContextualType(
+      contextNode,
+      contextualType,
+      /*isCache*/
+      false
+    );
+    pushInferenceContext(contextNode, inferenceContext);
+    const type = checkExpression(node, checkMode | 1 /* Contextual */ | (inferenceContext ? 2 /* Inferential */ : 0));
+    if (inferenceContext && inferenceContext.intraExpressionInferenceSites) {
+      inferenceContext.intraExpressionInferenceSites = void 0;
+    }
+    const result = maybeTypeOfKind(type, 2944 /* Literal */) && isLiteralOfContextualType(type, instantiateContextualType(
+      contextualType,
+      node,
+      /*contextFlags*/
+      void 0
+    )) ? getRegularTypeOfLiteralType(type) : type;
+    popInferenceContext();
+    popContextualType();
+    return result;
+  }
+  function checkExpressionCached(node, checkMode) {
+    if (checkMode) {
+      return checkExpression(node, checkMode);
+    }
+    const links = getNodeLinks(node);
+    if (!links.resolvedType) {
+      const saveFlowLoopStart = flowLoopStart;
+      const saveFlowTypeCache = flowTypeCache;
+      flowLoopStart = flowLoopCount;
+      flowTypeCache = void 0;
+      links.resolvedType = checkExpression(node, checkMode);
+      flowTypeCache = saveFlowTypeCache;
+      flowLoopStart = saveFlowLoopStart;
+    }
+    return links.resolvedType;
+  }
+  function isTypeAssertion(node) {
+    node = skipParentheses(
+      node,
+      /*excludeJSDocTypeAssertions*/
+      true
+    );
+    return node.kind === 216 /* TypeAssertionExpression */ || node.kind === 234 /* AsExpression */ || isJSDocTypeAssertion(node);
+  }
+  function checkDeclarationInitializer(declaration, checkMode, contextualType) {
+    const initializer = getEffectiveInitializer(declaration);
+    if (isInJSFile(declaration)) {
+      const typeNode = tryGetJSDocSatisfiesTypeNode(declaration);
+      if (typeNode) {
+        return checkSatisfiesExpressionWorker(initializer, typeNode, checkMode);
+      }
+    }
+    const type = getQuickTypeOfExpression(initializer) || (contextualType ? checkExpressionWithContextualType(
+      initializer,
+      contextualType,
+      /*inferenceContext*/
+      void 0,
+      checkMode || 0 /* Normal */
+    ) : checkExpressionCached(initializer, checkMode));
+    return isParameter(declaration) && declaration.name.kind === 207 /* ArrayBindingPattern */ && isTupleType(type) && !type.target.hasRestElement && getTypeReferenceArity(type) < declaration.name.elements.length ? padTupleType(type, declaration.name) : type;
+  }
+  function padTupleType(type, pattern) {
+    const patternElements = pattern.elements;
+    const elementTypes = getElementTypes(type).slice();
+    const elementFlags = type.target.elementFlags.slice();
+    for (let i = getTypeReferenceArity(type); i < patternElements.length; i++) {
+      const e = patternElements[i];
+      if (i < patternElements.length - 1 || !(e.kind === 208 /* BindingElement */ && e.dotDotDotToken)) {
+        elementTypes.push(!isOmittedExpression(e) && hasDefaultValue(e) ? getTypeFromBindingElement(
+          e,
+          /*includePatternInType*/
+          false,
+          /*reportErrors*/
+          false
+        ) : anyType);
+        elementFlags.push(2 /* Optional */);
+        if (!isOmittedExpression(e) && !hasDefaultValue(e)) {
+          reportImplicitAny(e, anyType);
+        }
+      }
+    }
+    return createTupleType(elementTypes, elementFlags, type.target.readonly);
+  }
+  function widenTypeInferredFromInitializer(declaration, type) {
+    const widened = getCombinedNodeFlagsCached(declaration) & 6 /* Constant */ || isDeclarationReadonly(declaration) ? type : getWidenedLiteralType(type);
+    if (isInJSFile(declaration)) {
+      if (isEmptyLiteralType(widened)) {
+        reportImplicitAny(declaration, anyType);
+        return anyType;
+      } else if (isEmptyArrayLiteralType(widened)) {
+        reportImplicitAny(declaration, anyArrayType);
+        return anyArrayType;
+      }
+    }
+    return widened;
+  }
+  function isLiteralOfContextualType(candidateType, contextualType) {
+    if (contextualType) {
+      if (contextualType.flags & 3145728 /* UnionOrIntersection */) {
+        const types = contextualType.types;
+        return some(types, (t) => isLiteralOfContextualType(candidateType, t));
+      }
+      if (contextualType.flags & 58982400 /* InstantiableNonPrimitive */) {
+        const constraint = getBaseConstraintOfType(contextualType) || unknownType;
+        return maybeTypeOfKind(constraint, 4 /* String */) && maybeTypeOfKind(candidateType, 128 /* StringLiteral */) || maybeTypeOfKind(constraint, 8 /* Number */) && maybeTypeOfKind(candidateType, 256 /* NumberLiteral */) || maybeTypeOfKind(constraint, 64 /* BigInt */) && maybeTypeOfKind(candidateType, 2048 /* BigIntLiteral */) || maybeTypeOfKind(constraint, 4096 /* ESSymbol */) && maybeTypeOfKind(candidateType, 8192 /* UniqueESSymbol */) || isLiteralOfContextualType(candidateType, constraint);
+      }
+      return !!(contextualType.flags & (128 /* StringLiteral */ | 4194304 /* Index */ | 134217728 /* TemplateLiteral */ | 268435456 /* StringMapping */) && maybeTypeOfKind(candidateType, 128 /* StringLiteral */) || contextualType.flags & 256 /* NumberLiteral */ && maybeTypeOfKind(candidateType, 256 /* NumberLiteral */) || contextualType.flags & 2048 /* BigIntLiteral */ && maybeTypeOfKind(candidateType, 2048 /* BigIntLiteral */) || contextualType.flags & 512 /* BooleanLiteral */ && maybeTypeOfKind(candidateType, 512 /* BooleanLiteral */) || contextualType.flags & 8192 /* UniqueESSymbol */ && maybeTypeOfKind(candidateType, 8192 /* UniqueESSymbol */));
+    }
+    return false;
+  }
+  function isConstContext(node) {
+    const parent2 = node.parent;
+    return isAssertionExpression(parent2) && isConstTypeReference(parent2.type) || isJSDocTypeAssertion(parent2) && isConstTypeReference(getJSDocTypeAssertionType(parent2)) || isValidConstAssertionArgument(node) && isConstTypeVariable(getContextualType2(node, 0 /* None */)) || (isParenthesizedExpression(parent2) || isArrayLiteralExpression(parent2) || isSpreadElement(parent2)) && isConstContext(parent2) || (isPropertyAssignment(parent2) || isShorthandPropertyAssignment(parent2) || isTemplateSpan(parent2)) && isConstContext(parent2.parent);
+  }
+  function checkExpressionForMutableLocation(node, checkMode, forceTuple) {
+    const type = checkExpression(node, checkMode, forceTuple);
+    return isConstContext(node) || isCommonJsExportedExpression(node) ? getRegularTypeOfLiteralType(type) : isTypeAssertion(node) ? type : getWidenedLiteralLikeTypeForContextualType(type, instantiateContextualType(
+      getContextualType2(
+        node,
+        /*contextFlags*/
+        void 0
+      ),
+      node,
+      /*contextFlags*/
+      void 0
+    ));
+  }
+  function checkPropertyAssignment(node, checkMode) {
+    if (node.name.kind === 167 /* ComputedPropertyName */) {
+      checkComputedPropertyName(node.name);
+    }
+    return checkExpressionForMutableLocation(node.initializer, checkMode);
+  }
+  function checkObjectLiteralMethod(node, checkMode) {
+    checkGrammarMethod(node);
+    if (node.name.kind === 167 /* ComputedPropertyName */) {
+      checkComputedPropertyName(node.name);
+    }
+    const uninstantiatedType = checkFunctionExpressionOrObjectLiteralMethod(node, checkMode);
+    return instantiateTypeWithSingleGenericCallSignature(node, uninstantiatedType, checkMode);
+  }
+  function instantiateTypeWithSingleGenericCallSignature(node, type, checkMode) {
+    if (checkMode && checkMode & (2 /* Inferential */ | 8 /* SkipGenericFunctions */)) {
+      const callSignature = getSingleSignature(
+        type,
+        0 /* Call */,
+        /*allowMembers*/
+        true
+      );
+      const constructSignature = getSingleSignature(
+        type,
+        1 /* Construct */,
+        /*allowMembers*/
+        true
+      );
+      const signature = callSignature || constructSignature;
+      if (signature && signature.typeParameters) {
+        const contextualType = getApparentTypeOfContextualType(node, 2 /* NoConstraints */);
+        if (contextualType) {
+          const contextualSignature = getSingleSignature(
+            getNonNullableType(contextualType),
+            callSignature ? 0 /* Call */ : 1 /* Construct */,
+            /*allowMembers*/
+            false
+          );
+          if (contextualSignature && !contextualSignature.typeParameters) {
+            if (checkMode & 8 /* SkipGenericFunctions */) {
+              skippedGenericFunction(node, checkMode);
+              return anyFunctionType;
+            }
+            const context = getInferenceContext(node);
+            const returnType = context.signature && getReturnTypeOfSignature(context.signature);
+            const returnSignature = returnType && getSingleCallOrConstructSignature(returnType);
+            if (returnSignature && !returnSignature.typeParameters && !every(context.inferences, hasInferenceCandidates)) {
+              const uniqueTypeParameters = getUniqueTypeParameters(context, signature.typeParameters);
+              const instantiatedSignature = getSignatureInstantiationWithoutFillingInTypeArguments(signature, uniqueTypeParameters);
+              const inferences = map(context.inferences, (info) => createInferenceInfo(info.typeParameter));
+              applyToParameterTypes(instantiatedSignature, contextualSignature, (source, target) => {
+                inferTypes(
+                  inferences,
+                  source,
+                  target,
+                  /*priority*/
+                  0,
+                  /*contravariant*/
+                  true
+                );
+              });
+              if (some(inferences, hasInferenceCandidates)) {
+                applyToReturnTypes(instantiatedSignature, contextualSignature, (source, target) => {
+                  inferTypes(inferences, source, target);
+                });
+                if (!hasOverlappingInferences(context.inferences, inferences)) {
+                  mergeInferences(context.inferences, inferences);
+                  context.inferredTypeParameters = concatenate(context.inferredTypeParameters, uniqueTypeParameters);
+                  return getOrCreateTypeFromSignature(instantiatedSignature);
+                }
+              }
+            }
+            return getOrCreateTypeFromSignature(instantiateSignatureInContextOf(signature, contextualSignature, context));
+          }
+        }
+      }
+    }
+    return type;
+  }
+  function skippedGenericFunction(node, checkMode) {
+    if (checkMode & 2 /* Inferential */) {
+      const context = getInferenceContext(node);
+      context.flags |= 4 /* SkippedGenericFunction */;
+    }
+  }
+  function hasInferenceCandidates(info) {
+    return !!(info.candidates || info.contraCandidates);
+  }
+  function hasInferenceCandidatesOrDefault(info) {
+    return !!(info.candidates || info.contraCandidates || hasTypeParameterDefault(info.typeParameter));
+  }
+  function hasOverlappingInferences(a, b) {
+    for (let i = 0; i < a.length; i++) {
+      if (hasInferenceCandidates(a[i]) && hasInferenceCandidates(b[i])) {
+        return true;
+      }
+    }
+    return false;
+  }
+  function mergeInferences(target, source) {
+    for (let i = 0; i < target.length; i++) {
+      if (!hasInferenceCandidates(target[i]) && hasInferenceCandidates(source[i])) {
+        target[i] = source[i];
+      }
+    }
+  }
+  function getUniqueTypeParameters(context, typeParameters) {
+    const result = [];
+    let oldTypeParameters;
+    let newTypeParameters;
+    for (const tp of typeParameters) {
+      const name = tp.symbol.escapedName;
+      if (hasTypeParameterByName(context.inferredTypeParameters, name) || hasTypeParameterByName(result, name)) {
+        const newName = getUniqueTypeParameterName(concatenate(context.inferredTypeParameters, result), name);
+        const symbol = createSymbol(262144 /* TypeParameter */, newName);
+        const newTypeParameter = createTypeParameter(symbol);
+        newTypeParameter.target = tp;
+        oldTypeParameters = append(oldTypeParameters, tp);
+        newTypeParameters = append(newTypeParameters, newTypeParameter);
+        result.push(newTypeParameter);
+      } else {
+        result.push(tp);
+      }
+    }
+    if (newTypeParameters) {
+      const mapper = createTypeMapper(oldTypeParameters, newTypeParameters);
+      for (const tp of newTypeParameters) {
+        tp.mapper = mapper;
+      }
+    }
+    return result;
+  }
+  function hasTypeParameterByName(typeParameters, name) {
+    return some(typeParameters, (tp) => tp.symbol.escapedName === name);
+  }
+  function getUniqueTypeParameterName(typeParameters, baseName) {
+    let len = baseName.length;
+    while (len > 1 && baseName.charCodeAt(len - 1) >= 48 /* _0 */ && baseName.charCodeAt(len - 1) <= 57 /* _9 */)
+      len--;
+    const s = baseName.slice(0, len);
+    for (let index = 1; true; index++) {
+      const augmentedName = s + index;
+      if (!hasTypeParameterByName(typeParameters, augmentedName)) {
+        return augmentedName;
+      }
+    }
+  }
+  function getReturnTypeOfSingleNonGenericCallSignature(funcType) {
+    const signature = getSingleCallSignature(funcType);
+    if (signature && !signature.typeParameters) {
+      return getReturnTypeOfSignature(signature);
+    }
+  }
+  function getReturnTypeOfSingleNonGenericSignatureOfCallChain(expr) {
+    const funcType = checkExpression(expr.expression);
+    const nonOptionalType = getOptionalExpressionType(funcType, expr.expression);
+    const returnType = getReturnTypeOfSingleNonGenericCallSignature(funcType);
+    return returnType && propagateOptionalTypeMarker(returnType, expr, nonOptionalType !== funcType);
+  }
+  function getTypeOfExpression(node) {
+    const quickType = getQuickTypeOfExpression(node);
+    if (quickType) {
+      return quickType;
+    }
+    if (node.flags & 268435456 /* TypeCached */ && flowTypeCache) {
+      const cachedType = flowTypeCache[getNodeId(node)];
+      if (cachedType) {
+        return cachedType;
+      }
+    }
+    const startInvocationCount = flowInvocationCount;
+    const type = checkExpression(node, 64 /* TypeOnly */);
+    if (flowInvocationCount !== startInvocationCount) {
+      const cache = flowTypeCache || (flowTypeCache = []);
+      cache[getNodeId(node)] = type;
+      setNodeFlags(node, node.flags | 268435456 /* TypeCached */);
+    }
+    return type;
+  }
+  function getQuickTypeOfExpression(node) {
+    let expr = skipParentheses(
+      node,
+      /*excludeJSDocTypeAssertions*/
+      true
+    );
+    if (isJSDocTypeAssertion(expr)) {
+      const type = getJSDocTypeAssertionType(expr);
+      if (!isConstTypeReference(type)) {
+        return getTypeFromTypeNode(type);
+      }
+    }
+    expr = skipParentheses(node);
+    if (isAwaitExpression(expr)) {
+      const type = getQuickTypeOfExpression(expr.expression);
+      return type ? getAwaitedType(type) : void 0;
+    }
+    if (isCallExpression(expr) && expr.expression.kind !== 108 /* SuperKeyword */ && !isRequireCall(
+      expr,
+      /*requireStringLiteralLikeArgument*/
+      true
+    ) && !isSymbolOrSymbolForCall(expr)) {
+      return isCallChain(expr) ? getReturnTypeOfSingleNonGenericSignatureOfCallChain(expr) : getReturnTypeOfSingleNonGenericCallSignature(checkNonNullExpression(expr.expression));
+    } else if (isAssertionExpression(expr) && !isConstTypeReference(expr.type)) {
+      return getTypeFromTypeNode(expr.type);
+    } else if (isLiteralExpression(node) || isBooleanLiteral(node)) {
+      return checkExpression(node);
+    }
+    return void 0;
+  }
+  function getContextFreeTypeOfExpression(node) {
+    const links = getNodeLinks(node);
+    if (links.contextFreeType) {
+      return links.contextFreeType;
+    }
+    pushContextualType(
+      node,
+      anyType,
+      /*isCache*/
+      false
+    );
+    const type = links.contextFreeType = checkExpression(node, 4 /* SkipContextSensitive */);
+    popContextualType();
+    return type;
+  }
+  function checkExpression(node, checkMode, forceTuple) {
+    var _a, _b;
+    (_a = tracing) == null ? void 0 : _a.push(tracing.Phase.Check, "checkExpression", { kind: node.kind, pos: node.pos, end: node.end, path: node.tracingPath });
+    const saveCurrentNode = currentNode;
+    currentNode = node;
+    instantiationCount = 0;
+    const uninstantiatedType = checkExpressionWorker(node, checkMode, forceTuple);
+    const type = instantiateTypeWithSingleGenericCallSignature(node, uninstantiatedType, checkMode);
+    if (isConstEnumObjectType(type)) {
+      checkConstEnumAccess(node, type);
+    }
+    currentNode = saveCurrentNode;
+    (_b = tracing) == null ? void 0 : _b.pop();
+    return type;
+  }
+  function checkConstEnumAccess(node, type) {
+    const ok = node.parent.kind === 211 /* PropertyAccessExpression */ && node.parent.expression === node || node.parent.kind === 212 /* ElementAccessExpression */ && node.parent.expression === node || ((node.kind === 80 /* Identifier */ || node.kind === 166 /* QualifiedName */) && isInRightSideOfImportOrExportAssignment(node) || node.parent.kind === 186 /* TypeQuery */ && node.parent.exprName === node) || node.parent.kind === 281 /* ExportSpecifier */;
+    if (!ok) {
+      error2(node, Diagnostics.const_enums_can_only_be_used_in_property_or_index_access_expressions_or_the_right_hand_side_of_an_import_declaration_or_export_assignment_or_type_query);
+    }
+    if (getIsolatedModules(compilerOptions)) {
+      Debug.assert(!!(type.symbol.flags & 128 /* ConstEnum */));
+      const constEnumDeclaration = type.symbol.valueDeclaration;
+      if (constEnumDeclaration.

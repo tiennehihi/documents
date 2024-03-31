@@ -1,0 +1,45 @@
+ssic
+        style: solid
+  label: Toggle Off
+  unicode: f204
+  voted: false
+toggle-on:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f205
+  changes:
+    - 4.2.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.1.2
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Toggle On
+  unicode: f205
+  voted: false
+toilet:
+  aliases:
+    unicodes:
+      composite:
+        - 1f6bd
+      secondary:
+        - 10f7d8
+  changes:
+    - 5.6.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        st

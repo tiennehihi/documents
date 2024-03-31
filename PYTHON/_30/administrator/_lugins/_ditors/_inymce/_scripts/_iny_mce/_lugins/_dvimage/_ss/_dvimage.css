@@ -1,0 +1,25 @@
+/*
+  Copyright 2018 Google LLC
+
+  Use of this source code is governed by an MIT-style
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/MIT.
+*/
+
+import './_version.mjs';
+
+/**
+ * @typedef {Object} ManifestEntry
+ * @property {string} url The URL to the asset in the manifest.
+ * @property {string} revision The revision details for the file. This should be
+ * either a hash generated based on the file contents, or `null` if there is
+ * versioning already included in the URL.
+ * @property {string} [integrity] Integrity metadata that will be used when
+ * making the network request for the URL.
+ *
+ * @memberof module:workbox-build
+ */
+
+/**
+ * @typedef {Object} ManifestTransformResult
+ * @property {Array<module:workbox-build.Manif

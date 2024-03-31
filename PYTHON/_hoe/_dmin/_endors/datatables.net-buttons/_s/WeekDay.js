@@ -1,0 +1,1 @@
+rns {*} Returns the last element of `array`.\n\t     * @example\n\t     *\n\t     * _.last([1, 2, 3]);\n\t     * // => 3\n\t     */\n\t    function last(array) {\n\t      var length = array ? array.length : 0

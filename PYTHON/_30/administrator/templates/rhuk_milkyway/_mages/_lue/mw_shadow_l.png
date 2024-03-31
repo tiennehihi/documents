@@ -1,0 +1,7 @@
+       throw error;
+            }
+          }
+
+          var maybeID = declaredDependencyNode;
+
+          while (maybeID.type === 'MemberExpression' || maybeID.type === 'OptionalMemberExpression' || maybeID.type === 'ChainEx

@@ -1,0 +1,263 @@
+n * URI.js\n *\n * @fileoverview An RFC 3986 compliant, scheme extendable URI parsing/validating/resolving library for JavaScript.\n * @author <a href=\"mailto:gary.court@gmail.com\">Gary Court</a>\n * @see http://github.com/garycourt/uri-js\n */\n\n/**\n * Copyright 2011 Gary Court. All rights reserved.\n *\n * Redistribution and use in source and binary forms, with or without modification, are\n * permitted provided that the following conditions are met:\n *\n *    1. Redistributions of source code must retain the above copyright notice, this list of\n *       conditions and the following disclaimer.\n *\n *    2. Redistributions in binary form must reproduce the above copyright notice, this list\n *       of conditions and the following disclaimer in the documentation and/or other materials\n *       provided with the distribution.\n *\n * THIS SOFTWARE IS PROVIDED BY GARY COURT ``AS IS'' AND ANY EXPRESS OR IMPLIED\n * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND\n * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL GARY COURT OR\n * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON\n * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\n * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF\n * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n *\n * The views and conclusions contained in the software and documentation are those of the\n * authors and should not be interpreted as representing official policies, either expressed\n * or implied, of Gary Court.\n */\n\nimport URI_PROTOCOL from \"./regexps-uri\";\nimport IRI_PROTOCOL from \"./regexps-iri\";\nimport punycode from \"punycode\";\nimport { toUpperCase, typeOf, assign } from \"./util\";\n\nexport interface URIComponents {\n\tscheme?:string;\n\tuserinfo?:string;\n\thost?:string;\n\tport?:number|string;\n\tpath?:string;\n\tquery?:string;\n\tfragment?:string;\n\treference?:string;\n\terror?:string;\n}\n\nexport interface URIOptions {\n\tscheme?:string;\n\treference?:string;\n\ttolerant?:boolean;\n\tabsolutePath?:boolean;\n\tiri?:boolean;\n\tunicodeSupport?:boolean;\n\tdomainHost?:boolean;\n}\n\nexport interface URISchemeHandler<Components extends URIComponents = URIComponents, Options extends URIOptions = URIOptions, ParentComponents extends URIComponents = URIComponents> {\n\tscheme:string;\n\tparse(components:ParentComponents, options:Options):Components;\n\tserialize(components:Components, options:Options):ParentComponents;\n\tunicodeSupport?:boolean;\n\tdomainHost?:boolean;\n\tabsolutePath?:boolean;\n}\n\nexport interface URIRegExps {\n\tNOT_SCHEME : RegExp,\n\tNOT_USERINFO : RegExp,\n\tNOT_HOST : RegExp,\n\tNOT_PATH : RegExp,\n\tNOT_PATH_NOSCHEME : RegExp,\n\tNOT_QUERY : RegExp,\n\tNOT_FRAGMENT : RegExp,\n\tESCAPE : RegExp,\n\tUNRESERVED : RegExp,\n\tOTHER_CHARS : RegExp,\n\tPCT_ENCODED : RegExp,\n\tIPV4ADDRESS : RegExp,\n\tIPV6ADDRESS : RegExp,\n}\n\nexport const SCHEMES:{[scheme:string]:URISchemeHandler} = {};\n\nexport function pctEncChar(chr:string):string {\n\tconst c = chr.charCodeAt(0);\n\tlet e:string;\n\n\tif (c < 16) e = \"%0\" + c.toString(16).toUpperCase();\n\telse if (c < 128) e = \"%\" + c.toString(16).toUpperCase();\n\telse if (c < 2048) e = \"%\" + ((c >> 6) | 192).toString(16).toUpperCase() + \"%\" + ((c & 63) | 128).toString(16).toUpperCase();\n\telse e = \"%\" + ((c >> 12) | 224).toString(16).toUpperCase() + \"%\" + (((c >> 6) & 63) | 128).toString(16).toUpperCase() + \"%\" + ((c & 63) | 128).toString(16).toUpperCase();\n\n\treturn e;\n}\n\nexport function pctDecChars(str:string):string {\n\tlet newStr = \"\";\n\tlet i = 0;\n\tconst il = str.length;\n\n\twhile (i < il) {\n\t\tconst c = parseInt(str.substr(i + 1, 2), 16);\n\n\t\tif (c < 128) {\n\t\t\tnewStr += String.fromCharCode(c);\n\t\t\ti += 3;\n\t\t}\n\t\telse if (c >= 194 && c < 224) {\n\t\t\tif ((il - i) >= 6) {\n\t\t\t\tconst c2 = parseInt(str.substr(i + 4, 2), 16);\n\t\t\t\tnewStr += String.fromCharCode(((c & 31) << 6) | (c2 & 63));\n\t\t\t} else {\n\t\t\t\tnewStr += str.substr(i, 6);\n\t\t\t}\n\t\t\ti += 6;\n\t\t}\n\t\telse if (c >= 224) {\n\t\t\tif ((il - i) >= 9) {\n\t\t\t\tconst c2 = parseInt(str.substr(i + 4, 2), 16);\n\t\t\t\tconst c3 = parseInt(str.substr(i + 7, 2), 16);\n\t\t\t\tnewStr += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));\n\t\t\t} else {\n\t\t\t\tnewStr += str.substr(i, 9);\n\t\t\t}\n\t\t\ti += 9;\n\t\t}\n\t\telse {\n\t\t\tnewStr += str.substr(i, 3);\n\t\t\ti += 3;\n\t\t}\n\t}\n\n\treturn newStr;\n}\n\nfunction _normalizeComponentEncoding(components:URIComponents, protocol:URIRegExps) {\n\tfunction decodeUnreserved(str:string):string {\n\t\tconst decStr = pctDecChars(str);\n\t\treturn (!decStr.match(protocol.UNRESERVED) ? str : decStr);\n\t}\n\n\tif (components.scheme) components.scheme = String(components.scheme).replace(protocol.PCT_ENCODED, decodeUnreserved).toLowerCase().replace(protocol.NOT_SCHEME, \"\");\n\tif (components.userinfo !== undefined) components.userinfo = String(components.userinfo).replace(protocol.PCT_ENCODED, decodeUnreserved).replace(protocol.NOT_USERINFO, pctEncChar).replace(protocol.PCT_ENCODED, toUpperCase);\n\tif (components.host !== undefined) components.host = String(components.host).replace(protocol.PCT_ENCODED, decodeUnreserved).toLowerCase().replace(protocol.NOT_HOST, pctEncChar).replace(protocol.PCT_ENCODED, toUpperCase);\n\tif (components.path !== undefined) components.path = String(components.path).replace(protocol.PCT_ENCODED, decodeUnreserved).replace((components.scheme ? protocol.NOT_PATH : protocol.NOT_PATH_NOSCHEME), pctEncChar).replace(protocol.PCT_ENCODED, toUpperCase);\n\tif (components.query !== undefined) components.query = String(components.query).replace(protocol.PCT_ENCODED, decodeUnreserved).replace(protocol.NOT_QUERY, pctEncChar).replace(protocol.PCT_ENCODED, toUpperCase);\n\tif (components.fragment !== undefined) components.fragment = String(components.fragment).replace(protocol.PCT_ENCODED, decodeUnreserved).replace(protocol.NOT_FRAGMENT, pctEncChar).replace(protocol.PCT_ENCODED, toUpperCase);\n\n\treturn components;\n};\n\nfunction _stripLeadingZeros(str:string):string {\n\treturn str.replace(/^0*(.*)/, \"$1\") || \"0\";\n}\n\nfunction _normalizeIPv4(host:string, protocol:URIRegExps):string {\n\tconst matches = host.match(protocol.IPV4ADDRESS) || [];\n\tconst [, address] = matches;\n\t\n\tif (address) {\n\t\treturn address.split(\".\").map(_stripLeadingZeros).join(\".\");\n\t} else {\n\t\treturn host;\n\t}\n}\n\nfunction _normalizeIPv6(host:string, protocol:URIRegExps):string {\n\tconst matches = host.match(protocol.IPV6ADDRESS) || [];\n\tconst [, address, zone] = matches;\n\n\tif (address) {\n\t\tconst [last, first] = address.toLowerCase().split('::').reverse();\n\t\tconst firstFields = first ? first.split(\":\").map(_stripLeadingZeros) : [];\n\t\tconst lastFields = last.split(\":\").map(_stripLeadingZeros);\n\t\tconst isLastFieldIPv4Address = protocol.IPV4ADDRESS.test(lastFields[lastFields.length - 1]);\n\t\tconst fieldCount = isLastFieldIPv4Address ? 7 : 8;\n\t\tconst lastFieldsStart = lastFields.length - fieldCount;\n\t\tconst fields = Array<string>(fieldCount);\n\n\t\tfor (let x = 0; x < fieldCount; ++x) {\n\t\t\tfields[x] = firstFields[x] || lastFields[lastFieldsStart + x] || '';\n\t\t}\n\n\t\tif (isLastFieldIPv4Address) {\n\t\t\tfields[fieldCount - 1] = _normalizeIPv4(fields[fieldCount - 1], protocol);\n\t\t}\n\n\t\tconst allZeroFields = fields.reduce<Array<{index:number,length:number}>>((acc, field, index) => {\n\t\t\tif (!field || field === \"0\") {\n\t\t\t\tconst lastLongest = acc[acc.length - 1];\n\t\t\t\tif (lastLongest && lastLongest.index + lastLongest.length === index) {\n\t\t\t\t\tlastLongest.length++;\n\t\t\t\t} else {\n\t\t\t\t\tacc.push({ index, length : 1 });\n\t\t\t\t}\n\t\t\t}\n\t\t\treturn acc;\n\t\t}, []);\n\n\t\tconst longestZeroFields = allZeroFields.sort((a, b) => b.length - a.length)[0];\n\n\t\tlet newHost:string;\n\t\tif (longestZeroFields && longestZeroFields.length > 1) {\n\t\t\tconst newFirst = fields.slice(0, longestZeroFields.index) ;\n\t\t\tconst newLast = fields.slice(longestZeroFields.index + longestZeroFields.length);\n\t\t\tnewHost = newFirst.join(\":\") + \"::\" + newLast.join(\":\");\n\t\t} else {\n\t\t\tnewHost = fields.join(\":\");\n\t\t}\n\n\t\tif (zone) {\n\t\t\tnewHost += \"%\" + zone;\n\t\t}\n\n\t\treturn newHost;\n\t} else {\n\t\treturn host;\n\t}\n}\n\nconst URI_PARSE = /^(?:([^:\\/?#]+):)?(?:\\/\\/((?:([^\\/?#@]*)@)?(\\[[^\\/?#\\]]+\\]|[^\\/?#:]*)(?:\\:(\\d*))?))?([^?#]*)(?:\\?([^#]*))?(?:#((?:.|\\n|\\r)*))?/i;\nconst NO_MATCH_IS_UNDEFINED = (<RegExpMatchArray>(\"\").match(/(){0}/))[1] === undefined;\n\nexport function parse(uriString:string, options:URIOptions = {}):URIComponents {\n\tconst components:URIComponents = {};\n\tconst protocol = (options.iri !== false ? IRI_PROTOCOL : URI_PROTOCOL);\n\n\tif (options.reference === \"suffix\") uriString = (options.scheme ? options.scheme + \":\" : \"\") + \"//\" + uriString;\n\n\tconst matches = uriString.match(URI_PARSE);\n\n\tif (matches) {\n\t\tif (NO_MATCH_IS_UNDEFINED) {\n\t\t\t//store each component\n\t\t\tcomponents.scheme = matches[1];\n\t\t\tcomponents.userinfo = matches[3];\n\t\t\tcomponents.host = matches[4];\n\t\t\tcomponents.port = parseInt(matches[5], 10);\n\t\t\tcomponents.path = matches[6] || \"\";\n\t\t\tcomponents.query = matches[7];\n\t\t\tcomponents.fragment = matches[8];\n\n\t\t\t//fix port number\n\t\t\tif (isNaN(components.port)) {\n\t\t\t\tcomponents.port = matches[5];\n\t\t\t}\n\t\t} else {  //IE FIX for improper RegExp matching\n\t\t\t//store each component\n\t\t\tcomponents.scheme = matches[1] || undefined;\n\t\t\tcomponents.userinfo = (uriString.indexOf(\"@\") !== -1 ? matches[3] : undefined);\n\t\t\tcomponents.host = (uriString.indexOf(\"//\") !== -1 ? matches[4] : undefined);\n\t\t\tcomponents.port = parseInt(matches[5], 10);\n\t\t\tcomponents.path = matches[6] || \"\";\n\t\t\tcomponents.query = (uriString.indexOf(\"?\") !== -1 ? matches[7] : undefined);\n\t\t\tcomponents.fragment = (uriString.indexOf(\"#\") !== -1 ? matches[8] : undefined);\n\n\t\t\t//fix port number\n\t\t\tif (isNaN(components.port)) {\n\t\t\t\tcomponents.port = (uriString.match(/\\/\\/(?:.|\\n)*\\:(?:\\/|\\?|\\#|$)/) ? matches[4] : undefined);\n\t\t\t}\n\t\t}\n\n\t\tif (components.host) {\n\t\t\t//normalize IP hosts\n\t\t\tcomponents.host = _normalizeIPv6(_normalizeIPv4(components.host, protocol), protocol);\n\t\t}\n\n\t\t//determine reference type\n\t\tif (components.scheme === undefined && components.userinfo === undefined && components.host === undefined && components.port === undefined && !components.path && components.query === undefined) {\n\t\t\tcomponents.reference = \"same-document\";\n\t\t} else if (components.scheme === undefined) {\n\t\t\tcomponents.reference = \"relative\";\n\t\t} else if (components.fragment === undefined) {\n\t\t\tcomponents.reference = \"absolute\";\n\t\t} else {\n\t\t\tcomponents.reference = \"uri\";\n\t\t}\n\n\t\t//check for reference errors\n\t\tif (options.reference && options.reference !== \"suffix\" && options.reference !== components.reference) {\n\t\t\tcomponents.error = components.error || \"URI is not a \" + options.reference + \" reference.\";\n\t\t}\n\n\t\t//find scheme handler\n\t\tconst schemeHandler = SCHEMES[(options.scheme || components.scheme || \"\").toLowerCase()];\n\n\t\t//check if scheme can't handle IRIs\n\t\tif (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport)) {\n\t\t\t//if host component is a domain name\n\t\t\tif (components.host && (options.domainHost || (schemeHandler && schemeHandler.domainHost))) {\n\t\t\t\t//convert Unicode IDN -> ASCII IDN\n\t\t\t\ttry {\n\t\t\t\t\tcomponents.host = punycode.toASCII(components.host.replace(protocol.PCT_ENCODED, pctDecChars).toLowerCase());\n\t\t\t\t} catch (e) {\n\t\t\t\t\tcomponents.error = components.error || \"Host's domain name can not be converted to ASCII via punycode: \" + e;\n\t\t\t\t}\n\t\t\t}\n\t\t\t//convert IRI -> URI\n\t\t\t_normalizeComponentEncoding(components, URI_PROTOCOL);\n\t\t} else {\n\t\t\t//normalize encodings\n\t\t\t_normalizeComponentEncoding(components, protocol);\n\t\t}\n\n\t\t//perform scheme specific parsing\n\t\tif (schemeHandler && schemeHandler.parse) {\n\t\t\tschemeHandler.parse(components, options);\n\t\t}\n\t} else {\n\t\tcomponents.error = components.error || \"URI can not be parsed.\";\n\t}\n\n\treturn components;\n};\n\nfunction _recomposeAuthority(components:URIComponents, options:URIOptions):string|undefined {\n\tconst protocol = (options.iri !== false ? IRI_PROTOCOL : URI_PROTOCOL);\n\tconst uriTokens:Array<string> = [];\n\n\tif (components.userinfo !== undefined) {\n\t\turiTokens.push(components.userinfo);\n\t\turiTokens.push(\"@\");\n\t}\n\n\tif (components.host !== undefined) {\n\t\t//normalize IP hosts, add brackets and escape zone separator for IPv6\n\t\turiTokens.push(_normalizeIPv6(_normalizeIPv4(String(components.host), protocol), protocol).replace(protocol.IPV6ADDRESS, (_, $1, $2) => \"[\" + $1 + ($2 ? \"%25\" + $2 : \"\") + \"]\"));\n\t}\n\n\tif (typeof components.port === \"number\" || typeof components.port === \"string\") {\n\t\turiTokens.push(\":\");\n\t\turiTokens.push(String(components.port));\n\t}\n\n\treturn uriTokens.length ? uriTokens.join(\"\") : undefined;\n};\n\nconst RDS1 = /^\\.\\.?\\//;\nconst RDS2 = /^\\/\\.(\\/|$)/;\nconst RDS3 = /^\\/\\.\\.(\\/|$)/;\nconst RDS4 = /^\\.\\.?$/;\nconst RDS5 = /^\\/?(?:.|\\n)*?(?=\\/|$)/;\n\nexport function removeDotSegments(input:string):string {\n\tconst output:Array<string> = [];\n\n\twhile (input.length) {\n\t\tif (input.match(RDS1)) {\n\t\t\tinput = input.replace(RDS1, \"\");\n\t\t} else if (input.match(RDS2)) {\n\t\t\tinput = input.replace(RDS2, \"/\");\n\t\t} else if (input.match(RDS3)) {\n\t\t\tinput = input.replace(RDS3, \"/\");\n\t\t\toutput.pop();\n\t\t} else if (input === \".\" || input === \"..\") {\n\t\t\tinput = \"\";\n\t\t} else {\n\t\t\tconst im = input.match(RDS5);\n\t\t\tif (im) {\n\t\t\t\tconst s = im[0];\n\t\t\t\tinput = input.slice(s.length);\n\t\t\t\toutput.push(s);\n\t\t\t} else {\n\t\t\t\tthrow new Error(\"Unexpected dot segment condition\");\n\t\t\t}\n\t\t}\n\t}\n\n\treturn output.join(\"\");\n};\n\nexport function serialize(components:URIComponents, options:URIOptions = {}):string {\n\tconst protocol = (options.iri ? IRI_PROTOCOL : URI_PROTOCOL);\n\tconst uriTokens:Array<string> = [];\n\n\t//find scheme handler\n\tconst schemeHandler = SCHEMES[(options.scheme || components.scheme || \"\").toLowerCase()];\n\n\t//perform scheme specific serialization\n\tif (schemeHandler && schemeHandler.serialize) schemeHandler.serialize(components, options);\n\n\tif (components.host) {\n\t\t//if host component is an IPv6 address\n\t\tif (protocol.IPV6ADDRESS.test(components.host)) {\n\t\t\t//TODO: normalize IPv6 address as per RFC 5952\n\t\t}\n\n\t\t//if host component is a domain name\n\t\telse if (options.domainHost || (schemeHandler && schemeHandler.domainHost)) {\n\t\t\t//convert IDN via punycode\n\t\t\ttry {\n\t\t\t\tcomponents.host = (!options.iri ? punycode.toASCII(components.host.replace(protocol.PCT_ENCODED, pctDecChars).toLowerCase()) : punycode.toUnicode(components.host));\n\t\t\t} catch (e) {\n\t\t\t\tcomponents.error = components.error || \"Host's domain name can not be converted to \" + (!options.iri ? \"ASCII\" : \"Unicode\") + \" via punycode: \" + e;\n\t\t\t}\n\t\t}\n\t}\n\n\t//normalize encoding\n\t_normalizeComponentEncoding(components, protocol);\n\n\tif (options.reference !== \"suffix\" && components.scheme) {\n\t\turiTokens.push(components.scheme);\n\t\turiTokens.push(\":\");\n\t}\n\n\tconst authority = _recomposeAuthority(components, options);\n\tif (authority !== undefined) {\n\t\tif (options.reference !== \"suffix\") {\n\t\t\turiTokens.push(\"//\");\n\t\t}\n\n\t\turiTokens.push(authority);\n\n\t\tif (components.path && components.path.charAt(0) !== \"/\") {\n\t\t\turiTokens.push(\"/\");\n\t\t}\n\t}\n\n\tif (components.path !== undefined) {\n\t\tlet s"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const tsutils = __importStar(require("tsutils"));
+const ts = __importStar(require("typescript"));
+const util_1 = require("../util");
+const getESLintCoreRule_1 = require("../util/getESLintCoreRule");
+const baseRule = (0, getESLintCoreRule_1.getESLintCoreRule)('dot-notation');
+exports.default = (0, util_1.createRule)({
+    name: 'dot-notation',
+    meta: {
+        type: 'suggestion',
+        docs: {
+            description: 'Enforce dot notation whenever possible',
+            recommended: 'strict',
+            extendsBaseRule: true,
+            requiresTypeChecking: true,
+        },
+        schema: [
+            {
+                type: 'object',
+                properties: {
+                    allowKeywords: {
+                        type: 'boolean',
+                        default: true,
+                    },
+                    allowPattern: {
+                        type: 'string',
+                        default: '',
+                    },
+                    allowPrivateClassPropertyAccess: {
+                        type: 'boolean',
+                        default: false,
+                    },
+                    allowProtectedClassPropertyAccess: {
+                        type: 'boolean',
+                        default: false,
+                    },
+                    allowIndexSignaturePropertyAccess: {
+                        type: 'boolean',
+                        default: false,
+                    },
+                },
+                additionalProperties: false,
+            },
+        ],
+        fixable: baseRule.meta.fixable,
+        hasSuggestions: baseRule.meta.hasSuggestions,
+        messages: baseRule.meta.messages,
+    },
+    defaultOptions: [
+        {
+            allowPrivateClassPropertyAccess: false,
+            allowProtectedClassPropertyAccess: false,
+            allowIndexSignaturePropertyAccess: false,
+            allowKeywords: true,
+            allowPattern: '',
+        },
+    ],
+    create(context, [options]) {
+        var _a;
+        const rules = baseRule.create(context);
+        const { program, esTreeNodeToTSNodeMap } = (0, util_1.getParserServices)(context);
+        const typeChecker = program.getTypeChecker();
+        const allowPrivateClassPropertyAccess = options.allowPrivateClassPropertyAccess;
+        const allowProtectedClassPropertyAccess = options.allowProtectedClassPropertyAccess;
+        const allowIndexSignaturePropertyAccess = ((_a = options.allowIndexSignaturePropertyAccess) !== null && _a !== void 0 ? _a : false) ||
+            tsutils.isCompilerOptionEnabled(program.getCompilerOptions(), 
+            // @ts-expect-error - TS is refining the type to never for some reason
+            'noPropertyAccessFromIndexSignature');
+        return {
+            MemberExpression(node) {
+                var _a, _b;
+                if ((allowPrivateClassPropertyAccess ||
+                    allowProtectedClassPropertyAccess ||
+                    allowIndexSignaturePropertyAccess) &&
+                    node.computed) {
+                    // for perf reasons - only fetch symbols if we have to
+                    const propertySymbol = typeChecker.getSymbolAtLocation(esTreeNodeToTSNodeMap.get(node.property));
+                    const modifierKind = (_b = (0, util_1.getModifiers)((_a = propertySymbol === null || propertySymbol === void 0 ? void 0 : propertySymbol.getDeclarations()) === null || _a === void 0 ? void 0 : _a[0])) === null || _b === void 0 ? void 0 : _b[0].kind;
+                    if ((allowPrivateClassPropertyAccess &&
+                        modifierKind === ts.SyntaxKind.PrivateKeyword) ||
+                        (allowProtectedClassPropertyAccess &&
+                            modifierKind === ts.SyntaxKind.ProtectedKeyword)) {
+                        return;
+                    }
+                    if (propertySymbol === undefined &&
+                        allowIndexSignaturePropertyAccess) {
+                        const objectType = typeChecker.getTypeAtLocation(esTreeNodeToTSNodeMap.get(node.object));
+                        const indexType = objectType
+                            .getNonNullableType()
+                            .getStringIndexType();
+                        if (indexType !== undefined) {
+                            return;
+                        }
+                    }
+                }
+                rules.MemberExpression(node);
+            },
+        };
+    },
+});
+//# sourceMappingURL=dot-notation.js.map                                                          ¾28·‰,ºdÎ½ÊÊA'ö R0CŸö²ğÎÂªøÓrpÒAÓÁ%§ÂË­’°N\ÛÉ¶°5¤½İÂ‚V=j‘_S;nÇ}iü=6úp–»…s"c»`¬SĞƒŠsG=¹ÅÊV™\'~Q¬>+Æ‰9.$²«ì»¤Î28Ç<iï¼øxp.MZµîl=÷2ÙZÅ_ŠùşÕ¯óGñ¯˜Fß9EÆà­¢Êßû¾²}ßÊ|V“RdÊîuèÖ2e¹ôulÕÏXÌ¸ñ¶ú?w>:DğÁµŸš¹r£s\rK¹ƒı’\&Î³­!áº¦=V¼)PØWgÚUWH 4|Ì ‹•œƒé1@ã‘%Ç:|Ö¸L&ŒcFS˜	šÓwcNµ/cá{zl@OD’@×Û‘¹0 b”Š™,P<JUFlNÈÙ±üƒ˜q?¥hOBŒh³¡$fÄøÚ<O¯Š(9+uÚXÇğ	1/ k¨p²F“ q­¦¿û¾ÄH*†‘ôô3B,¾ë¯9)dWD¿&1ƒ¤
+ÇÒÅAµ€Ô¤Únã? "aHÀ¤~-FJ Ò7’¤%	œu¤ø…XHüÄ¥Y’øÖÈ$€Óœ/xá3a¥¨Â
+7!2­5 }Œ±vÖœ:¢"~•Àk¹?2vĞèÀùgQ1sğÉ>º"mîŒk€&ô+XÀú×â‡P†Ìâ;…¢û¹9#1²Ufft"ª8gøÈñHÌÔ{ˆÜ³Vä1’;E#y~`¸B<âş¨ññ»k‡eÄ{ózDL¶U Å 	. û8k¡3#)DçáŞÙ¨G ‹óÈ¨CôCáóŒ¿>É:ıÛh2ciVœ¨C Î™àö®ÜéP`uÖòŠLV>¦À¢¤¥*N)Iñ¬ˆ’61.XªÁ‰$ï@›ì¾|é"-ÃiÚ7ì‚¨a-©ÙÖ8G!ò5FøuPì'Üˆ´™ôøMˆšíœÚD5‚€…Q²³ïº¢ÏŞµWt!d™ËŸqğºuM(Ñ/ÿá1«\ì8xl¸¨æG0ry?Ô*ûìWéÌ€É9Ó£×nì¾éµ_u?˜Üñüá#åäg–Î[Ï6Kd«ÎŸ)¬ğF7ÿ¢}’š«Ú[ú'úğ`–«4¹ß|ó`ûíş†vË[®WØãŒ“È·K™ßµL!Yr?o¬\¯‹¸ë7khÔëae¨ñik+ãÙÏ’¡—¡ÁÓvü°N§Î&"òüÔ¥>vD.Ò ½-°áñé? Òšv^Ô+Û÷Òn—29~=ş´b%¿=Ät;dí„î>9¼Õõ[WŠñŞÕI;C|íªxõlº–’¡k…Ì)Ü yt§¤ÍúGh8:[ËÂiĞñOô™µ¥¨ºÿû•÷'Ğ¿èæÍU«ã
+vhh£¼rëCmÎµ‰8ê³~¿cm:ÑÏ¢¬À€[¿|Ğ—±ÖÒ"ç°¼›šcÑ˜Xû8àEI’~Ğ§•üÑÎÎ½
+ ıiy=¸”İ¹Í\úƒD’~ôpÇI&ğMBcÃ“§8ïü´€¿_ŸFO$†ğ¢'·ˆ7'NTí
+Şàß¾)¼y9Ë©.çÑÇ¨Ì€@‘33À­³áVdj¼£oš?'gôËÎeRŞ,ö-L©%A*?Ÿ4U•qÓ>W¾Xúàd³ù{u(ëªÆÀbts©½ßü—ş%vR˜KDBø«®¦1éÑ9$ÓîèlzÃ…•A_šØOD^M1?™º˜»Lã¦š¬Ìj*Tš589:v˜ØJŒèU'³;Oyg{Jf’í3¨âÎíıuœâô–Å6×öÓ—õ„Y…Şk›iÚßMîÊŞ	ùôß‹êß¥•ôüÕãg¸Şß´ú°£ºŒãÉ®vÙŞ¼ÄıçïÓŸÿ bï[•çİè~öıåçc¥¥9Ah‡hóÏù÷±wäfÄ¯új©±ÆÆfÑ+«¶j®\„xÜ©i§±ùî®ôñAÄÅ*%–ƒ—YÉl)´Öt‡Öö_Îãî®Èµ6ª«`±gÌ=ZÔµœŞè—Føë®D¹l²…Yä¢r`ƒÓ­Á±èÛh¦NRÑÎ3z0~ÿÇ›‡ÃåRÊ"¥ò…ù«¥åò¢“SçSìsxI£ºÛÇ>¼ÿ´è`
+®R ß"z ¶îco›«¼·zğĞÁPIoVMĞãpkm¿“Ú\e5‹Ü¡=÷µ›=Ü2‚¦%“C=İ“5H@1óŞiÅËì¡UÕ‡§Ö·îvœM»ÙÕ;·ß+sùˆÀdMÅ´¶x5¦U´môE™tEæ4~ÚUÅ·íVÊu÷.'šù=·ÁñX…òê7ĞúV<¥Mß‰[ Eàœ¸úš“¿H»to¿Wç¹äæcğ"³ÖXénÃ”ùa›»²³àAÍÑã3ã[‡]nycÄIßŠn:K´ÜŞÑª	)ZzŞşLg¸(VÿO×™çæ•w–IF:·½Á?mG#óòÆÉïÒJ5ÒãÑ´4}guê¼Õ–øO®®Ç²,vK¸ŞIéN”MiSÈö×íµ2­s¬¸xÁõÆÏ€–}íŸV^÷æd£§ÊÛÒêò}ÚÑ,Zñ‹´8åÔÃ`áÿ²í¤—­L	p©ÊÚ/tÃû¸•KÊ#u­–êÉŸÛİG^äõ"cwæR®Ô½~y&§Çë,1·kıÃ¥èı÷À¶Û"µ’&‚¦ãÒ®»<Ôr`ÒÇ‰5.x”Lö;¶ê4îJ´Ÿ_–vr\^XJŞwP¶—xÒíü´·ŸÌ5»,=U_?Ïû4&|ôDã÷|^”‚‘eQv¾Õü´ÙA±­£*ÚâãzdÕ(É¸%À¯¢W2Öİ¨‡)ÇwÇ,–Kß(…P–ÛûªX±Œ~íŸ‰{péìö—ü•Š–ŞyšXò&%V˜,=.·-E…§W70)ô±²Îx]µGˆ •%“Şœ=4«—"Í§îÄu„¥u½È…{ PQD8¦7ôÑĞÜ4Kı¾åQtvø]Êåù[²»1kšû[~±úõ![::is›WŞÂiğWÕİSr’ÇUÑà§³ï¸í Âs…-Uñ«1ßkG„x¯÷lg÷âòÎSà„É@¡Fõªğ!U·Ø¬l‹ ¢ÌL†®ûóÍÛ]ÖÚÈÄq¢Níšw©pƒŠÌğê›Oî~¼ŠQuÆ¤hê¹tÈâ¶RŒ`ŠŒ±½ =`æ&jµsIqßõi³ışIv¢]ºô¾ŠYüÍ^ôµ%R³üc×ç}†Ó/]óT–:/Å36{İYm‹×¹Sß†Lİ„«ô JÄ‹‹1¢®Hr¨€_à?Ê%“îI—Šb©Ï'c¯«T% ¶Ë ,ŒÃ. O¢5$›ÌOIÚÇH‹Å¡š`x@ò çäK˜A±A ÷³r˜+“ö
+<ƒè¹/xÂObt;GésjÙ±°{, Î˜GöíX”„<I¥¦Ì|äşm<K?Œ›Œ`OP5àá§JÑ€0•›²˜B(à
+ôS€)}|)†y-…!L5;5j»q@£ÂTÄˆGl£X}‰$b°dœİ’}û¿˜€`•(Fµ–œØ(öôÄ#ûã¥/_=rö%|Á§d‚¡ÇH…}QGL¹
+g²y6ÚÁ´yYÍ6†œ{‘(Áa£ü{0X?„ã›µùÌˆ×ïyÑx§E1D·ãã®ûjÅÓIÖÍ²:Ÿ¡n—pÊÉL$õª3kl”X’„ˆQã“*ŒÀØÏˆ‚¯åèš^Î50œMk`³¾ ÀYMT}Ä19‰Y’Ã²}•Ûó~ ğ¹1Y©’¡®á„=8ÒP\şN¬|Ï™%¤Cf¢q|#ÙûTìŸ$ÇÈŸ…€l À t1_ÓAÁ
+˜–¸\â¥ ñúüß!•ˆ¼$ş]Å9˜$‡¡ö´Òxp¯­¡ª1„+yØJÇ£˜ˆ¼+«@¡†CÀNí‡QÖúîÑ
+0vüšÆJcuÇôo‘9ÎÔâU+™ì#_3ÿ´s€ºı2ö½äî›ı°ıN¾öwT×müM\ø.°ZûÁeaãşO%s®?€UÕáìÕsÃÎGÎòõ=¿ßşÀ¿ĞbŠHPŞõüL&Zœ¥ù—ã³%/¡ïıw#‘Vwñ:ïŞıÇi?Â­~­É‘SuûhÍş‡îÛï?—N‹{Àx¢uÒ¼çŸôË›Z®Aûz]…“1
+İij~o›¯Ëıê
+qêhHw›ˆ,<üıåYZpñÍkôHzh¹8ò°õÖ¦‰aÖç2åáo7‚ú/µ#Ü¾½Èù/ÿŸ×~6†µÇ£è˜D®ÜÆÿ¶^Ô]Ò:ş ?ÑÖ±Šø×:Õ#Ş1¦Ò¿,h,ÆºA©Ztòz{RÁ{ÙÏfÙ\DŠ†ÕğVu\:¡JwÚ@ú×k½~¦	Ô'‡Ğ°[&ş+ºúÎşrT¨fªb
+VÇKÉéûNm:jb‡›P©.ìïåÑçŸkr+ùÃÇTöA71bß‰†²İì,àoß´òÀu¨Ê@"¹¯8B¼+\‡*(c…%¤,sac¥”b~Zc/Fy%LLÑËşi]ñ±ÚzÕ’X0*Ücçè02„aû¸ZC›tl_ËÊÊ×Û•–Î¾Ğ$Ú“ns¡Á‰š;$¾0{azw`å¢ÔÊ†tP–G;ú¡Dü(×ğZı‘T1ù»°È]²ÈbOº¡9¹@NRwP­åŠ»Tş-sùsæ+nñF+Î=ŸÏıÇ^>?0
+é“êU»3× ‘rv/_eÙæEÍ?gÌ?<N+d,FÔe8&Ì#ìUÛë,.¼zšÆäÆÔ¸¤d/Iè‹EtFÕ¼|5bv0T¸5NVråÖº·+›!peõ«°×ŸïñÒÌûî-9ü› ­2bwœë¬ñ|H	´T'Ş6ùÿÔ%c~gyZZ¨Û ËùÈ$ùÙïBÆVfúÅìıºô2ëàeLğ¡üA“dÉèü¬Í?DOĞ;§“1(‡ë’KP6[U×CÖ}]±†ŞA¯L«Å§‚57™kDiºB•À.ß8ÖŒ«w¢XÈ×‘äÊù@r'o´IuÅ—j½«ïzª¾ÉÓ/ì¶±rÎñ’ò¢:Õ£Ç÷)û„JÓÚøsÄë8¬_0ŞáU€±Q¼*©hv%ºq«×"™v§¡Ïü`ı’—KC”_s¯çrE;!£³FÎUT»ôê€ô«cİÅ€C“ªŸ¼rnëS`D§ù.äÓ®¸tcä‚uåúÈÁ7Ş"ç\zûĞbÓ¾$æ¯CZşPè£¶¸õÌ¸g\-l­²êqÀË³Øå9½b¦X¿«1öy‹A³OÃwµËÃh†£ V<aní™ùî³¶üKïUÛ‡¶säÏ'ØJ›[ÅYŒÇÄËm#S9û¾‹U-gãåğ'7Y×ô=pÆ•_â±ğÖ©_~aäA6têHí¬Ñäs\ë´õşSãÒ~©8ß/>·¾‹],~ÒTš8ÿşeXŠŠ ^a°2Şk¨4lÛ¼ò¹½A<lí‡(öznçüßµ"KRˆüÛo|9DÏØyZŠQÓbÃ³üô+[Ü&×jlMƒwT6í:TÙDşiz?k;V?$·àÿE\KLgtŒ090m¿zûBoQŞĞQJ¢8â{cÖÔNğî"§³Ç)ÃFkf– £—/W9.É;®
+ë‡Ùç’/´Üf´’¸Æwr,D?º„«ÇéÔtİR­íé£ı¾Nşï^å‘²?E¥=ªs3O³û™^úo·âeûN^.Ö1TõªÔÁZŞo»ğ4:”ÉÖ„{5ãñ×Ş7LpO‰Š‘A.ì‡ -÷­e;¶¢'aôFæM­¥Ë	Ó¤e¸­tS¢¶½÷¢İ—ÊPlóğb½Eyˆ³`Xôúq­ô¼^3<éÌ4ñí]Œ½ŸogI¦ºI­²[¶©:ÜS:²¿·VvF©ƒ5È>ôøƒá6pÂ	Eú…ğQÍbOû4ÛØÅÛ¶pëë¾f&§”K‘¿*X¤{œÖÂ­"ìókÀiKgöz]³“«ÒíóãÚ75îÆÆnÉy
+/Îk[êuã¬¢SDIö5La"¹<+…ş}ğ´é®d@¿2^Ik!µğ,qPz <oÂ	vñ®^__ˆÿß\ÅÈcÊ6”Ôíç+'³ç¹Õas¸6Vè¹
+ª|÷\Ëü ÀZøÒ?õJÒÃÙ[ôhO¦+kwIwÿâÎíïBÅ©¤¹ì}ì‡Cçñ9§Ÿ!–ìÀtJ&QQW†ÎÁÍXM’@å·	¼Ü<şoS.U–W®JFñk.‡aØ@ÛD#g2bšÓj‘¬ÃŒÅè±ÁQ˜>G†i€¯’ïì-°'É«4¬ó9…'‹nîäŒPá¬Ÿ·æäb°f×Ä+¢õÒıT¡™kób,`®AHÂ)DäÁ j
+­Ñ}V.DëÈ”E6I¯B1Ô_çâº¸F© f©°%Q*¢aœ±… H„EÂÊ´tæ±øDÈ(9¹>SùvJæKø9¯A%0Ù¢Wa@£ÎÂ¤›óN^gÓp„¯z,CQÀ£ù'N©ß™hÕ‹^çÔÔ€H¬:ü>vt.™¤pCAsìQ£G[•í¹b2‘§R³§w¼W¿1ã5¬/ÏÆQ×”Â JZñ× 'J	Ñä+?Ê	@+¾Häq˜O‚êJ§Àm$¦/`>H’É‡N~2ŸÂÊ—dTáÁ³H0W99À³b"å*À›FæI\hşN%ô!:h~æq~—ü€KĞ›]ì-Î¥Kƒ¬tq3E¬LÃ!ÌS½PpØ›P¼ ¿Ós#SÎ„€l«kƒ‚‡œÊÇd@Q­ä%òf„+Ú)¡%Ãö­!ñ#ø|!c±GA)Edï¿Ø
+K¬=›…)¦¶ÑÓîÔƒŠ“Æ¥÷ôáïªsßß°ŠüéüOúãåšë²·ÜºƒVÚ>™‘:UİØşqÍaòeØ§Ô× éã÷{úv÷xJöåùB® 3uÍ½¿ŞoEüJ½vİyõ0nêåïÍ·ª(Êà€]”--•‹ô=Ük´Ôéí1»ló¿yoVÆ¿ËËï©3npL°İ	õ‰‘ú÷›ˆ’É¼†¤rÂZ§Ç¯û»oÇóöãvë	tÚevJŸ÷ÙÊeüYäé2)Äşk>rXNA™B[
+}Í_vØ5š×ë
+÷‰[¼ız¥³ªÒ7©?ò#~øäİÖæş¦FZGcß>y"ìsƒr®\²Æhùbqë–š|¶Ö:årîš0õHöß_ÑCÆŠ¿©<¤ã—ìP!òµú(mP¡‰ãq×MÚlP¡šzgßµÆÕ;"‰‚$¯ò.„Ó¿ÄÎÛú= jNš¶ğs~Ó?k–Š·Y¬PíñiTd±vÎløşã7šv¶ÒœjıIC0F”ıõÄ<ÎY6¸}İÈåBCñ$ÛÓdûˆn¹¾$® =•.ËG±|UQ¹ea„)˜ÂXSƒÍŒãç£¨şrŒÜ°	CLÙE€ÜkÓÌ¾‡Èû.Ef‘íÙ,Ii³º1yõ	ÑK’0¢k®ø_¿ÃÜÑ1îFèÔÆ5fø0®/?`Z¬üUŸ&`¦ ^Kì“{K÷÷Wl(VPó‡ÎŒL	ï	ÎEğ°)HØAO.=s³•Ô÷ß*ÂsBeú
+‹°§ûRyÉ-ÈH!’ıÓ§_j{šXøÑÇßkd\lÒæFCŸß[°İ)9°üØ,©ºSÇh4ÙwÅ-3z¿8®ÎFqëkXVoÕ=$ĞŞÑõ9W¾„;Nõ©ªLø;Çöú‹ş8æÔ)Œm°q}çW<T‹ .g¯¦K›-Nºæ•¿ù[÷+ºR[×’¿ÁÒ˜«ÓêK`õ¥ãñ§®|4>õü~à][nYw®ó,/ï¸…-wûHÕì¬Ğ|”z3›ƒö¥c½ÂÆµ-Û‰ºg¥#yŞ·Ù-‡c5{:œÇî^êm’kÊæ°5só_¢}Ìñ\[çîœ¥Ü:šY]Ç÷üÚ‹ßÏ»hıZªc¯°#çß7Úš§/S|ÅÖJ>\åÒş9SÔ±ì´)U•â{;¡}¨ÍÑ4<Ëæ`âäìa3'^#)U¦¨b¤> ­nk‹cø©Î9ôÓ‘E…#l2òµ–fØTúİ¨œ×Q‘íC”­ı¸'ô‘m†O¿>mÉıÒ4	{zÚ¬òáPnğ}ÀvœâÛ®ïõû-«³í”]zç²Ç(ÂKdÁçmhïOß_2·¼*;oŒ;ynèÂ~;¿ıPµ˜·E©¬çµQÊDşÜt:Ê}&(°l¨onWÒÙ5ÏŒi´«ë¯E}Œõ¤iy™7<œ}äºL¬˜øt6é½Ğ«ºS¯0[YÑ9Ş•”4%{ç\FÕç†ÿ?ÄÁÌÔ±d»Íù>ë’k;ÃÂ7‡±œà×=ù?cíŸü;UéyÖ‹­£§¼)3I*’¼?¨Îkë*Uk8ÄTö”8"&M<^`ySÙÂÎg®ŸT;È·7v„OV¹ŠÍ^=áİ	˜ò‹|µÒÂ YÉ±Å[Z%løÃ÷F•Ö«­×¸e;o¡a¯Ê€ûÌ±§·çVzŸ	Ö´Fî|¢Wğš½´˜¼·ĞÓPy‡5ùÅ>0ùÍD“şÃb'}»¦*èF•HNşªSçb1zZõÎÎµ`_ôF#$_Ø¿6D.ñ»Ók$†ÿ’å«ªã÷éïxß™•›rİtŒdçğo¸ÕĞÚx¼PRõ‘¥Ab4[é¦wZÌëëÁè_QS%5çr;bvÙA'éÚBWä`vãŒƒ\4äj‡|€KçÈğFû—Õ¶ÓşüF-u&ãí>C¯OË“åº;.İòwş äÿ ˆ»/w5%íå>-ÆGÅ{}§>ùn>4èPÙê{ŸŞYÓ.©s™æí’+ŠÖ 4?õ·Xîqc7
+èöóémÎF°zJD„4l_+}sI]H<XµÓ¨«pHïà"=·/ˆ~3 X+^Ìrï¹HcÛQ³P¯È^¸({T}hùæ§``2@4$«-õ+ÆØJÑ¨°¯RÄÖc~WÙşÂ]Çñ•×®¼õ‡ş’ùÇ˜ÇŒ”íYË ê@N]Ó`“(µúgÚ…ÔÊ§¤&£9Õãc|‚öËn¿9À7‰½œGBˆ!öjB àñÃîZÏ¦Ú5ˆI—ÅÄœúÉ>ggÒ]¬’¥ÄÜ ¸Ã¤Eú8mNŒ âÅT®ŞT´N`–¾C-ï \AºŠ¿WõB"3ë1ö¢¤,@Lc»º$©t™›Ú>•‡é„µ³†;ÈÛ^§?gN]m›à«ç®»1®qıx§ !Õ.xKuñyZğ3 }ëL`ï¤£ôrgåq‰’FÙÎÜLSllZx«eË¾ÿ'8Ü5RØ—ˆ`ñ§Ø•ng‘üÕä=ò©X¯W!µşÆIfŠÔ_“xÿár÷P œö`l	’Ê¯9_¶Ë ôÍNsª­¢ú( ±ÚT¾‡¡'iƒq˜Ò T<I®Muñ“ñº ƒ$*¹UÁ„‚øk¾S2tğĞµÇ˜Ià²İ~$†™i­ÁCİìQİÒ‰g$‘Tr"±JfŠÇ“‹ğ¬8N¼¤•Œ“}ˆ|s?–Ìq'—Hg¾
+`äÆL‚1Ë‡fU@‘À-¥Û tB–<¶{(¥¢ló4¦²‚íĞP>e° Æ¨hï	,HREH5×Bqì\ ø÷ÚÛµÆ<%O.W¿t³à‚òt‚tú©’+GÌ§dæFRk¤zn¦g×¾¢?Û¿°±‹À¡B*§ƒÖ ö¥Œ._˜0Š<pÁC@X›CAN÷NÀWp|F³D¥sfe…ÑöCdM‚—9EG¸5q
+¶œìF.P ä[wÌ4»Sÿ¡
+ ûšó'¡i¥|0#4jåF~§°dg*3y´Z±0¤BNGº×N «9aŠâU72/dFB“a€§û›YhÁ±„mİJê#@yzïQvŒ•)ôQN)ÂÔ9¯epøÑ¡j¬ƒé¿tÏ1p~çVgåš%¼Õ^#§Ù9¨ù§ÛI-ïV^d›ìZ¹ÈÆI|‘xÆÒ\İSÛ>F®5ŞüŞ¨+Î¬;|?à\7!ãRB"wHÀıº7ÿ½xŒ?¾UÛá-«Àû$Ñëşü?¯ğŞ·£çV	ÉƒwC‡®W|¿n5@Øî}iëLëOºe“ş{áËæ0³jÚ=ÁO¿JsKî¹uî¾ÿÔy¦şà—ùí¸¢Û+NYbÀÇªoµ·mÜÛ<¾ÿõÒğ§¡°£÷B/·¯ß4Ñ8¼Îúíì^»sÃóïiÒEã€onM§¿ì¶¸õœö]\è1y¹,oye¼æİ(¯?Ü¸(,Ûd²bQÚ¹1äòõŸ5ó¦×¶ËY÷öØ„ÉìNa×‹Ã~×şçö¼ã4,ËüÕİ ¥Pã†? yÁÅkJZkœi@ˆßÉé³KrO¤vt-‡å¯	;ü‹·6êŞªï¸æ·\­¤ñÓ±ò?óæ¯cc¬oÅ89Æ§g²´ŒX•™TXYSùJ›¨äÁ|="£ŒŒ.±¡µ×©G¸U±Øş]UËÆdL„ö×Ó¬§«¼¶‡]Ò°•r„F©•0ç ´(Á¢‰yİÒ3~.¢ß‡I¸Õ:R©Èt€z)ærƒÉ(ò+S‚™	›ïR„ÉÕxU5ã'\¹`¸øm§”
+ÛİÜì
+Œ²*<ê1Ì7²«ãıáw÷ ûI8@µ²jíƒXÌ›Ecî»¶o(¿‚æ‚	¯´}ïiÌF(ÄÇ§¤¯x¾)×#Ò!Q‚ŒA|µ5k6´=:ÆIí;Ò¿!ûˆb‡â»exU•²bº±k›ÎŠ¿“Ş•¾úøâÀŸ‘‘ÕÂBÖ¨GB_ÁÃ$Ğ:7™¢İ,½”-‘=L|`6ÅMÙ¤+A˜Ú\rô$³
+¾ñ½»‹~Ş³#¦"¦kğ¯²mÈÁ6.N±?]zGbÎ½.´ü[HAÈËJ¯•3	Ş‰z´¯Ã½õCš¼õ
+sÁ¾+öŠYïÅZoOÄx~ÍV­^D’›#ÆE¬v?1—Jíê¼ÆEî<ÃşlUÌ”J:sèRÎÛÉğc>/¹wûÙ¿^Ú%P-3ù¸bÕ¨öûzğ­ÙñègË]áW¤òÏA=ÄËàê—›[Vû,¤¤_-”Ïr>â‹aëÓüşSàUÑQ¥™xE’/áı­ÿ@U]T¢·¡ÃóóEùº²P 2X”R[QvQ=˜Õäá%—–ªtwx¤UøÆ]»sÍiûñm³~}ëd~ıĞü3‡˜’·ÑgÑ²ÿùÔF„åÑC^_T”[^kWå'º™I.ó„=NkZZ;¸¼ î=ûìUCËçIY³³ò’ªg¹g–/Ş®µÕzN«sêø¼H¬:}ñÈ(X¥ÛA½"İé<*ErÖ+¯>mV$İ¿Íe}ÄéÇ=JuUM—ÔÕµ±BubşÔhºòÜì@ÔÛwöÌZàØQd¼²­ıYğnßk%'ELú6ƒulY1Ë..Yæ–Ì6-^!ğÏ³õ	(=fÅ^ì~!XÑiXü_ooqğ~ƒv%×ó„÷³î¥ZÁ—¹·& c=MÍt/š|^Ô~ıç? (Ø½³#AŞ	}›¾ 9kºu‡¸ó°µeùfr¨·_°Dó³ŸI-§i÷Ş€…!Ÿö›`ólOïÅJºs•Lê¢l©äHW\6_°’9q,rRC¿±^Ø«©„8î¾dìÀªÏ^[{±ë££áRBkÌÉ°§°7zÅ#²æÚzæ»w1AnÿŞKÛš8E5úJHDfyª£ùIjVºÜrxóœck°\ŠÃ>=:´$Ánò}0"çhç¸ôÁlïBÄMîÙ õˆå—½Î¹RÙüÉîIä©#àúó%¥Û´˜§ÊøÈ¼}ÿÁñ'y¿i«²~RdaÀ¾ÃÚÙq¾…åùÓÈõù·bºWôéE;Ş_ºÉ¿ï´Sß˜@„ãvj£Ôl–º¢—Ddƒó3bZö‹Tò"÷ï¸uÇI3å%4¸FÍ)óºÒu%÷›tµ'ó6Õ…•Û^­NïH<¡ÂıB~İıo­ø§Ë£ÿ .¶R#›ï°½Ò,\)qz÷ßÕƒÖ‚)ûã³ñö}Í©±…)›Î­ÎúÖ³â°8&4_6è)X£èâóÈ1té¹põjB–Ëÿv€‰“l[¡Fw;·)®(%àws ñŠDª”mm€ÄŒ•¤‘CZr»‹“¥]³¥Úkm¿O¥K6²ê2_¹¸–<Gc5FÕqéz¨›Â(Œ¾@´åÑˆ=DÕDóNÒ$U÷@H9 qV#æºWĞ˜´‚Vö¶Qy1$R%;*Z²‰êúw«ÑÚæñÒ@ÅT%Èòd	=ªÄg&D*Ä$š¨&E (Î#%P¡&{Õ!œNDR
+ÕŒÕ-·"¶ÅSt¯×Ú¬b«~àUŒŠ´ŸWÒšYJîÒb6Š²%´šºC(¥E«¹[kdUÓ#q†ÓíI©`…=S=+QšRÌjóI%?9 ıjê´ÂIpHâ)1©sŒWõÍ'Ê¶>¦ºL?.w;ôÃwQ}¾f?lVæ1Êå“×ÈcÏS]$éÇ+ßnÿ Â6Ê­ûó!ˆQö¬r_§n	î»uÍèq~$±Ş NÖ­âåÉ:Û‘°Zst´ëµÎ@®VºÉ¨fº¨¤±ÍMlŞœû÷™É3°®“9Ü¶M20_lK™ Ö[‡lÜ+
+Š˜‘@Šª²`h†<gŠƒË×¹âJAÌÊASÒŠ"*1A*ÅAš¨M(ô¢–MÃ4T ò*	@Àz¦ºP@y 3Ò€Ñ 'Q\ƒDÚ€‘E‚±**PH
+ÅT0z€‰ >¯­ PÁdĞ`AA"h©@hf€š€À"`‰ +Áš¢DT¼‹?Z°B3C@Fj)”b€…í@àc¥#µ•ã4( 2`E¦p$v¢Ú@©VŠph¢ “š@‘·=èZ ¬ÏH¨F#üĞ( e˜~”ŒœO TS®Ñq•G>ôòÇô "2½zb(†É ˜Ç4Q™PAâJ¸È8â€¨ şôR¡$&ŒX~¸Š(¨ ?µ@«h,ì¯‚¡ÇN”P›“êaf‘ şlôSD7HÅÁNzñ ’[ó|óïE‰\"¶Fy¢”©U•J–Ûİ(šC2c­  ™ÛàPGU"Hi÷â€'n1ĞMŠ:ˆ÷ ÿ à ÂÊœâĞKˆèhòqT=®£Û4Dc 	>üQEƒ	+äP.àÇGaA$àĞ€6™QÖ¶[˜â‹($ ıê%—¿D(ãÖLsE[l ¢ú”#Õü%ãíÛ>¬â"É·íO;«ßúéûïğ×ëòIñ9¿Òÿ Úºş-àûnº›)¥B$³>ö#Ú¼Üœ9q÷ŸSû¿]ò>/.òºxßğÅòïj7zØúY
+‹íÜÔÃ“Zš~7õÓ'|»ş«÷}Iÿ zçéôtz­EÀmßRëoóÇÚkÑ–rİOoÏåúF\<8órå©–î¾ÿ øºxÖœjµúÔê›Fß‚Ú*ßÒÿ 9úUÏ‡±ôô~™úçÎøùeÅ{¶u/çûıQ¹âZOKWUüb€O{ÒÄõÚx5Çıáêî=\ÿ â/•”¼¸\r‹tÖ/**
+ * @fileoverview Define common types for input completion.
+ * @author Toru Nagashima <https://github.com/mysticatea>
+ */
+
+/** @type {any} */
+export default {};
+
+/** @typedef {boolean | "off" | "readable" | "readonly" | "writable" | "writeable"} GlobalConf */
+/** @typedef {0 | 1 | 2 | "off" | "warn" | "error"} SeverityConf */
+/** @typedef {SeverityConf | [SeverityConf, ...any[]]} RuleConf */
+
+/**
+ * @typedef {Object} EcmaFeatures
+ * @property {boolean} [globalReturn] Enabling `return` statements at the top-level.
+ * @property {boolean} [jsx] Enabling JSX syntax.
+ * @property {boolean} [impliedStrict] Enabling strict mode always.
+ */
+
+/**
+ * @typedef {Object} ParserOptions
+ * @property {EcmaFeatures} [ecmaFeatures] The optional features.
+ * @property {3|5|6|7|8|9|10|11|12|2015|2016|2017|2018|2019|2020|2021} [ecmaVersion] The ECMAScript version (or revision number).
+ * @property {"script"|"module"} [sourceType] The source code type.
+ */
+
+/**
+ * @typedef {Object} ConfigData
+ * @property {Record<string, boolean>} [env] The environment settings.
+ * @property {string | string[]} [extends] The path to other config files or the package name of shareable configs.
+ * @property {Record<string, GlobalConf>} [globals] The global variable settings.
+ * @property {string | string[]} [ignorePatterns] The glob patterns that ignore to lint.
+ * @property {boolean} [noInlineConfig] The flag that disables directive comments.
+ * @property {OverrideConfigData[]} [overrides] The override settings per kind of files.
+ * @property {string} [parser] The path to a parser or the package name of a parser.
+ * @property {ParserOptions} [parserOptions] The parser options.
+ * @property {string[]} [plugins] The plugin specifiers.
+ * @property {string} [processor] The processor specifier.
+ * @property {boolean} [reportUnusedDisableDirectives] The flag to report unused `eslint-disable` comments.
+ * @property {boolean} [root] The root flag.
+ * @property {Record<string, RuleConf>} [rules] The rule settings.
+ * @property {Object} [settings] The shared settings.
+ */
+
+/**
+ * @typedef {Object} OverrideConfigData
+ * @property {Record<string, boolean>} [env] The environment settings.
+ * @property {string | string[]} [excludedFiles] The glob pattarns for excluded files.
+ * @property {string | string[]} [extends] The path to other config files or the package name of shareable configs.
+ * @property {string | string[]} files The glob patterns for target files.
+ * @property {Record<string, GlobalConf>} [globals] The global variable settings.
+ * @property {boolean} [noInlineConfig] The flag that disables directive comments.
+ * @property {OverrideConfigData[]} [overrides] The override settings per kind of files.
+ * @property {string} [parser] The path to a parser or the package name of a parser.
+ * @property {ParserOptions} [parserOptions] The parser options.
+ * @property {string[]} [plugins] The plugin specifiers.
+ * @property {string} [processor] The processor specifier.
+ * @property {boolean} [reportUnusedDisableDirectives] The flag to report unused `eslint-disable` comments.
+ * @property {Record<string, RuleConf>} [rules] The rule settings.
+ * @property {Object} [settings] The shared settings.
+ */
+
+/**
+ * @typedef {Object} ParseResult
+ * @property {Object} ast The AST.
+ * @property {ScopeManager} [scopeManager] The scope manager of the AST.
+ * @property {Record<string, any>} [services] The services that the parser provides.
+ * @property {Record<string, string[]>} [visitorKeys] The visitor keys of the AST.
+ */
+
+/**
+ * @typedef {Object} Parser
+ * @property {(text:string, options:ParserOptions) => Object} parse The definition of global variables.
+ * @property {(text:string, options:ParserOptions) => ParseResult} [parseForESLint] The parser options that will be enabled under this environment.
+ */
+
+/**
+ * @typedef {Object} Environment
+ * @property {Record<string, GlobalConf>} [globals] The definition of global variables.
+ * @property {ParserOptions} [parserOptions] The parser options that will be enabled under this environment.
+ */
+
+/**
+ * @typedef {Object} LintMessage
+ * @property {number} column The 1-based column number.
+ * @property {number} [endColumn] The 1-based column number of the end location.
+ * @property {number} [endLine] The 1-based line number of the end location.
+ * @property {boolean} fatal If `true` then this is a fatal error.
+ * @property {{range:[number,number], text:string}} [fix] Information for autofix.
+ * @property {number} line The 1-based line number.
+ * @property {string} message The error message.
+ * @property {string|null} ruleId The ID of the rule which makes this message.
+ * @property {0|1|2} severity The severity of this message.
+ * @property {Array<{desc?: string, messageId?: string, fix: {range: [number, number], text: string}}>} [suggestions] Information for suggestions.
+ */
+
+/**
+ * @typedef {Object} SuggestionResult
+ * @property {string} desc A short description.
+ * @property {string} [messageId] Id referencing a message for the description.
+ * @property {{ text: string, range: number[] }} fix fix result info
+ */
+
+/*

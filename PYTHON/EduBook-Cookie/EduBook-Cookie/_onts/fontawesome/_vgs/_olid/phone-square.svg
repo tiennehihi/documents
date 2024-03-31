@@ -1,0 +1,24 @@
+ression: StringLiteral;
+}
+
+export interface TSNonNullExpression extends BaseNode {
+  type: "TSNonNullExpression";
+  expression: Expression;
+}
+
+export interface TSExportAssignment extends BaseNode {
+  type: "TSExportAssignment";
+  expression: Expression;
+}
+
+export interface TSNamespaceExportDeclaration extends BaseNode {
+  type: "TSNamespaceExportDeclaration";
+  id: Identifier;
+}
+
+export interface TSTypeAnnotation extends BaseNode {
+  type: "TSTypeAnnotation";
+  typeAnnotation: TSType;
+}
+
+export interface TSTypePa

@@ -1,0 +1,20 @@
+import rng from './rng.js';
+import stringify from './stringify.js'; // **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+
+var _nodeId;
+
+var _clockseq; // Previous uuid creation time
+
+
+var _lastMSecs = 0;
+var _lastNSecs = 0; // See https://github.com/uuidjs/uuid for API details
+
+function v1(options, buf, offset) {
+  var i = buf && offset || 0;
+  var b = buf || new Array(16);
+  options = options || {};
+  var node = options.node || _nodeId;
+  var clockseq = options.cl

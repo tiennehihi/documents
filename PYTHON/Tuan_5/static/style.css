@@ -1,0 +1,39 @@
+h2 {
+    color: blue;
+    background-color: pink;
+    word-spacing: 20px;
+}
+
+h2.teen {
+    color: orange;
+    text-align: center;
+    letter-spacing: 10px;
+}
+
+h3 {
+    color: limegreen;
+}
+
+.love {
+    color: #fff;
+    background-color: limegreen;
+    font-size: 40px;
+    text-decoration: underline;
+    line-height: 200%;
+    text-indent: 50px;
+}
+
+#lol {
+    color: pink;
+    background-color: #000;
+    font-size: 60px;
+    font-style: italic;
+}
+
+.xiec {
+    color: red;
+    background-color: orange;
+    font-style: italic;
+    text-transform: capitalize;
+    text-decoration: line-through;
+}

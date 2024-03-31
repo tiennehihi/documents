@@ -1,0 +1,593 @@
+ = operations[operationIndex];
+    if (opcode === 0 /* Nop */) {
+      return;
+    } else if (opcode === 10 /* Endfinally */) {
+      return writeEndfinally();
+    }
+    const args = operationArguments[operationIndex];
+    if (opcode === 1 /* Statement */) {
+      return writeStatement(args[0]);
+    }
+    const location = operationLocations[operationIndex];
+    switch (opcode) {
+      case 2 /* Assign */:
+        return writeAssign(args[0], args[1], location);
+      case 3 /* Break */:
+        return writeBreak(args[0], location);
+      case 4 /* BreakWhenTrue */:
+        return writeBreakWhenTrue(args[0], args[1], location);
+      case 5 /* BreakWhenFalse */:
+        return writeBreakWhenFalse(args[0], args[1], location);
+      case 6 /* Yield */:
+        return writeYield(args[0], location);
+      case 7 /* YieldStar */:
+        return writeYieldStar(args[0], location);
+      case 8 /* Return */:
+        return writeReturn(args[0], location);
+      case 9 /* Throw */:
+        return writeThrow(args[0], location);
+    }
+  }
+  function writeStatement(statement) {
+    if (statement) {
+      if (!statements) {
+        statements = [statement];
+      } else {
+        statements.push(statement);
+      }
+    }
+  }
+  function writeAssign(left, right, operationLocation) {
+    writeStatement(setTextRange(factory2.createExpressionStatement(factory2.createAssignment(left, right)), operationLocation));
+  }
+  function writeThrow(expression, operationLocation) {
+    lastOperationWasAbrupt = true;
+    lastOperationWasCompletion = true;
+    writeStatement(setTextRange(factory2.createThrowStatement(expression), operationLocation));
+  }
+  function writeReturn(expression, operationLocation) {
+    lastOperationWasAbrupt = true;
+    lastOperationWasCompletion = true;
+    writeStatement(
+      setEmitFlags(
+        setTextRange(
+          factory2.createReturnStatement(
+            factory2.createArrayLiteralExpression(
+              expression ? [createInstruction(2 /* Return */), expression] : [createInstruction(2 /* Return */)]
+            )
+          ),
+          operationLocation
+        ),
+        768 /* NoTokenSourceMaps */
+      )
+    );
+  }
+  function writeBreak(label, operationLocation) {
+    lastOperationWasAbrupt = true;
+    writeStatement(
+      setEmitFlags(
+        setTextRange(
+          factory2.createReturnStatement(
+            factory2.createArrayLiteralExpression([
+              createInstruction(3 /* Break */),
+              createLabel(label)
+            ])
+          ),
+          operationLocation
+        ),
+        768 /* NoTokenSourceMaps */
+      )
+    );
+  }
+  function writeBreakWhenTrue(label, condition, operationLocation) {
+    writeStatement(
+      setEmitFlags(
+        factory2.createIfStatement(
+          condition,
+          setEmitFlags(
+            setTextRange(
+              factory2.createReturnStatement(
+                factory2.createArrayLiteralExpression([
+                  createInstruction(3 /* Break */),
+                  createLabel(label)
+                ])
+              ),
+              operationLocation
+            ),
+            768 /* NoTokenSourceMaps */
+          )
+        ),
+        1 /* SingleLine */
+      )
+    );
+  }
+  function writeBreakWhenFalse(label, condition, operationLocation) {
+    writeStatement(
+      setEmitFlags(
+        factory2.createIfStatement(
+          factory2.createLogicalNot(condition),
+          setEmitFlags(
+            setTextRange(
+              factory2.createReturnStatement(
+                factory2.createArrayLiteralExpression([
+                  createInstruction(3 /* Break */),
+                  createLabel(label)
+                ])
+              ),
+              operationLocation
+            ),
+            768 /* NoTokenSourceMaps */
+          )
+        ),
+        1 /* SingleLine */
+      )
+    );
+  }
+  function writeYield(expression, operationLocation) {
+    lastOperationWasAbrupt = true;
+    writeStatement(
+      setEmitFlags(
+        setTextRange(
+          factory2.createReturnStatement(
+            factory2.createArrayLiteralExpression(
+              expression ? [createInstruction(4 /* Yield */), expression] : [createInstruction(4 /* Yield */)]
+            )
+          ),
+          operationLocation
+        ),
+        768 /* NoTokenSourceMaps */
+      )
+    );
+  }
+  function writeYieldStar(expression, operationLocation) {
+    lastOperationWasAbrupt = true;
+    writeStatement(
+      setEmitFlags(
+        setTextRange(
+          factory2.createReturnStatement(
+            factory2.createArrayLiteralExpression([
+              createInstruction(5 /* YieldStar */),
+              expression
+            ])
+          ),
+          operationLocation
+        ),
+        768 /* NoTokenSourceMaps */
+      )
+    );
+  }
+  function writeEndfinally() {
+    lastOperationWasAbrupt = true;
+    writeStatement(
+      factory2.createReturnStatement(
+        factory2.createArrayLiteralExpression([
+          createInstruction(7 /* Endfinally */)
+        ])
+      )
+    );
+  }
+}
+
+// src/compiler/transformers/module/module.ts
+function transformModule(context) {
+  function getTransformModuleDelegate(moduleKind2) {
+    switch (moduleKind2) {
+      case 2 /* AMD */:
+        return transformAMDModule;
+      case 3 /* UMD */:
+        return transformUMDModule;
+      default:
+        return transformCommonJSModule;
+    }
+  }
+  const {
+    factory: factory2,
+    getEmitHelperFactory: emitHelpers,
+    startLexicalEnvironment,
+    endLexicalEnvironment,
+    hoistVariableDeclaration
+  } = context;
+  const compilerOptions = context.getCompilerOptions();
+  const resolver = context.getEmitResolver();
+  const host = context.getEmitHost();
+  const languageVersion = getEmitScriptTarget(compilerOptions);
+  const moduleKind = getEmitModuleKind(compilerOptions);
+  const previousOnSubstituteNode = context.onSubstituteNode;
+  const previousOnEmitNode = context.onEmitNode;
+  context.onSubstituteNode = onSubstituteNode;
+  context.onEmitNode = onEmitNode;
+  context.enableSubstitution(213 /* CallExpression */);
+  context.enableSubstitution(215 /* TaggedTemplateExpression */);
+  context.enableSubstitution(80 /* Identifier */);
+  context.enableSubstitution(226 /* BinaryExpression */);
+  context.enableSubstitution(304 /* ShorthandPropertyAssignment */);
+  context.enableEmitNotification(312 /* SourceFile */);
+  const moduleInfoMap = [];
+  let currentSourceFile;
+  let currentModuleInfo;
+  const noSubstitution = [];
+  let needUMDDynamicImportHelper;
+  return chainBundle(context, transformSourceFile);
+  function transformSourceFile(node) {
+    if (node.isDeclarationFile || !(isEffectiveExternalModule(node, compilerOptions) || node.transformFlags & 8388608 /* ContainsDynamicImport */ || isJsonSourceFile(node) && hasJsonModuleEmitEnabled(compilerOptions) && outFile(compilerOptions))) {
+      return node;
+    }
+    currentSourceFile = node;
+    currentModuleInfo = collectExternalModuleInfo(context, node);
+    moduleInfoMap[getOriginalNodeId(node)] = currentModuleInfo;
+    const transformModule2 = getTransformModuleDelegate(moduleKind);
+    const updated = transformModule2(node);
+    currentSourceFile = void 0;
+    currentModuleInfo = void 0;
+    needUMDDynamicImportHelper = false;
+    return updated;
+  }
+  function shouldEmitUnderscoreUnderscoreESModule() {
+    if (!currentModuleInfo.exportEquals && isExternalModule(currentSourceFile)) {
+      return true;
+    }
+    return false;
+  }
+  function transformCommonJSModule(node) {
+    startLexicalEnvironment();
+    const statements = [];
+    const ensureUseStrict = getStrictOptionValue(compilerOptions, "alwaysStrict") || !compilerOptions.noImplicitUseStrict && isExternalModule(currentSourceFile);
+    const statementOffset = factory2.copyPrologue(node.statements, statements, ensureUseStrict && !isJsonSourceFile(node), topLevelVisitor);
+    if (shouldEmitUnderscoreUnderscoreESModule()) {
+      append(statements, createUnderscoreUnderscoreESModule());
+    }
+    if (length(currentModuleInfo.exportedNames)) {
+      const chunkSize = 50;
+      for (let i = 0; i < currentModuleInfo.exportedNames.length; i += chunkSize) {
+        append(
+          statements,
+          factory2.createExpressionStatement(
+            reduceLeft(
+              currentModuleInfo.exportedNames.slice(i, i + chunkSize),
+              (prev, nextId) => factory2.createAssignment(factory2.createPropertyAccessExpression(factory2.createIdentifier("exports"), factory2.createIdentifier(idText(nextId))), prev),
+              factory2.createVoidZero()
+            )
+          )
+        );
+      }
+    }
+    append(statements, visitNode(currentModuleInfo.externalHelpersImportDeclaration, topLevelVisitor, isStatement));
+    addRange(statements, visitNodes2(node.statements, topLevelVisitor, isStatement, statementOffset));
+    addExportEqualsIfNeeded(
+      statements,
+      /*emitAsReturn*/
+      false
+    );
+    insertStatementsAfterStandardPrologue(statements, endLexicalEnvironment());
+    const updated = factory2.updateSourceFile(node, setTextRange(factory2.createNodeArray(statements), node.statements));
+    addEmitHelpers(updated, context.readEmitHelpers());
+    return updated;
+  }
+  function transformAMDModule(node) {
+    const define = factory2.createIdentifier("define");
+    const moduleName = tryGetModuleNameFromFile(factory2, node, host, compilerOptions);
+    const jsonSourceFile = isJsonSourceFile(node) && node;
+    const { aliasedModuleNames, unaliasedModuleNames, importAliasNames } = collectAsynchronousDependencies(
+      node,
+      /*includeNonAmdDependencies*/
+      true
+    );
+    const updated = factory2.updateSourceFile(
+      node,
+      setTextRange(
+        factory2.createNodeArray([
+          factory2.createExpressionStatement(
+            factory2.createCallExpression(
+              define,
+              /*typeArguments*/
+              void 0,
+              [
+                // Add the module name (if provided).
+                ...moduleName ? [moduleName] : [],
+                // Add the dependency array argument:
+                //
+                //     ["require", "exports", module1", "module2", ...]
+                factory2.createArrayLiteralExpression(
+                  jsonSourceFile ? emptyArray : [
+                    factory2.createStringLiteral("require"),
+                    factory2.createStringLiteral("exports"),
+                    ...aliasedModuleNames,
+                    ...unaliasedModuleNames
+                  ]
+                ),
+                // Add the module body function argument:
+                //
+                //     function (require, exports, module1, module2) ...
+                jsonSourceFile ? jsonSourceFile.statements.length ? jsonSourceFile.statements[0].expression : factory2.createObjectLiteralExpression() : factory2.createFunctionExpression(
+                  /*modifiers*/
+                  void 0,
+                  /*asteriskToken*/
+                  void 0,
+                  /*name*/
+                  void 0,
+                  /*typeParameters*/
+                  void 0,
+                  [
+                    factory2.createParameterDeclaration(
+                      /*modifiers*/
+                      void 0,
+                      /*dotDotDotToken*/
+                      void 0,
+                      "require"
+                    ),
+                    factory2.createParameterDeclaration(
+                      /*modifiers*/
+                      void 0,
+                      /*dotDotDotToken*/
+                      void 0,
+                      "exports"
+                    ),
+                    ...importAliasNames
+                  ],
+                  /*type*/
+                  void 0,
+                  transformAsynchronousModuleBody(node)
+                )
+              ]
+            )
+          )
+        ]),
+        /*location*/
+        node.statements
+      )
+    );
+    addEmitHelpers(updated, context.readEmitHelpers());
+    return updated;
+  }
+  function transformUMDModule(node) {
+    const { aliasedModuleNames, unaliasedModuleNames, importAliasNames } = collectAsynchronousDependencies(
+      node,
+      /*includeNonAmdDependencies*/
+      false
+    );
+    const moduleName = tryGetModuleNameFromFile(factory2, node, host, compilerOptions);
+    const umdHeader = factory2.createFunctionExpression(
+      /*modifiers*/
+      void 0,
+      /*asteriskToken*/
+      void 0,
+      /*name*/
+      void 0,
+      /*typeParameters*/
+      void 0,
+      [factory2.createParameterDeclaration(
+        /*modifiers*/
+        void 0,
+        /*dotDotDotToken*/
+        void 0,
+        "factory"
+      )],
+      /*type*/
+      void 0,
+      setTextRange(
+        factory2.createBlock(
+          [
+            factory2.createIfStatement(
+              factory2.createLogicalAnd(
+                factory2.createTypeCheck(factory2.createIdentifier("module"), "object"),
+                factory2.createTypeCheck(factory2.createPropertyAccessExpression(factory2.createIdentifier("module"), "exports"), "object")
+              ),
+              factory2.createBlock([
+                factory2.createVariableStatement(
+                  /*modifiers*/
+                  void 0,
+                  [
+                    factory2.createVariableDeclaration(
+                      "v",
+                      /*exclamationToken*/
+                      void 0,
+                      /*type*/
+                      void 0,
+                      factory2.createCallExpression(
+                        factory2.createIdentifier("factory"),
+                        /*typeArguments*/
+                        void 0,
+                        [
+                          factory2.createIdentifier("require"),
+                          factory2.createIdentifier("exports")
+                        ]
+                      )
+                    )
+                  ]
+                ),
+                setEmitFlags(
+                  factory2.createIfStatement(
+                    factory2.createStrictInequality(
+                      factory2.createIdentifier("v"),
+                      factory2.createIdentifier("undefined")
+                    ),
+                    factory2.createExpressionStatement(
+                      factory2.createAssignment(
+                        factory2.createPropertyAccessExpression(factory2.createIdentifier("module"), "exports"),
+                        factory2.createIdentifier("v")
+                      )
+                    )
+                  ),
+                  1 /* SingleLine */
+                )
+              ]),
+              factory2.createIfStatement(
+                factory2.createLogicalAnd(
+                  factory2.createTypeCheck(factory2.createIdentifier("define"), "function"),
+                  factory2.createPropertyAccessExpression(factory2.createIdentifier("define"), "amd")
+                ),
+                factory2.createBlock([
+                  factory2.createExpressionStatement(
+                    factory2.createCallExpression(
+                      factory2.createIdentifier("define"),
+                      /*typeArguments*/
+                      void 0,
+                      [
+                        // Add the module name (if provided).
+                        ...moduleName ? [moduleName] : [],
+                        factory2.createArrayLiteralExpression([
+                          factory2.createStringLiteral("require"),
+                          factory2.createStringLiteral("exports"),
+                          ...aliasedModuleNames,
+                          ...unaliasedModuleNames
+                        ]),
+                        factory2.createIdentifier("factory")
+                      ]
+                    )
+                  )
+                ])
+              )
+            )
+          ],
+          /*multiLine*/
+          true
+        ),
+        /*location*/
+        void 0
+      )
+    );
+    const updated = factory2.updateSourceFile(
+      node,
+      setTextRange(
+        factory2.createNodeArray([
+          factory2.createExpressionStatement(
+            factory2.createCallExpression(
+              umdHeader,
+              /*typeArguments*/
+              void 0,
+              [
+                // Add the module body function argument:
+                //
+                //     function (require, exports) ...
+                factory2.createFunctionExpression(
+                  /*modifiers*/
+                  void 0,
+                  /*asteriskToken*/
+                  void 0,
+                  /*name*/
+                  void 0,
+                  /*typeParameters*/
+                  void 0,
+                  [
+                    factory2.createParameterDeclaration(
+                      /*modifiers*/
+                      void 0,
+                      /*dotDotDotToken*/
+                      void 0,
+                      "require"
+                    ),
+                    factory2.createParameterDeclaration(
+                      /*modifiers*/
+                      void 0,
+                      /*dotDotDotToken*/
+                      void 0,
+                      "exports"
+                    ),
+                    ...importAliasNames
+                  ],
+                  /*type*/
+                  void 0,
+                  transformAsynchronousModuleBody(node)
+                )
+              ]
+            )
+          )
+        ]),
+        /*location*/
+        node.statements
+      )
+    );
+    addEmitHelpers(updated, context.readEmitHelpers());
+    return updated;
+  }
+  function collectAsynchronousDependencies(node, includeNonAmdDependencies) {
+    const aliasedModuleNames = [];
+    const unaliasedModuleNames = [];
+    const importAliasNames = [];
+    for (const amdDependency of node.amdDependencies) {
+      if (amdDependency.name) {
+        aliasedModuleNames.push(factory2.createStringLiteral(amdDependency.path));
+        importAliasNames.push(factory2.createParameterDeclaration(
+          /*modifiers*/
+          void 0,
+          /*dotDotDotToken*/
+          void 0,
+          amdDependency.name
+        ));
+      } else {
+        unaliasedModuleNames.push(factory2.createStringLiteral(amdDependency.path));
+      }
+    }
+    for (const importNode of currentModuleInfo.externalImports) {
+      const externalModuleName = getExternalModuleNameLiteral(factory2, importNode, currentSourceFile, host, resolver, compilerOptions);
+      const importAliasName = getLocalNameForExternalImport(factory2, importNode, currentSourceFile);
+      if (externalModuleName) {
+        if (includeNonAmdDependencies && importAliasName) {
+          setEmitFlags(importAliasName, 8 /* NoSubstitution */);
+          aliasedModuleNames.push(externalModuleName);
+          importAliasNames.push(factory2.createParameterDeclaration(
+            /*modifiers*/
+            void 0,
+            /*dotDotDotToken*/
+            void 0,
+            importAliasName
+          ));
+        } else {
+          unaliasedModuleNames.push(externalModuleName);
+        }
+      }
+    }
+    return { aliasedModuleNames, unaliasedModuleNames, importAliasNames };
+  }
+  function getAMDImportExpressionForImport(node) {
+    if (isImportEqualsDeclaration(node) || isExportDeclaration(node) || !getExternalModuleNameLiteral(factory2, node, currentSourceFile, host, resolver, compilerOptions)) {
+      return void 0;
+    }
+    const name = getLocalNameForExternalImport(factory2, node, currentSourceFile);
+    const expr = getHelperExpressionForImport(node, name);
+    if (expr === name) {
+      return void 0;
+    }
+    return factory2.createExpressionStatement(factory2.createAssignment(name, expr));
+  }
+  function transformAsynchronousModuleBody(node) {
+    startLexicalEnvironment();
+    const statements = [];
+    const statementOffset = factory2.copyPrologue(
+      node.statements,
+      statements,
+      /*ensureUseStrict*/
+      !compilerOptions.noImplicitUseStrict,
+      topLevelVisitor
+    );
+    if (shouldEmitUnderscoreUnderscoreESModule()) {
+      append(statements, createUnderscoreUnderscoreESModule());
+    }
+    if (length(currentModuleInfo.exportedNames)) {
+      append(statements, factory2.createExpressionStatement(reduceLeft(currentModuleInfo.exportedNames, (prev, nextId) => factory2.createAssignment(factory2.createPropertyAccessExpression(factory2.createIdentifier("exports"), factory2.createIdentifier(idText(nextId))), prev), factory2.createVoidZero())));
+    }
+    append(statements, visitNode(currentModuleInfo.externalHelpersImportDeclaration, topLevelVisitor, isStatement));
+    if (moduleKind === 2 /* AMD */) {
+      addRange(statements, mapDefined(currentModuleInfo.externalImports, getAMDImportExpressionForImport));
+    }
+    addRange(statements, visitNodes2(node.statements, topLevelVisitor, isStatement, statementOffset));
+    addExportEqualsIfNeeded(
+      statements,
+      /*emitAsReturn*/
+      true
+    );
+    insertStatementsAfterStandardPrologue(statements, endLexicalEnvironment());
+    const body = factory2.createBlock(
+      statements,
+      /*multiLine*/
+      true
+    );
+    if (needUMDDynamicImportHelper) {
+      addEmitHelper(body, dynamicImportUMDHelper);
+    }
+    return body;
+  }
+  function addExportEqualsIfNeeded(statements, emitAsReturn) {
+    if (currentModuleInfo.exportEquals) {
+      const expressionResult = visitNode(currentModuleInfo.exportEquals.expression, visitor, isExpression);
+      if (expressionResult)

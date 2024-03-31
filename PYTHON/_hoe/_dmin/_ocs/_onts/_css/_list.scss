@@ -1,0 +1,15 @@
+if (typeof Promise === "function") {
+        try {
+            var promise = new Promise(function(){});
+            if (classString(promise) === "[object Promise]") {
+                return Promise;
+            }
+        } catch (e) {}
+    }
+}
+
+var reflectHandler;
+function contextBind(ctx, cb) {
+    if (ctx === null ||
+        typeof cb !== "function" ||
+        cb === reflec

@@ -1,0 +1,16 @@
+{
+	"name": "@csstools/postcss-cascade-layers",
+	"description": "Use cascade layers in CSS",
+	"version": "1.1.1",
+	"contributors": [
+		{
+			"name": "Olu Niyi-Awosusi",
+			"email": "o.niyiawosusi@gmail.com"
+		},
+		{
+			"name": "Sana Javed",
+			"email": "sanajaved7@gmail.com"
+		},
+		{
+			"name": "Antonio Laguna",
+			"email": "antonio@lag

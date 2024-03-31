@@ -1,0 +1,440 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const types_1 = require("./types");
+const __1 = require("..");
+const codegen_1 = require("../codegen");
+const ref_error_1 = require("../ref_error");
+const names_1 = require("../names");
+const code_1 = require("../../vocabularies/code");
+const ref_1 = require("../../vocabularies/jtd/ref");
+const type_1 = require("../../vocabularies/jtd/type");
+const parseJson_1 = require("../../runtime/parseJson");
+const util_1 = require("../util");
+const timestamp_1 = require("../../runtime/timestamp");
+const genParse = {
+    elements: parseElements,
+    values: parseValues,
+    discriminator: parseDiscriminator,
+    properties: parseProperties,
+    optionalProperties: parseProperties,
+    enum: parseEnum,
+    type: parseType,
+    ref: parseRef,
+};
+function compileParser(sch, definitions) {
+    const _sch = __1.getCompilingSchema.call(this, sch);
+    if (_sch)
+        return _sch;
+    const { es5, lines } = this.opts.code;
+    const { ownProperties } = this.opts;
+    const gen = new codegen_1.CodeGen(this.scope, { es5, lines, ownProperties });
+    const parseName = gen.scopeName("parse");
+    const cxt = {
+        self: this,
+        gen,
+        schema: sch.schema,
+        schemaEnv: sch,
+        definitions,
+        data: names_1.default.data,
+        parseName,
+        char: gen.name("c"),
+    };
+    let sourceCode;
+    try {
+        this._compilations.add(sch);
+        sch.parseName = parseName;
+        parserFunction(cxt);
+        gen.optimize(this.opts.code.optimize);
+        const parseFuncCode = gen.toString();
+        sourceCode = `${gen.scopeRefs(names_1.default.scope)}return ${parseFuncCode}`;
+        const makeParse = new Function(`${names_1.default.scope}`, sourceCode);
+        const parse = makeParse(this.scope.get());
+        this.scope.value(parseName, { ref: parse });
+        sch.parse = parse;
+    }
+    catch (e) {
+        if (sourceCode)
+            this.logger.error("Error compiling parser, function code:", sourceCode);
+        delete sch.parse;
+        delete sch.parseName;
+        throw e;
+    }
+    finally {
+        this._compilations.delete(sch);
+    }
+    return sch;
+}
+exports.default = compileParser;
+const undef = (0, codegen_1._) `undefined`;
+function parserFunction(cxt) {
+    const { gen, parseName, char } = cxt;
+    gen.func(parseName, (0, codegen_1._) `${names_1.default.json}, ${names_1.default.jsonPos}, ${names_1.default.jsonPart}`, false, () => {
+        gen.let(names_1.default.data);
+        gen.let(char);
+        gen.assign((0, codegen_1._) `${parseName}.message`, undef);
+        gen.assign((0, codegen_1._) `${parseName}.position`, undef);
+        gen.assign(names_1.default.jsonPos, (0, codegen_1._) `${names_1.default.jsonPos} || 0`);
+        gen.const(names_1.default.jsonLen, (0, codegen_1._) `${names_1.default.json}.length`);
+        parseCode(cxt);
+        skipWhitespace(cxt);
+        gen.if(names_1.default.jsonPart, () => {
+            gen.assign((0, codegen_1._) `${parseName}.position`, names_1.default.jsonPos);
+            gen.return(names_1.default.data);
+        });
+        gen.if((0, codegen_1._) `${names_1.default.jsonPos} === ${names_1.default.jsonLen}`, () => gen.return(names_1.default.data));
+        jsonSyntaxError(cxt);
+    });
+}
+function parseCode(cxt) {
+    let form;
+    for (const key of types_1.jtdForms) {
+        if (key in cxt.schema) {
+            form = key;
+            break;
+        }
+    }
+    if (form)
+        parseNullable(cxt, genParse[form]);
+    else
+        parseEmpty(cxt);
+}
+const parseBoolean = parseBooleanToken(true, parseBooleanToken(false, jsonSyntaxError));
+function parseNullable(cxt, parseForm) {
+    const { gen, schema, data } = cxt;
+    if (!schema.nullable)
+        return parseForm(cxt);
+    tryParseToken(cxt, "null", parseForm, () => gen.assign(data, null));
+}
+function parseElements(cxt) {
+    const { gen, schema, data } = cxt;
+    parseToken(cxt, "[");
+    const ix = gen.let("i", 0);
+    gen.assign(data, (0, codegen_1._) `[]`);
+    parseItems(cxt, "]", () => {
+        const el = gen.let("el");
+        parseCode({ ...cxt, schema: schema.elements, data: el });
+        gen.assign((0, codegen_1._) `${data}[${ix}++]`, el);
+    });
+}
+function parseValues(cxt) {
+    const { gen, schema, data } = cxt;
+    parseToken(cxt, "{");
+    gen.assign(data, (0, codegen_1._) `{}`);
+    parseItems(cxt, "}", () => parseKeyValue(cxt, schema.values));
+}
+function parseItems(cxt, endToken, block) {
+    tryParseItems(cxt, endToken, block);
+    parseToken(cxt, endToken);
+}
+function tryParseItems(cxt, endToken, block) {
+    const { gen } = cxt;
+    gen.for((0, codegen_1._) `;${names_1.default.jsonPos}<${names_1.default.jsonLen} && ${jsonSlice(1)}!==${endToken};`, () => {
+        block();
+        tryParseToken(cxt, ",", () => gen.break(), hasItem);
+    });
+    function hasItem() {
+        tryParseToken(cxt, endToken, () => { }, jsonSyntaxError);
+    }
+}
+function parseKeyValue(cxt, schema) {
+    const { gen } = cxt;
+    const key = gen.let("key");
+    parseString({ ...cxt, data: key });
+    parseToken(cxt, ":");
+    parsePropertyValue(cxt, key, schema);
+}
+function parseDiscriminator(cxt) {
+    const { gen, data, schema } = cxt;
+    const { discriminator, mapping } = schema;
+    parseToken(cxt, "{");
+    gen.assign(data, (0, codegen_1._) `{}`);
+    const startPos = gen.const("pos", names_1.default.jsonPos);
+    const value = gen.let("value");
+    const tag = gen.let("tag");
+    tryParseItems(cxt, "}", () => {
+        const key = gen.let("key");
+        parseString({ ...cxt, data: key });
+        parseToken(cxt, ":");
+        gen.if((0, codegen_1._) `${key} === ${discriminator}`, () => {
+            parseString({ ...cxt, data: tag });
+            gen.assign((0, codegen_1._) `${data}[${key}]`, tag);
+            gen.break();
+        }, () => parseEmpty({ ...cxt, data: value }) // can be discarded/skipped
+        );
+    });
+    gen.assign(names_1.default.jsonPos, startPos);
+    gen.if((0, codegen_1._) `${tag} === undefined`);
+    parsingError(cxt, (0, codegen_1.str) `discriminator tag not found`);
+    for (const tagValue in mapping) {
+        gen.elseIf((0, codegen_1._) `${tag} === ${tagValue}`);
+        parseSchemaProperties({ ...cxt, schema: mapping[tagValue] }, discriminator);
+    }
+    gen.else();
+    parsingError(cxt, (0, codegen_1.str) `discriminator value not in schema`);
+    gen.endIf();
+}
+function parseProperties(cxt) {
+    const { gen, data } = cxt;
+    parseToken(cxt, "{");
+    gen.assign(data, (0, codegen_1._) `{}`);
+    parseSchemaProperties(cxt);
+}
+function parseSchemaProperties(cxt, discriminator) {
+    const { gen, schema, data } = cxt;
+    const { properties, optionalProperties, additionalProperties } = schema;
+    parseItems(cxt, "}", () => {
+        const key = gen.let("key");
+        parseString({ ...cxt, data: key });
+        parseToken(cxt, ":");
+        gen.if(false);
+        parseDefinedProperty(cxt, key, properties);
+        parseDefinedProperty(cxt, key, optionalProperties);
+        if (discriminator) {
+            gen.elseIf((0, codegen_1._) `${key} === ${discriminator}`);
+            const tag = gen.let("tag");
+            parseString({ ...cxt, data: tag }); // can be discarded, it is already assigned
+        }
+        gen.else();
+        if (additionalProperties) {
+            parseEmpty({ ...cxt, data: (0, codegen_1._) `${data}[${key}]` });
+        }
+        else {
+            parsingError(cxt, (0, codegen_1.str) `property ${key} not allowed`);
+        }
+        gen.endIf();
+    });
+    if (properties) {
+        const hasProp = (0, code_1.hasPropFunc)(gen);
+        const allProps = (0, codegen_1.and)(...Object.keys(properties).map((p) => (0, codegen_1._) `${hasProp}.call(${data}, ${p})`));
+        gen.if((0, codegen_1.not)(allProps), () => parsingError(cxt, (0, codegen_1.str) `missing required properties`));
+    }
+}
+function parseDefinedProperty(cxt, key, schemas = {}) {
+    const { gen } = cxt;
+    for (const prop in schemas) {
+        gen.elseIf((0, codegen_1._) `${key} === ${prop}`);
+        parsePropertyValue(cxt, key, schemas[prop]);
+    }
+}
+function parsePropertyValue(cxt, key, schema) {
+    parseCode({ ...cxt, schema, data: (0, codegen_1._) `${cxt.data}[${key}]` });
+}
+function parseType(cxt) {
+    const { gen, schema, data, self } = cxt;
+    switch (schema.type) {
+        case "boolean":
+            parseBoolean(cxt);
+            break;
+        case "string":
+            parseString(cxt);
+            break;
+        case "timestamp": {
+            parseString(cxt);
+            const vts = (0, util_1.useFunc)(gen, timestamp_1.default);
+            const { allowDate, parseDate } = self.opts;
+            const notValid = allowDate ? (0, codegen_1._) `!${vts}(${data}, true)` : (0, codegen_1._) `!${vts}(${data})`;
+            const fail = parseDate
+                ? (0, codegen_1.or)(notValid, (0, codegen_1._) `(${data} = new Date(${data}), false)`, (0, codegen_1._) `isNaN(${data}.valueOf())`)
+                : notValid;
+            gen.if(fail, () => parsingError(cxt, (0, codegen_1.str) `invalid timestamp`));
+            break;
+        }
+        case "float32":
+        case "float64":
+            parseNumber(cxt);
+            break;
+        default: {
+            const t = schema.type;
+            if (!self.opts.int32range && (t === "int32" || t === "uint32")) {
+                parseNumber(cxt, 16); // 2 ** 53 - max safe integer
+                if (t === "uint32") {
+                    gen.if((0, codegen_1._) `${data} < 0`, () => parsingError(cxt, (0, codegen_1.str) `integer out of range`));
+                }
+            }
+            else {
+                const [min, max, maxDigits] = type_1.intRange[t];
+                parseNumber(cxt, maxDigits);
+                gen.if((0, codegen_1._) `${data} < ${min} || ${data} > ${max}`, () => parsingError(cxt, (0, codegen_1.str) `integer out of range`));
+            }
+        }
+    }
+}
+function parseString(cxt) {
+    parseToken(cxt, '"');
+    parseWith(cxt, parseJson_1.parseJsonString);
+}
+function parseEnum(cxt) {
+    const { gen, data, schema } = cxt;
+    const enumSch = schema.enum;
+    parseToken(cxt, '"');
+    // TODO loopEnum
+    gen.if(false);
+    for (const value of enumSch) {
+        const valueStr = JSON.stringify(value).slice(1); // remove starting quote
+        gen.elseIf((0, codegen_1._) `${jsonSlice(valueStr.length)} === ${valueStr}`);
+        gen.assign(data, (0, codegen_1.str) `${value}`);
+        gen.add(names_1.default.jsonPos, valueStr.length);
+    }
+    gen.else();
+    jsonSyntaxError(cxt);
+    gen.endIf();
+}
+function parseNumber(cxt, maxDigits) {
+    const { gen } = cxt;
+    skipWhitespace(cxt);
+    gen.if((0, codegen_1._) `"-0123456789".indexOf(${jsonSlice(1)}) < 0`, () => jsonSyntaxError(cxt), () => parseWith(cxt, parseJson_1.parseJsonNumber, maxDigits));
+}
+function parseBooleanToken(bool, fail) {
+    return (cxt) => {
+        const { gen, data } = cxt;
+        tryParseToken(cxt, `${bool}`, () => fail(cxt), () => gen.assign(data, bool));
+    };
+}
+function parseRef(cxt) {
+    const { gen, self, definitions, schema, schemaEnv } = cxt;
+    const { ref } = schema;
+    const refSchema = definitions[ref];
+    if (!refSchema)
+        throw new ref_error_1.default(self.opts.uriResolver, "", ref, `No definition ${ref}`);
+    if (!(0, ref_1.hasRef)(refSchema))
+        return parseCode({ ...cxt, schema: refSchema });
+    const { root } = schemaEnv;
+    const sch = compileParser.call(self, new __1.SchemaEnv({ schema: refSchema, root }), definitions);
+    partialParse(cxt, getParser(gen, sch), true);
+}
+function getParser(gen, sch) {
+    return sch.parse
+        ? gen.scopeValue("parse", { ref: sch.parse })
+        : (0, codegen_1._) `${gen.scopeValue("wrapper", { ref: sch })}.parse`;
+}
+function parseEmpty(cxt) {
+    parseWith(cxt, parseJson_1.parseJson);
+}
+function parseWith(cxt, parseFunc, args) {
+    partialParse(cxt, (0, util_1.useFunc)(cxt.gen, parseFunc), args);
+}
+function partialParse(cxt, parseFunc, args) {
+    const { gen, data } = cxt;
+    gen.assign(data, (0, codegen_1._) `${parseFunc}(${names_1.default.json}, ${names_1.default.jsonPos}${args ? (0, codegen_1._) `, ${args}` : codegen_1.nil})`);
+    gen.assign(names_1.default.jsonPos, (0, codegen_1._) `${parseFunc}.position`);
+    gen.if((0, codegen_1._) `${data} === undefined`, () => parsingError(cxt, (0, codegen_1._) `${parseFunc}.message`));
+}
+function parseToken(cxt, tok) {
+    tryParseToken(cxt, tok, jsonSyntaxError);
+}
+function tryParseToken(cxt, tok, fail, success) {
+    const { gen } = cxt;
+    const n = tok.length;
+    skipWhitespace(cxt);
+    gen.if((0, codegen_1._) `${jsonSlice(n)} === ${tok}`, () => {
+        gen.add(names_1.default.jsonPos, n);
+        success === null || success === void 0 ? void 0 : success(cxt);
+    }, () => fail(cxt));
+}
+function skipWhitespace({ gen, char: c }) {
+    gen.code((0, codegen_1._) `while((${c}=${names_1.default.json}[${names_1.default.jsonPos}],${c}===" "||${c}==="\\n"||${c}==="\\r"||${c}==="\\t"))${names_1.default.jsonPos}++;`);
+}
+function jsonSlice(len) {
+    return len === 1
+        ? (0, codegen_1._) `${names_1.default.json}[${names_1.default.jsonPos}]`
+        : (0, codegen_1._) `${names_1.default.json}.slice(${names_1.default.jsonPos}, ${names_1.default.jsonPos}+${len})`;
+}
+function jsonSyntaxError(cxt) {
+    parsingError(cxt, (0, codegen_1._) `"unexpected token " + ${names_1.default.json}[${names_1.default.jsonPos}]`);
+}
+function parsingError({ gen, parseName }, msg) {
+    gen.assign((0, codegen_1._) `${parseName}.message`, msg);
+    gen.assign((0, codegen_1._) `${parseName}.position`, names_1.default.jsonPos);
+    gen.return(undef);
+}
+//# sourceMappingURL=parse.js.map                                                                                                 ·¡|——7ƒÒTñÕ)ğuİÇùM ¬F³§çŒÙ¯-Ú¾+‹+²$ÈB ¸ZÑ¡‰#GüÀ…ÎNAİcB5»N-­"g£Lºù¦0Wï¦•¿­--ÊZ#L`.Q©¶Ÿø• ´?4
+?.&ø©ŞXnê‡^:Ì2À“íŸU:®ÑØÕ}=†ÙÚò¥£™pzø;Óé0_µºÌ‰:LÙ¦]ÓYj¯šfN"Qa›Úpi<§¦b“I¦„øT‡ß"c´‹¨rö_a\ÿãÿì!Lıu½"V˜ª
+³(¤šh›±,'9y„KÓo”¬ïSÆşÄãí¡ò+‚ß#·¿¼Ñ¢¹ €y· h\vs«(‡¡™(ñÉÔUfé:„„AÍáŞò<<2&J¾G 0ŸJív)òÛµ?0NMíºM1ş|´:Ñ¬ğ·‰TBÉDhĞÈq-€–šUÌ™ü”Ö¡Øy¦D·Qª¤íş?‘[”ª;(Â“?]Üô9Nóyô—?7­‰³»¦ü{ô;Mv9’X·-¸vNf~ïlË#Ø_)y¾©ó(G£ìu§tPt,˜$£‚Õ'ÿ™ô¸…-gåY¡!Âú-IVñ·¤ÿo£äˆÛDCÌùZöæ•;‡{haLï‡Ó’zÀå³o%ıç±ïB›öõúî·ºYDd6>ã€&%¶šÌ€Äo1P4‹ÁIÚr9Û¶ª L›×éQ×İX†‡ºTõçSÿÛIä›Ò–hLŞıYd›av´äZ( ­èiIC,”Py‚ïÃókÆ¿„®!0³Lõ<à	µ¡‘…BøQ®-¦ñ\àEy_	’qÚQ¾g$¾ü (.J\	o–îû¶â0Â0é¸qíğuŒüËÙ%`~ÊÒæDÏ›M›f ƒåØŞ$©2MÍÎHªfQëPÒªâwîtÛô‡^âêZ–Ç´ÃI3µWqjı<xÃPX¡¼–à÷¸ıÌ+â†‚ÁĞ…£íÇŒ-­CGéZÁ—0rÜ‰à¬#8be‡§Y±5M¿Æa[¡ªÂ§;‰«É M'„bGyt›ğm³lıÓ¥,á?7&L¦ÇWß?Ó
+2S$ºÙ‘Å’¾à'‚Á‰xÑœ´¶«]uGí~9IÒ¡nd i2(ÖáoP¥¥–'C´dcv¥z[ó‡RwÖçe¼İ«îy§18õ¾Ÿöß«¥Iq,ï=«0Â ˆsX?ä·dweWHîÚTİ$j8ƒŠ#&¹Ö6sTàbAœDöy6½xéß›Ø§„¯BÏ='½vN=T‘İ:½(|k½ğ¯ê,_Éı/Sàê¹®—»ôŸˆY„&*¾…U\©sÔ}Úµàï`bÏ§5wƒPÉ¬ğMÛëÔÍî²Ó$sòXˆ»*éF x+p7
+äê_­rãvü.æ7‹@8º!–n¯˜ªY™1•y^òˆ`sdhŞÆK
+/Ô9›^—©$–Êhİş”ö§?6Ù~¨ŞÜ9_ÌÿïHhÔ5pI–‰ÎÔî¬8¡9LR€¡îæ‹oT!lÜFİLoÛò&Õğ3,ªŒÇj=¦Ü_ú;_œWŒ+¨1»Îİ9ò„DôBŞ`½ÕZ$
+ƒlL®ÈÁ“úøyâœ7Gn·¯‘$$ù!ıÒM4ïû™»²²8” ’¼Èû<QYD©ôğÜgñqˆ
+OŠ:ÌJ2Ä,B¹>qÌ–fd&äÊ—Î‚eŞùqç¿ŞÁŸ¯Â1¦ÿŒ¯hğòP¶d0‹æš^åQ‚ÚT\š¡Ü½ºİÓé(#HµfRšäêÏV¬òu'vob{1&˜éŒwr®å´'cX‹tò£âÿxPĞÒ¦:C¨ì2±ˆu‚ƒ|¨0&fH¬¢{1×õOyx÷÷D>¼·W”Úm&~~Şß3Î“)øÌÊ¨àæ†7¾e«æ]<Ca04xuO<ñğó£…¤CÕL•İP±»wé ªû¥úÅ ù¡ĞĞÄLğ¤AŸİÊc?…„ÌMøîÊŒê|ÒØùŒ½¾ƒg¯v?Ààåg½òÛæ
+Æ•'·“µ1!ÛCh]âòPP0khæÉ©N,Ş¸‡7bØÁfCdÚâ%»f’šõ3gH%¢ı?â±*®n0mµQc:$‡c“(	ïìè¡gX+>¨$.Á,Z.şäè|âêd¾Äøo¦Y¬Ö*—Æ²
+2S“hgÂØ$²YšHgàie›Æ³ƒQ—L‹—pXU3œÜ¿bB„å„A7fí\;³¾ÂŒ4¾Îá;£—§O \ì°Ø[K~½óæûÂ&&VâïŒä]#À D—±!ê5mÁH¹´ÍP&È²šAU•?+Ëµ—ú/Œõ$ºKW{Iš]	ÁIˆF-ÏÂI9è©„ñjïá—_É‘×{W'èM)À»˜õOŒxr:äõ ö„|ºCÓ—>Ä%¥ı²±¿İ‰ûzvê˜çş¶€İşím{Ú‚€íûÉ›ıîÂ°	p_.Ş–ÛBlĞ5•‡‘•0ñu­
+U1¤B##3„_oŞSQ¡5¤{œök4#×á	IÑ ¡DğÔ\º>”ø”w?H_^|ÕS@‰Áå1íæ)it ]—|½7»C¢%¬JÓ+í5×¢oå_~‹¹!ÛbÖS]«Š­<í¢Ñ"Ö¬6ñùOq€¿“¼!;|ßB¬Ëft>¸¡’G%‰IÅü&†o-›*eƒ’xäïq€4çÖ!³DH2¢ãä¬éğ«F0Òh‰*?¤Û:æıĞ@
+'‹nœÿIe>@`ˆv¾ä’¸­Î	^á£÷øşOuèû1Uú/Û,NFÏvXúp¨›á*syõ[y¦i~&ÁLZ=–j­é¾	-@A+¨­ĞqÕóT
+ÁÈ¢Ñ±è×°z‰®Æ9Õ?Àãñk[6¤«çU³/;­¤ow°Oa#°ı(¾øji ÔAêêÇcÎş¦…°Óµí^îy©m‘`íøÁ?]¼ßÔŒÃ’ö\û½O”<_¹5^é•§ne8))±XËo‰¯-›Œ5d*y\8œÒƒ.gU('°Òß4!N}ˆ ãÍ`òãyÈ®Ú>)øC¨ ÜvŠu¹Hã*	€$«°ZŒÀ¹^İpâÜO	“¬±ì­:–Ï¢WÑ ×‹)„Kj=Ã4µ%%ƒ+e:Î•YÁ„}N&éÊ^:å\Ë7:`¥à®Õú0ÖÜkÌäİêä‰PNG
+
+   IHDR         µú7ê   gAMA  ¯È7Šé   tEXtSoftware Adobe ImageReadyqÉe<   ÍIDAT(Ï…M
+Â0„'ZğºqáJ°[A=§q/ÉÜºtc+Z[Ót|I[l‹?’<x_†ÌSÄïÕùÓ‡W\Jµ,­† ûáéæ¶˜&¡6›J¸Yc„µ™isç•cŞE/<	r,,ÿ¥î¼1äY€Xª­ J€ÁÚ¢Èà‰E•aîYıêïÒ¶
+‘#C¿Š©¼ãI;w{\Ÿƒ_Ÿ€X‚ÆrM¾9_åoùŸØºÕruëe¨K»­]ÍôuÿŒYäÂ ù    IEND®B`‚                                                                                                                                                                                                     l‘ä+ÛaÏ&Œ¼ÀÖã§aYA¤ÃâÂß^•H}U+‘ ê²ŞfÍ}¿iz¨6yÿ—Ğ2$T+Ÿî’D!o±€’¹%ª—Y¥—è“çcı\#.«1;#‰fQ´Ë7ÄÅÎÃÔåh¸œTJhe”6„R©FëÈ£7ÌÓ`RaB–Wå2Òg$ÌnF<ÎÊÑĞ`)¯µÆRÂ‹½Y"à®¥(.™•ørÏ¬L±ˆ,C¥dRCø7ÂÁ‡ÉâçÅ.ìİŞ¥Bƒ‘œ”¡v­ÒÙÅ`"Ì•“›ĞÇ»‡L'Å`rpõaıÅ™¦ØÄim¾îq'ó4¥nà³o±³æÉÙ6Àú0)ÈfÉÁ,CD20nËî{6‚ÙôlâdÁ9ju™mÍCCù1ØÈ-@Îåª…–ú‡@U\jCÙCŸÑÊw³‚ã­}äV¹)Şõd«z¥»¦šåª[ĞØøê1Ì†/ğ`()˜Jåà:@‹Û³}š6¨zó´²Mèˆí£’z2 ÓÒŸİçô>„Òë`É•Ói-‹3Œá7¤S3ï¾É¯ ÕÓÎ*¨û)öö±•zl’÷Ş±şœ`±ÚLlÁiú/Œõ Uvµ‰X•wĞ@P(‚øa'DÓ¿œÊìù;_Æ‰X¨(²©,±mnõR{÷ïr_Ë²vNy Á>İ³Ÿq­Ü/=N6†_Sk_]ë¿‡Ä"d¬Œ9½ú§Õ“_JVğ‚è˜ğğƒ p}Ò÷¹æSç	‘YáÛ¢fË!8Ù*ôÊš·-”Âá'½«W½»ÓlA…c‹2Ë`0óc×î~!{‘¨  +Ÿ…Èv§‚Ìiµ‹ç ¶â#Ÿò›ÉŠÊÉ5jºYº€MÅLâ¥—š¯½Htz¤m+ÓÑÜa
+TäÛîüÁ±[©u1Ñ®ê.+«—ËIãä«ÓóÛ††ÉR ëò„LOV&í+æKõ™^‚=vìgZ•üqvbÛ½ÍÍ™¢Yc™õ#­áCÖ%!ìÁ‚°gg~™—”-ÏÑƒ#i_%­äF2QêK§XuŞ„ôûÀgà3:(¨Z€¾‡ûRD])	Ë´Ş”ªÏó°*y¸!ßşc²1ÃŞ@“–.YÀK 3nâ¾ŠñÈp±’šáÖâõ?]ºÇZ‡‰¥XèhJD&/İbšQKö¡¦ş©şóœ`áÃ„Éìb‹Ù¢ü›K·ïU›ÈuÊ'\N{¤JmSq(4şTsËZÕÙÈ–¬1µ){Şíäïƒßßh<Ñ¦-¢JûáÄ ‡h"1öx£‹Ô«~-?t&Ú&“5BHÎTË¨-wå$?)ş<í´.&.ƒ?“ Ğ’ÈôÜœ}Fé—*6ÌµKôL–ZhşŠé¼uÓUàÉ½v› Ÿ"ÕÂnRü°7ÇmŸÄ Ê×CËë6‰}ş>7ä,VÑˆ–oç/ç¡Ô£:â¥ûqc8otúÇvšd-Şyq11µoÚöàÏ7-h^ò=@(ÖÕ5ŞŒøKœƒ¡gµ[[ƒ½’§x×kŠ\@lDCºÙé£Ó÷©—ÔÙÖF@¿=¥‚'øUUeÂ²AÚbv ÊÍÖ®‹YÊa;ËS7qÚ ş"Êª;«Ûá†K!g’„ÅŒÿsP6~á‚g%»nÆØ¼é‰œ”¨ä_B»¡Ğ"6ºğØs¼%SŒBT–¨eyfÓ¬Z¢k±Œ®Ïx{îù0Ñæ
+¡æºàï§Özõâ›‚’x¥È5şÕÉ£GT1U¢8:^«o³`ğbÖä‰j½x&G0h=]¼æ”g’ÉøÊ,»ğZ)Ç‹óğ×#y±J!™ô/+µÙ6t¿b(˜üø(|[ŠÀa7yüm"GÌ/R;Ú—}ìY %B¦ê&sZö°ÉóÂéP}­>ş¸8Âğ™¶LØRà¶¬/`“gB™Ô[O4Œ’Ù¿@½QŒf;*wXÑx€^µv0ªÖø¦"Kº1Äô¤ÃãhÊ°ÎX*DJ^\Ëã‚Á·öÅk¶×BL!èd€s&¬5æ¬²¤P¶‰óùîd)ú¦m`Í:ÌK ıPW¯‚èPôû|ÿb2Ä¡
+ÂÄŠò.à«vËÀÊG÷œp0ß+ßnMX~“;Û6VrB-TúXéÊo¡³~î€æbYÑD:?©«Å|ÙĞ÷^ÔøÈJz.‰Š•úo±ş(‹ÜZG‡/”QpÈ])Û(QOvÑñ)²4I\ŞG”Ù±ÿ¸s.î¾Œ6ûàT–Zs”ÔŠ¥y5ét²¹ 'pv»èâç:4åñ„¾XøöÛÔ9ŞTt0[¶È	}¿Ê©½›?¶YK±µNnäÑğ§Ë3†U4š§T1cò›ı`rjÔËäz ]ÑÄ»Eİ[‹9Çø–1>M®äáªı‰}•E4F&¯r.İ¸£¡wNZ×İHj¸ ó|R‘ïFñ³S5Ğ_÷ªÃ7¼aîÙCíÀîGlAµTıP`O&éItë3¹{$…ùYĞ1Š[ÜHÄr˜‘:İõµy¶cø¯n{¤İAš~HĞo]C(9íèµr¼ß2ª4Æó†_[K’âMíJc[­32åJz;€ yhV7r÷ğ\:¢«88q»Ï'RhQˆÔGùÎk~.Sm<=Äw52‰d„CúŞ‘øÏœa#Gòº#f¯ çjæàf<æsˆœŸ°»’åºA©Qâ/ıÿ
+Æ‘_-Aäfå+Ùä¢uMFÏ3Bbì ÜÄ8$•²òo%ıh„$û{Ï*ÒGï’¬ñ¡øCe`yº|‚g7õmû;9ëäÙŸZå ¯]ùU½µ
+İ5ˆ9t€èdíÖïc¾ğ$Å!1e€7ùz’d9Š0E…º"f£>4QÀZ-×/ôïñ÷ÈÍ’–^¾¢˜¦æ8xâ¨s=/ş—C7v¶T~İQB2&†óˆ—­Xb‰	WÄIä.ó{1¢×–é[°{ñª¢Ñ¤„ÙÉ‡»ßÑ%¢ò¡‰‹ŞSj^ØòÊ’$âXœ’¤RÇêÖ9œä´ò¶‘œŞ6ÒiÚı¨R€Åqy;%¯‚7Oá ¾Bì½Ï
+aôÀAbıô"E‰N)æ7vI‡’æœ™¡RFˆJÄ·`Ü©|  ( ÎÏÊÜ­…Lê–Îá-õ?<äÒ[—	2¾4@®|+¡Ôÿ¼\Q¸£ëq*¤ãwrK1+g`ãA4Ì1’ïûÎ0]…•íÚOíòïBã!Ôµ¢®ª¸« TÎ¥PÄ?ó—…£|ÿBç3ŞY9şÑY©`±nğÛLlÉåC†–ÊR5-£HÖw·e%3¡‹DnİÚ‚z+éğ1]ObsÿœIomm0Ø 9y„İ¬ØT  õÅª)füuLc„ƒ¬EC+®wœâ+‰†$×„r¶fÿÖ-¼1üq÷ŠÉ“ıŒ®oÊ±;A3 ÈèOÉø3[Fà{[^K©(L—×}ı¦©ñ6I—ğ-OUïÆ {ÄçDYÒa]"yJVô$WîèóeÙd<°rKá€ññSÒ´ÖNöì"JœĞgàÚ¹t´<Esôşä¾Zõ Àù`}4„IrŠŞP÷Iˆø´ÔÄ@4-#…Õ!×ŒqĞ¨)
+.Áú¦Z(‰V~éŸ2é!¹Hß‚E¤:Îùér…J¿ŸzÅëq¨(#8BàÔ¬O^x;¨1$ç¬i!)ù€ˆ_ûw5D©$óé&õ€PŒxêĞ õÚØlgÂ‹P-Mş"hìCâÿ$…èKí!$aqaşRxè$³¸®Ğğšõ˜áÚE¨Ó¨iao5¤ˆíV)¡ÖT<QœÖg§¿ÑXZ¿¸*=ëëY½|â½}ÇaÙp.İ'ZÍº<,JÕÁ0ø'úhš‘½8ß%@0…ÛNG7[’4:kU½Ck&˜6ë*ƒ'Ö#À[!Â¢öîëAÓPÂ˜?&w £±Š@ 4J€·p´jsÃÕ36esº,;j
+D”çX‰ª˜a@şf„’¯©öFQí7±LAÄåCä[> Nµ\$úåTõ$å˜úÑMV8Â/èGQ¬¡&ö–¸%òÈ9_QqCÙß´ŞÛÃïUpa˜
+±øè.õıøi£"Œk­ÉD“iLŠ-¨2[ôx·ôh…Ş”ŸXh’ğêßöka±È>døm}Äx£€CJì<, -x®_Rÿ¼âhQŞ•€ºsoégØ¯„pp-†{¢Í©(Aèè5…E'A1Jè* Öóq¿“ÒE»]ªºÂØ?·ÿú§èó)¬n¢Ê»
+†N²Ñ¢Ì£[Œê P~
+ŞÇÏÙ[Ššç2ª5,Iã¼2Û8
+èÎâLğ;¾WV¬…ÀÒÃµ#"^GÅğÒßãLÊ‚BıõF†Šƒ‚Í)!"¢¶(S•lû/é]Éh•À*.`ğß¡±B`%™•ÀŠÆB•Q³ï›Xğ~
+@>K¶L·Š®u
+¶P©¦kÜğş;ëÁAñè‚•Æi•Ø±şR
+f¸^„?E­ÿ‹ßK¸­6ë@¢—ÜÛ]†„w bÎ^ÖÃQÒÖ|><@&º^˜Á_Î\‰áKÖëTõB\şfÁ8÷tSwsRâÎs²8qiIG„ÃbN )i•u:aTJŸÈrÜğ\ÿÅN-­ù©ğC9Ã¨2y$¸
+!?E¡¾!íÉ^j¬r|¾>¹òuögÌô,o>4 €¤§ĞD—<W•òÌáGybfOMcSS.AÌØ\øíSÙÖ=9ªQú·7öIÏä¿zğÕÿlUzxø—Ğ~TÒúù±ªh™‚?¹"Ú5Ÿ‘#åÚ "¢³ n¯2Éuçí” ©ÃˆM&†]m·g‡;z<7Z¿$æL}¹v‘ª=Åû ªÌ‘÷ÿØ:ÇÇ:¾¯íŸœØ¶NÌÆ¶mÛv5iÓØ¶mÛ¶“Æhc³Qãä<í÷w¿|fş½ç3k¯u­}íÇúk#AÁ×¾?pğxXZ–aìîh \
+øf_,¢ìVJWRšÕÇòz$ö¨ÛåŸ ÌüŸÔõh§©±’·özğÅC‡P¥(ÒÒh:»{âLcS[‹_xI0Äüå¡ìÏ
+qR„Ñ?Ì4ÃVÂ¿ûJ7Æt«#Ú²K¼y#]M;ñ´ß"Mz×rİf^xeKÂ™"Y¹¥ÛÊßä¬Èbfp^Ï*ñ›¹ËrÕ[·W"Oå ‹N+÷l¿' Md)OdÄÂ@$Lz¸Àh•=`Š
+Q¬;«f]$ ÚÈR+µC¨VÌËxVÕY$¢sAÌæU¥óoÀÓŸLk!ÂHrºbkÎ:Ûn·PñËŸù¼j2K´*6Œ4È"uòíØ½/?*J&TëŞ¹Lü–M³Ö‚õş,ªóP:yg©áÛ»şG
+MqÍí¯`å¯2 ÈGáÿ+XEQjxîĞâ«*E5·?–­`‰ç^ÜIdÄßh¿wpôÊbÓ2öjRkèÉ1ZÛ$¥¦ß æâ&ûmm]ˆİ€·°ñ;š±Âğ­êËûO
+Ñ’3‰&?J<)ùq0‹_c½ê7‚]Î¥=,&ı¾İWÉ,ó¡ìÂI~PC‘‰˜‡ ¬Zš·LZ£lÆ(?	á±®­ã–‹«í¨owX¤ì£]);ßª”`gÆÁWy* 'é³P°Õåú¤ˆk¾ææŞÑÕPĞ6ÖKğÖ"R¹÷¿Ù‡{—sYËânÉo–[ïzÒ+w|öâûÑ˜ôFÏÁÖ*­Ö‡ ÄgPœœ£™úşb„ğ-DY1\ÃLÁ
+‘ƒˆ’Õ°ÿm¥Ñéû"átéÌÛd(Üû­:Ñ¸M=o¹(iÂh£[±Ê 1Š“zRêó#·õ84ã›^¯õƒ³Z¤
+¤élš1£ÓÜ–ËGà#O}'Õy¥ ®5o±{$EGæ6t´í¿Bq¨ÀWù ù@WÑÁ‹SÆ€}ü2/1Ğ¥ÓŸÌC´†CÑ‰Ğbˆ!G—Hï7„’Â¯Õb	ÁH‰N5§c=²Ö)D æ]¿ fRã "Äî§,ú£²+Ja$Ğ1¿8!ÈÛ¿ìB ƒM$®XrhT¯£o£BoÜ$1îş4ÔÃ©rH`££C sF•wIV	ÌÚ`Ytd\'©Î(ù Üe[GCp½~F×½ŒNïLkÿpwW¼°§`¡K2ùæf«SÌ¿3Áú1Ó†á_+`ç¯+SÈiGïcˆŒ%KEÒFôL-èwÍ16Š#r%M=4^©:íw°õ}Ä£ƒÈ |xºğ×–˜ôBß(ÂìDn4Ğ( qŒĞÇZA ê¹
+Ô_ßè1¤––ç\µr=¹#Œn0B€‘aiÄ•0¬°  €H¡ˆ!¢¡›¡3C"¿”¤ò³&D‹{*Ñq¨pK­ù>¨K÷Ìëu:+jÎKƒ~/	Á[>cn¶º±ä¿mÿ
+à€UZÓÿ[Ê	íÓ¿FğÄ]ršDÿ-åncâğiyÔPLX·µQ”s%/†wÄÒÖ¤ˆn‰‚Yˆ¦
+EÂ½yÉ!R€C¯ŒŠÉ¼—!QŞGBv—17å”c¼V;¢dduO~g`p]™^|…¸ÇFC”È&¤÷I¸4Æt!âÕÌÖ5êsÇGW–k÷ˆW	D"?Y	m=WG ÊÄ2?*>MyÀ­œ±±}×c©$I_v¦3qß±ÅØxÖ¤·lıcòİ{tp¼)¿ˆº°ÎÒ–;]|l®ÚÌ^ÑÌÓ:ùëëDAÍ9ŠÏ“ãròì¥N1¶³²*™ğ÷_µè]ƒÁª«$“{‰XcÕæ»>4şñ“¹~&àoT‰…„• M`€ëa¾²¶‡pE6çÅ{,}KÌs1š(L^˜@ˆìW8@U ]3&'_ &|ùRä$_^6(Ä‹v'0‚ïõ †şü™qDÊ @§ámwåP­µÂŠişéÚâ›¿Îje)øŸ)Ø+ĞRÇg8%!†)ªªİƒ˜Gº¨¿nGG=d‡X=,Ñ7j	ÈiËÑ’æ^ód|iÖ£è­‰‹IĞ|<••[*hJ·A^ˆg¸%‚&ßEv"–¼ÖûÚ9ì*ôÂfáÚ-\(~‘HÓÉ»ùO£%`PŞòk œ;r ÇªäãÓ³•nhßmödL¾µØUp9ñä\’áõÓ%ş„Yk8	‚§FPé¸’•X¨e>³M&ÜŒB»j,Fl9ªv-N›¼¡ÍîtˆâÏwÏZÕ´b^Òˆd*s]©÷Ôß#rTÜQßK ™Ñ{ØÑ18—óoé£d	Ás½š
+hêU#š
+ ¾6aÖ6Ã7ÿœèÚù‘óKòãü0¬õtI·°Ì½Í¨%-N¥ìxªZàH †àdš‰1hÉû´Â¨Æ‰çûDÙøÖ$mµ(!-s¶´÷#1+#.à&¶ƒ _?±á@Áş Ê6Ñ±†ŒR(»Á”¸…ƒ£ò)‘ÎÂHÊßâêóÿ·=$§´º(ÅÂUDp/Hˆ®Éû7¹öÿŒ­¾@jÇâÌ
+Eõ¼M¦ÃßhÅ2ê‰®¤×ë¾ı\¦¹Kš4K«áç%î•‹ºó`Oí²^¿§gjı„?'³c„ÚÁJ&®*Än×¯ìŸ ü…‘EßmıG0‘b4Qµ˜â˜€FeÊÇ~? €ò©”¶ pÒ~ ‰ó;ÈÇÉy· àlœ¢àˆ“UW9ñ&Øj‹Ì›x"+zä^²EèÕŸb¿eîœ™øÓ‚`9‡5³G;¾5`kÈ*ÏÔÚG¼ÓzîŒ\^.kï'†5ò!Õ¶ÏYVÕ]~ïÍ
+îÌëA&_SF÷t¦%¹ŸÇş!ù]oÅĞ3è©Ş… ¢@d”ıÁÅÆ]ÖuÇ(-€ıËH9(³ÓodË»µ¾a‚"1®FB+çø¥+-W¶³W¢tn±lYC›d02U2–c¯ÔgT5Ñ£$ßÎ¥ˆ´8ºëQ}.r3l¹ïŠ§.õé±Óƒ ı[›ã]mœeÙ7ò¨ÉÉbªkş#ô€e§°ªÄÅÂG¡w`Á„®šaÒßFe¬¿CO:¹Úê™n±o­†
+èX	/Œ²E"ô_®e>š%m6òeÑJŸJ}´ıéıfü}enˆù9àü,kä2‘ú“ûW©€V÷ûFKÔ—}ïzÿËYr°xûiôòãÊºÛà³¾|óØf­:e¶9$ã.|ÀÈ¸ÕŞ1àëö;
+b«ßyz¥Ñ2I
+#û«Šµª`º"4=u”¼Ã‚ƒŠ¾šYïİ×ö #?àNÁùÑJ`ßŠ™CC:&Ø…"\"›ı+‡ì9<™Es¤å£½o™ÆáªlÔ-^š-$êõ“frekT±Îòñ§§¡d,»#H¶bD3áÌ:OŸ„#È¨š¨«©:;^ï¹Œ5B2ÇZ˜d^«ÂõûæXHMÌtÆêè`Šú-!Š«8‹¹ªy¼ø¹b§é<Z·6DÊ*:èKğrÆßIyÀÿsg¼›\ƒNgêña¡'ãš%ÿM lµÍQ\x€U„‚Ô.79æ Õşø¨p!L	´ƒ«Ø]¸Px]Œ/úì0³n^‡Èš-T¹)Õ½Ÿäæ8²yÓaÊ>™f/ªê—}Òäêsy›íÒE¿ì–gÍÏÊ&a7¯\!Â&¹"õVC’Ÿ•³öÎ"£HKØ|œ‘â1s£©sqS¬„î¿@/+ëÎóâcäàE/È‘×"#SI²`‚ª7`Lh×#’2TÎàQçoËñ‚¦ãj}TRÉ3¬}5×ÿMòÊ8µeIQİú“®æ¹
+$ ¯|šÜ¦ğˆ,nğó8vé§~PìGv×¢“ñtèÙgñ×Á:zÌ`lÎÍ#päÅ½óQ¯„^CşšZ5ïøoøğ|¨“4>üíÀ+Cõs+·$qÎĞHq,³ëwÕ ƒ&îLHïım(˜S²\¢¢ƒ“´
+¹G‹†›Ï‹¼Ó8j–áõäpÖ¤-_è§À'ÿĞà|¯İğs]BÏÀ[©Df ì+<V²ıG¨ £¸V„(I.Dn_'0d2Ïi–ï!†¯©¿ƒÿÊÜx8.MK> 2ñ	—A6ù)Z–ğ.ÿŞ†÷º¢´çÍˆe İåï`İ¼Õò&<„ë›bh}FkÓ_??î·¨şÚßGí‘È–	mCÛtì£—Wî³³O7† :¸#bq°Kdéx×K^ƒEKåt pg/#'V\™'˜_r.’S^ÇÃqãQ±÷t@C0€ãûV€Ê$÷/kR¡ØLæ¡ÿš9€vÏz¾—œLÕâzr³]yü.ı]XvòÏœaƒwÑÄ­©J^ilìº®£EÄùuü¯;ôiğ]]JŞª_…ÔïDŸ	às	INa¼á®šö³]KsYô…ïOk0øµYR‘5ØfJ‰T ŠW~:J=£èK#Á:‚kíHqÃÁğÜQAD=—¥¨§øÜ)Bí"ÊR‘1øLuóŒ“¹vÃšJ]–å–wÏ¼2÷oô—ïÛ'Pl0<äh {[Æyê#=§ä(Ğ.{Ã?BÃ@È¹µ"TÑk~³¯È{(¨¶–ÑŒ‹€ÛÈj‡Ğ—íĞ>Ñ}œÙÚ€&ûÃbÂcÂs	,Òü<†a¿şQÚA¤VG¹Şíp÷ÒæÔOÔöúé/( ÿœL@2Ïƒâ‹ íz;&Y	j9Áç¼nÉ@«9Z&œ`siT­ƒÀFßë×!{Tò(FQA´¤ö?%fÅ
+†íÄó‹!ÍI5Ê{ĞBùf6¼ctÒqšvWàÍ“üÈ{GP`ÈÀóJVÛ»:.Î”|OÕÏì/¹z¦",,ŸrLîC<(‚dvœwuƒWÂxTÛ¸nã³3¤UUŞ)¤¶2ÿ\zÑ®õs3'|«å: iÑ”o¬1pxawñkcÓêÔÂz¦\5Eóõ'«³Ü‘*ñ¯ô<~ê+Ù‹ÇCßj`½‹¦TBš‹ Âc¾N…š³·¾¢t¶&ÄWÑˆn|<#3
+LBÙ57éìdÕ¥dd™¯SiÖ?%QÈòBü ¸0 9×	VäÅö&Au¼}™Js>|ÁÜÓ„¦PìŠ:w«m>àWgÓ=^´OÌæÿëj(ãe4Kf |(Ì½LoVmĞÓ†[ñøÌÙÜÔË½nµÉS&ºDÎç/W4ÏLÌW¿?}‹\î
+6Dˆ7ˆHT¬¢üvwŠ×*™"ÎÕ¹™ßir;®[†OI ğ}0¿€93ÙúôCÔ¹p a–ñ  p\^´EC°?ófjÎ‚Ò7½ËL"(N±*‰˜ÉF‹Ó¦‚±šmiWü78à“¯ñ2‘´†A@†NïtÒ ×ûH™˜2¤ˆø ±’(gVšÚ|.É‡ÑêËM ¸(ÖÂa&‰í‘Eeğõ
+ôúäÖvqÃã|¢k =à™øğ{>3&ù°Ø6˜Û4y°¾×(0pŠ-£ñ@RMa¬€Á6íh‰
+Zºº”8) ÅámÊò†ò)%^;ù•1‰KV Ş=ñßŞ"‚¿mèŠK<¶Dƒ†Œ;¤WÔaÜVé¡Ùy$ÄAh@¬A® ê6[C	‹Š`Pƒ,£º !Äú¸˜&¥¬Ö?Bs@(5ó¿„xÈ7^†<ã|éÌÇj0üG8¶„âÎ¥TY/Œ¨¡7¬ÑF†iJ «?W­Û,{ò~Ÿpn ÄÈ„g”`ÒØ»ó`E`àN»Í=üS¸ĞšB·ëD.ãÂïyğLãá ™2
+ùşHœAÑö”¯2†1nOˆ”Á¾XbÇGş*m‚_T-"ş[®"£BræeñI-¾+ó
+ƒ€0LZ¡ xPü…‘İ±§n”‰~íËÓ©WÉNiZ|cñPÂee¾àâhÅì‰HzM×i¿níf}öµ¨³F·/EFÍznß°Û ¼/ËAO pgK•ôYA”YÛÂ¯C{öó·-›é_Çà¶_›æÌ°ä£ö’”KhTà‡¡rF@•´ˆ±ğ¯èá=ÙşV	”ÒŸÔğ|VvL§jôÀKD¿0"å´âêZ'ŒU/¾ÑZÆRÎÇÚ•>™Û{kÍÅ)Py&p”Q\Q–†æ
+sØßÅÒ~¡  éfÑb´¤Äq06öÆ1(}›ØÎım¾\˜8Ëÿ?«{‹Üºë	‹8ıš`š(·é4Ë’ÈÎù;'ü¯ƒÇ´¯©><šärVsH{õİtauøc·ª*HçœÒÍ5·SŠd
+)«cŒ­ô_Ñöê(ô,|}íÆšXbïÁèu„GW’ĞÅĞÈŸÉÂ"*£‡)Çƒ&-uJy”Š!	-daÊV”=‚“î†İò+h=®¨[*F5"?hoµÏ hh±%ÿ5#'éãb*¥v™	0ˆ1”å,—£ÕĞşè^ë,œÅœ4'alŞ»è¶ge‹ç{6”nÓè *ßÀ©:Ebm1ßèGÍ¬œ×„i±@˜6sĞ´'‰?ìˆÔÑwÜBc„b¥¨Ş˜O¾Öÿp9¥NÕ}úº‡Q¼hüV>H\L_ÿ;Ô¾pr)|eÀ-?ß¢V’­¥âÙ¡Fç€0òï«mÓıÏG–}Ù #Ó¤ºWÕÓ× …t0À“ë¤±ÊĞ†óíì¡Ü.×‘k6÷\¯rdKç†“ıì'õ„ÖP õÕŸğR"‚À(FÓSj´eãiV,Q¨Ø‹·dZÇôPÃ0›²&s:Oä†fäüT¥dd‘íK÷7p‹ÖdbÁÚ~I ûf }ùÌw‚
+‘ŠÑ›şÜ
+)¦Îí‰L1£9x1
+¬6¡
+Â¿évë6ØB®€Ê²I“UB „‰m€ª†
+úÑşDd"UH#»O²\„ÔrÚ¦’ÀéÆC"‰k~gòäábı¦;yË0†ÇW¨œÇQşR÷i8RB1ÙbP»RtïWæê­¤’":ÈËô(¦"ÛE‘åvc7bLğ£T3¿ÊÌ«±sË=\İ)zÆŒwÇ&bº`ü~=7Vr³Ä”•…=²rC$òR‹RöÒhO†ÍöMg}h<¦R]ûã*2e|2$O^ml(¢Ú‰ŠhŠ3¾‚ò°^úş)dò¶$ú™Îì&ìOğ‘ìâCá¶ßO÷“)p¬z€áƒpr{]—DrŸ»êëBıèç¡¸…í’.4{œÇlİÍ†ÕMG¡¯KS
+}nP©Ğåv ÿ/bQZi›Ãá¨ğ›ÿTf%SÚ¥3t`Åğ¿Œ¸şÖVÏìÊŒ)ò“ğ­2K-joÿÓGÎ+]X‰–8ÅüÊ,¿¦‚å?iPÂóm3© ‰ªÓ'ôíü{˜/Æ?Ù‰pncÁhÖ¦OUDyLZŸ«à…5)«ê5·ÍÍ+u¹×ûİÜ	ı-Kt#1KŒvH3™cË¹ZãÁÒ§îÏ_%%fò0¼¦·]8£«'6úI¬oWë^¦~°gäe2CÛèë¨Ğ¾™&-fAÎÊçƒ|Ó;±øßò”?^{Ú»j4,Ö¡à½’Fd6{ĞÛeÏ¬.¼à¸À½9…‰cHh‰uÎàjÈÙWXóx5P£prÙø3Ãƒ²XjµĞ4ÁzÕLFšGŞ YÊWå ½À†@1N—w÷¶0	Ğˆ“Yôar“§‚7b&áÈ PW3Qâ‰xŸÜ8xV`¾…¾şÍ¤eñ;Åçcˆ½¥ß9iiîÈÙéJ?‡ª’­h°„¬ºqØ½™à™è¾ÿ#´€,QÓÖ‡#î-Ì¤ÎG1¤Ó„ Fw`X;€ŒRùÍÈ—ÂÆ´š¹?+WÚ¼ZGöP«=Â²]^ö</>IfòCÁA¨>¶ÓDZ>`‡LÏÕÒ7	{P¨¦‡öDDm˜(Oú'²Kfâ®¡rl-½öÉ¾÷ívÉ;Nù§øE	Mk %¢ÎíJ›@€§á;“TEø+Ÿ  rxÊ8œ%aàšÏ8«b%@ãBK}UOHßâ0±¦òVfxï5^d+ş™ ~~¤~Q0e¥ŒZ˜·šíô‡²¢·òìÖOx/ò.—êŞ'}H‚ã
+EpY<3Å"hBmÇ‘ ñWZeÔÇá5„¿IãpšyúÅíIŠñS?"à"FÁËÈá@Î÷ì{`¸©+ÎÔb² @xJ¾œXøTÂ/›^vwx4Ad3p¨l®èÓ¥„*{½3Š! Ğ
+Êô8Zä$çÔbšŒDSˆh0[Ò,s´´VZ>n»½Äâäññà;xş²ÚæH„ı’…>o‚¡|(’)æÕ,¶2ïÑÕí÷és
+QœÉH,%¶7Y³â`ğñùÜôãíœ[ğ×%\ &œ@„†’Wà¬2œ´NÅO _¬["ÄÁ%şl5‚ÿ{{”ŠĞb0ÏMª"1hŸëç	%µjAZÓeUÕãEÇªßG ´	 
+@3LHFˆîô¶ P}|Ä¶ÏS¤Ê´ÒÏApÁA)†	‡‹DW;œ
+ßKuŸMÕâ‚=:W=¹·[êÑôÀåätáT.SS-ğşş¬ºí'4ç%7#1¼6^\»†53²yÂ·/Kè™D
+¿TPlNœT~Éƒ|‘pÈä#4Ò,µsÏÜİaÔ«‹"ÉG£¬âĞÖjA°",/"$‰gõLõ«î}hm%®Í®ß¨F…¼­óİtVš7ZêÜ´×â^ûKúÀ‡v hHx( <r2YÑ7 K"¥Ùç©Ùú€â3xx¦®—ÔI±kU'ô†’^7HGßfQy8’Úİ+è„ÿ]øCZkŸ#ü›¼d AsLĞ×À‹&3œåúãØÌö¸“oàª1Ù~7ÚX°gİ´%®¿&À-5:‹~ofš°ÜQ
+(*´>ÄîI©Lú¬iŞÈi¢$¥6»ú³ö@Î/§KVKZØ:±ÿT£Ti>Ãü7|Ä8Õ—‘S‡Ic(ı¦ĞGA^ÏâNm£Ãß%‘RçÇÆ¾-²´‘¦¥N.ßd¤—®õø]«"×¥&†únâuëá|fòxÈï¯²Âƒ©,á¹€îµÊlŒb*áÂâ­M¼bºÄ‰r(‘k×Ws)Ç³lgÀ¾g”ÈÀJR­Š•™›ËQIÇ¨Æ`?K`´GGpËSıYHŸã˜Š‘‰ÅeP…gœ
+‡nÎØºÂÔ†ĞtÙ2INRô=:2¬ÖÕ UîX'£·H,ğÊBPšıû·s·¯8œ«è{‹¼Ÿ]R!“ˆ¼©›uæw<JBR	ƒ_WqÜ÷£ŒÁ}QfÉ3dš{1FG–sâ5ZZ\â~àÿÏõš(±ã‹c©1k ìÖëMLw4GR<Úı1ÙûØúàW!“Ô_©ÚY‰²ğ²”‰’Ü8a„,BQıYtP©ˆvÄä“¹Ld³È¥Á 0¦¿ĞU¥ĞJ™˜qV2º“lÌ•Ñs¸Şƒµ\‰;&’ša8ˆ Õ³»Ï.‹ÙÙ|Ş·oÿe	®Zyß(ºÈÊŞ|+—Ódc{/µ†éÕ}–Ìu®µ¡r
+âş¹›{½×«ÒYo¦-£Eùƒ½/[|™Õá\·›xî«Ú2˜w«Ó¨íõµFøñš¾Œ£BÂŠÒR‹›Ğ‘R€¸‚â~*ij…2ßêŒ·MõÚşñ\__Ğ1Ğig’ÓfcÀ—tß#ãîS“„‚õNu,eáhœ¢Ó&ÍùK’ù¼<G-ÄtwÛSÑS£,`¼1xü‘üz~ÉÕjs—ª³¨_wß—´4Ss²´rfVÓç¨7½Ñôç£úı]WÏ«ir“©±•Õ¢fÃe«Æ.½ï³™mÈ¶<ÓmIZ–¿Áeà®®æhmÄ•ÄÏçÀÂ—Ù¦fn”qƒtN½÷„P À'½c“ ¥å«Áq5 ±ŞÚº¬~DÔ-â’å'>´;¨`|BmÜÀõ¸Î]àù1Eî…g
+›½Ãä¥´ı<Š6›EAm©ßÏç5çW¿SğâÃ‹µªa…“æ}ñ¯²,dŞO±œ´R–$Òª“S‰/¥ú¿i[Ü¾oçà3)"H{¬Õßº×t]†9tµœÖäií[Œ´n¶¤ÿ–Aàò½¯ímëÙıFEÖêüu—ÁÌ2ä¼vH‘ˆ	ğ0V!“A1_ Ø€ÃMæ…2hª İì¼É7Àš±*y€«Eeª¼Ñ@	Ù­Êª]«ÉÍçQYi$)E—ÓBYi™
+ò !qYÁ¸µ4hG€íÜŸ¶¾›à  9==k°PK¾RBÑ2BÀîS¼€;ÊÆ¥ËÑ¼Vƒ¸ğ}HŞ–T€G¨yœiYXààaÎ'ñ%FN&êâše‘ÊâòÑHºõdGÇø“z.ÕÃü*D”j>²ñM÷}‘ğÒ4õbş‘QáO{“©JGx)–ú«²?ä_}lzD”¨iş“È4P	ïÑ4O%@Ùş2,úi˜P¯^dÔrP¿”éÈI£F8|:ó¦SÙ·2ä¬ÿóørAÈer¹OXùm÷¾BÜ¢›ù½1äaûtóR™ágö­z%C½Š £ÛèGïg½JÊñF¶D§%rŠ…ÒœVº5	ŠôüÓ¶6¶øÉY‚úŞşsÍ§*Ì{®ÒÍƒ” £§rÓ3sÆ;…
+Cõ%ZŒûW‡gLòØò–İuJÊ¦qYy‘x jå¡³–Ækİ2]ëÕüfš÷ñæˆ†ËŸz•`ŸÏ³µ‰vz’hG]…$İ‡ëz>ğŸ	òã"|Ã5‹å»ø."³É½äô>£¬î¯*¡àI˜„æ'Á“Ak&ĞJà‹)¢¸-ÌóH
+%€@ôA¢aÑµ^EMN²mŠµˆ!zøÚ‘7ìwH|ìİ%ëİñx¾Ö2µâ‹İŒ²ub~¶mK¥ #&*ê™‡å}µûãÈßÙã}ÈÄâ7e+œQ}–ÉfTP&is&¢ê°oÂ³P>å} (‹ğ°v9H™®í)a¾N‘<’)…Ò%q4‹u„x\åzXz{ê’ïè„Å’F…Q6ŠÉq³";aˆ‰àVùcd$U°H/RÇÅ¢2Ş(Ó#³öøª¼_
+Y\¦[½ã3I™ÜçUE¦Jç’\ä÷±]},xÓ¹'Ş+ò—‹3ÁwŸDÌ;õÜú9…à U[–¥à‰›uÇ	ó:oçasóÆ‘¶ôÕú=›Ş=Æ†Ñ…ú‹ä4­t
+B~|P¹+ö… ¦[ äş;0DÄ)ŞcáÙ³^Økç„KÆÁØ,øm•ˆ¼A¯]m­£ÍêÖ{ñÌóÓMj¡&øÃ»H‘~İ¯Ïå’zøê{š÷>Íuı–×ˆ©¼æu€@Ş–’¥R¾ÆáÏ¼
+2ÍŠQÁO3~(gL×Áİ¹aµ*G¥(ˆlH.fXw›}‘Ü(Û*ú”E‘ˆƒJ¬·Æ§Ÿ­HE¢ÀWÊ/DP ÑTd:¢LÕñØ¾²`Nµjš+À¦Ì¢jÉù>Súb«Õ¿Âğ‡”æ_G"b‘-Ì|3 FëG³Ø ÅUY†E·Ó^í­V ÖöxøoÂ+ÌˆÅ*\WƒÃ¦¬Ÿ¨éİÖäğ•xF+	Ş§p\ Tğ‹äÂ?UœÓDÆ¨-ÀÓ–HÆí>N¨à[.¨Á„Xú.„DïàƒHğğcë-˜`ºL@¥[ˆ´	Vz_—`p®ÃÛwÆƒÃCfHni)¬}+«ş<·ÁàÂÜ~¸  z§yu‚viÅª>_
+Ò4«Ş˜4 ®å´V„F{]w|m"HÎ·¼üx²â’Ÿ=&²®
+•Ö—=38átZ‘w:®^‚üW~¹©1rÑéò‚ïÛl=êDwj‚æ
+da¤#6©  \Âèš›KS…Ót»œøÅ]?RÍÒÙ›2>§áš>'ÚS$œ„y®m¿ÄŠ5çåh®D­ é;<4T>¹:]%Ü­'!õÏ©„´±é°PñÃ¾°(­ûfE,Ñ@bìt3¥ñ¶*ôè0½WŞì8K{›ÇyN¿åÿN±’ú“ÿX;İÇb‘³²›0R’³©3-«·Ée ½C7ê‹W÷×# ½Aú“'(G¥VŸ¯‰‰cóU†Ì@“bE„TÕòÊ:
+Ğcƒ Ø Çø¬š”™¼w¹sôbàÍ ­7< –Ê$Ãu|¿ŞÊZæQß'º¥>¿Æû¶öt.úÂà$‰ 0DÓé‚×¯pšƒCòP¯•#‰ê²%Ÿ~!ËCÛF6«âƒ&õ¾	3R	tiMpÜå=kN&CY‚U1X€CÍ›ámT¡ ÄĞR¸LèNŞğƒüDÈ“õyİè–Æµo‡–RÖéjNlV^äÚyáÒjEm4'_3@‘‡+Õæ™zÌT[ëkÍ¾o­jÔàº?vo‡š@Ü_­
+i î0uRÕ¾-Z¬Ğw6’’ùO¹ê,m&(R×d¬ç§¸†¼r¨MZ>Ø³Dxbz’š÷_0‘Û®Rl/Égúı1òU&1¶Dá®J¯FıÀÊÏ†¬§<‘Åñ„•(Ü9°ĞÉ¡üGˆÌ%Ö2‡'TQîì¤E òĞg¤”‹b¸¿GÃv iÛ919À´ÿ¶RojˆB i}ejxÆºNnä‹ÔrQz•. íÁ-
+ƒxå×4úI~@7Üß~¥ŸlÓSè)Ø´<'¤Ä”,àŸºñúRÜ•ÀİP„PÎ!ì¦ªùVèÙ<YÊ4M¨µd‚cx”oœıĞ£ùõşD>o¼©LÂXÓ†hß )Ù!šªdš¶§bm ,}ëÉË®Ÿ1Wú@-Æ¯ÍâÉŸŒı¶¶<ÎXÁR0sGxjoMiöpÔ{˜–?kw)â+¤=øĞy(ÛmŒœ ƒ5\LHSL?ìösCnÍEs²âøÆSìl²Îìİ9Aù›=Æ½İ**|	ä´+‘ë(iÊ[yš‘ AŠ”0øŒüNXúëÙ²‡£U ï$R¦™%Õ„!ša.ß|²I zB:•¦RA :·ipj^MŒv³‚8y:G`Õ$1‡…H6ÑyRi"SŸ^,÷=Ó%ûøGHÅO¬£z$¦1„°!Ä„àîaXÍ2"ªŒsŞ|‡"³òõ1éS1BÆ¸?€’ú”¼`|üÔ{àiÛ$T•x.îùg(và6‹®kL‰7(ª›²ÍjÚËïn/4dì‚$Âél®ƒ[0Uİ-Q…ç¿¹ª¢¶RöLp!B…,V> (Ã*ºÕy0Ç§ô¼Ha¡£W³¼¿wÔ‹æ¬ÓÈÖâ8ËDá'ÑÀ“ÍP®”|µ7R ÿËLô.XÄ!?yË}z'.UTì©pµĞCRŠ“c`%Ú/Ş*4à`·IKG’¨aƒ,’ş>Óµ¦.ŠEu§)šJxŞàl/AıáYö#ûÃ¼{¿¶İ‚TºVê”ó«ï½uUwV¡Eşˆ¶Ñ˜Õïlp”ÄÃÀ/2†H4´X“°äWUÁ~4T’
+J*Ö[$pV#@ø
+…©Â#LŒ²§†•Yê MğßE‹/1÷ÓŠ½Bt0m¯Êôüx

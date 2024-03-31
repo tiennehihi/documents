@@ -1,0 +1,24 @@
+192);
+      output.push(charCode & 63 | 128);
+    } else if (charCode < 65536) {
+      output.push(charCode >> 12 | 224);
+      output.push(charCode >> 6 & 63 | 128);
+      output.push(charCode & 63 | 128);
+    } else if (charCode < 131072) {
+      output.push(charCode >> 18 | 240);
+      output.push(charCode >> 12 & 63 | 128);
+      output.push(charCode >> 6 & 63 | 128);
+      output.push(charCode & 63 | 128);
+    } else {
+      Debug.assert(false, "Unexpected code point");
+    }
+  }
+  return output;
+}
+var base64Digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+function convertToBase64(input) {
+  let result = "";
+  const charCodes = getExpandedCharCodes(input);
+  let i = 0;
+  const length2 = charCodes.length;
+  let byte1, byte2, byt

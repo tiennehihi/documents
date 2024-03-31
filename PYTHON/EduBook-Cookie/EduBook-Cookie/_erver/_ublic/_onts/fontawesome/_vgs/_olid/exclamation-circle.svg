@@ -1,0 +1,8 @@
+console.info("\t%c".concat(resultsCollectionMaxWaitAttr, "%c: milliseconds to wait for the browser to accumulate test results before giving up."), 'font-weight: bold;', 'font-size: normal;');
+      pollUntil({
+        // Give this overall timer a little extra cushion
+        maxDuration: masterTimeout,
+        showProgress: true,
+        progressIndicator: 'waiting...',
+        fn: function fn() {
+          return Object.keys(nodesTested.conflict).length + O

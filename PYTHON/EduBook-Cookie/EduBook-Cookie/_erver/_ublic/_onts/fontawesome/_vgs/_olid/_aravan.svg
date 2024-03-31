@@ -1,0 +1,15 @@
+fix() {
+    return _defaultUsablePrefix;
+  }
+  var emptyCanonicalIcon = function emptyCanonicalIcon() {
+    return {
+      prefix: null,
+      iconName: null,
+      rest: []
+    };
+  };
+  function getCanonicalPrefix(styleOrPrefix) {
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var _params$family = params.family,
+        family = _params$family === void 0 ? FAMILY_CLASSIC : _params$family;
+    var style = PREFIX_TO_STYLE[f

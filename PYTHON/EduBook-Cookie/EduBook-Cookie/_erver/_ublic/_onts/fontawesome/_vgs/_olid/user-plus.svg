@@ -1,0 +1,25 @@
+320 32c-17.7 0-32-14.3-32-32s14.3-32 32-32zm80-64H304c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16z"
+      }
+    },
+    "free": [
+      "solid"
+    ]
+  },
+  "microsoft": {
+    "changes": [
+      "5.0.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "brands"
+    ],
+    "unicode": "f3ca",
+    "label": "Microsoft",
+    "voted": true,
+    "svg": {
+      "brands": {
+        "last_modified": 1660014481,
+        "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 

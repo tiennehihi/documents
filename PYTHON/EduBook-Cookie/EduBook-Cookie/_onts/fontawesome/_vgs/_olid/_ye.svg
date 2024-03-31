@@ -1,0 +1,15 @@
+var TYPE = require('../../tokenizer').TYPE;
+var rawMode = require('./Raw').mode;
+
+var LEFTCURLYBRACKET = TYPE.LeftCurlyBracket;
+
+function consumeRaw(startToken) {
+    return this.Raw(startToken, rawMode.leftCurlyBracket, true);
+}
+
+function consumePrelude() {
+    var prelude = this.SelectorList();
+
+    if (prelude.type !== 'Raw' &&
+        this.scanner.eof === false &&
+        this.scanner.tokenType !== LEFT

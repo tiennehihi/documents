@@ -1,0 +1,14 @@
+var SourceMapGenerator = require('source-map').SourceMapGenerator;
+var all = require('./helpers').all;
+
+var isRemoteResource = require('../utils/is-remote-resource');
+
+var isWindows = process.platform == 'win32';
+
+var NIX_SEPARATOR_PATTERN = /\//g;
+var UNKNOWN_SOURCE = '$stdin';
+var WINDOWS_SEPARATOR = '\\';
+
+function store(serializeContext, element) {
+  var fromString = typeof element == 'string';
+  

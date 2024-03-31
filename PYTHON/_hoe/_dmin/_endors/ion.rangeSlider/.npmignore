@@ -1,0 +1,2 @@
+'use strict';
+var charAt = require('../internals/string-multi

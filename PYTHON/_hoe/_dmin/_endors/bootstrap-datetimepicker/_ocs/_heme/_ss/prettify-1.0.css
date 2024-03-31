@@ -1,0 +1,27 @@
+/* eslint no-unused-vars: ["error", { "varsIgnorePattern": "^Readable$" }] */
+
+'use strict';
+
+const EventEmitter = require('events');
+const https = require('https');
+const http = require('http');
+const net = require('net');
+const tls = require('tls');
+const { randomBytes, createHash } = require('crypto');
+const { Readable } = require('stream');
+const { URL } = require('url');
+
+const PerMessageDeflate = require('./permessage-deflate');
+const Receiver = require('./receiver');
+const Sender = require('./sender');
+const {
+  BINARY_TYPES,
+  EMPTY_BUFFER,
+  GUID,
+  kStatusCode,
+  kWebSocket,
+  NOOP
+} = require('./constants');
+const { addEventListener, removeEventListener } = require('./event-target');
+const { format, parse } = require('./extension');
+const { 

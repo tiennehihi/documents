@@ -1,0 +1,7 @@
+ 2015-08-16
+
+### Commits
+
+- [Fix] cover the case where there is no descriptor on the prototype [`67014c3`](https://github.com/es-shims/RegExp.prototype.flags/commit/67014c35a93c76e28c4ab5cd3e5a54f7f40c2ddf)
+
+## [v1.1.0

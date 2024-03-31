@@ -1,0 +1,39 @@
+ree": [
+      "brands"
+    ]
+  },
+  "football": {
+    "aliases": {
+      "names": [
+        "football-ball"
+      ],
+      "unicodes": {
+        "composite": [
+          "1f3c8"
+        ],
+        "secondary": [
+          "10f44e"
+        ]
+      }
+    },
+    "changes": [
+      "5.0.5",
+      "5.11.0",
+      "5.11.1",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid"
+    ],
+    "unicode": "f44e",
+    "label": "Football Ball",
+    "voted": false,
+    "svg": {
+      "solid": {
+        "last_modified": 1660321823,
+        "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M247.5 25.4c-13.5 3.3-26.4 7.2-38.6 11.7C142.9 61.6 96.7 103.6 66 153.6c-18.3 29.8-30.9 62.3-39.2 

@@ -1,0 +1,37 @@
+@example
+     * var Kitty = mongoose.model("Kitty");
+     * var findKitties = Q.nfbind(Kitty.find.bind(Kitty));
+     *
+     * The better strategy for methods would be to use Q.nbind, as shown below.
+     */
+    export function nfbind<T>(nodeFunction: (...args: any[]) => any, ...args: any[]): (...args: any[]) => Promise<T>;
+
+    /**
+     * Alias for nfbind()
+     */
+    export function denodeify<T>(nodeFunction: (...args: any[]) => any, ...args: any[]): (...args: any[]) => Promise<T>;
+
+    /**
+     * Creates a promise-returning function from a Node.js-style method, optionally binding it with the given
+     * variadic arguments. An example:
+     *
+     * @example
+     * var Kitty = mongoose.model("Kitty");
+     * var findKitties = Q.nbind(Kitty.find, Kitty);
+     * findKitties({ cute: true }).done(function (theKitties) {
+     *     //...
+     * });
+     */
+    export function nbind<T>(
+        nodeFunction: (...args: any[]) => any,
+        thisArg: any,
+        ...args: any[]
+    ): (...args: any[]) => Promise<T>;
+
+    /**
+     * Calls a Node.js-style function with the given array of arguments, returning a promise that is fulfilled if the
+     * Node.js function calls back with a result, or rejected if it calls back with an error
+     * (or throws one synchronously). An example:
+     *
+     * @example
+     * Q.nfapply(FS.r

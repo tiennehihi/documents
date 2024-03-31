@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RULE_NAME = void 0;
+const create_testing_library_rule_1 = require("../create-testing-library-rule");
+const node_utils_1 = require("../node-utils");
+exports.RULE_NAME = 'prefer-query-matchers';
+exports.default = (0, create_testing_library_rule_1.createTestingLibraryRule)({
+    name: exports.RULE_NAME,
+    meta: {
+        docs: {
+            description: 'Ensure the configured `get*`/`query*` query is used with the corresponding matchers',
+            recommendedCo

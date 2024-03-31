@@ -1,0 +1,13 @@
+/**
+ * @fileoverview Prevent usage of unknown DOM property
+ * @author Yannick Croissant
+ */
+
+'use strict';
+
+const has = require('object.hasown/polyfill')();
+const docsUrl = require('../util/docsUrl');
+const testReactVersion = require('../util/version').testReactVersion;
+const report = require('../util/report');
+
+// -----------------------------------------

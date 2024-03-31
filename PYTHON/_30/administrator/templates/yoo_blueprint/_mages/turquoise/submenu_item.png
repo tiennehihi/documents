@@ -1,0 +1,47 @@
+# Changes to PostCSS Custom Media
+
+### 8.0.2 (June 4, 2022)
+
+- Fixed: dependency declarations in package.json
+
+### 8.0.1 (June 3, 2022)
+
+- Updated: use specific AtRule visitor
+- Fixed: allow any valid ident in custom media (`@custom-media --🧑🏾‍🎤 (min-width: 320px);`)
+- Fixed: allow white space around custom media (`@media ( --mq-1   );`) (https://github.com/csstools/postcss-custom-media/pull/59) (https://github.com/csstools/postcss-custom-media/pull/71)
+
+### 8.0.0 (January 12, 2021)
+
+- Added: Support for PostCSS v8
+
+### 7.0.8 (March 30, 2019)
+
+- Fixed: Issue importing from `.pcss` files
+- Updated: `postcss` to 7.0.14 (patch)
+
+### 7.0.7 (October 19, 2018)
+
+- Fixed: Issue combining custom media media queries with `and`
+
+### 7.0.6 (October 12, 2018)
+
+- Fixed: Issue combining multiple custom media
+
+### 7.0.5 (October 5, 2018)
+
+- Fixed: Possible issues resolving paths to imports and exports
+- Added: Imports from `customMedia` and `custom-media` simultaneously
+- Updated: `postcss` to 7.0.5
+
+### 7.0.4 (September 23, 2018)
+
+- Added: `importFromPlugins` option to process imports
+
+### 7.0.3 (September 20, 2018)
+
+- Fixed: Do not break on an empty `importFrom` object
+
+### 7.0.2 (September 15, 2018)
+
+- Fixed: An issue with re-assigning params as a non-string
+

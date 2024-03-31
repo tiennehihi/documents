@@ -1,0 +1,9 @@
+ingleAsteriskRegexFragment : match === "?" ? "[^/]" : "\\" + match;
+}
+function getFileMatcherPatterns(path, excludes, includes, useCaseSensitiveFileNames2, currentDirectory) {
+  path = normalizePath(path);
+  currentDirectory = normalizePath(currentDirectory);
+  const absolutePath = combinePaths(currentDirectory, path);
+  return {
+    includeFilePatterns: map(getRegularExpressionsForWildcards(includes, absolutePath, "files"), (pattern) => `^${pattern}$`),
+    includeFilePa

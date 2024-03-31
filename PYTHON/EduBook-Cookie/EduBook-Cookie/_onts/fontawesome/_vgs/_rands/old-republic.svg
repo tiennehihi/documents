@@ -1,0 +1,299 @@
+dConfigFilePath(state, resolveProjectName(state, status.upstreamProjectName)) === projectPath) {
+              clearProjectStatus(state, nextProjectPath);
+            }
+            break;
+        }
+      }
+      addProjToQueue(state, nextProjectPath, 0 /* Update */);
+      break;
+    }
+  }
+}
+function build(state, project, cancellationToken, writeFile2, getCustomTransformers, onlyReferences) {
+  mark("SolutionBuilder::beforeBuild");
+  const result = buildWorker(state, project, cancellationToken, writeFile2, getCustomTransformers, onlyReferences);
+  mark("SolutionBuilder::afterBuild");
+  measure("SolutionBuilder::Build", "SolutionBuilder::beforeBuild", "SolutionBuilder::afterBuild");
+  return result;
+}
+function buildWorker(state, project, cancellationToken, writeFile2, getCustomTransformers, onlyReferences) {
+  const buildOrder = getBuildOrderFor(state, project, onlyReferences);
+  if (!buildOrder)
+    return 3 /* InvalidProject_OutputsSkipped */;
+  setupInitialBuild(state, cancellationToken);
+  let reportQueue = true;
+  let successfulProjects = 0;
+  while (true) {
+    const invalidatedProject = getNextInvalidatedProject(state, buildOrder, reportQueue);
+    if (!invalidatedProject)
+      break;
+    reportQueue = false;
+    invalidatedProject.done(cancellationToken, writeFile2, getCustomTransformers == null ? void 0 : getCustomTransformers(invalidatedProject.project));
+    if (!state.diagnostics.has(invalidatedProject.projectPath))
+      successfulProjects++;
+  }
+  disableCache(state);
+  reportErrorSummary(state, buildOrder);
+  startWatching(state, buildOrder);
+  return isCircularBuildOrder(buildOrder) ? 4 /* ProjectReferenceCycle_OutputsSkipped */ : !buildOrder.some((p) => state.diagnostics.has(toResolvedConfigFilePath(state, p))) ? 0 /* Success */ : successfulProjects ? 2 /* DiagnosticsPresent_OutputsGenerated */ : 1 /* DiagnosticsPresent_OutputsSkipped */;
+}
+function clean(state, project, onlyReferences) {
+  mark("SolutionBuilder::beforeClean");
+  const result = cleanWorker(state, project, onlyReferences);
+  mark("SolutionBuilder::afterClean");
+  measure("SolutionBuilder::Clean", "SolutionBuilder::beforeClean", "SolutionBuilder::afterClean");
+  return result;
+}
+function cleanWorker(state, project, onlyReferences) {
+  const buildOrder = getBuildOrderFor(state, project, onlyReferences);
+  if (!buildOrder)
+    return 3 /* InvalidProject_OutputsSkipped */;
+  if (isCircularBuildOrder(buildOrder)) {
+    reportErrors(state, buildOrder.circularDiagnostics);
+    return 4 /* ProjectReferenceCycle_OutputsSkipped */;
+  }
+  const { options, host } = state;
+  const filesToDelete = options.dry ? [] : void 0;
+  for (const proj of buildOrder) {
+    const resolvedPath = toResolvedConfigFilePath(state, proj);
+    const parsed = parseConfigFile(state, proj, resolvedPath);
+    if (parsed === void 0) {
+      reportParseConfigFileDiagnostic(state, resolvedPath);
+      continue;
+    }
+    const outputs = getAllProjectOutputs(parsed, !host.useCaseSensitiveFileNames());
+    if (!outputs.length)
+      continue;
+    const inputFileNames = new Set(parsed.fileNames.map((f) => toPath2(state, f)));
+    for (const output of outputs) {
+      if (inputFileNames.has(toPath2(state, output)))
+        continue;
+      if (host.fileExists(output)) {
+        if (filesToDelete) {
+          filesToDelete.push(output);
+        } else {
+          host.deleteFile(output);
+          invalidateProject(state, resolvedPath, 0 /* Update */);
+        }
+      }
+    }
+  }
+  if (filesToDelete) {
+    reportStatus(state, Diagnostics.A_non_dry_build_would_delete_the_following_files_Colon_0, filesToDelete.map((f) => `\r
+ * ${f}`).join(""));
+  }
+  return 0 /* Success */;
+}
+function invalidateProject(state, resolved, updateLevel) {
+  if (state.host.getParsedCommandLine && updateLevel === 1 /* RootNamesAndUpdate */) {
+    updateLevel = 2 /* Full */;
+  }
+  if (updateLevel === 2 /* Full */) {
+    state.configFileCache.delete(resolved);
+    state.buildOrder = void 0;
+  }
+  state.needsSummary = true;
+  clearProjectStatus(state, resolved);
+  addProjToQueue(state, resolved, updateLevel);
+  enableCache(state);
+}
+function invalidateProjectAndScheduleBuilds(state, resolvedPath, updateLevel) {
+  state.reportFileChangeDetected = true;
+  invalidateProject(state, resolvedPath, updateLevel);
+  scheduleBuildInvalidatedProject(
+    state,
+    250,
+    /*changeDetected*/
+    true
+  );
+}
+function scheduleBuildInvalidatedProject(state, time, changeDetected) {
+  const { hostWithWatch } = state;
+  if (!hostWithWatch.setTimeout || !hostWithWatch.clearTimeout) {
+    return;
+  }
+  if (state.timerToBuildInvalidatedProject) {
+    hostWithWatch.clearTimeout(state.timerToBuildInvalidatedProject);
+  }
+  state.timerToBuildInvalidatedProject = hostWithWatch.setTimeout(buildNextInvalidatedProject, time, "timerToBuildInvalidatedProject", state, changeDetected);
+}
+function buildNextInvalidatedProject(_timeoutType, state, changeDetected) {
+  mark("SolutionBuilder::beforeBuild");
+  const buildOrder = buildNextInvalidatedProjectWorker(state, changeDetected);
+  mark("SolutionBuilder::afterBuild");
+  measure("SolutionBuilder::Build", "SolutionBuilder::beforeBuild", "SolutionBuilder::afterBuild");
+  if (buildOrder)
+    reportErrorSummary(state, buildOrder);
+}
+function buildNextInvalidatedProjectWorker(state, changeDetected) {
+  state.timerToBuildInvalidatedProject = void 0;
+  if (state.reportFileChangeDetected) {
+    state.reportFileChangeDetected = false;
+    state.projectErrorsReported.clear();
+    reportWatchStatus(state, Diagnostics.File_change_detected_Starting_incremental_compilation);
+  }
+  let projectsBuilt = 0;
+  const buildOrder = getBuildOrder(state);
+  const invalidatedProject = getNextInvalidatedProject(
+    state,
+    buildOrder,
+    /*reportQueue*/
+    false
+  );
+  if (invalidatedProject) {
+    invalidatedProject.done();
+    projectsBuilt++;
+    while (state.projectPendingBuild.size) {
+      if (state.timerToBuildInvalidatedProject)
+        return;
+      const info = getNextInvalidatedProjectCreateInfo(
+        state,
+        buildOrder,
+        /*reportQueue*/
+        false
+      );
+      if (!info)
+        break;
+      if (info.kind !== 2 /* UpdateOutputFileStamps */ && (changeDetected || projectsBuilt === 5)) {
+        scheduleBuildInvalidatedProject(
+          state,
+          100,
+          /*changeDetected*/
+          false
+        );
+        return;
+      }
+      const project = createInvalidatedProjectWithInfo(state, info, buildOrder);
+      project.done();
+      if (info.kind !== 2 /* UpdateOutputFileStamps */)
+        projectsBuilt++;
+    }
+  }
+  disableCache(state);
+  return buildOrder;
+}
+function watchConfigFile(state, resolved, resolvedPath, parsed) {
+  if (!state.watch || state.allWatchedConfigFiles.has(resolvedPath))
+    return;
+  state.allWatchedConfigFiles.set(
+    resolvedPath,
+    watchFile(
+      state,
+      resolved,
+      () => invalidateProjectAndScheduleBuilds(state, resolvedPath, 2 /* Full */),
+      2e3 /* High */,
+      parsed == null ? void 0 : parsed.watchOptions,
+      WatchType.ConfigFile,
+      resolved
+    )
+  );
+}
+function watchExtendedConfigFiles(state, resolvedPath, parsed) {
+  updateSharedExtendedConfigFileWatcher(
+    resolvedPath,
+    parsed == null ? void 0 : parsed.options,
+    state.allWatchedExtendedConfigFiles,
+    (extendedConfigFileName, extendedConfigFilePath) => watchFile(
+      state,
+      extendedConfigFileName,
+      () => {
+        var _a;
+        return (_a = state.allWatchedExtendedConfigFiles.get(extendedConfigFilePath)) == null ? void 0 : _a.projects.forEach((projectConfigFilePath) => invalidateProjectAndScheduleBuilds(state, projectConfigFilePath, 2 /* Full */));
+      },
+      2e3 /* High */,
+      parsed == null ? void 0 : parsed.watchOptions,
+      WatchType.ExtendedConfigFile
+    ),
+    (fileName) => toPath2(state, fileName)
+  );
+}
+function watchWildCardDirectories(state, resolved, resolvedPath, parsed) {
+  if (!state.watch)
+    return;
+  updateWatchingWildcardDirectories(
+    getOrCreateValueMapFromConfigFileMap(state.allWatchedWildcardDirectories, resolvedPath),
+    parsed.wildcardDirectories,
+    (dir, flags) => state.watchDirectory(
+      dir,
+      (fileOrDirectory) => {
+        var _a;
+        if (isIgnoredFileFromWildCardWatching({
+          watchedDirPath: toPath2(state, dir),
+          fileOrDirectory,
+          fileOrDirectoryPath: toPath2(state, fileOrDirectory),
+          configFileName: resolved,
+          currentDirectory: state.compilerHost.getCurrentDirectory(),
+          options: parsed.options,
+          program: state.builderPrograms.get(resolvedPath) || ((_a = getCachedParsedConfigFile(state, resolvedPath)) == null ? void 0 : _a.fileNames),
+          useCaseSensitiveFileNames: state.parseConfigFileHost.useCaseSensitiveFileNames,
+          writeLog: (s) => state.writeLog(s),
+          toPath: (fileName) => toPath2(state, fileName)
+        }))
+          return;
+        invalidateProjectAndScheduleBuilds(state, resolvedPath, 1 /* RootNamesAndUpdate */);
+      },
+      flags,
+      parsed == null ? void 0 : parsed.watchOptions,
+      WatchType.WildcardDirectory,
+      resolved
+    )
+  );
+}
+function watchInputFiles(state, resolved, resolvedPath, parsed) {
+  if (!state.watch)
+    return;
+  mutateMap(
+    getOrCreateValueMapFromConfigFileMap(state.allWatchedInputFiles, resolvedPath),
+    new Set(parsed.fileNames),
+    {
+      createNewValue: (input) => watchFile(
+        state,
+        input,
+        () => invalidateProjectAndScheduleBuilds(state, resolvedPath, 0 /* Update */),
+        250 /* Low */,
+        parsed == null ? void 0 : parsed.watchOptions,
+        WatchType.SourceFile,
+        resolved
+      ),
+      onDeleteValue: closeFileWatcher
+    }
+  );
+}
+function watchPackageJsonFiles(state, resolved, resolvedPath, parsed) {
+  if (!state.watch || !state.lastCachedPackageJsonLookups)
+    return;
+  mutateMap(
+    getOrCreateValueMapFromConfigFileMap(state.allWatchedPackageJsonFiles, resolvedPath),
+    state.lastCachedPackageJsonLookups.get(resolvedPath),
+    {
+      createNewValue: (input) => watchFile(
+        state,
+        input,
+        () => invalidateProjectAndScheduleBuilds(state, resolvedPath, 0 /* Update */),
+        2e3 /* High */,
+        parsed == null ? void 0 : parsed.watchOptions,
+        WatchType.PackageJson,
+        resolved
+      ),
+      onDeleteValue: closeFileWatcher
+    }
+  );
+}
+function startWatching(state, buildOrder) {
+  if (!state.watchAllProjectsPending)
+    return;
+  mark("SolutionBuilder::beforeWatcherCreation");
+  state.watchAllProjectsPending = false;
+  for (const resolved of getBuildOrderFromAnyBuildOrder(buildOrder)) {
+    const resolvedPath = toResolvedConfigFilePath(state, resolved);
+    const cfg = parseConfigFile(state, resolved, resolvedPath);
+    watchConfigFile(state, resolved, resolvedPath, cfg);
+    watchExtendedConfigFiles(state, resolvedPath, cfg);
+    if (cfg) {
+      watchWildCardDirectories(state, resolved, resolvedPath, cfg);
+      watchInputFiles(state, resolved, resolvedPath, cfg);
+      watchPackageJsonFiles(state, resolved, resolvedPath, cfg);
+    }
+  }
+  mark("SolutionBuilder::afterWatcherCreation");
+  measure("SolutionBuilder::Watcher creation", "SolutionBuild

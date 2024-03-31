@@ -1,0 +1,26 @@
+2V160H32c-17.7 0-32-14.3-32-32s14.3-32 32-32zm168 64H120v64h80V160z"
+      }
+    },
+    "free": [
+      "solid"
+    ]
+  },
+  "road-circle-check": {
+    "changes": [
+      "6.1.0",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid"
+    ],
+    "unicode": "e564",
+    "label": "Road Circle-check",
+    "voted": false,
+    "svg": {
+      "solid": {
+        "last_modified": 1660321859,
+   

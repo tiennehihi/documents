@@ -1,0 +1,69 @@
+var mapping = require('./_mapping'),
+    fallbackHolder = require('./placeholder');
+
+/** Built-in value reference. */
+var push = Array.prototype.push;
+
+/**
+ * Creates a function, with an arity of `n`, that invokes `func` with the
+ * arguments it receives.
+ *
+ * @private
+ * @param {Function} func The function to wrap.
+ * @param {number} n The arity of the new function.
+ * @returns {Function} Returns the new function.
+ */
+function baseArity(func, n) {
+  return n == 2
+    ? function(a, b) { return func.apply(undefined, arguments); }
+    : function(a) { return func.apply(undefined, arguments); };
+}
+
+/**
+ * Creates a function that invokes `func`, with up to `n` arguments, ignoring
+ * any additional arguments.
+ *
+ * @private
+ * @param {Function} func The function to cap arguments for.
+ * @param {number} n The arity cap.
+ * @returns {Function} Returns the new function.
+ */
+function baseAry(func, n) {
+  return n == 2
+    ? function(a, b) { return func(a, b); }
+    : function(a) { return func(a); };
+}
+
+/**
+ * Creates a clone of `array`.
+ *
+ * @private
+ * @param {Array} array The array to clone.
+ * @returns {Array} Returns the cloned array.
+ */
+function cloneArray(array) {
+  var length = array ? array.length : 0,
+      result = Array(length);
+
+  while (length--) {
+    result[length] = array[length];
+  }
+  return result;
+}
+
+/**
+ * Creates a function that clones a given object using the assignment `func`.
+ *
+ * @private
+ * @param {Function} func The assignment function.
+ * @returns {Function} Returns the new cloner function.
+ */
+function createCloner(func) {
+  return function(object) {
+    return func({}, object);
+  };
+}
+
+/**
+ * A specialized version of `_.spread` which flattens the spread array into
+ * the arguments

@@ -1,0 +1,8 @@
+ typeParameters || node.heritageClauses !== heritageClauses || node.members !== members ? update(createInterfaceDeclaration(modifiers, name, typeParameters, heritageClauses, members), node) : node;
+  }
+  function createTypeAliasDeclaration(modifiers, name, typeParameters, type) {
+    const node = createBaseDeclaration(265 /* TypeAliasDeclaration */);
+    node.modifiers = asNodeArray(modifiers);
+    node.name = asName(name);
+    node.typeParameters = asNodeArray(typeParameters);
+    node.type = t

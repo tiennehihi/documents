@@ -1,0 +1,17 @@
+import { Scalar } from '../nodes/Scalar.js';
+
+function resolveBlockScalar(scalar, strict, onError) {
+    const start = scalar.offset;
+    const header = parseBlockScalarHeader(scalar, strict, onError);
+    if (!header)
+        return { value: '', type: null, comment: '', range: [start, start, start] };
+    const type = header.mode === '>' ? Scalar.BLOCK_FOLDED : Scalar.BLOCK_LITERAL;
+    const lines = scalar.source ? splitLines(scalar.source) : [];
+    // determine the end of content & start of chomping
+    let chompStart = lines.length;
+    for (let i = lines.length - 1; i >= 0; --i) {
+        const content = lines[i][1];
+        if (content === '' || content === '\r')
+            chompStart = i;
+        else
+            break

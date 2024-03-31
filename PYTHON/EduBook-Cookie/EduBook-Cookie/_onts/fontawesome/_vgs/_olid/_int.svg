@@ -1,0 +1,15 @@
+xt,
+        0,
+        /*stopAfterLineBreak*/
+        false
+      );
+      if (pos2 === sourceFile.text.length) {
+        return createTextSpan(0, 0);
+      }
+      return getSpanOfTokenAtPosition(sourceFile, pos2);
+    }
+    case 260 /* VariableDeclaration */:
+    case 208 /* BindingElement */:
+    case 263 /* ClassDeclaration */:
+    case 231 /* ClassExpression */:
+  

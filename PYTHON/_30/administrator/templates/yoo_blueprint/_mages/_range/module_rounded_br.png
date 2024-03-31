@@ -1,0 +1,56 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+var fs = require("fs");
+var readFile = fs.readFile.bind(fs);
+var loadLoader = require("./loadLoader");
+
+function utf8BufferToString(buf) {
+	var str = buf.toString("utf-8");
+	if(str.charCodeAt(0) === 0xFEFF) {
+		return str.substr(1);
+	} else {
+		return str;
+	}
+}
+
+const PATH_QUERY_FRAGMENT_REGEXP = /^((?:\0.|[^?#\0])*)(\?(?:\0.|[^#\0])*)?(#.*)?$/;
+
+/**
+ * @param {string} str the path with query and fragment
+ * @returns {{ path: string, query: string, fragment: string }} parsed parts
+ */
+function parsePathQueryFragment(str) {
+	var match = PATH_QUERY_FRAGMENT_REGEXP.exec(str);
+	return {
+		path: match[1].replace(/\0(.)/g, "$1"),
+		query: match[2] ? match[2].replace(/\0(.)/g, "$1") : "",
+		fragment: match[3] || ""
+	};
+}
+
+function dirname(path) {
+	if(path === "/") return "/";
+	var i = path.lastIndexOf("/");
+	var j = path.lastIndexOf("\\");
+	var i2 = path.indexOf("/");
+	var j2 = path.indexOf("\\");
+	var idx = i > j ? i : j;
+	var idx2 = i > j ? i2 : j2;
+	if(idx < 0) return path;
+	if(idx === idx2) return path.substr(0, idx + 1);
+	return path.substr(0, idx);
+}
+
+function createLoaderObject(loader) {
+	var obj = {
+		path: null,
+		query: null,
+		fragment: null,
+		options: null,
+		ident: null,
+		normal: null,
+		pitch: null,
+		raw: null,
+	

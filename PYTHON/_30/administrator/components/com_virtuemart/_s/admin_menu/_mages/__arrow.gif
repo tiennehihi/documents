@@ -1,0 +1,12 @@
+{
+  "name": "data-urls",
+  "description": "Parses data: URLs",
+  "keywords": [
+    "data url",
+    "data uri",
+    "data:",
+    "http",
+    "fetch",
+    "whatwg"
+  ],
+ 

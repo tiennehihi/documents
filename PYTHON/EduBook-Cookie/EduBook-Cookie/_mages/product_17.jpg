@@ -1,0 +1,790 @@
+ (parseExpected(19 /* OpenBraceToken */)) {
+      statements = parseList(1 /* BlockStatements */, parseStatement);
+      parseExpected(20 /* CloseBraceToken */);
+    } else {
+      statements = createMissingList();
+    }
+    return finishNode(factory2.createModuleBlock(statements), pos);
+  }
+  function parseModuleOrNamespaceDeclaration(pos, hasJSDoc, modifiers, flags) {
+    const namespaceFlag = flags & 32 /* Namespace */;
+    const name = flags & 8 /* NestedNamespace */ ? parseIdentifierName() : parseIdentifier();
+    const body = parseOptional(25 /* DotToken */) ? parseModuleOrNamespaceDeclaration(
+      getNodePos(),
+      /*hasJSDoc*/
+      false,
+      /*modifiers*/
+      void 0,
+      8 /* NestedNamespace */ | namespaceFlag
+    ) : parseModuleBlock();
+    const node = factory2.createModuleDeclaration(modifiers, name, body, flags);
+    return withJSDoc(finishNode(node, pos), hasJSDoc);
+  }
+  function parseAmbientExternalModuleDeclaration(pos, hasJSDoc, modifiersIn) {
+    let flags = 0;
+    let name;
+    if (token() === 162 /* GlobalKeyword */) {
+      name = parseIdentifier();
+      flags |= 2048 /* GlobalAugmentation */;
+    } else {
+      name = parseLiteralNode();
+      name.text = internIdentifier(name.text);
+    }
+    let body;
+    if (token() === 19 /* OpenBraceToken */) {
+      body = parseModuleBlock();
+    } else {
+      parseSemicolon();
+    }
+    const node = factory2.createModuleDeclaration(modifiersIn, name, body, flags);
+    return withJSDoc(finishNode(node, pos), hasJSDoc);
+  }
+  function parseModuleDeclaration(pos, hasJSDoc, modifiersIn) {
+    let flags = 0;
+    if (token() === 162 /* GlobalKeyword */) {
+      return parseAmbientExternalModuleDeclaration(pos, hasJSDoc, modifiersIn);
+    } else if (parseOptional(145 /* NamespaceKeyword */)) {
+      flags |= 32 /* Namespace */;
+    } else {
+      parseExpected(144 /* ModuleKeyword */);
+      if (token() === 11 /* StringLiteral */) {
+        return parseAmbientExternalModuleDeclaration(pos, hasJSDoc, modifiersIn);
+      }
+    }
+    return parseModuleOrNamespaceDeclaration(pos, hasJSDoc, modifiersIn, flags);
+  }
+  function isExternalModuleReference2() {
+    return token() === 149 /* RequireKeyword */ && lookAhead(nextTokenIsOpenParen);
+  }
+  function nextTokenIsOpenParen() {
+    return nextToken() === 21 /* OpenParenToken */;
+  }
+  function nextTokenIsOpenBrace() {
+    return nextToken() === 19 /* OpenBraceToken */;
+  }
+  function nextTokenIsSlash() {
+    return nextToken() === 44 /* SlashToken */;
+  }
+  function parseNamespaceExportDeclaration(pos, hasJSDoc, modifiers) {
+    parseExpected(130 /* AsKeyword */);
+    parseExpected(145 /* NamespaceKeyword */);
+    const name = parseIdentifier();
+    parseSemicolon();
+    const node = factory2.createNamespaceExportDeclaration(name);
+    node.modifiers = modifiers;
+    return withJSDoc(finishNode(node, pos), hasJSDoc);
+  }
+  function parseImportDeclarationOrImportEqualsDeclaration(pos, hasJSDoc, modifiers) {
+    parseExpected(102 /* ImportKeyword */);
+    const afterImportPos = scanner2.getTokenFullStart();
+    let identifier;
+    if (isIdentifier2()) {
+      identifier = parseIdentifier();
+    }
+    let isTypeOnly = false;
+    if ((identifier == null ? void 0 : identifier.escapedText) === "type" && (token() !== 161 /* FromKeyword */ || isIdentifier2() && lookAhead(nextTokenIsFromKeywordOrEqualsToken)) && (isIdentifier2() || tokenAfterImportDefinitelyProducesImportDeclaration())) {
+      isTypeOnly = true;
+      identifier = isIdentifier2() ? parseIdentifier() : void 0;
+    }
+    if (identifier && !tokenAfterImportedIdentifierDefinitelyProducesImportDeclaration()) {
+      return parseImportEqualsDeclaration(pos, hasJSDoc, modifiers, identifier, isTypeOnly);
+    }
+    let importClause;
+    if (identifier || // import id
+    token() === 42 /* AsteriskToken */ || // import *
+    token() === 19 /* OpenBraceToken */) {
+      importClause = parseImportClause(identifier, afterImportPos, isTypeOnly);
+      parseExpected(161 /* FromKeyword */);
+    }
+    const moduleSpecifier = parseModuleSpecifier();
+    const currentToken2 = token();
+    let attributes;
+    if ((currentToken2 === 118 /* WithKeyword */ || currentToken2 === 132 /* AssertKeyword */) && !scanner2.hasPrecedingLineBreak()) {
+      attributes = parseImportAttributes(currentToken2);
+    }
+    parseSemicolon();
+    const node = factory2.createImportDeclaration(modifiers, importClause, moduleSpecifier, attributes);
+    return withJSDoc(finishNode(node, pos), hasJSDoc);
+  }
+  function parseImportAttribute() {
+    const pos = getNodePos();
+    const name = tokenIsIdentifierOrKeyword(token()) ? parseIdentifierName() : parseLiteralLikeNode(11 /* StringLiteral */);
+    parseExpected(59 /* ColonToken */);
+    const value = parseAssignmentExpressionOrHigher(
+      /*allowReturnTypeInArrowFunction*/
+      true
+    );
+    return finishNode(factory2.createImportAttribute(name, value), pos);
+  }
+  function parseImportAttributes(token2, skipKeyword) {
+    const pos = getNodePos();
+    if (!skipKeyword) {
+      parseExpected(token2);
+    }
+    const openBracePosition = scanner2.getTokenStart();
+    if (parseExpected(19 /* OpenBraceToken */)) {
+      const multiLine = scanner2.hasPrecedingLineBreak();
+      const elements = parseDelimitedList(
+        24 /* ImportAttributes */,
+        parseImportAttribute,
+        /*considerSemicolonAsDelimiter*/
+        true
+      );
+      if (!parseExpected(20 /* CloseBraceToken */)) {
+        const lastError = lastOrUndefined(parseDiagnostics);
+        if (lastError && lastError.code === Diagnostics._0_expected.code) {
+          addRelatedInfo(
+            lastError,
+            createDetachedDiagnostic(fileName, sourceText, openBracePosition, 1, Diagnostics.The_parser_expected_to_find_a_1_to_match_the_0_token_here, "{", "}")
+          );
+        }
+      }
+      return finishNode(factory2.createImportAttributes(elements, multiLine, token2), pos);
+    } else {
+      const elements = createNodeArray(
+        [],
+        getNodePos(),
+        /*end*/
+        void 0,
+        /*hasTrailingComma*/
+        false
+      );
+      return finishNode(factory2.createImportAttributes(
+        elements,
+        /*multiLine*/
+        false,
+        token2
+      ), pos);
+    }
+  }
+  function tokenAfterImportDefinitelyProducesImportDeclaration() {
+    return token() === 42 /* AsteriskToken */ || token() === 19 /* OpenBraceToken */;
+  }
+  function tokenAfterImportedIdentifierDefinitelyProducesImportDeclaration() {
+    return token() === 28 /* CommaToken */ || token() === 161 /* FromKeyword */;
+  }
+  function parseImportEqualsDeclaration(pos, hasJSDoc, modifiers, identifier, isTypeOnly) {
+    parseExpected(64 /* EqualsToken */);
+    const moduleReference = parseModuleReference();
+    parseSemicolon();
+    const node = factory2.createImportEqualsDeclaration(modifiers, isTypeOnly, identifier, moduleReference);
+    const finished = withJSDoc(finishNode(node, pos), hasJSDoc);
+    return finished;
+  }
+  function parseImportClause(identifier, pos, isTypeOnly) {
+    let namedBindings;
+    if (!identifier || parseOptional(28 /* CommaToken */)) {
+      namedBindings = token() === 42 /* AsteriskToken */ ? parseNamespaceImport() : parseNamedImportsOrExports(275 /* NamedImports */);
+    }
+    return finishNode(factory2.createImportClause(isTypeOnly, identifier, namedBindings), pos);
+  }
+  function parseModuleReference() {
+    return isExternalModuleReference2() ? parseExternalModuleReference() : parseEntityName(
+      /*allowReservedWords*/
+      false
+    );
+  }
+  function parseExternalModuleReference() {
+    const pos = getNodePos();
+    parseExpected(149 /* RequireKeyword */);
+    parseExpected(21 /* OpenParenToken */);
+    const expression = parseModuleSpecifier();
+    parseExpected(22 /* CloseParenToken */);
+    return finishNode(factory2.createExternalModuleReference(expression), pos);
+  }
+  function parseModuleSpecifier() {
+    if (token() === 11 /* StringLiteral */) {
+      const result = parseLiteralNode();
+      result.text = internIdentifier(result.text);
+      return result;
+    } else {
+      return parseExpression();
+    }
+  }
+  function parseNamespaceImport() {
+    const pos = getNodePos();
+    parseExpected(42 /* AsteriskToken */);
+    parseExpected(130 /* AsKeyword */);
+    const name = parseIdentifier();
+    return finishNode(factory2.createNamespaceImport(name), pos);
+  }
+  function parseNamedImportsOrExports(kind) {
+    const pos = getNodePos();
+    const node = kind === 275 /* NamedImports */ ? factory2.createNamedImports(parseBracketedList(23 /* ImportOrExportSpecifiers */, parseImportSpecifier, 19 /* OpenBraceToken */, 20 /* CloseBraceToken */)) : factory2.createNamedExports(parseBracketedList(23 /* ImportOrExportSpecifiers */, parseExportSpecifier, 19 /* OpenBraceToken */, 20 /* CloseBraceToken */));
+    return finishNode(node, pos);
+  }
+  function parseExportSpecifier() {
+    const hasJSDoc = hasPrecedingJSDocComment();
+    return withJSDoc(parseImportOrExportSpecifier(281 /* ExportSpecifier */), hasJSDoc);
+  }
+  function parseImportSpecifier() {
+    return parseImportOrExportSpecifier(276 /* ImportSpecifier */);
+  }
+  function parseImportOrExportSpecifier(kind) {
+    const pos = getNodePos();
+    let checkIdentifierIsKeyword = isKeyword(token()) && !isIdentifier2();
+    let checkIdentifierStart = scanner2.getTokenStart();
+    let checkIdentifierEnd = scanner2.getTokenEnd();
+    let isTypeOnly = false;
+    let propertyName;
+    let canParseAsKeyword = true;
+    let name = parseIdentifierName();
+    if (name.escapedText === "type") {
+      if (token() === 130 /* AsKeyword */) {
+        const firstAs = parseIdentifierName();
+        if (token() === 130 /* AsKeyword */) {
+          const secondAs = parseIdentifierName();
+          if (tokenIsIdentifierOrKeyword(token())) {
+            isTypeOnly = true;
+            propertyName = firstAs;
+            name = parseNameWithKeywordCheck();
+            canParseAsKeyword = false;
+          } else {
+            propertyName = name;
+            name = secondAs;
+            canParseAsKeyword = false;
+          }
+        } else if (tokenIsIdentifierOrKeyword(token())) {
+          propertyName = name;
+          canParseAsKeyword = false;
+          name = parseNameWithKeywordCheck();
+        } else {
+          isTypeOnly = true;
+          name = firstAs;
+        }
+      } else if (tokenIsIdentifierOrKeyword(token())) {
+        isTypeOnly = true;
+        name = parseNameWithKeywordCheck();
+      }
+    }
+    if (canParseAsKeyword && token() === 130 /* AsKeyword */) {
+      propertyName = name;
+      parseExpected(130 /* AsKeyword */);
+      name = parseNameWithKeywordCheck();
+    }
+    if (kind === 276 /* ImportSpecifier */ && checkIdentifierIsKeyword) {
+      parseErrorAt(checkIdentifierStart, checkIdentifierEnd, Diagnostics.Identifier_expected);
+    }
+    const node = kind === 276 /* ImportSpecifier */ ? factory2.createImportSpecifier(isTypeOnly, propertyName, name) : factory2.createExportSpecifier(isTypeOnly, propertyName, name);
+    return finishNode(node, pos);
+    function parseNameWithKeywordCheck() {
+      checkIdentifierIsKeyword = isKeyword(token()) && !isIdentifier2();
+      checkIdentifierStart = scanner2.getTokenStart();
+      checkIdentifierEnd = scanner2.getTokenEnd();
+      return parseIdentifierName();
+    }
+  }
+  function parseNamespaceExport(pos) {
+    return finishNode(factory2.createNamespaceExport(parseIdentifierName()), pos);
+  }
+  function parseExportDeclaration(pos, hasJSDoc, modifiers) {
+    const savedAwaitContext = inAwaitContext();
+    setAwaitContext(
+      /*value*/
+      true
+    );
+    let exportClause;
+    let moduleSpecifier;
+    let attributes;
+    const isTypeOnly = parseOptional(156 /* TypeKeyword */);
+    const namespaceExportPos = getNodePos();
+    if (parseOptional(42 /* AsteriskToken */)) {
+      if (parseOptional(130 /* AsKeyword */)) {
+        exportClause = parseNamespaceExport(namespaceExportPos);
+      }
+      parseExpected(161 /* FromKeyword */);
+      moduleSpecifier = parseModuleSpecifier();
+    } else {
+      exportClause = parseNamedImportsOrExports(279 /* NamedExports */);
+      if (token() === 161 /* FromKeyword */ || token() === 11 /* StringLiteral */ && !scanner2.hasPrecedingLineBreak()) {
+        parseExpected(161 /* FromKeyword */);
+        moduleSpecifier = parseModuleSpecifier();
+      }
+    }
+    const currentToken2 = token();
+    if (moduleSpecifier && (currentToken2 === 118 /* WithKeyword */ || currentToken2 === 132 /* AssertKeyword */) && !scanner2.hasPrecedingLineBreak()) {
+      attributes = parseImportAttributes(currentToken2);
+    }
+    parseSemicolon();
+    setAwaitContext(savedAwaitContext);
+    const node = factory2.createExportDeclaration(modifiers, isTypeOnly, exportClause, moduleSpecifier, attributes);
+    return withJSDoc(finishNode(node, pos), hasJSDoc);
+  }
+  function parseExportAssignment(pos, hasJSDoc, modifiers) {
+    const savedAwaitContext = inAwaitContext();
+    setAwaitContext(
+      /*value*/
+      true
+    );
+    let isExportEquals;
+    if (parseOptional(64 /* EqualsToken */)) {
+      isExportEquals = true;
+    } else {
+      parseExpected(90 /* DefaultKeyword */);
+    }
+    const expression = parseAssignmentExpressionOrHigher(
+      /*allowReturnTypeInArrowFunction*/
+      true
+    );
+    parseSemicolon();
+    setAwaitContext(savedAwaitContext);
+    const node = factory2.createExportAssignment(modifiers, isExportEquals, expression);
+    return withJSDoc(finishNode(node, pos), hasJSDoc);
+  }
+  let ParsingContext;
+  ((ParsingContext2) => {
+    ParsingContext2[ParsingContext2["SourceElements"] = 0] = "SourceElements";
+    ParsingContext2[ParsingContext2["BlockStatements"] = 1] = "BlockStatements";
+    ParsingContext2[ParsingContext2["SwitchClauses"] = 2] = "SwitchClauses";
+    ParsingContext2[ParsingContext2["SwitchClauseStatements"] = 3] = "SwitchClauseStatements";
+    ParsingContext2[ParsingContext2["TypeMembers"] = 4] = "TypeMembers";
+    ParsingContext2[ParsingContext2["ClassMembers"] = 5] = "ClassMembers";
+    ParsingContext2[ParsingContext2["EnumMembers"] = 6] = "EnumMembers";
+    ParsingContext2[ParsingContext2["HeritageClauseElement"] = 7] = "HeritageClauseElement";
+    ParsingContext2[ParsingContext2["VariableDeclarations"] = 8] = "VariableDeclarations";
+    ParsingContext2[ParsingContext2["ObjectBindingElements"] = 9] = "ObjectBindingElements";
+    ParsingContext2[ParsingContext2["ArrayBindingElements"] = 10] = "ArrayBindingElements";
+    ParsingContext2[ParsingContext2["ArgumentExpressions"] = 11] = "ArgumentExpressions";
+    ParsingContext2[ParsingContext2["ObjectLiteralMembers"] = 12] = "ObjectLiteralMembers";
+    ParsingContext2[ParsingContext2["JsxAttributes"] = 13] = "JsxAttributes";
+    ParsingContext2[ParsingContext2["JsxChildren"] = 14] = "JsxChildren";
+    ParsingContext2[ParsingContext2["ArrayLiteralMembers"] = 15] = "ArrayLiteralMembers";
+    ParsingContext2[ParsingContext2["Parameters"] = 16] = "Parameters";
+    ParsingContext2[ParsingContext2["JSDocParameters"] = 17] = "JSDocParameters";
+    ParsingContext2[ParsingContext2["RestProperties"] = 18] = "RestProperties";
+    ParsingContext2[ParsingContext2["TypeParameters"] = 19] = "TypeParameters";
+    ParsingContext2[ParsingContext2["TypeArguments"] = 20] = "TypeArguments";
+    ParsingContext2[ParsingContext2["TupleElementTypes"] = 21] = "TupleElementTypes";
+    ParsingContext2[ParsingContext2["HeritageClauses"] = 22] = "HeritageClauses";
+    ParsingContext2[ParsingContext2["ImportOrExportSpecifiers"] = 23] = "ImportOrExportSpecifiers";
+    ParsingContext2[ParsingContext2["ImportAttributes"] = 24] = "ImportAttributes";
+    ParsingContext2[ParsingContext2["JSDocComment"] = 25] = "JSDocComment";
+    ParsingContext2[ParsingContext2["Count"] = 26] = "Count";
+  })(ParsingContext || (ParsingContext = {}));
+  let Tristate;
+  ((Tristate2) => {
+    Tristate2[Tristate2["False"] = 0] = "False";
+    Tristate2[Tristate2["True"] = 1] = "True";
+    Tristate2[Tristate2["Unknown"] = 2] = "Unknown";
+  })(Tristate || (Tristate = {}));
+  let JSDocParser;
+  ((JSDocParser2) => {
+    function parseJSDocTypeExpressionForTests2(content, start2, length2) {
+      initializeState(
+        "file.js",
+        content,
+        99 /* Latest */,
+        /*syntaxCursor*/
+        void 0,
+        1 /* JS */,
+        0 /* ParseAll */
+      );
+      scanner2.setText(content, start2, length2);
+      currentToken = scanner2.scan();
+      const jsDocTypeExpression = parseJSDocTypeExpression();
+      const sourceFile = createSourceFile2(
+        "file.js",
+        99 /* Latest */,
+        1 /* JS */,
+        /*isDeclarationFile*/
+        false,
+        [],
+        factoryCreateToken(1 /* EndOfFileToken */),
+        0 /* None */,
+        noop
+      );
+      const diagnostics = attachFileToDiagnostics(parseDiagnostics, sourceFile);
+      if (jsDocDiagnostics) {
+        sourceFile.jsDocDiagnostics = attachFileToDiagnostics(jsDocDiagnostics, sourceFile);
+      }
+      clearState();
+      return jsDocTypeExpression ? { jsDocTypeExpression, diagnostics } : void 0;
+    }
+    JSDocParser2.parseJSDocTypeExpressionForTests = parseJSDocTypeExpressionForTests2;
+    function parseJSDocTypeExpression(mayOmitBraces) {
+      const pos = getNodePos();
+      const hasBrace = (mayOmitBraces ? parseOptional : parseExpected)(19 /* OpenBraceToken */);
+      const type = doInsideOfContext(16777216 /* JSDoc */, parseJSDocType);
+      if (!mayOmitBraces || hasBrace) {
+        parseExpectedJSDoc(20 /* CloseBraceToken */);
+      }
+      const result = factory2.createJSDocTypeExpression(type);
+      fixupParentReferences(result);
+      return finishNode(result, pos);
+    }
+    JSDocParser2.parseJSDocTypeExpression = parseJSDocTypeExpression;
+    function parseJSDocNameReference() {
+      const pos = getNodePos();
+      const hasBrace = parseOptional(19 /* OpenBraceToken */);
+      const p2 = getNodePos();
+      let entityName = parseEntityName(
+        /*allowReservedWords*/
+        false
+      );
+      while (token() === 81 /* PrivateIdentifier */) {
+        reScanHashToken();
+        nextTokenJSDoc();
+        entityName = finishNode(factory2.createJSDocMemberName(entityName, parseIdentifier()), p2);
+      }
+      if (hasBrace) {
+        parseExpectedJSDoc(20 /* CloseBraceToken */);
+      }
+      const result = factory2.createJSDocNameReference(entityName);
+      fixupParentReferences(result);
+      return finishNode(result, pos);
+    }
+    JSDocParser2.parseJSDocNameReference = parseJSDocNameReference;
+    function parseIsolatedJSDocComment2(content, start2, length2) {
+      initializeState(
+        "",
+        content,
+        99 /* Latest */,
+        /*syntaxCursor*/
+        void 0,
+        1 /* JS */,
+        0 /* ParseAll */
+      );
+      const jsDoc = doInsideOfContext(16777216 /* JSDoc */, () => parseJSDocCommentWorker(start2, length2));
+      const sourceFile = { languageVariant: 0 /* Standard */, text: content };
+      const diagnostics = attachFileToDiagnostics(parseDiagnostics, sourceFile);
+      clearState();
+      return jsDoc ? { jsDoc, diagnostics } : void 0;
+    }
+    JSDocParser2.parseIsolatedJSDocComment = parseIsolatedJSDocComment2;
+    function parseJSDocComment(parent2, start2, length2) {
+      const saveToken = currentToken;
+      const saveParseDiagnosticsLength = parseDiagnostics.length;
+      const saveParseErrorBeforeNextFinishedNode = parseErrorBeforeNextFinishedNode;
+      const comment = doInsideOfContext(16777216 /* JSDoc */, () => parseJSDocCommentWorker(start2, length2));
+      setParent(comment, parent2);
+      if (contextFlags & 524288 /* JavaScriptFile */) {
+        if (!jsDocDiagnostics) {
+          jsDocDiagnostics = [];
+        }
+        addRange(jsDocDiagnostics, parseDiagnostics, saveParseDiagnosticsLength);
+      }
+      currentToken = saveToken;
+      parseDiagnostics.length = saveParseDiagnosticsLength;
+      parseErrorBeforeNextFinishedNode = saveParseErrorBeforeNextFinishedNode;
+      return comment;
+    }
+    JSDocParser2.parseJSDocComment = parseJSDocComment;
+    let JSDocState;
+    ((JSDocState2) => {
+      JSDocState2[JSDocState2["BeginningOfLine"] = 0] = "BeginningOfLine";
+      JSDocState2[JSDocState2["SawAsterisk"] = 1] = "SawAsterisk";
+      JSDocState2[JSDocState2["SavingComments"] = 2] = "SavingComments";
+      JSDocState2[JSDocState2["SavingBackticks"] = 3] = "SavingBackticks";
+    })(JSDocState || (JSDocState = {}));
+    let PropertyLikeParse;
+    ((PropertyLikeParse2) => {
+      PropertyLikeParse2[PropertyLikeParse2["Property"] = 1] = "Property";
+      PropertyLikeParse2[PropertyLikeParse2["Parameter"] = 2] = "Parameter";
+      PropertyLikeParse2[PropertyLikeParse2["CallbackParameter"] = 4] = "CallbackParameter";
+    })(PropertyLikeParse || (PropertyLikeParse = {}));
+    function parseJSDocCommentWorker(start2 = 0, length2) {
+      const content = sourceText;
+      const end = length2 === void 0 ? content.length : start2 + length2;
+      length2 = end - start2;
+      Debug.assert(start2 >= 0);
+      Debug.assert(start2 <= end);
+      Debug.assert(end <= content.length);
+      if (!isJSDocLikeText(content, start2)) {
+        return void 0;
+      }
+      let tags;
+      let tagsPos;
+      let tagsEnd;
+      let linkEnd;
+      let commentsPos;
+      let comments = [];
+      const parts = [];
+      const saveParsingContext = parsingContext;
+      parsingContext |= 1 << 25 /* JSDocComment */;
+      const result = scanner2.scanRange(start2 + 3, length2 - 5, doJSDocScan);
+      parsingContext = saveParsingContext;
+      return result;
+      function doJSDocScan() {
+        let state = 1 /* SawAsterisk */;
+        let margin;
+        let indent3 = start2 - (content.lastIndexOf("\n", start2) + 1) + 4;
+        function pushComment(text) {
+          if (!margin) {
+            margin = indent3;
+          }
+          comments.push(text);
+          indent3 += text.length;
+        }
+        nextTokenJSDoc();
+        while (parseOptionalJsdoc(5 /* WhitespaceTrivia */))
+          ;
+        if (parseOptionalJsdoc(4 /* NewLineTrivia */)) {
+          state = 0 /* BeginningOfLine */;
+          indent3 = 0;
+        }
+        loop:
+          while (true) {
+            switch (token()) {
+              case 60 /* AtToken */:
+                removeTrailingWhitespace(comments);
+                if (!commentsPos)
+                  commentsPos = getNodePos();
+                addTag(parseTag(indent3));
+                state = 0 /* BeginningOfLine */;
+                margin = void 0;
+                break;
+              case 4 /* NewLineTrivia */:
+                comments.push(scanner2.getTokenText());
+                state = 0 /* BeginningOfLine */;
+                indent3 = 0;
+                break;
+              case 42 /* AsteriskToken */:
+                const asterisk = scanner2.getTokenText();
+                if (state === 1 /* SawAsterisk */) {
+                  state = 2 /* SavingComments */;
+                  pushComment(asterisk);
+                } else {
+                  Debug.assert(state === 0 /* BeginningOfLine */);
+                  state = 1 /* SawAsterisk */;
+                  indent3 += asterisk.length;
+                }
+                break;
+              case 5 /* WhitespaceTrivia */:
+                Debug.assert(state !== 2 /* SavingComments */, "whitespace shouldn't come from the scanner while saving top-level comment text");
+                const whitespace = scanner2.getTokenText();
+                if (margin !== void 0 && indent3 + whitespace.length > margin) {
+                  comments.push(whitespace.slice(margin - indent3));
+                }
+                indent3 += whitespace.length;
+                break;
+              case 1 /* EndOfFileToken */:
+                break loop;
+              case 82 /* JSDocCommentTextToken */:
+                state = 2 /* SavingComments */;
+                pushComment(scanner2.getTokenValue());
+                break;
+              case 19 /* OpenBraceToken */:
+                state = 2 /* SavingComments */;
+                const commentEnd = scanner2.getTokenFullStart();
+                const linkStart = scanner2.getTokenEnd() - 1;
+                const link = parseJSDocLink(linkStart);
+                if (link) {
+                  if (!linkEnd) {
+                    removeLeadingNewlines(comments);
+                  }
+                  parts.push(finishNode(factory2.createJSDocText(comments.join("")), linkEnd ?? start2, commentEnd));
+                  parts.push(link);
+                  comments = [];
+                  linkEnd = scanner2.getTokenEnd();
+                  break;
+                }
+              default:
+                state = 2 /* SavingComments */;
+                pushComment(scanner2.getTokenText());
+                break;
+            }
+            if (state === 2 /* SavingComments */) {
+              nextJSDocCommentTextToken(
+                /*inBackticks*/
+                false
+              );
+            } else {
+              nextTokenJSDoc();
+            }
+          }
+        const trimmedComments = comments.join("").trimEnd();
+        if (parts.length && trimmedComments.length) {
+          parts.push(finishNode(factory2.createJSDocText(trimmedComments), linkEnd ?? start2, commentsPos));
+        }
+        if (parts.length && tags)
+          Debug.assertIsDefined(commentsPos, "having parsed tags implies that the end of the comment span should be set");
+        const tagsArray = tags && createNodeArray(tags, tagsPos, tagsEnd);
+        return finishNode(factory2.createJSDocComment(parts.length ? createNodeArray(parts, start2, commentsPos) : trimmedComments.length ? trimmedComments : void 0, tagsArray), start2, end);
+      }
+      function removeLeadingNewlines(comments2) {
+        while (comments2.length && (comments2[0] === "\n" || comments2[0] === "\r")) {
+          comments2.shift();
+        }
+      }
+      function removeTrailingWhitespace(comments2) {
+        while (comments2.length) {
+          const trimmed = comments2[comments2.length - 1].trimEnd();
+          if (trimmed === "") {
+            comments2.pop();
+          } else if (trimmed.length < comments2[comments2.length - 1].length) {
+            comments2[comments2.length - 1] = trimmed;
+            break;
+          } else {
+            break;
+          }
+        }
+      }
+      function isNextNonwhitespaceTokenEndOfFile() {
+        while (true) {
+          nextTokenJSDoc();
+          if (token() === 1 /* EndOfFileToken */) {
+            return true;
+          }
+          if (!(token() === 5 /* WhitespaceTrivia */ || token() === 4 /* NewLineTrivia */)) {
+            return false;
+          }
+        }
+      }
+      function skipWhitespace() {
+        if (token() === 5 /* WhitespaceTrivia */ || token() === 4 /* NewLineTrivia */) {
+          if (lookAhead(isNextNonwhitespaceTokenEndOfFile)) {
+            return;
+          }
+        }
+        while (token() === 5 /* WhitespaceTrivia */ || token() === 4 /* NewLineTrivia */) {
+          nextTokenJSDoc();
+        }
+      }
+      function skipWhitespaceOrAsterisk() {
+        if (token() === 5 /* WhitespaceTrivia */ || token() === 4 /* NewLineTrivia */) {
+          if (lookAhead(isNextNonwhitespaceTokenEndOfFile)) {
+            return "";
+          }
+        }
+        let precedingLineBreak = scanner2.hasPrecedingLineBreak();
+        let seenLineBreak = false;
+        let indentText = "";
+        while (precedingLineBreak && token() === 42 /* AsteriskToken */ || token() === 5 /* WhitespaceTrivia */ || token() === 4 /* NewLineTrivia */) {
+          indentText += scanner2.getTokenText();
+          if (token() === 4 /* NewLineTrivia */) {
+            precedingLineBreak = true;
+            seenLineBreak = true;
+            indentText = "";
+          } else if (token() === 42 /* AsteriskToken */) {
+            precedingLineBreak = false;
+          }
+          nextTokenJSDoc();
+        }
+        return seenLineBreak ? indentText : "";
+      }
+      function parseTag(margin) {
+        Debug.assert(token() === 60 /* AtToken */);
+        const start3 = scanner2.getTokenStart();
+        nextTokenJSDoc();
+        const tagName = parseJSDocIdentifierName(
+          /*message*/
+          void 0
+        );
+        const indentText = skipWhitespaceOrAsterisk();
+        let tag;
+        switch (tagName.escapedText) {
+          case "author":
+            tag = parseAuthorTag(start3, tagName, margin, indentText);
+            break;
+          case "implements":
+            tag = parseImplementsTag(start3, tagName, margin, indentText);
+            break;
+          case "augments":
+          case "extends":
+            tag = parseAugmentsTag(start3, tagName, margin, indentText);
+            break;
+          case "class":
+          case "constructor":
+            tag = parseSimpleTag(start3, factory2.createJSDocClassTag, tagName, margin, indentText);
+            break;
+          case "public":
+            tag = parseSimpleTag(start3, factory2.createJSDocPublicTag, tagName, margin, indentText);
+            break;
+          case "private":
+            tag = parseSimpleTag(start3, factory2.createJSDocPrivateTag, tagName, margin, indentText);
+            break;
+          case "protected":
+            tag = parseSimpleTag(start3, factory2.createJSDocProtectedTag, tagName, margin, indentText);
+            break;
+          case "readonly":
+            tag = parseSimpleTag(start3, factory2.createJSDocReadonlyTag, tagName, margin, indentText);
+            break;
+          case "override":
+            tag = parseSimpleTag(start3, factory2.createJSDocOverrideTag, tagName, margin, indentText);
+            break;
+          case "deprecated":
+            hasDeprecatedTag = true;
+            tag = parseSimpleTag(start3, factory2.createJSDocDeprecatedTag, tagName, margin, indentText);
+            break;
+          case "this":
+            tag = parseThisTag(start3, tagName, margin, indentText);
+            break;
+          case "enum":
+            tag = parseEnumTag(start3, tagName, margin, indentText);
+            break;
+          case "arg":
+          case "argument":
+          case "param":
+            return parseParameterOrPropertyTag(start3, tagName, 2 /* Parameter */, margin);
+          case "return":
+          case "returns":
+            tag = parseReturnTag(start3, tagName, margin, indentText);
+            break;
+          case "template":
+            tag = parseTemplateTag(start3, tagName, margin, indentText);
+            break;
+          case "type":
+            tag = parseTypeTag(start3, tagName, margin, indentText);
+            break;
+          case "typedef":
+            tag = parseTypedefTag(start3, tagName, margin, indentText);
+            break;
+          case "callback":
+            tag = parseCallbackTag(start3, tagName, margin, indentText);
+            break;
+          case "overload":
+            tag = parseOverloadTag(start3, tagName, margin, indentText);
+            break;
+          case "satisfies":
+            tag = parseSatisfiesTag(start3, tagName, margin, indentText);
+            break;
+          case "see":
+            tag = parseSeeTag(start3, tagName, margin, indentText);
+            break;
+          case "exception":
+          case "throws":
+            tag = parseThrowsTag(start3, tagName, margin, indentText);
+            break;
+          default:
+            tag = parseUnknownTag(start3, tagName, margin, indentText);
+            break;
+        }
+        return tag;
+      }
+      function parseTrailingTagComments(pos, end2, margin, indentText) {
+        if (!indentText) {
+          margin += end2 - pos;
+        }
+        return parseTagComments(margin, indentText.slice(margin));
+      }
+      function parseTagComments(indent3, initialMargin) {
+        const commentsPos2 = getNodePos();
+        let comments2 = [];
+        const parts2 = [];
+        let linkEnd2;
+        let state = 0 /* BeginningOfLine */;
+        let margin;
+        function pushComment(text) {
+          if (!margin) {
+            margin = indent3;
+          }
+          comments2.push(text);
+          indent3 += text.length;
+        }
+        if (initialMargin !== void 0) {
+          if (initialMargin !== "") {
+            pushComment(initialMargin);
+          }
+          state = 1 /* SawAsterisk */;
+        }
+        let tok = token();
+        loop:
+          while (true) {
+            switch (tok) {
+              case 4 /* NewLineTrivia */:
+                state = 0 /* BeginningOfLine */;
+                comments2.push(scanner2.getTokenText());
+                indent3 = 0;
+                break;
+              case 60 /* AtToken */:
+            

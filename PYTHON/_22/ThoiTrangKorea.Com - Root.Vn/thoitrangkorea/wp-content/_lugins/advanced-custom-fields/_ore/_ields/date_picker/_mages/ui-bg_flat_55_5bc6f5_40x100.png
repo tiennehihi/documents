@@ -1,0 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const util_1 = require("../../compile/util");
+const def = {
+    keyword: "not",
+    schemaType: ["object", "boolean"],
+    trackErrors: 

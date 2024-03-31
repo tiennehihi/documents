@@ -1,0 +1,25 @@
+/**
+ * @fileoverview Prevent declaring unused methods and properties of component class
+ * @author Paweł Nowak, Berton Zhu
+ */
+
+'use strict';
+
+const docsUrl = require('../util/docsUrl');
+const componentUtil = require('../util/componentUtil');
+const report = require('../util/report');
+
+// ------------------------------------------------------------------------------
+// Rule Definition
+// ------------------------------------------------------------------------------
+
+const LIFECYCLE_METHODS = new Set([
+  'constructor',
+  'componentDidCatch',
+  'componentDidMount',
+  'componentDidUpdate',
+  'componentWillMount',
+  'componentWillReceiveProps',
+  'componentWillUnmount',
+  'componentWillUpdate',
+  'getChil

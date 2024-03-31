@@ -1,0 +1,23 @@
+/**
+ * @fileoverview Report "this" being used in stateless functional components.
+ */
+
+'use strict';
+
+const Components = require('../util/Components');
+const docsUrl = require('../util/docsUrl');
+const report = require('../util/report');
+
+// ------------------------------------------------------------------------------
+// Rule Definition
+// ------------------------------------------------------------------------------
+
+const messages = {
+  noThisInSFC: 'Stateless functional components should not use `this`',
+};
+
+module.exports = {
+  meta: {
+    docs: {
+      description: 'Disallow `this` from being used in stateless functional components',
+      category: 'Possible Errors'

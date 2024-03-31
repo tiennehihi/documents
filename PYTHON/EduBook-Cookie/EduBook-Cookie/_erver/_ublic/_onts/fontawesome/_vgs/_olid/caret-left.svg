@@ -1,0 +1,12 @@
+-id'),
+      prefix: prefix,
+      transform: meaninglessTransform,
+      mask: {
+        iconName: null,
+        prefix: null,
+        rest: []
+      },
+      maskId: null,
+      symbol: false,
+      extra: {
+        classes: extraClasses,

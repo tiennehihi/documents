@@ -1,0 +1,95 @@
+'0':
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: '0'
+  unicode: '30'
+  voted: false
+'1':
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: '1'
+  unicode: '31'
+  voted: false
+'2':
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: '2'
+  unicode: '32'
+  voted: false
+'3':
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: '3'
+  unicode: '33'
+  voted: false
+'4':
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: '4'
+  unicode: '34'
+  voted: false
+'5':
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: '5'
+  unicode: '35'
+  voted: false
+'6':
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+    

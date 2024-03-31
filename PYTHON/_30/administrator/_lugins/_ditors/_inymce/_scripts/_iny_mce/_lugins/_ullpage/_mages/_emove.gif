@@ -1,0 +1,14 @@
+'use strict';
+
+function _jsdom() {
+  const data = require('jsdom');
+
+  _jsdom = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _fakeTimers() {
+  const data = requi

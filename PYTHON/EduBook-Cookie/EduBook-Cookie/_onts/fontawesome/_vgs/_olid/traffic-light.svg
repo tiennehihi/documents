@@ -1,0 +1,19 @@
+return parenthesizeConstituentTypeOfIntersectionType(type);
+  }
+  function parenthesizeOperandOfReadonlyTypeOperator(type) {
+    switch (type.kind) {
+      case 198 /* TypeOperator */:
+        return factory2.createParenthesizedType(type);
+    }
+    return parenthesizeOperandOfTypeOperator(type);
+  }
+  function parenthesizeNonArrayTypeOfPostfixType(type) {
+    switch (type.kind) {
+      case 195 /* InferType */:
+      case 198 /* TypeOperator */:
+      case 186 /* TypeQuery */:
+        return factory2.createParenthesizedType(type);
+    }
+    return parenthesizeOperandOfTypeOperator(type);
+  }
+  function parenthesizeElementTypesOfTupleType(ty

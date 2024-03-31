@@ -1,0 +1,19 @@
+eOfExpression */:
+    case 222 /* VoidExpression */:
+    case 220 /* DeleteExpression */:
+    case 223 /* AwaitExpression */:
+    case 227 /* ConditionalExpression */:
+    case 229 /* YieldExpression */:
+      return 1 /* Right */;
+    case 226 /* BinaryExpression */:
+      switch (operator) {
+        case 43 /* AsteriskAsteriskToken */:
+        case 64 /* EqualsToken */:
+        case 65 /* PlusEqualsToken */:
+        case 66 /* MinusEqualsToken */:
+        case 68 /* AsteriskAsteriskEqualsToken */:
+        case 67 /* AsteriskEqualsToken */:
+        case 69 /* SlashEqualsToken */:
+        case 70 /* PercentEqualsToken */:
+        case 71 /* LessThanLessThanEqualsToken */:
+        case 72 /* GreaterThanGreaterThanEqual

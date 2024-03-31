@@ -1,0 +1,34 @@
+"use strict";
+
+exports.__esModule = true;
+exports.has = has;
+exports.laterLogMissing = laterLogMissing;
+exports.logMissing = logMissing;
+exports.resolve = resolve;
+var _path = _interopRequireDefault(require("path"));
+var _lodash = _interopRequireDefault(require("lodash.debounce"));
+var _resolve = _interopRequireDefault(require("resolve"));
+var _module = require("module");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+const nativeRequireResolve = parseFloat(process.versions.node) >= 8.9;
+// eslint-disable-line
+
+function myResolve(name, basedir) {
+  if (nativeRequireResolve) {
+    return require.resolve(name, {
+      paths: [basedir]
+    }).replace(/\\/g, "/");
+  } else {
+    return _resolve.default.sync(name, {
+      basedir
+    }).replace(/\\/g, "/");
+  }
+}
+function resolve(dirname, moduleName, absoluteImports) {
+  if (absoluteImports === false) return moduleName;
+  let basedir = dirname;
+  if (typeof absoluteImports === "string") {
+    basedir = _path.default.resolve(basedir, absoluteImports);
+  }
+  try {
+    return myResolve(moduleNam

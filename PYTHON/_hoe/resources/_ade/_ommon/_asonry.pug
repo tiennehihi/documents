@@ -1,0 +1,37 @@
+{{# def.definitions }}
+{{# def.errors }}
+{{# def.setupKeyword }}
+
+{{## def.skipFormat:
+  {{? $breakOnError }} if (true) { {{?}}
+  {{ return out; }}
+#}}
+
+{{? it.opts.format === false }}{{# def.skipFormat }}{{?}}
+
+
+{{# def.$data }}
+
+
+{{## def.$dataCheckFormat:
+  {{# def.$dataNotType:'string' }}
+  ({{? $unknownFormats != 'ignore' }}
+     ({{=$schemaValue}} && !{{=$format}}
+      {{? $allowUnknown }}
+        && self._opts.unknownFormats.indexOf({{=$schemaValue}}) == -1
+      {{?}}) ||
+   {{?}}
+   ({{=$format}} && {{=$formatType}} == '{{=$ruleType}}'
+                 && !(typeof {{=$format}} == 'function'
+                     ? {{? it.async}}
+                        (async{{=$lvl}} ? await {{=$format}}({{=$data}}) : {{=$format}}({{=$data}}))
+                       {{??}}
+                        {{=$format}}({{=$data}})
+                       {{?}}
+                     : {{=$format}}.test({{=$data}}))))
+#}}
+
+{{## def.checkFormat:
+  {{
+    var $formatRef = 'formats' + it.util.getProperty($schema);
+    if ($isObject) 

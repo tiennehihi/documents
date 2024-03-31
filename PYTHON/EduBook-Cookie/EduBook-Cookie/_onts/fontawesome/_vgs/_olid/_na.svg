@@ -1,0 +1,22 @@
+ching an array of outputs ([#2262](https://github.com/rollup/rollup/pull/2262))
+
+## 0.60.2
+
+_2018-06-11_
+
+- Permit setting an asset's source in `generateBundle` ([#2256](https://github.com/rollup/rollup/pull/2256))
+- Add automatic linting ([#2242](https://github.com/rollup/rollup/pull/2242))
+
+## 0.60.1
+
+_2018-06-07_
+
+- Fix plugin regressions ([#2246](https://github.com/rollup/rollup/pull/2246))
+- Avoid conflicts for large numbers of variables ([#2244](https://github.com/rollup/rollup/pull/2244))
+
+## 0.60.0
+
+_2018-06-06_
+
+- New plugin hooks: transformChunk, buildStart, buildEnd; extended plugin context with warn, error, resolveId, isExternal, emitAsset, setAssetSource and getAssetFileName available to any hook ([#2208](https://github.com/rollup/rollup/pull/2208))
+- [BREAKING] Deprecate the `legacy` option and thus IE8 support ([#2141]

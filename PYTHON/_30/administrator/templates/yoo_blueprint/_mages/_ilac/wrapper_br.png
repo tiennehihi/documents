@@ -1,0 +1,34 @@
+
+             *
+             * @param attrs the array of subject attributes to use.
+             * @param uniqueId an optional a unique ID to use.
+             */
+            setSubject(attrs: CertificateField[], uniqueId?: string): void;
+            /**
+             * Sets the issuer of this certificate.
+             *
+             * @param attrs the array of subject attributes to use.
+             * @param uniqueId an optional a unique ID to use.
+             */
+            setIssuer(attrs: CertificateField[], uniqueId?: string): void;
+            /**
+             * Sets the extensions of this certificate.
+             *
+             * @param exts the array of extensions to use.
+             */
+            setExtensions(exts: any[]): void;
+            /**
+             * Gets an extension by its name or id.
+             *
+             * @param options the name to use or an object with:
+             *          name the name to use.
+             *          id the id to use.
+             *
+             * @return the extension or null if not found.
+             */
+            getExtension(options: string | { name: string } | { id: number }): {} | undefined;
+
+            /**
+             * Signs this certificate using the given private key.
+             *
+             * @param key the private key to 

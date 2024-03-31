@@ -1,0 +1,14 @@
+/**
+ * @fileoverview Prevent common casing typos
+ */
+
+'use strict';
+
+const PROP_TYPES = Object.keys(require('prop-types'));
+const Components = require('../util/Components');
+const docsUrl = require('../util/docsUrl');
+const componentUtil = require('../util/componentUtil');
+const report = require('../util/report');
+const lifecycleMethods = require('../util/lifecycleMethods');
+
+// --------------------

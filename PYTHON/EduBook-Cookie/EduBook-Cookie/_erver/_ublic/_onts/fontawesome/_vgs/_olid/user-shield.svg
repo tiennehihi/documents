@@ -1,0 +1,33 @@
+26.5 0-48 21.5-48 48h48V416zM416 304c0 26.5 21.5 48 48 48V304H416zm-96 80c0-35.3-28.7-64-64-64s-64 28.7-64 64s28.7 64 64 64s64-28.7 64-64z"
+      }
+    },
+    "free": [
+      "solid"
+    ]
+  },
+  "money-bill-wave": {
+    "aliases": {
+      "unicodes": {
+        "secondary": [
+          "10f53a"
+        ]
+      }
+    },
+    "changes": [
+      "5.0.13",
+      "6.0.0-beta1",
+      "6.0.0-beta3",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid"
+    ],
+    "unicode": "f53a",
+    "label": "Wavy Money Bill",
+    "voted": true,
+    "svg": {
+      "solid": {

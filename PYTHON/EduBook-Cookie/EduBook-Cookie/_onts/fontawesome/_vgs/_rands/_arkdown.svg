@@ -1,0 +1,10 @@
+'use strict';
+
+var Pair = require('../nodes/Pair.js');
+var YAMLMap = require('../nodes/YAMLMap.js');
+var resolveProps = require('./resolve-props.js');
+var utilContainsNewline = require('./util-contains-newline.js');
+var utilFlowIndentCheck = require('./util-flow-indent-check.js');
+var utilMapIncludes = require('./util-map-includes.js');
+
+const startColMsg =

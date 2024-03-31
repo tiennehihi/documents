@@ -1,0 +1,1439 @@
+de_modules") });
+    }
+  }
+}
+function normalizePathForCJSResolution(containingDirectory, moduleName) {
+  const combined = combinePaths(containingDirectory, moduleName);
+  const parts = getPathComponents(combined);
+  const lastPart = lastOrUndefined(parts);
+  const path = lastPart === "." || lastPart === ".." ? ensureTrailingDirectorySeparator(normalizePath(combined)) : normalizePath(combined);
+  return { path, parts };
+}
+function realPath(path, host, traceEnabled) {
+  if (!host.realpath) {
+    return path;
+  }
+  const real = normalizePath(host.realpath(path));
+  if (traceEnabled) {
+    trace(host, Diagnostics.Resolving_real_path_for_0_result_1, path, real);
+  }
+  return real;
+}
+function nodeLoadModuleByRelativeName(extensions, candidate, onlyRecordFailures, state, considerPackageJson) {
+  if (state.traceEnabled) {
+    trace(state.host, Diagnostics.Loading_module_as_file_Slash_folder_candidate_module_location_0_target_file_types_Colon_1, candidate, formatExtensions(extensions));
+  }
+  if (!hasTrailingDirectorySeparator(candidate)) {
+    if (!onlyRecordFailures) {
+      const parentOfCandidate = getDirectoryPath(candidate);
+      if (!directoryProbablyExists(parentOfCandidate, state.host)) {
+        if (state.traceEnabled) {
+          trace(state.host, Diagnostics.Directory_0_does_not_exist_skipping_all_lookups_in_it, parentOfCandidate);
+        }
+        onlyRecordFailures = true;
+      }
+    }
+    const resolvedFromFile = loadModuleFromFile(extensions, candidate, onlyRecordFailures, state);
+    if (resolvedFromFile) {
+      const packageDirectory = considerPackageJson ? parseNodeModuleFromPath(resolvedFromFile.path) : void 0;
+      const packageInfo = packageDirectory ? getPackageJsonInfo(
+        packageDirectory,
+        /*onlyRecordFailures*/
+        false,
+        state
+      ) : void 0;
+      return withPackageId(packageInfo, resolvedFromFile);
+    }
+  }
+  if (!onlyRecordFailures) {
+    const candidateExists = directoryProbablyExists(candidate, state.host);
+    if (!candidateExists) {
+      if (state.traceEnabled) {
+        trace(state.host, Diagnostics.Directory_0_does_not_exist_skipping_all_lookups_in_it, candidate);
+      }
+      onlyRecordFailures = true;
+    }
+  }
+  if (!(state.features & 32 /* EsmMode */)) {
+    return loadNodeModuleFromDirectory(extensions, candidate, onlyRecordFailures, state, considerPackageJson);
+  }
+  return void 0;
+}
+var nodeModulesPathPart = "/node_modules/";
+function pathContainsNodeModules(path) {
+  return path.includes(nodeModulesPathPart);
+}
+function parseNodeModuleFromPath(resolved, isFolder) {
+  const path = normalizePath(resolved);
+  const idx = path.lastIndexOf(nodeModulesPathPart);
+  if (idx === -1) {
+    return void 0;
+  }
+  const indexAfterNodeModules = idx + nodeModulesPathPart.length;
+  let indexAfterPackageName = moveToNextDirectorySeparatorIfAvailable(path, indexAfterNodeModules, isFolder);
+  if (path.charCodeAt(indexAfterNodeModules) === 64 /* at */) {
+    indexAfterPackageName = moveToNextDirectorySeparatorIfAvailable(path, indexAfterPackageName, isFolder);
+  }
+  return path.slice(0, indexAfterPackageName);
+}
+function moveToNextDirectorySeparatorIfAvailable(path, prevSeparatorIndex, isFolder) {
+  const nextSeparatorIndex = path.indexOf(directorySeparator, prevSeparatorIndex + 1);
+  return nextSeparatorIndex === -1 ? isFolder ? path.length : prevSeparatorIndex : nextSeparatorIndex;
+}
+function loadModuleFromFileNoPackageId(extensions, candidate, onlyRecordFailures, state) {
+  return noPackageId(loadModuleFromFile(extensions, candidate, onlyRecordFailures, state));
+}
+function loadModuleFromFile(extensions, candidate, onlyRecordFailures, state) {
+  const resolvedByReplacingExtension = loadModuleFromFileNoImplicitExtensions(extensions, candidate, onlyRecordFailures, state);
+  if (resolvedByReplacingExtension) {
+    return resolvedByReplacingExtension;
+  }
+  if (!(state.features & 32 /* EsmMode */)) {
+    const resolvedByAddingExtension = tryAddingExtensions(candidate, extensions, "", onlyRecordFailures, state);
+    if (resolvedByAddingExtension) {
+      return resolvedByAddingExtension;
+    }
+  }
+}
+function loadModuleFromFileNoImplicitExtensions(extensions, candidate, onlyRecordFailures, state) {
+  const filename = getBaseFileName(candidate);
+  if (!filename.includes(".")) {
+    return void 0;
+  }
+  let extensionless = removeFileExtension(candidate);
+  if (extensionless === candidate) {
+    extensionless = candidate.substring(0, candidate.lastIndexOf("."));
+  }
+  const extension = candidate.substring(extensionless.length);
+  if (state.traceEnabled) {
+    trace(state.host, Diagnostics.File_name_0_has_a_1_extension_stripping_it, candidate, extension);
+  }
+  return tryAddingExtensions(extensionless, extensions, extension, onlyRecordFailures, state);
+}
+function loadFileNameFromPackageJsonField(extensions, candidate, onlyRecordFailures, state) {
+  if (extensions & 1 /* TypeScript */ && fileExtensionIsOneOf(candidate, supportedTSImplementationExtensions) || extensions & 4 /* Declaration */ && fileExtensionIsOneOf(candidate, supportedDeclarationExtensions)) {
+    const result = tryFile(candidate, onlyRecordFailures, state);
+    return result !== void 0 ? { path: candidate, ext: tryExtractTSExtension(candidate), resolvedUsingTsExtension: void 0 } : void 0;
+  }
+  if (state.isConfigLookup && extensions === 8 /* Json */ && fileExtensionIs(candidate, ".json" /* Json */)) {
+    const result = tryFile(candidate, onlyRecordFailures, state);
+    return result !== void 0 ? { path: candidate, ext: ".json" /* Json */, resolvedUsingTsExtension: void 0 } : void 0;
+  }
+  return loadModuleFromFileNoImplicitExtensions(extensions, candidate, onlyRecordFailures, state);
+}
+function tryAddingExtensions(candidate, extensions, originalExtension, onlyRecordFailures, state) {
+  if (!onlyRecordFailures) {
+    const directory = getDirectoryPath(candidate);
+    if (directory) {
+      onlyRecordFailures = !directoryProbablyExists(directory, state.host);
+    }
+  }
+  switch (originalExtension) {
+    case ".mjs" /* Mjs */:
+    case ".mts" /* Mts */:
+    case ".d.mts" /* Dmts */:
+      return extensions & 1 /* TypeScript */ && tryExtension(".mts" /* Mts */, originalExtension === ".mts" /* Mts */ || originalExtension === ".d.mts" /* Dmts */) || extensions & 4 /* Declaration */ && tryExtension(".d.mts" /* Dmts */, originalExtension === ".mts" /* Mts */ || originalExtension === ".d.mts" /* Dmts */) || extensions & 2 /* JavaScript */ && tryExtension(".mjs" /* Mjs */) || void 0;
+    case ".cjs" /* Cjs */:
+    case ".cts" /* Cts */:
+    case ".d.cts" /* Dcts */:
+      return extensions & 1 /* TypeScript */ && tryExtension(".cts" /* Cts */, originalExtension === ".cts" /* Cts */ || originalExtension === ".d.cts" /* Dcts */) || extensions & 4 /* Declaration */ && tryExtension(".d.cts" /* Dcts */, originalExtension === ".cts" /* Cts */ || originalExtension === ".d.cts" /* Dcts */) || extensions & 2 /* JavaScript */ && tryExtension(".cjs" /* Cjs */) || void 0;
+    case ".json" /* Json */:
+      return extensions & 4 /* Declaration */ && tryExtension(".d.json.ts") || extensions & 8 /* Json */ && tryExtension(".json" /* Json */) || void 0;
+    case ".tsx" /* Tsx */:
+    case ".jsx" /* Jsx */:
+      return extensions & 1 /* TypeScript */ && (tryExtension(".tsx" /* Tsx */, originalExtension === ".tsx" /* Tsx */) || tryExtension(".ts" /* Ts */, originalExtension === ".tsx" /* Tsx */)) || extensions & 4 /* Declaration */ && tryExtension(".d.ts" /* Dts */, originalExtension === ".tsx" /* Tsx */) || extensions & 2 /* JavaScript */ && (tryExtension(".jsx" /* Jsx */) || tryExtension(".js" /* Js */)) || void 0;
+    case ".ts" /* Ts */:
+    case ".d.ts" /* Dts */:
+    case ".js" /* Js */:
+    case "":
+      return extensions & 1 /* TypeScript */ && (tryExtension(".ts" /* Ts */, originalExtension === ".ts" /* Ts */ || originalExtension === ".d.ts" /* Dts */) || tryExtension(".tsx" /* Tsx */, originalExtension === ".ts" /* Ts */ || originalExtension === ".d.ts" /* Dts */)) || extensions & 4 /* Declaration */ && tryExtension(".d.ts" /* Dts */, originalExtension === ".ts" /* Ts */ || originalExtension === ".d.ts" /* Dts */) || extensions & 2 /* JavaScript */ && (tryExtension(".js" /* Js */) || tryExtension(".jsx" /* Jsx */)) || state.isConfigLookup && tryExtension(".json" /* Json */) || void 0;
+    default:
+      return extensions & 4 /* Declaration */ && !isDeclarationFileName(candidate + originalExtension) && tryExtension(`.d${originalExtension}.ts`) || void 0;
+  }
+  function tryExtension(ext, resolvedUsingTsExtension) {
+    const path = tryFile(candidate + ext, onlyRecordFailures, state);
+    return path === void 0 ? void 0 : { path, ext, resolvedUsingTsExtension: !state.candidateIsFromPackageJsonField && resolvedUsingTsExtension };
+  }
+}
+function tryFile(fileName, onlyRecordFailures, state) {
+  var _a;
+  if (!((_a = state.compilerOptions.moduleSuffixes) == null ? void 0 : _a.length)) {
+    return tryFileLookup(fileName, onlyRecordFailures, state);
+  }
+  const ext = tryGetExtensionFromPath2(fileName) ?? "";
+  const fileNameNoExtension = ext ? removeExtension(fileName, ext) : fileName;
+  return forEach(state.compilerOptions.moduleSuffixes, (suffix) => tryFileLookup(fileNameNoExtension + suffix + ext, onlyRecordFailures, state));
+}
+function tryFileLookup(fileName, onlyRecordFailures, state) {
+  var _a;
+  if (!onlyRecordFailures) {
+    if (state.host.fileExists(fileName)) {
+      if (state.traceEnabled) {
+        trace(state.host, Diagnostics.File_0_exists_use_it_as_a_name_resolution_result, fileName);
+      }
+      return fileName;
+    } else {
+      if (state.traceEnabled) {
+        trace(state.host, Diagnostics.File_0_does_not_exist, fileName);
+      }
+    }
+  }
+  (_a = state.failedLookupLocations) == null ? void 0 : _a.push(fileName);
+  return void 0;
+}
+function loadNodeModuleFromDirectory(extensions, candidate, onlyRecordFailures, state, considerPackageJson = true) {
+  const packageInfo = considerPackageJson ? getPackageJsonInfo(candidate, onlyRecordFailures, state) : void 0;
+  const packageJsonContent = packageInfo && packageInfo.contents.packageJsonContent;
+  const versionPaths = packageInfo && getVersionPathsOfPackageJsonInfo(packageInfo, state);
+  return withPackageId(packageInfo, loadNodeModuleFromDirectoryWorker(extensions, candidate, onlyRecordFailures, state, packageJsonContent, versionPaths));
+}
+function getEntrypointsFromPackageJsonInfo(packageJsonInfo, options, host, cache, resolveJs) {
+  if (!resolveJs && packageJsonInfo.contents.resolvedEntrypoints !== void 0) {
+    return packageJsonInfo.contents.resolvedEntrypoints;
+  }
+  let entrypoints;
+  const extensions = 1 /* TypeScript */ | 4 /* Declaration */ | (resolveJs ? 2 /* JavaScript */ : 0);
+  const features = getNodeResolutionFeatures(options);
+  const loadPackageJsonMainState = getTemporaryModuleResolutionState(cache == null ? void 0 : cache.getPackageJsonInfoCache(), host, options);
+  loadPackageJsonMainState.conditions = getConditions(options);
+  loadPackageJsonMainState.requestContainingDirectory = packageJsonInfo.packageDirectory;
+  const mainResolution = loadNodeModuleFromDirectoryWorker(
+    extensions,
+    packageJsonInfo.packageDirectory,
+    /*onlyRecordFailures*/
+    false,
+    loadPackageJsonMainState,
+    packageJsonInfo.contents.packageJsonContent,
+    getVersionPathsOfPackageJsonInfo(packageJsonInfo, loadPackageJsonMainState)
+  );
+  entrypoints = append(entrypoints, mainResolution == null ? void 0 : mainResolution.path);
+  if (features & 8 /* Exports */ && packageJsonInfo.contents.packageJsonContent.exports) {
+    const conditionSets = deduplicate(
+      [getConditions(options, 99 /* ESNext */), getConditions(options, 1 /* CommonJS */)],
+      arrayIsEqualTo
+    );
+    for (const conditions of conditionSets) {
+      const loadPackageJsonExportsState = { ...loadPackageJsonMainState, failedLookupLocations: [], conditions, host };
+      const exportResolutions = loadEntrypointsFromExportMap(
+        packageJsonInfo,
+        packageJsonInfo.contents.packageJsonContent.exports,
+        loadPackageJsonExportsState,
+        extensions
+      );
+      if (exportResolutions) {
+        for (const resolution of exportResolutions) {
+          entrypoints = appendIfUnique(entrypoints, resolution.path);
+        }
+      }
+    }
+  }
+  return packageJsonInfo.contents.resolvedEntrypoints = entrypoints || false;
+}
+function loadEntrypointsFromExportMap(scope, exports2, state, extensions) {
+  let entrypoints;
+  if (isArray(exports2)) {
+    for (const target of exports2) {
+      loadEntrypointsFromTargetExports(target);
+    }
+  } else if (typeof exports2 === "object" && exports2 !== null && allKeysStartWithDot(exports2)) {
+    for (const key in exports2) {
+      loadEntrypointsFromTargetExports(exports2[key]);
+    }
+  } else {
+    loadEntrypointsFromTargetExports(exports2);
+  }
+  return entrypoints;
+  function loadEntrypointsFromTargetExports(target) {
+    var _a, _b;
+    if (typeof target === "string" && startsWith(target, "./")) {
+      if (target.includes("*") && state.host.readDirectory) {
+        if (target.indexOf("*") !== target.lastIndexOf("*")) {
+          return false;
+        }
+        state.host.readDirectory(
+          scope.packageDirectory,
+          extensionsToExtensionsArray(extensions),
+          /*excludes*/
+          void 0,
+          [
+            changeFullExtension(replaceFirstStar(target, "**/*"), ".*")
+          ]
+        ).forEach((entry) => {
+          entrypoints = appendIfUnique(entrypoints, {
+            path: entry,
+            ext: getAnyExtensionFromPath(entry),
+            resolvedUsingTsExtension: void 0
+          });
+        });
+      } else {
+        const partsAfterFirst = getPathComponents(target).slice(2);
+        if (partsAfterFirst.includes("..") || partsAfterFirst.includes(".") || partsAfterFirst.includes("node_modules")) {
+          return false;
+        }
+        const resolvedTarget = combinePaths(scope.packageDirectory, target);
+        const finalPath = getNormalizedAbsolutePath(resolvedTarget, (_b = (_a = state.host).getCurrentDirectory) == null ? void 0 : _b.call(_a));
+        const result = loadFileNameFromPackageJsonField(
+          extensions,
+          finalPath,
+          /*onlyRecordFailures*/
+          false,
+          state
+        );
+        if (result) {
+          entrypoints = appendIfUnique(entrypoints, result, (a, b) => a.path === b.path);
+          return true;
+        }
+      }
+    } else if (Array.isArray(target)) {
+      for (const t of target) {
+        const success = loadEntrypointsFromTargetExports(t);
+        if (success) {
+          return true;
+        }
+      }
+    } else if (typeof target === "object" && target !== null) {
+      return forEach(getOwnKeys(target), (key) => {
+        if (key === "default" || contains(state.conditions, key) || isApplicableVersionedTypesKey(state.conditions, key)) {
+          loadEntrypointsFromTargetExports(target[key]);
+          return true;
+        }
+      });
+    }
+  }
+}
+function getTemporaryModuleResolutionState(packageJsonInfoCache, host, options) {
+  return {
+    host,
+    compilerOptions: options,
+    traceEnabled: isTraceEnabled(options, host),
+    failedLookupLocations: void 0,
+    affectingLocations: void 0,
+    packageJsonInfoCache,
+    features: 0 /* None */,
+    conditions: emptyArray,
+    requestContainingDirectory: void 0,
+    reportDiagnostic: noop,
+    isConfigLookup: false,
+    candidateIsFromPackageJsonField: false,
+    resolvedPackageDirectory: false
+  };
+}
+function getPackageScopeForPath(fileName, state) {
+  const parts = getPathComponents(fileName);
+  parts.pop();
+  while (parts.length > 0) {
+    const pkg = getPackageJsonInfo(
+      getPathFromPathComponents(parts),
+      /*onlyRecordFailures*/
+      false,
+      state
+    );
+    if (pkg) {
+      return pkg;
+    }
+    parts.pop();
+  }
+  return void 0;
+}
+function getVersionPathsOfPackageJsonInfo(packageJsonInfo, state) {
+  if (packageJsonInfo.contents.versionPaths === void 0) {
+    packageJsonInfo.contents.versionPaths = readPackageJsonTypesVersionPaths(packageJsonInfo.contents.packageJsonContent, state) || false;
+  }
+  return packageJsonInfo.contents.versionPaths || void 0;
+}
+function getPackageJsonInfo(packageDirectory, onlyRecordFailures, state) {
+  var _a, _b, _c, _d, _e, _f;
+  const { host, traceEnabled } = state;
+  const packageJsonPath = combinePaths(packageDirectory, "package.json");
+  if (onlyRecordFailures) {
+    (_a = state.failedLookupLocations) == null ? void 0 : _a.push(packageJsonPath);
+    return void 0;
+  }
+  const existing = (_b = state.packageJsonInfoCache) == null ? void 0 : _b.getPackageJsonInfo(packageJsonPath);
+  if (existing !== void 0) {
+    if (isPackageJsonInfo(existing)) {
+      if (traceEnabled)
+        trace(host, Diagnostics.File_0_exists_according_to_earlier_cached_lookups, packageJsonPath);
+      (_c = state.affectingLocations) == null ? void 0 : _c.push(packageJsonPath);
+      return existing.packageDirectory === packageDirectory ? existing : { packageDirectory, contents: existing.contents };
+    } else {
+      if (existing.directoryExists && traceEnabled)
+        trace(host, Diagnostics.File_0_does_not_exist_according_to_earlier_cached_lookups, packageJsonPath);
+      (_d = state.failedLookupLocations) == null ? void 0 : _d.push(packageJsonPath);
+      return void 0;
+    }
+  }
+  const directoryExists = directoryProbablyExists(packageDirectory, host);
+  if (directoryExists && host.fileExists(packageJsonPath)) {
+    const packageJsonContent = readJson(packageJsonPath, host);
+    if (traceEnabled) {
+      trace(host, Diagnostics.Found_package_json_at_0, packageJsonPath);
+    }
+    const result = { packageDirectory, contents: { packageJsonContent, versionPaths: void 0, resolvedEntrypoints: void 0 } };
+    if (state.packageJsonInfoCache && !state.packageJsonInfoCache.isReadonly)
+      state.packageJsonInfoCache.setPackageJsonInfo(packageJsonPath, result);
+    (_e = state.affectingLocations) == null ? void 0 : _e.push(packageJsonPath);
+    return result;
+  } else {
+    if (directoryExists && traceEnabled) {
+      trace(host, Diagnostics.File_0_does_not_exist, packageJsonPath);
+    }
+    if (state.packageJsonInfoCache && !state.packageJsonInfoCache.isReadonly)
+      state.packageJsonInfoCache.setPackageJsonInfo(packageJsonPath, { packageDirectory, directoryExists });
+    (_f = state.failedLookupLocations) == null ? void 0 : _f.push(packageJsonPath);
+  }
+}
+function loadNodeModuleFromDirectoryWorker(extensions, candidate, onlyRecordFailures, state, jsonContent, versionPaths) {
+  let packageFile;
+  if (jsonContent) {
+    if (state.isConfigLookup) {
+      packageFile = readPackageJsonTSConfigField(jsonContent, candidate, state);
+    } else {
+      packageFile = extensions & 4 /* Declaration */ && readPackageJsonTypesFields(jsonContent, candidate, state) || extensions & (3 /* ImplementationFiles */ | 4 /* Declaration */) && readPackageJsonMainField(jsonContent, candidate, state) || void 0;
+    }
+  }
+  const loader = (extensions2, candidate2, onlyRecordFailures2, state2) => {
+    const fromFile = loadFileNameFromPackageJsonField(extensions2, candidate2, onlyRecordFailures2, state2);
+    if (fromFile) {
+      return noPackageId(fromFile);
+    }
+    const expandedExtensions = extensions2 === 4 /* Declaration */ ? 1 /* TypeScript */ | 4 /* Declaration */ : extensions2;
+    const features = state2.features;
+    const candidateIsFromPackageJsonField = state2.candidateIsFromPackageJsonField;
+    state2.candidateIsFromPackageJsonField = true;
+    if ((jsonContent == null ? void 0 : jsonContent.type) !== "module") {
+      state2.features &= ~32 /* EsmMode */;
+    }
+    const result = nodeLoadModuleByRelativeName(
+      expandedExtensions,
+      candidate2,
+      onlyRecordFailures2,
+      state2,
+      /*considerPackageJson*/
+      false
+    );
+    state2.features = features;
+    state2.candidateIsFromPackageJsonField = candidateIsFromPackageJsonField;
+    return result;
+  };
+  const onlyRecordFailuresForPackageFile = packageFile ? !directoryProbablyExists(getDirectoryPath(packageFile), state.host) : void 0;
+  const onlyRecordFailuresForIndex = onlyRecordFailures || !directoryProbablyExists(candidate, state.host);
+  const indexPath = combinePaths(candidate, state.isConfigLookup ? "tsconfig" : "index");
+  if (versionPaths && (!packageFile || containsPath(candidate, packageFile))) {
+    const moduleName = getRelativePathFromDirectory(
+      candidate,
+      packageFile || indexPath,
+      /*ignoreCase*/
+      false
+    );
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.package_json_has_a_typesVersions_entry_0_that_matches_compiler_version_1_looking_for_a_pattern_to_match_module_name_2, versionPaths.version, version, moduleName);
+    }
+    const result = tryLoadModuleUsingPaths(
+      extensions,
+      moduleName,
+      candidate,
+      versionPaths.paths,
+      /*pathPatterns*/
+      void 0,
+      loader,
+      onlyRecordFailuresForPackageFile || onlyRecordFailuresForIndex,
+      state
+    );
+    if (result) {
+      return removeIgnoredPackageId(result.value);
+    }
+  }
+  const packageFileResult = packageFile && removeIgnoredPackageId(loader(extensions, packageFile, onlyRecordFailuresForPackageFile, state));
+  if (packageFileResult)
+    return packageFileResult;
+  if (!(state.features & 32 /* EsmMode */)) {
+    return loadModuleFromFile(extensions, indexPath, onlyRecordFailuresForIndex, state);
+  }
+}
+function extensionIsOk(extensions, extension) {
+  return extensions & 2 /* JavaScript */ && (extension === ".js" /* Js */ || extension === ".jsx" /* Jsx */ || extension === ".mjs" /* Mjs */ || extension === ".cjs" /* Cjs */) || extensions & 1 /* TypeScript */ && (extension === ".ts" /* Ts */ || extension === ".tsx" /* Tsx */ || extension === ".mts" /* Mts */ || extension === ".cts" /* Cts */) || extensions & 4 /* Declaration */ && (extension === ".d.ts" /* Dts */ || extension === ".d.mts" /* Dmts */ || extension === ".d.cts" /* Dcts */) || extensions & 8 /* Json */ && extension === ".json" /* Json */ || false;
+}
+function parsePackageName(moduleName) {
+  let idx = moduleName.indexOf(directorySeparator);
+  if (moduleName[0] === "@") {
+    idx = moduleName.indexOf(directorySeparator, idx + 1);
+  }
+  return idx === -1 ? { packageName: moduleName, rest: "" } : { packageName: moduleName.slice(0, idx), rest: moduleName.slice(idx + 1) };
+}
+function allKeysStartWithDot(obj) {
+  return every(getOwnKeys(obj), (k) => startsWith(k, "."));
+}
+function noKeyStartsWithDot(obj) {
+  return !some(getOwnKeys(obj), (k) => startsWith(k, "."));
+}
+function loadModuleFromSelfNameReference(extensions, moduleName, directory, state, cache, redirectedReference) {
+  var _a, _b;
+  const directoryPath = getNormalizedAbsolutePath(combinePaths(directory, "dummy"), (_b = (_a = state.host).getCurrentDirectory) == null ? void 0 : _b.call(_a));
+  const scope = getPackageScopeForPath(directoryPath, state);
+  if (!scope || !scope.contents.packageJsonContent.exports) {
+    return void 0;
+  }
+  if (typeof scope.contents.packageJsonContent.name !== "string") {
+    return void 0;
+  }
+  const parts = getPathComponents(moduleName);
+  const nameParts = getPathComponents(scope.contents.packageJsonContent.name);
+  if (!every(nameParts, (p, i) => parts[i] === p)) {
+    return void 0;
+  }
+  const trailingParts = parts.slice(nameParts.length);
+  const subpath = !length(trailingParts) ? "." : `.${directorySeparator}${trailingParts.join(directorySeparator)}`;
+  if (getAllowJSCompilerOption(state.compilerOptions) && !pathContainsNodeModules(directory)) {
+    return loadModuleFromExports(scope, extensions, subpath, state, cache, redirectedReference);
+  }
+  const priorityExtensions = extensions & (1 /* TypeScript */ | 4 /* Declaration */);
+  const secondaryExtensions = extensions & ~(1 /* TypeScript */ | 4 /* Declaration */);
+  return loadModuleFromExports(scope, priorityExtensions, subpath, state, cache, redirectedReference) || loadModuleFromExports(scope, secondaryExtensions, subpath, state, cache, redirectedReference);
+}
+function loadModuleFromExports(scope, extensions, subpath, state, cache, redirectedReference) {
+  if (!scope.contents.packageJsonContent.exports) {
+    return void 0;
+  }
+  if (subpath === ".") {
+    let mainExport;
+    if (typeof scope.contents.packageJsonContent.exports === "string" || Array.isArray(scope.contents.packageJsonContent.exports) || typeof scope.contents.packageJsonContent.exports === "object" && noKeyStartsWithDot(scope.contents.packageJsonContent.exports)) {
+      mainExport = scope.contents.packageJsonContent.exports;
+    } else if (hasProperty(scope.contents.packageJsonContent.exports, ".")) {
+      mainExport = scope.contents.packageJsonContent.exports["."];
+    }
+    if (mainExport) {
+      const loadModuleFromTargetImportOrExport = getLoadModuleFromTargetImportOrExport(
+        extensions,
+        state,
+        cache,
+        redirectedReference,
+        subpath,
+        scope,
+        /*isImports*/
+        false
+      );
+      return loadModuleFromTargetImportOrExport(
+        mainExport,
+        "",
+        /*pattern*/
+        false,
+        "."
+      );
+    }
+  } else if (allKeysStartWithDot(scope.contents.packageJsonContent.exports)) {
+    if (typeof scope.contents.packageJsonContent.exports !== "object") {
+      if (state.traceEnabled) {
+        trace(state.host, Diagnostics.Export_specifier_0_does_not_exist_in_package_json_scope_at_path_1, subpath, scope.packageDirectory);
+      }
+      return toSearchResult(
+        /*value*/
+        void 0
+      );
+    }
+    const result = loadModuleFromImportsOrExports(
+      extensions,
+      state,
+      cache,
+      redirectedReference,
+      subpath,
+      scope.contents.packageJsonContent.exports,
+      scope,
+      /*isImports*/
+      false
+    );
+    if (result) {
+      return result;
+    }
+  }
+  if (state.traceEnabled) {
+    trace(state.host, Diagnostics.Export_specifier_0_does_not_exist_in_package_json_scope_at_path_1, subpath, scope.packageDirectory);
+  }
+  return toSearchResult(
+    /*value*/
+    void 0
+  );
+}
+function loadModuleFromImports(extensions, moduleName, directory, state, cache, redirectedReference) {
+  var _a, _b;
+  if (moduleName === "#" || startsWith(moduleName, "#/")) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Invalid_import_specifier_0_has_no_possible_resolutions, moduleName);
+    }
+    return toSearchResult(
+      /*value*/
+      void 0
+    );
+  }
+  const directoryPath = getNormalizedAbsolutePath(combinePaths(directory, "dummy"), (_b = (_a = state.host).getCurrentDirectory) == null ? void 0 : _b.call(_a));
+  const scope = getPackageScopeForPath(directoryPath, state);
+  if (!scope) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Directory_0_has_no_containing_package_json_scope_Imports_will_not_resolve, directoryPath);
+    }
+    return toSearchResult(
+      /*value*/
+      void 0
+    );
+  }
+  if (!scope.contents.packageJsonContent.imports) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.package_json_scope_0_has_no_imports_defined, scope.packageDirectory);
+    }
+    return toSearchResult(
+      /*value*/
+      void 0
+    );
+  }
+  const result = loadModuleFromImportsOrExports(
+    extensions,
+    state,
+    cache,
+    redirectedReference,
+    moduleName,
+    scope.contents.packageJsonContent.imports,
+    scope,
+    /*isImports*/
+    true
+  );
+  if (result) {
+    return result;
+  }
+  if (state.traceEnabled) {
+    trace(state.host, Diagnostics.Import_specifier_0_does_not_exist_in_package_json_scope_at_path_1, moduleName, scope.packageDirectory);
+  }
+  return toSearchResult(
+    /*value*/
+    void 0
+  );
+}
+function comparePatternKeys(a, b) {
+  const aPatternIndex = a.indexOf("*");
+  const bPatternIndex = b.indexOf("*");
+  const baseLenA = aPatternIndex === -1 ? a.length : aPatternIndex + 1;
+  const baseLenB = bPatternIndex === -1 ? b.length : bPatternIndex + 1;
+  if (baseLenA > baseLenB)
+    return -1;
+  if (baseLenB > baseLenA)
+    return 1;
+  if (aPatternIndex === -1)
+    return 1;
+  if (bPatternIndex === -1)
+    return -1;
+  if (a.length > b.length)
+    return -1;
+  if (b.length > a.length)
+    return 1;
+  return 0;
+}
+function loadModuleFromImportsOrExports(extensions, state, cache, redirectedReference, moduleName, lookupTable, scope, isImports) {
+  const loadModuleFromTargetImportOrExport = getLoadModuleFromTargetImportOrExport(extensions, state, cache, redirectedReference, moduleName, scope, isImports);
+  if (!endsWith(moduleName, directorySeparator) && !moduleName.includes("*") && hasProperty(lookupTable, moduleName)) {
+    const target = lookupTable[moduleName];
+    return loadModuleFromTargetImportOrExport(
+      target,
+      /*subpath*/
+      "",
+      /*pattern*/
+      false,
+      moduleName
+    );
+  }
+  const expandingKeys = sort(filter(getOwnKeys(lookupTable), (k) => k.includes("*") || endsWith(k, "/")), comparePatternKeys);
+  for (const potentialTarget of expandingKeys) {
+    if (state.features & 16 /* ExportsPatternTrailers */ && matchesPatternWithTrailer(potentialTarget, moduleName)) {
+      const target = lookupTable[potentialTarget];
+      const starPos = potentialTarget.indexOf("*");
+      const subpath = moduleName.substring(potentialTarget.substring(0, starPos).length, moduleName.length - (potentialTarget.length - 1 - starPos));
+      return loadModuleFromTargetImportOrExport(
+        target,
+        subpath,
+        /*pattern*/
+        true,
+        potentialTarget
+      );
+    } else if (endsWith(potentialTarget, "*") && startsWith(moduleName, potentialTarget.substring(0, potentialTarget.length - 1))) {
+      const target = lookupTable[potentialTarget];
+      const subpath = moduleName.substring(potentialTarget.length - 1);
+      return loadModuleFromTargetImportOrExport(
+        target,
+        subpath,
+        /*pattern*/
+        true,
+        potentialTarget
+      );
+    } else if (startsWith(moduleName, potentialTarget)) {
+      const target = lookupTable[potentialTarget];
+      const subpath = moduleName.substring(potentialTarget.length);
+      return loadModuleFromTargetImportOrExport(
+        target,
+        subpath,
+        /*pattern*/
+        false,
+        potentialTarget
+      );
+    }
+  }
+  function matchesPatternWithTrailer(target, name) {
+    if (endsWith(target, "*"))
+      return false;
+    const starPos = target.indexOf("*");
+    if (starPos === -1)
+      return false;
+    return startsWith(name, target.substring(0, starPos)) && endsWith(name, target.substring(starPos + 1));
+  }
+}
+function getLoadModuleFromTargetImportOrExport(extensions, state, cache, redirectedReference, moduleName, scope, isImports) {
+  return loadModuleFromTargetImportOrExport;
+  function loadModuleFromTargetImportOrExport(target, subpath, pattern, key) {
+    if (typeof target === "string") {
+      if (!pattern && subpath.length > 0 && !endsWith(target, "/")) {
+        if (state.traceEnabled) {
+          trace(state.host, Diagnostics.package_json_scope_0_has_invalid_type_for_target_of_specifier_1, scope.packageDirectory, moduleName);
+        }
+        return toSearchResult(
+          /*value*/
+          void 0
+        );
+      }
+      if (!startsWith(target, "./")) {
+        if (isImports && !startsWith(target, "../") && !startsWith(target, "/") && !isRootedDiskPath(target)) {
+          const combinedLookup = pattern ? target.replace(/\*/g, subpath) : target + subpath;
+          traceIfEnabled(state, Diagnostics.Using_0_subpath_1_with_target_2, "imports", key, combinedLookup);
+          traceIfEnabled(state, Diagnostics.Resolving_module_0_from_1, combinedLookup, scope.packageDirectory + "/");
+          const result = nodeModuleNameResolverWorker(
+            state.features,
+            combinedLookup,
+            scope.packageDirectory + "/",
+            state.compilerOptions,
+            state.host,
+            cache,
+            extensions,
+            /*isConfigLookup*/
+            false,
+            redirectedReference,
+            state.conditions
+          );
+          return toSearchResult(
+            result.resolvedModule ? {
+              path: result.resolvedModule.resolvedFileName,
+              extension: result.resolvedModule.extension,
+              packageId: result.resolvedModule.packageId,
+              originalPath: result.resolvedModule.originalPath,
+              resolvedUsingTsExtension: result.resolvedModule.resolvedUsingTsExtension
+            } : void 0
+          );
+        }
+        if (state.traceEnabled) {
+          trace(state.host, Diagnostics.package_json_scope_0_has_invalid_type_for_target_of_specifier_1, scope.packageDirectory, moduleName);
+        }
+        return toSearchResult(
+          /*value*/
+          void 0
+        );
+      }
+      const parts = pathIsRelative(target) ? getPathComponents(target).slice(1) : getPathComponents(target);
+      const partsAfterFirst = parts.slice(1);
+      if (partsAfterFirst.includes("..") || partsAfterFirst.includes(".") || partsAfterFirst.includes("node_modules")) {
+        if (state.traceEnabled) {
+          trace(state.host, Diagnostics.package_json_scope_0_has_invalid_type_for_target_of_specifier_1, scope.packageDirectory, moduleName);
+        }
+        return toSearchResult(
+          /*value*/
+          void 0
+        );
+      }
+      const resolvedTarget = combinePaths(scope.packageDirectory, target);
+      const subpathParts = getPathComponents(subpath);
+      if (subpathParts.includes("..") || subpathParts.includes(".") || subpathParts.includes("node_modules")) {
+        if (state.traceEnabled) {
+          trace(state.host, Diagnostics.package_json_scope_0_has_invalid_type_for_target_of_specifier_1, scope.packageDirectory, moduleName);
+        }
+        return toSearchResult(
+          /*value*/
+          void 0
+        );
+      }
+      if (state.traceEnabled) {
+        trace(state.host, Diagnostics.Using_0_subpath_1_with_target_2, isImports ? "imports" : "exports", key, pattern ? target.replace(/\*/g, subpath) : target + subpath);
+      }
+      const finalPath = toAbsolutePath(pattern ? resolvedTarget.replace(/\*/g, subpath) : resolvedTarget + subpath);
+      const inputLink = tryLoadInputFileForPath(finalPath, subpath, combinePaths(scope.packageDirectory, "package.json"), isImports);
+      if (inputLink)
+        return inputLink;
+      return toSearchResult(withPackageId(scope, loadFileNameFromPackageJsonField(
+        extensions,
+        finalPath,
+        /*onlyRecordFailures*/
+        false,
+        state
+      )));
+    } else if (typeof target === "object" && target !== null) {
+      if (!Array.isArray(target)) {
+        traceIfEnabled(state, Diagnostics.Entering_conditional_exports);
+        for (const condition of getOwnKeys(target)) {
+          if (condition === "default" || state.conditions.includes(condition) || isApplicableVersionedTypesKey(state.conditions, condition)) {
+            traceIfEnabled(state, Diagnostics.Matched_0_condition_1, isImports ? "imports" : "exports", condition);
+            const subTarget = target[condition];
+            const result = loadModuleFromTargetImportOrExport(subTarget, subpath, pattern, key);
+            if (result) {
+              traceIfEnabled(state, Diagnostics.Resolved_under_condition_0, condition);
+              traceIfEnabled(state, Diagnostics.Exiting_conditional_exports);
+              return result;
+            } else {
+              traceIfEnabled(state, Diagnostics.Failed_to_resolve_under_condition_0, condition);
+            }
+          } else {
+            traceIfEnabled(state, Diagnostics.Saw_non_matching_condition_0, condition);
+          }
+        }
+        traceIfEnabled(state, Diagnostics.Exiting_conditional_exports);
+        return void 0;
+      } else {
+        if (!length(target)) {
+          if (state.traceEnabled) {
+            trace(state.host, Diagnostics.package_json_scope_0_has_invalid_type_for_target_of_specifier_1, scope.packageDirectory, moduleName);
+          }
+          return toSearchResult(
+            /*value*/
+            void 0
+          );
+        }
+        for (const elem of target) {
+          const result = loadModuleFromTargetImportOrExport(elem, subpath, pattern, key);
+          if (result) {
+            return result;
+          }
+        }
+      }
+    } else if (target === null) {
+      if (state.traceEnabled) {
+        trace(state.host, Diagnostics.package_json_scope_0_explicitly_maps_specifier_1_to_null, scope.packageDirectory, moduleName);
+      }
+      return toSearchResult(
+        /*value*/
+        void 0
+      );
+    }
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.package_json_scope_0_has_invalid_type_for_target_of_specifier_1, scope.packageDirectory, moduleName);
+    }
+    return toSearchResult(
+      /*value*/
+      void 0
+    );
+    function toAbsolutePath(path) {
+      var _a, _b;
+      if (path === void 0)
+        return path;
+      return getNormalizedAbsolutePath(path, (_b = (_a = state.host).getCurrentDirectory) == null ? void 0 : _b.call(_a));
+    }
+    function combineDirectoryPath(root, dir) {
+      return ensureTrailingDirectorySeparator(combinePaths(root, dir));
+    }
+    function tryLoadInputFileForPath(finalPath, entry, packagePath, isImports2) {
+      var _a, _b, _c, _d;
+      if (!state.isConfigLookup && (state.compilerOptions.declarationDir || state.compilerOptions.outDir) && !finalPath.includes("/node_modules/") && (state.compilerOptions.configFile ? containsPath(scope.packageDirectory, toAbsolutePath(state.compilerOptions.configFile.fileName), !useCaseSensitiveFileNames(state)) : true)) {
+        const getCanonicalFileName = hostGetCanonicalFileName({ useCaseSensitiveFileNames: () => useCaseSensitiveFileNames(state) });
+        const commonSourceDirGuesses = [];
+        if (state.compilerOptions.rootDir || state.compilerOptions.composite && state.compilerOptions.configFilePath) {
+          const commonDir = toAbsolutePath(getCommonSourceDirectory(state.compilerOptions, () => [], ((_b = (_a = state.host).getCurrentDirectory) == null ? void 0 : _b.call(_a)) || "", getCanonicalFileName));
+          commonSourceDirGuesses.push(commonDir);
+        } else if (state.requestContainingDirectory) {
+          const requestingFile = toAbsolutePath(combinePaths(state.requestContainingDirectory, "index.ts"));
+          const commonDir = toAbsolutePath(getCommonSourceDirectory(state.compilerOptions, () => [requestingFile, toAbsolutePath(packagePath)], ((_d = (_c = state.host).getCurrentDirectory) == null ? void 0 : _d.call(_c)) || "", getCanonicalFileName));
+          commonSourceDirGuesses.push(commonDir);
+          let fragment = ensureTrailingDirectorySeparator(commonDir);
+          while (fragment && fragment.length > 1) {
+            const parts = getPathComponents(fragment);
+            parts.pop();
+            const commonDir2 = getPathFromPathComponents(parts);
+            commonSourceDirGuesses.unshift(commonDir2);
+            fragment = ensureTrailingDirectorySeparator(commonDir2);
+          }
+        }
+        if (commonSourceDirGuesses.length > 1) {
+          state.reportDiagnostic(createCompilerDiagnostic(
+            isImports2 ? Diagnostics.The_project_root_is_ambiguous_but_is_required_to_resolve_import_map_entry_0_in_file_1_Supply_the_rootDir_compiler_option_to_disambiguate : Diagnostics.The_project_root_is_ambiguous_but_is_required_to_resolve_export_map_entry_0_in_file_1_Supply_the_rootDir_compiler_option_to_disambiguate,
+            entry === "" ? "." : entry,
+            // replace empty string with `.` - the reverse of the operation done when entries are built - so main entrypoint errors don't look weird
+            packagePath
+          ));
+        }
+        for (const commonSourceDirGuess of commonSourceDirGuesses) {
+          const candidateDirectories = getOutputDirectoriesForBaseDirectory(commonSourceDirGuess);
+          for (const candidateDir of candidateDirectories) {
+            if (containsPath(candidateDir, finalPath, !useCaseSensitiveFileNames(state))) {
+              const pathFragment = finalPath.slice(candidateDir.length + 1);
+              const possibleInputBase = combinePaths(commonSourceDirGuess, pathFragment);
+              const jsAndDtsExtensions = [".mjs" /* Mjs */, ".cjs" /* Cjs */, ".js" /* Js */, ".json" /* Json */, ".d.mts" /* Dmts */, ".d.cts" /* Dcts */, ".d.ts" /* Dts */];
+              for (const ext of jsAndDtsExtensions) {
+                if (fileExtensionIs(possibleInputBase, ext)) {
+                  const inputExts = getPossibleOriginalInputExtensionForExtension(possibleInputBase);
+                  for (const possibleExt of inputExts) {
+                    if (!extensionIsOk(extensions, possibleExt))
+                      continue;
+                    const possibleInputWithInputExtension = changeAnyExtension(possibleInputBase, possibleExt, ext, !useCaseSensitiveFileNames(state));
+                    if (state.host.fileExists(possibleInputWithInputExtension)) {
+                      return toSearchResult(withPackageId(scope, loadFileNameFromPackageJsonField(
+                        extensions,
+                        possibleInputWithInputExtension,
+                        /*onlyRecordFailures*/
+                        false,
+                        state
+                      )));
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return void 0;
+      function getOutputDirectoriesForBaseDirectory(commonSourceDirGuess) {
+        var _a2, _b2;
+        const currentDir = state.compilerOptions.configFile ? ((_b2 = (_a2 = state.host).getCurrentDirectory) == null ? void 0 : _b2.call(_a2)) || "" : commonSourceDirGuess;
+        const candidateDirectories = [];
+        if (state.compilerOptions.declarationDir) {
+          candidateDirectories.push(toAbsolutePath(combineDirectoryPath(currentDir, state.compilerOptions.declarationDir)));
+        }
+        if (state.compilerOptions.outDir && state.compilerOptions.outDir !== state.compilerOptions.declarationDir) {
+          candidateDirectories.push(toAbsolutePath(combineDirectoryPath(currentDir, state.compilerOptions.outDir)));
+        }
+        return candidateDirectories;
+      }
+    }
+  }
+}
+function isApplicableVersionedTypesKey(conditions, key) {
+  if (!conditions.includes("types"))
+    return false;
+  if (!startsWith(key, "types@"))
+    return false;
+  const range = VersionRange.tryParse(key.substring("types@".length));
+  if (!range)
+    return false;
+  return range.test(version);
+}
+function loadModuleFromNearestNodeModulesDirectory(extensions, moduleName, directory, state, cache, redirectedReference) {
+  return loadModuleFromNearestNodeModulesDirectoryWorker(
+    extensions,
+    moduleName,
+    directory,
+    state,
+    /*typesScopeOnly*/
+    false,
+    cache,
+    redirectedReference
+  );
+}
+function loadModuleFromNearestNodeModulesDirectoryTypesScope(moduleName, directory, state) {
+  return loadModuleFromNearestNodeModulesDirectoryWorker(
+    4 /* Declaration */,
+    moduleName,
+    directory,
+    state,
+    /*typesScopeOnly*/
+    true,
+    /*cache*/
+    void 0,
+    /*redirectedReference*/
+    void 0
+  );
+}
+function loadModuleFromNearestNodeModulesDirectoryWorker(extensions, moduleName, directory, state, typesScopeOnly, cache, redirectedReference) {
+  const mode = state.features === 0 ? void 0 : state.features & 32 /* EsmMode */ ? 99 /* ESNext */ : 1 /* CommonJS */;
+  const priorityExtensions = extensions & (1 /* TypeScript */ | 4 /* Declaration */);
+  const secondaryExtensions = extensions & ~(1 /* TypeScript */ | 4 /* Declaration */);
+  if (priorityExtensions) {
+    traceIfEnabled(state, Diagnostics.Searching_all_ancestor_node_modules_directories_for_preferred_extensions_Colon_0, formatExtensions(priorityExtensions));
+    const result = lookup(priorityExtensions);
+    if (result)
+      return result;
+  }
+  if (secondaryExtensions && !typesScopeOnly) {
+    traceIfEnabled(state, Diagnostics.Searching_all_ancestor_node_modules_directories_for_fallback_extensions_Colon_0, formatExtensions(secondaryExtensions));
+    return lookup(secondaryExtensions);
+  }
+  function lookup(extensions2) {
+    return forEachAncestorDirectory(normalizeSlashes(directory), (ancestorDirectory) => {
+      if (getBaseFileName(ancestorDirectory) !== "node_modules") {
+        const resolutionFromCache = tryFindNonRelativeModuleNameInCache(cache, moduleName, mode, ancestorDirectory, redirectedReference, state);
+        if (resolutionFromCache) {
+          return resolutionFromCache;
+        }
+        return toSearchResult(loadModuleFromImmediateNodeModulesDirectory(extensions2, moduleName, ancestorDirectory, state, typesScopeOnly, cache, redirectedReference));
+      }
+    });
+  }
+}
+function loadModuleFromImmediateNodeModulesDirectory(extensions, moduleName, directory, state, typesScopeOnly, cache, redirectedReference) {
+  const nodeModulesFolder = combinePaths(directory, "node_modules");
+  const nodeModulesFolderExists = directoryProbablyExists(nodeModulesFolder, state.host);
+  if (!nodeModulesFolderExists && state.traceEnabled) {
+    trace(state.host, Diagnostics.Directory_0_does_not_exist_skipping_all_lookups_in_it, nodeModulesFolder);
+  }
+  if (!typesScopeOnly) {
+    const packageResult = loadModuleFromSpecificNodeModulesDirectory(extensions, moduleName, nodeModulesFolder, nodeModulesFolderExists, state, cache, redirectedReference);
+    if (packageResult) {
+      return packageResult;
+    }
+  }
+  if (extensions & 4 /* Declaration */) {
+    const nodeModulesAtTypes2 = combinePaths(nodeModulesFolder, "@types");
+    let nodeModulesAtTypesExists = nodeModulesFolderExists;
+    if (nodeModulesFolderExists && !directoryProbablyExists(nodeModulesAtTypes2, state.host)) {
+      if (state.traceEnabled) {
+        trace(state.host, Diagnostics.Directory_0_does_not_exist_skipping_all_lookups_in_it, nodeModulesAtTypes2);
+      }
+      nodeModulesAtTypesExists = false;
+    }
+    return loadModuleFromSpecificNodeModulesDirectory(4 /* Declaration */, mangleScopedPackageNameWithTrace(moduleName, state), nodeModulesAtTypes2, nodeModulesAtTypesExists, state, cache, redirectedReference);
+  }
+}
+function loadModuleFromSpecificNodeModulesDirectory(extensions, moduleName, nodeModulesDirectory, nodeModulesDirectoryExists, state, cache, redirectedReference) {
+  var _a, _b;
+  const candidate = normalizePath(combinePaths(nodeModulesDirectory, moduleName));
+  const { packageName, rest } = parsePackageName(moduleName);
+  const packageDirectory = combinePaths(nodeModulesDirectory, packageName);
+  let rootPackageInfo;
+  let packageInfo = getPackageJsonInfo(candidate, !nodeModulesDirectoryExists, state);
+  if (rest !== "" && packageInfo && (!(state.features & 8 /* Exports */) || !hasProperty(((_a = rootPackageInfo = getPackageJsonInfo(packageDirectory, !nodeModulesDirectoryExists, state)) == null ? void 0 : _a.contents.packageJsonContent) ?? emptyArray, "exports"))) {
+    const fromFile = loadModuleFromFile(extensions, candidate, !nodeModulesDirectoryExists, state);
+    if (fromFile) {
+      return noPackageId(fromFile);
+    }
+    const fromDirectory = loadNodeModuleFromDirectoryWorker(
+      extensions,
+      candidate,
+      !nodeModulesDirectoryExists,
+      state,
+      packageInfo.contents.packageJsonContent,
+      getVersionPathsOfPackageJsonInfo(packageInfo, state)
+    );
+    return withPackageId(packageInfo, fromDirectory);
+  }
+  const loader = (extensions2, candidate2, onlyRecordFailures, state2) => {
+    let pathAndExtension = (rest || !(state2.features & 32 /* EsmMode */)) && loadModuleFromFile(extensions2, candidate2, onlyRecordFailures, state2) || loadNodeModuleFromDirectoryWorker(
+      extensions2,
+      candidate2,
+      onlyRecordFailures,
+      state2,
+      packageInfo && packageInfo.contents.packageJsonContent,
+      packageInfo && getVersionPathsOfPackageJsonInfo(packageInfo, state2)
+    );
+    if (!pathAndExtension && packageInfo && (packageInfo.contents.packageJsonContent.exports === void 0 || packageInfo.contents.packageJsonContent.exports === null) && state2.features & 32 /* EsmMode */) {
+      pathAndExtension = loadModuleFromFile(extensions2, combinePaths(candidate2, "index.js"), onlyRecordFailures, state2);
+    }
+    return withPackageId(packageInfo, pathAndExtension);
+  };
+  if (rest !== "") {
+    packageInfo = rootPackageInfo ?? getPackageJsonInfo(packageDirectory, !nodeModulesDirectoryExists, state);
+  }
+  if (packageInfo) {
+    state.resolvedPackageDirectory = true;
+  }
+  if (packageInfo && packageInfo.contents.packageJsonContent.exports && state.features & 8 /* Exports */) {
+    return (_b = loadModuleFromExports(packageInfo, extensions, combinePaths(".", rest), state, cache, redirectedReference)) == null ? void 0 : _b.value;
+  }
+  const versionPaths = rest !== "" && packageInfo ? getVersionPathsOfPackageJsonInfo(packageInfo, state) : void 0;
+  if (versionPaths) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.package_json_has_a_typesVersions_entry_0_that_matches_compiler_version_1_looking_for_a_pattern_to_match_module_name_2, versionPaths.version, version, rest);
+    }
+    const packageDirectoryExists = nodeModulesDirectoryExists && directoryProbablyExists(packageDirectory, state.host);
+    const fromPaths = tryLoadModuleUsingPaths(
+      extensions,
+      rest,
+      packageDirectory,
+      versionPaths.paths,
+      /*pathPatterns*/
+      void 0,
+      loader,
+      !packageDirectoryExists,
+      state
+    );
+    if (fromPaths) {
+      return fromPaths.value;
+    }
+  }
+  return loader(extensions, candidate, !nodeModulesDirectoryExists, state);
+}
+function tryLoadModuleUsingPaths(extensions, moduleName, baseDirectory, paths, pathPatterns, loader, onlyRecordFailures, state) {
+  pathPatterns || (pathPatterns = tryParsePatterns(paths));
+  const matchedPattern = matchPatternOrExact(pathPatterns, moduleName);
+  if (matchedPattern) {
+    const matchedStar = isString(matchedPattern) ? void 0 : matchedText(matchedPattern, moduleName);
+    const matchedPatternText = isString(matchedPattern) ? matchedPattern : patternText(matchedPattern);
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Module_name_0_matched_pattern_1, moduleName, matchedPatternText);
+    }
+    const resolved = forEach(paths[matchedPatternText], (subst) => {
+      const path = matchedStar ? replaceFirstStar(subst, matchedStar) : subst;
+      const candidate = normalizePath(combinePaths(baseDirectory, path));
+      if (state.traceEnabled) {
+        trace(state.host, Diagnostics.Trying_substitution_0_candidate_module_location_Colon_1, subst, path);
+      }
+      const extension = tryGetExtensionFromPath2(subst);
+      if (extension !== void 0) {
+        const path2 = tryFile(candidate, onlyRecordFailures, state);
+        if (path2 !== void 0) {
+          return noPackageId({ path: path2, ext: extension, resolvedUsingTsExtension: void 0 });
+        }
+      }
+      return loader(extensions, candidate, onlyRecordFailures || !directoryProbablyExists(getDirectoryPath(candidate), state.host), state);
+    });
+    return { value: resolved };
+  }
+}
+var mangledScopedPackageSeparator = "__";
+function mangleScopedPackageNameWithTrace(packageName, state) {
+  const mangled = mangleScopedPackageName(packageName);
+  if (state.traceEnabled && mangled !== packageName) {
+    trace(state.host, Diagnostics.Scoped_package_detected_looking_in_0, mangled);
+  }
+  return mangled;
+}
+function getTypesPackageName(packageName) {
+  return `@types/${mangleScopedPackageName(packageName)}`;
+}
+function mangleScopedPackageName(packageName) {
+  if (startsWith(packageName, "@")) {
+    const replaceSlash = packageName.replace(directorySeparator, mangledScopedPackageSeparator);
+    if (replaceSlash !== packageName) {
+      return replaceSlash.slice(1);
+    }
+  }
+  return packageName;
+}
+function getPackageNameFromTypesPackageName(mangledName) {
+  const withoutAtTypePrefix = removePrefix(mangledName, "@types/");
+  if (withoutAtTypePrefix !== mangledName) {
+    return unmangleScopedPackageName(withoutAtTypePrefix);
+  }
+  return mangledName;
+}
+function unmangleScopedPackageName(typesPackageName) {
+  return typesPackageName.includes(mangledScopedPackageSeparator) ? "@" + typesPackageName.replace(mangledScopedPackageSeparator, directorySeparator) : typesPackageName;
+}
+function tryFindNonRelativeModuleNameInCache(cache, moduleName, mode, containingDirectory, redirectedReference, state) {
+  const result = cache && cache.getFromNonRelativeNameCache(moduleName, mode, containingDirectory, redirectedReference);
+  if (result) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Resolution_for_module_0_was_found_in_cache_from_location_1, moduleName, containingDirectory);
+    }
+    state.resultFromCache = result;
+    return {
+      value: result.resolvedModule && {
+        path: result.resolvedModule.resolvedFileName,
+        originalPath: result.resolvedModule.originalPath || true,
+        extension: result.resolvedModule.extension,
+        packageId: result.resolvedModule.packageId,
+        resolvedUsingTsExtension: result.resolvedModule.resolvedUsingTsExtension
+      }
+    };
+  }
+}
+function classicNameResolver(moduleName, containingFile, compilerOptions, host, cache, redirectedReference) {
+  const traceEnabled = isTraceEnabled(compilerOptions, host);
+  const failedLookupLocations = [];
+  const affectingLocations = [];
+  const containingDirectory = getDirectoryPath(containingFile);
+  const diagnostics = [];
+  const state = {
+    compilerOptions,
+    host,
+    traceEnabled,
+    failedLookupLocations,
+    affectingLocations,
+    packageJsonInfoCache: cache,
+    features: 0 /* None */,
+    conditions: [],
+    requestContainingDirectory: containingDirectory,
+    reportDiagnostic: (diag2) => void diagnostics.push(diag2),
+    isConfigLookup: false,
+    candidateIsFromPackageJsonField: false,
+    resolvedPackageDirectory: false
+  };
+  const resolved = tryResolve(1 /* TypeScript */ | 4 /* Declaration */) || tryResolve(2 /* JavaScript */ | (compilerOptions.resolveJsonModule ? 8 /* Json */ : 0));
+  return createResolvedModuleWithFailedLookupLocationsHandlingSymlink(
+    moduleName,
+    resolved && resolved.value,
+    (resolved == null ? void 0 : resolved.value) && pathContainsNodeModules(resolved.value.path),
+    failedLookupLocations,
+    affectingLocations,
+    diagnostics,
+    state,
+    cache
+  );
+  function tryResolve(extensions) {
+    const resolvedUsingSettings = tryLoadModuleUsingOptionalResolutionSettings(extensions, moduleName, containingDirectory, loadModuleFromFileNoPackageId, state);
+    if (resolvedUsingSettings) {
+      return { value: resolvedUsingSettings };
+    }
+    if (!isExternalModuleNameRelative(moduleName)) {
+      const resolved2 = forEachAncestorDirectory(containingDirectory, (directory) => {
+        const resolutionFromCache = tryFindNonRelativeModuleNameInCache(
+          cache,
+          moduleName,
+          /*mode*/
+          void 0,
+          directory,
+          redirectedReference,
+          state
+        );
+        if (resolutionFromCache) {
+          return resolutionFromCache;
+        }
+        const searchName = normalizePath(combinePaths(directory, moduleName));
+        return toSearchResult(loadModuleFromFileNoPackageId(
+          extensions,
+          searchName,
+          /*onlyRecordFailures*/
+          false,
+          state
+        ));
+      });
+      if (resolved2)
+        return resolved2;
+      if (extensions & (1 /* TypeScript */ | 4 /* Declaration */)) {
+        let resolved3 = loadModuleFromNearestNodeModulesDirectoryTypesScope(moduleName, containingDirectory, state);
+        if (extensions & 4 /* Declaration */)
+          resolved3 ?? (resolved3 = resolveFromTypeRoot(moduleName, state));
+        return resolved3;
+      }
+    } else {
+      const candidate = normalizePath(combinePaths(containingDirectory, moduleName));
+      return toSearchResult(loadModuleFromFileNoPackageId(
+        extensions,
+        candidate,
+        /*onlyRecordFailures*/
+        false,
+        state
+      ));
+    }
+  }
+}
+function resolveFromTypeRoot(moduleName, state) {
+  if (!state.compilerOptions.typeRoots)
+    return;
+  for (const typeRoot of state.compilerOptions.typeRoots) {
+    const candidate = getCandidateFromTypeRoot(typeRoot, moduleName, state);
+    const directoryExists = directoryProbablyExists(typeRoot, state.host);
+    if (!directoryExists && state.traceEnabled) {
+      trace(state.host, Diagnostics.Directory_0_does_not_exist_skipping_all_lookups_in_it, typeRoot);
+    }
+    const resolvedFromFile = loadModuleFromFile(4 /* Declaration */, candidate, !directoryExists, state);
+    if (resolvedFromFile) {
+      const packageDirectory = parseNodeModuleFromPath(resolvedFromFile.path);
+      const packageInfo = packageDirectory ? getPackageJsonInfo(
+        packageDirectory,
+        /*onlyRecordFailures*/
+        false,
+        state
+      ) : void 0;
+      return toSearchResult(withPackageId(packageInfo, resolvedFromFile));
+    }
+    const resolved = loadNodeModuleFromDirectory(4 /* Declaration */, candidate, !directoryExists, state);
+    if (resolved)
+      return toSearchResult(resolved);
+  }
+}
+function shouldAllowImportingTsExtension(compilerOptions, fromFileName) {
+  return !!compilerOptions.allowImportingTsExtensions || fromFileName && isDeclarationFileName(fromFileName);
+}
+function loadModuleFromGlobalCache(moduleName, projectName, compilerOptions, host, globalCache, packageJsonInfoCache) {
+  const traceEnabled = isTraceEnabled(compilerOptions, host);
+  if (traceEnabled) {
+    trace(host, Diagnostics.Auto_discovery_for_typings_is_enabled_in_project_0_Running_extra_resolution_pass_for_module_1_using_cache_location_2, projectName, moduleName, globalCache);
+  }
+  const failedLookupLocations = [];
+  const affectingLocations = [];
+  const diagnostics = [];
+  const state = {
+    compilerOptions,
+    host,
+    traceEnabled,
+    failedLookupLocations,
+    affectingLocations,
+    packageJsonInfoCache,
+    features: 0 /* None */,
+    conditions: [],
+    requestContainingDirectory: void 0,
+    reportDiagnostic: (diag2) => void diagnostics.push(diag2),
+    isConfigLookup: false,
+    candidateIsFromPackageJsonField: false,
+    resolvedPackageDirectory: false
+  };
+  const resolved = loadModuleFromImmediateNodeModulesDirectory(
+    4 /* Declaration */,
+    moduleName,
+    globalCache,
+    state,
+    /*typesScopeOnly*/
+    false,
+    /*cache*/
+    void 0,
+    /*redirectedReference*/
+    void 0
+  );
+  return createResolvedModuleWithFailedLookupLocations(
+    resolved,
+    /*isExternalLibraryImport*/
+    true,
+    failedLookupLocations,
+    affectingLocations,
+    diagnostics,
+    state.resultFromCache,
+    /*cache*/
+    void 0
+  );
+}
+function toSearchResult(value) {
+  return value !== void 0 ? { value } : void 0;
+}
+function traceIfEnabled(state, diagnostic, ...args) {
+  if (state.traceEnabled) {
+    trace(state.host, diagnostic, ...args);
+  }
+}
+function useCaseSensitiveFileNames(state) {
+  return !state.host.useCaseSensitiveFileNames ? true : typeof state.host.useCaseSensitiveFileNames === "boolean" ? state.host.useCaseSensitiveFileNames : state.host.useCaseSensitiveFileNames();
+}
+
+// src/compiler/binder.ts
+var ModuleInstanceState = /* @__PURE__ */ ((ModuleInstanceState2) => {
+  ModuleInstanceState2[ModuleInstanceState2["NonInstantiated"] = 0] = "NonInstantiated";
+  ModuleInstanceState2[ModuleInstanceState2["Instantiated"] = 1] = "Instantiated";
+  ModuleInstanceState2[ModuleInstanceState2["ConstEnumOnly"] = 2] = "ConstEnumOnly";
+  return ModuleInstanceState2;
+})(ModuleInstanceState || {});
+function getModuleInstanceState(node, visited) {
+  if (node.body && !node.body.parent) {
+    setParent(node.body, node);
+    setParentRecursive(
+      node.body,
+      /*incremental*/
+      false
+    );
+  }
+  return node.body ? getModuleInstanceStateCached(node.body, visited) : 1 /* Instantiated */;
+}
+function getModuleInstanceStateCached(node, visited = /* @__PURE__ */ new Map()) {
+  const nodeId = getNodeId(node);
+  if (visited.has(nodeId)) {
+    return visited.get(nodeId) || 0 /* NonInstantiated */;
+  }
+  visited.set(nodeId, void 0);
+  const result = getModuleInstanceStateWorker(node, visited);
+  visited.set(nodeId, result);
+  return result;
+}
+function getModuleInstanceStateWorker(node, visited) {
+  switch (node.kind) {
+    case 264 /* InterfaceDeclaration */:
+    case 265 /* TypeAliasDeclaration */:
+      return 0 /* NonInstantiated */;
+    case 266 /* EnumDeclaration */:
+      if (isEnumConst(node)) {
+        return 2 /* ConstEnumOnly */;
+      }
+      break;
+    case 272 /* ImportDeclaration */:
+    case 271 /* ImportEqualsDeclaration */:
+      if (!hasSyntacticModifier(node, 32 /* Export */)) {
+        return 0 /* NonInstantiated */;
+      }
+      break;
+    case 278 /* ExportDeclaration */:
+      const exportDeclaration = node;
+      if (!exportDeclaration.moduleSpecifier && exportDeclaration.exportClause && exportDeclaration.exportClause.kind === 279 /* NamedExports */) {
+        let state = 0 /* NonInstantiated */;
+        for (const specifier of exportDeclaration.exportClause.elements) {
+          const specifierState = getModuleInstanceStateForAliasTarget(specifier, visited);
+          if (specifierState > state) {
+            state = specifierState;
+          }
+          if (state === 1 /* Instantiated */) {
+            return state;
+          }
+        }
+        return state;
+      }
+      break;
+    case 268 /* ModuleBlock */: {
+      let state = 0 /* NonInstantiated */;
+      forEachChild(node, (n) => {
+        const childState = getModuleInstanceStateCached(n, visited);
+        switch (childState) {
+          case 0 /* NonInstantiated */:
+            return;
+          case 2 /* ConstEnumOnly */:
+            state = 2 /* ConstEnumOnly */;
+            return;
+          case 1 /* Instantiated */:
+            state = 1 /* Instantiated */;
+            return true;
+          default:
+            Debug.assertNever(childState);
+        }
+      });
+      return state;
+    }
+    case 267 /* ModuleDeclaration */:
+      return getModuleInstanceState(node, visited);
+    case 80 /* Identifier */:
+      if (node.flags & 4096 /* IdentifierIsInJSDocNamespace */) {
+        return 0 /* NonInstantiated */;
+      }
+  }
+  return 1 /* Instantiated */;
+}
+function getModuleInstanceStateForAliasTarget(specifier, visited) {
+  const name = specifier.propertyName || specifier.name;
+  let p = specifier.parent;
+  while (p) {
+    if (isBlock(p) || isModuleBlock(p) || isSourceFile(p)) {
+      const statements = p.statements;
+      let found;
+      for (const statement of statements) {
+        if (nodeHasName(statement, name)) {
+          if (!statement.parent) {
+            setParent(statement, p);
+            setParentRecursive(
+              statement,
+              /*incremental*/
+              false
+            );
+          }
+          const state = getModuleInstanceStateCached(statement, visited);
+          if (found === void 0 || state > found) {
+            found = state;
+          }
+          if (found === 1 /* Instantiated */) {
+            return found;
+          }
+          if (statement.kind === 271 /* ImportEqualsDeclaration */) {
+            found = 1 /* Instantiated */;
+          }
+        }
+      }
+      if (found !== void 0) {
+        return found;
+      }
+    }
+    p = p.parent;
+  }
+  return 1 /* Instantiated */;
+}
+var ContainerFlags = /* @__PURE__ */ ((ContainerFlags2) => {
+  ContainerFlags2[ContainerFlags2["None"] = 0] = "None";
+  ContainerFlags2[ContainerFlags2["IsContainer"] = 1] = "IsContainer";
+  ContainerFlags2[ContainerFlags2["IsBlockScopedContainer"] = 2] = "IsBlockScopedContainer";
+  ContainerFlags2[ContainerFlags2["IsControlFlowContainer"] = 4] = "IsControlFlowContainer";
+  ContainerFlags2[ContainerFlags2["IsFunctionLike"] = 8] = "IsFunctionLike";
+  ContainerFlags2[ContainerFlags2["IsFunctionExpression"] = 16] = "IsFunctionExpression";
+  ContainerFlags2[ContainerFlags2["HasLocals"] = 32] = "HasLocals";
+  ContainerFlags2[ContainerFlags2["IsInterface"] = 64] = "IsInterface";
+  ContainerFlags2[ContainerFlags2["IsObjectLiteralOrClassExpressionMethodOrAccessor"] = 128] = "IsObjectLiteralOrCl

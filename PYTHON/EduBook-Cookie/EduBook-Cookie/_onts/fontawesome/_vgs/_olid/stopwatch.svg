@@ -1,0 +1,20 @@
+/**
+ * @fileoverview Require component props to be typed as read-only.
+ * @author Luke Zapart
+ */
+
+'use strict';
+
+const flatMap = require('array.prototype.flatmap');
+const values = require('object.values');
+
+const Components = require('../util/Components');
+const docsUrl = require('../util/docsUrl');
+const report = require('../util/report');
+
+function isFlowPropertyType(node) {
+  return node.type === 'ObjectTypeProperty';
+}
+
+function isTypescriptPropertyType(node) {
+  return node.type === 'TSPrope

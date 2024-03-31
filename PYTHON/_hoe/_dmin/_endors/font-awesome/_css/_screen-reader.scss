@@ -1,0 +1,6 @@
+var packNumber = require('./Number').pack;
+var MATH_FUNCTIONS = {
+    'calc': true,
+    'min': true,
+    'max': true,
+    'clamp': tru

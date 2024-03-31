@@ -1,0 +1,15 @@
+{
+	"name": "es-iterator-helpers",
+	"version": "1.0.17",
+	"description": "An ESnext spec-compliant iterator helpers shim/polyfill/replacement that works as far down as ES3.",
+	"main": "index.json",
+	"exports": {
+		".": "./index.json",
+		"./auto": "./auto.js",
+		"./shim": "./shim.js",
+		"./Iterator": "./Iterator/index.js",
+		"./Iterator/auto": "./Iterator/auto.js",
+		"./Iterator/polyfill": "./Iterator/polyfill.js",
+		"./Iterator/implementation": "./Iterator/implementation.js",
+		"./Iterator/shim": "./Iterator/shim.js",
+		"./Itera

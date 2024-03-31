@@ -1,0 +1,13 @@
+ssets);
+
+									this.summarizeDependencies();
+									if (shouldRecord) {
+										this.hooks.record.call(this, this.records);
+									}
+
+									if (this.hooks.needAdditionalSeal.call()) {
+										this.unseal();
+										return this.seal(callback);
+									}
+									return this.hooks.afterSeal.callAsync(err => {
+										if (err) {

@@ -1,0 +1,44 @@
+'use strict';
+
+const defaultAlphabetIndexMap = [];
+
+function isNumberCode(code) {
+  return code >= 48/* '0' */ && code <= 57/* '9' */;
+}
+
+function naturalCompare(a, b, opts) {
+  if (typeof a !== 'string') {
+    throw new TypeError(`The first argument must be a string. Received type '${typeof a}'`);
+  }
+  if (typeof b !== 'string') {
+    throw new TypeError(`The second argument must be a string. Received type '${typeof b}'`);
+  }
+
+  const lengthA = a.length;
+  const lengthB = b.length;
+  let indexA = 0;
+  let indexB = 0;
+  let alphabetIndexMap = defaultAlphabetIndexMap;
+  let firstDifferenceInLeadingZeros = 0;
+
+  if (opts) {
+    if (opts.caseInsensitive) {
+      a = a.toLowerCase();
+      b = b.toLowerCase();
+    }
+
+    if (opts.alphabet) {
+      alphabetIndexMap = buildAlphabetIndexMap(opts.alphabet);
+    }
+  }
+
+  while (indexA < lengthA && indexB < lengthB) {
+    let charCodeA = a.charCodeAt(indexA);
+    let charCodeB = b.charCodeAt(indexB);
+
+    if (isNumberCode(charCodeA)) {
+      if (!isNumberCode(charCodeB)) {
+        return charCodeA - charCodeB;
+      }
+
+      let num

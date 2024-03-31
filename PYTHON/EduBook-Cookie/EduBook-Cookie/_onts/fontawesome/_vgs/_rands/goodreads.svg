@@ -1,0 +1,7 @@
+ects with `new Ajv.ValidationError(errors)` if you want to return custom errors from the keyword function).
+
+Ajv compiles asynchronous schemas to [es7 async functions](http://tc39.github.io/ecmascript-asyncawait/) that can optionally be transpiled with [nodent](https://github.com/MatAtBread/nodent). Async functions are supported in Node.js 7+ and all modern browsers. You can also supply any other transpiler as a function via `processCode` option. See [Options](#options).
+
+The compiled validation function has `$async: true` property (if the schema is asynchronous), so you can differentiate these functions if you are using both synchronous and asynchronous schemas.
+
+Validation result will be a promise that resolves with validated data or rejects with an exception `Ajv.ValidationError` that contains the

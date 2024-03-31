@@ -1,0 +1,43 @@
+nitFragments", chunkInitFragments);
+		data.set("topLevelDeclarations", topLevelDeclarations);
+
+		/** @type {CodeGenerationResult} */
+		const resultEntry = {
+			sources: new Map([["javascript", new CachedSource(result)]]),
+			data,
+			runtimeRequirements
+		};
+
+		return resultEntry;
+	}
+
+	/**
+	 * @param {Map<Module, ModuleInfo>} modulesMap modulesMap
+	 * @param {ModuleInfo} info info
+	 * @param {DependencyTemplates} dependencyTemplates dependencyTemplates
+	 * @param {RuntimeTemplate} runtimeTemplate runtimeTemplate
+	 * @param {ModuleGraph} moduleGraph moduleGraph
+	 * @param {ChunkGraph} chunkGraph chunkGraph
+	 * @param {RuntimeSpec} runtime runtime
+	 * @param {CodeGenerationResults} codeGenerationResults codeGenerationResults
+	 */
+	_analyseModule(
+		modulesMap,
+		info,
+		dependencyTemplates,
+		runtimeTemplate,
+		moduleGraph,
+		chunkGraph,
+		runtime,
+		codeGenerationResults
+	) {
+		if (info.type === "concatenated") {
+			const m = info.module;
+			try {
+				// Create a concatenation scope to track and capture information
+				const concatenationScope = new ConcatenationScope(modulesMap, info);
+
+				// TODO cache codeGeneration results
+				const codeGenResult = m.codeGeneration({
+					dependencyTemplates,
+					runtime

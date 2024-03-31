@@ -1,0 +1,8 @@
+/**
+ * An externally resolvable/rejectable "promise". Use it to resolve/reject
+ * promise at any time.
+ *
+ * ```ts
+ * const future = new Defer();
+ *
+ * future.promise.then(valu

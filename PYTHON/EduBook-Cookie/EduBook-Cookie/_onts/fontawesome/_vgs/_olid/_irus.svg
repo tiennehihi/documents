@@ -1,0 +1,32 @@
+var List = require('../common/List');
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function isValidNumber(value) {
+    // Number.isInteger(value) && value >= 0
+    return (
+        typeof value === 'number' &&
+        isFinite(value) &&
+        Math.floor(value) === value &&
+        value >= 0
+    );
+}
+
+function isValidLocation(loc) {
+    return (
+        Boolean(loc) &&
+        isValidNumber(loc.offset) &&
+        isValidNumber(loc.line) &&
+        isValidNumber(loc.column)
+    );
+}
+
+function createNodeStructureChecker(type, fields) {
+    return function checkNode(node, warn) {
+        if (!node || node.constructor !== Object) {
+            return warn(node, 'Type of node should be an Object');
+        }
+
+        for (var key in node) {
+            var valid = true;
+
+            i

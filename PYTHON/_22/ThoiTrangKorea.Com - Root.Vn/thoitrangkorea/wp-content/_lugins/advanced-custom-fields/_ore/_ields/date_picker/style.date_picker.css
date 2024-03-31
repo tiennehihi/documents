@@ -1,0 +1,557 @@
+/**
+ * XmlHttpRequest implementation that uses TLS and flash SocketPool.
+ *
+ * @author Dave Longley
+ *
+ * Copyright (c) 2010-2013 Digital Bazaar, Inc.
+ */
+var forge = require('./forge');
+require('./socket');
+require('./http');
+
+/* XHR API */
+var xhrApi = module.exports = forge.xhr = forge.xhr || {};
+
+(function($) {
+
+// logging category
+var cat = 'forge.xhr';
+
+/*
+XMLHttpRequest interface definition from:
+http://www.w3.org/TR/XMLHttpRequest
+
+interface XMLHttpRequest {
+  // event handler
+  attribute EventListener onreadystatechange;
+
+  // state
+  const unsigned short UNSENT = 0;
+  const unsigned short OPENED = 1;
+  const unsigned short HEADERS_RECEIVED = 2;
+  const unsigned short LOADING = 3;
+  const unsigned short DONE = 4;
+  readonly attribute unsigned short readyState;
+
+  // request
+  void open(in DOMString method, in DOMString url);
+  void open(in DOMString method, in DOMString url, in boolean async);
+  void open(in DOMString method, in DOMString url,
+            in boolean async, in DOMString user);
+  void open(in DOMString method, in DOMString url,
+            in boolean async, in DOMString user, in DOMString password);
+  void setRequestHeader(in DOMString header, in DOMString value);
+  void send();
+  void send(in DOMString data);
+  void send(in Document data);
+  void abort();
+
+  // response
+  DOMString getAllResponseHeaders();
+  DOMString getResponseHeader(in DOMString header);
+  readonly attribute DOMString responseText;
+  readonly attribute Document responseXML;
+  readonly attribute unsigned short status;
+  readonly attribute DOMString statusText;
+};
+*/
+
+// readyStates
+var UNSENT = 0;
+var OPENED = 1;
+var HEADERS_RECEIVED = 2;
+var LOADING = 3;
+var DONE = 4;
+
+// exceptions
+var INVALID_STATE_ERR = 11;
+var SYNTAX_ERR = 12;
+var SECURITY_ERR = 18;
+var NETWORK_ERR = 19;
+var ABORT_ERR = 20;
+
+// private flash socket pool vars
+var _sp = null;
+var _policyPort = 0;
+var _policyUrl = null;
+
+// default client (used if no special URL provided when creating an XHR)
+var _client = null;
+
+// all clients including the default, key'd by full base url
+// (multiple cross-domain http clients are permitted so there may be more
+// than one client in this map)
+// TODO: provide optional clean up API for non-default clients
+var _clients = {};
+
+// the default maximum number of concurrents connections per client
+var _maxConnections = 10;
+
+var net = forge.net;
+var http = forge.http;
+
+/**
+ * Initializes flash XHR support.
+ *
+ * @param options:
+ *   url: the default base URL to connect to if xhr URLs are relative,
+ *     ie: https://myserver.com.
+ *   flashId: the dom ID of the flash SocketPool.
+ *   policyPort: the port that provides the server's flash policy, 0 to use
+ *     the flash default.
+ *   policyUrl: the policy file URL to use instead of a policy port.
+ *   msie: true if browser is internet explorer, false if not.
+ *   connections: the maximum number of concurrent connections.
+ *   caCerts: a list of PEM-formatted certificates to trust.
+ *   cipherSuites: an optional array of cipher suites to use,
+ *     see forge.tls.CipherSuites.
+ *   verify: optional TLS certificate verify callback to use (see forge.tls
+ *     for details).
+ *   getCertificate: an optional callback used to get a client-side
+ *     certificate (see forge.tls for details).
+ *   getPrivateKey: an optional callback used to get a client-side private
+ *     key (see forge.tls for details).
+ *   getSignature: an optional callback used to get a client-side signature
+ *     (see forge.tls for details).
+ *   persistCookies: true to use persistent cookies via flash local storage,
+ *     false to only keep cookies in javascript.
+ *   primeTlsSockets: true to immediately connect TLS sockets on their
+ *     creation so that they will cache TLS sessions for reuse.
+ */
+xhrApi.init = function(options) {
+  forge.log.debug(cat, 'initializing', options);
+
+  // update default policy port and max connections
+  _policyPort = options.policyPort || _policyPort;
+  _policyUrl = options.policyUrl || _policyUrl;
+  _maxConnections = options.connections || _maxConnections;
+
+  // create the flash socket pool
+  _sp = net.createSocketPool({
+    flashId: options.flashId,
+    policyPort: _policyPort,
+    policyUrl: _policyUrl,
+    msie: options.msie || false
+  });
+
+  // create default http client
+  _client = http.createClient({
+    url: options.url || (
+      window.location.protocol + '//' + window.location.host),
+    socketPool: _sp,
+    policyPort: _policyPort,
+    policyUrl: _policyUrl,
+    connections: options.connections || _maxConnections,
+    caCerts: options.caCerts,
+    cipherSuites: options.cipherSuites,
+    persistCookies: options.persistCookies || true,
+    primeTlsSockets: options.primeTlsSockets || false,
+    verify: options.verify,
+    getCertificate: options.getCertificate,
+    getPrivateKey: options.getPrivateKey,
+    getSignature: options.getSignature
+  });
+  _clients[_client.url.origin] = _client;
+
+  forge.log.debug(cat, 'ready');
+};
+
+/**
+ * Called to clean up the clients and socket pool.
+ */
+xhrApi.cleanup = function() {
+  // destroy all clients
+  for(var key in _clients) {
+    _clients[key].destroy();
+  }
+  _clients = {};
+  _client = null;
+
+  // destroy socket pool
+  _sp.destroy();
+  _sp = null;
+};
+
+/**
+ * Sets a cookie.
+ *
+ * @param cookie the cookie with parameters:
+ *   name: the name of the cookie.
+ *   value: the value of the cookie.
+ *   comment: an optional comment string.
+ *   maxAge: the age of the cookie in seconds relative to created time.
+ *   secure: true if the cookie must be sent over a secure protocol.
+ *   httpOnly: true to restrict access to the cookie from javascript
+ *     (inaffective since the cookies are stored in javascript).
+ *   path: the path for the cookie.
+ *   domain: optional domain the cookie belongs to (must start with dot).
+ *   version: optional version of the cookie.
+ *   created: creation time, in UTC seconds, of the cookie.
+ */
+xhrApi.setCookie = function(cookie) {
+  // default cookie expiration to never
+  cookie.maxAge = cookie.maxAge || -1;
+
+  // if the cookie's domain is set, use the appropriate client
+  if(cookie.domain) {
+    // add the cookies to the applicable domains
+    for(var key in _clients) {
+      var client = _clients[key];
+      if(http.withinCookieDomain(client.url, cookie) &&
+        client.secure === cookie.secure) {
+        client.setCookie(cookie);
+      }
+    }
+  } else {
+    // use the default domain
+    // FIXME: should a null domain cookie be added to all clients? should
+    // this be an option?
+    _client.setCookie(cookie);
+  }
+};
+
+/**
+ * Gets a cookie.
+ *
+ * @param name the name of the cookie.
+ * @param path an optional path for the cookie (if there are multiple cookies
+ *          with the same name but different paths).
+ * @param domain an optional domain for the cookie (if not using the default
+ *          domain).
+ *
+ * @return the cookie, cookies (if multiple matches), or null if not found.
+ */
+xhrApi.getCookie = function(name, path, domain) {
+  var rval = null;
+
+  if(domain) {
+    // get the cookies from the applicable domains
+    for(var key in _clients) {
+      var client = _clients[key];
+      if(http.withinCookieDomain(client.url, domain)) {
+        var cookie = client.getCookie(name, path);
+        if(cookie !== null) {
+          if(rval === null) {
+            rval = cookie;
+          } else if(!forge.util.isArray(rval)) {
+            rval = [rval, cookie];
+          } else {
+            rval.push(cookie);
+          }
+        }
+      }
+    }
+  } else {
+    // get cookie from default domain
+    rval = _client.getCookie(name, path);
+  }
+
+  return rval;
+};
+
+/**
+ * Removes a cookie.
+ *
+ * @param name the name of the cookie.
+ * @param path an optional path for the cookie (if there are multiple cookies
+ *          with the same name but different paths).
+ * @param domain an optional domain for the cookie (if not using the default
+ *          domain).
+ *
+ * @return true if a cookie was removed, false if not.
+ */
+xhrApi.removeCookie = function(name, path, domain) {
+  var rval = false;
+
+  if(domain) {
+    // remove the cookies from the applicable domains
+    for(var key in _clients) {
+      var client = _clients[key];
+      if(http.withinCookieDomain(client.url, domain)) {
+        if(client.removeCookie(name, path)) {
+           rval = true;
+        }
+      }
+    }
+  } else {
+    // remove cookie from default domain
+    rval = _client.removeCookie(name, path);
+  }
+
+  return rval;
+};
+
+/**
+ * Creates a new XmlHttpRequest. By default the base URL, flash policy port,
+ * etc, will be used. However, an XHR can be created to point at another
+ * cross-domain URL.
+ *
+ * @param options:
+ *   logWarningOnError: If true and an HTTP error status code is received then
+ *     log a warning, otherwise log a verbose message.
+ *   verbose: If true be very verbose in the output including the response
+ *     event and response body, otherwise only include status, timing, and
+ *     data size.
+ *   logError: a multi-var log function for warnings that takes the log
+ *     category as the first var.
+ *   logWarning: a multi-var log function for warnings that takes the log
+ *     category as the first var.
+ *   logDebug: a multi-var log function for warnings that takes the log
+ *     category as the first var.
+ *   logVerbose: a multi-var log function for warnings that takes the log
+ *     category as the first var.
+ *   url: the default base URL to connect to if xhr URLs are relative,
+ *     eg: https://myserver.com, and note that the following options will be
+ *     ignored if the URL is absent or the same as the default base URL.
+ *   policyPort: the port that provides the server's flash policy, 0 to use
+ *     the flash default.
+ *   policyUrl: the policy file URL to use instead of a policy port.
+ *   connections: the maximum number of concurrent connections.
+ *   caCerts: a list of PEM-formatted certificates to trust.
+ *   cipherSuites: an optional array of cipher suites to use, see
+ *     forge.tls.CipherSuites.
+ *   verify: optional TLS certificate verify callback to use (see forge.tls
+ *     for details).
+ *   getCertificate: an optional callback used to get a client-side
+ *     certificate.
+ *   getPrivateKey: an optional callback used to get a client-side private key.
+ *   getSignature: an optional callback used to get a client-side signature.
+ *   persistCookies: true to use persistent cookies via flash local storage,
+ *     false to only keep cookies in javascript.
+ *   primeTlsSockets: true to immediately connect TLS sockets on their
+ *     creation so that they will cache TLS sessions for reuse.
+ *
+ * @return the XmlHttpRequest.
+ */
+xhrApi.create = function(options) {
+  // set option defaults
+  options = $.extend({
+    logWarningOnError: true,
+    verbose: false,
+    logError: function() {},
+    logWarning: function() {},
+    logDebug: function() {},
+    logVerbose: function() {},
+    url: null
+  }, options || {});
+
+  // private xhr state
+  var _state = {
+    // the http client to use
+    client: null,
+    // request storage
+    request: null,
+    // response storage
+    response: null,
+    // asynchronous, true if doing asynchronous communication
+    asynchronous: true,
+    // sendFlag, true if send has been called
+    sendFlag: false,
+    // errorFlag, true if a network error occurred
+    errorFlag: false
+  };
+
+  // private log functions
+  var _log = {
+    error: options.logError || forge.log.error,
+    warning: options.logWarning || forge.log.warning,
+    debug: options.logDebug || forge.log.debug,
+    verbose: options.logVerbose || forge.log.verbose
+  };
+
+  // create public xhr interface
+  var xhr = {
+    // an EventListener
+    onreadystatechange: null,
+    // readonly, the current readyState
+    readyState: UNSENT,
+    // a string with the response entity-body
+    responseText: '',
+    // a Document for response entity-bodies that are XML
+    responseXML: null,
+    // readonly, returns the HTTP status code (i.e. 404)
+    status: 0,
+    // readonly, returns the HTTP status message (i.e. 'Not Found')
+    statusText: ''
+  };
+
+  // determine which http client to use
+  if(options.url === null) {
+    // use default
+    _state.client = _client;
+  } else {
+    var url;
+    try {
+      url = new URL(options.url);
+    } catch(e) {
+      var error = new Error('Invalid url.');
+      error.details = {
+        url: options.url
+      };
+    }
+
+    // find client
+    if(url.origin in _clients) {
+      // client found
+      _state.client = _clients[url.origin];
+    } else {
+      // create client
+      _state.client = http.createClient({
+        url: options.url,
+        socketPool: _sp,
+        policyPort: options.policyPort || _policyPort,
+        policyUrl: options.policyUrl || _policyUrl,
+        connections: options.connections || _maxConnections,
+        caCerts: options.caCerts,
+        cipherSuites: options.cipherSuites,
+        persistCookies: options.persistCookies || true,
+        primeTlsSockets: options.primeTlsSockets || false,
+        verify: options.verify,
+        getCertificate: options.getCertificate,
+        getPrivateKey: options.getPrivateKey,
+        getSignature: options.getSignature
+      });
+      _clients[url.origin] = _state.client;
+    }
+  }
+
+  /**
+   * Opens the request. This method will create the HTTP request to send.
+   *
+   * @param method the HTTP method (i.e. 'GET').
+   * @param url the relative url (the HTTP request path).
+   * @param async always true, ignored.
+   * @param user always null, ignored.
+   * @param password always null, ignored.
+   */
+  xhr.open = function(method, url, async, user, password) {
+    // 1. validate Document if one is associated
+    // TODO: not implemented (not used yet)
+
+    // 2. validate method token
+    // 3. change method to uppercase if it matches a known
+    // method (here we just require it to be uppercase, and
+    // we do not allow the standard methods)
+    // 4. disallow CONNECT, TRACE, or TRACK with a security error
+    switch(method) {
+    case 'DELETE':
+    case 'GET':
+    case 'HEAD':
+    case 'OPTIONS':
+    case 'PATCH':
+    case 'POST':
+    case 'PUT':
+      // valid method
+      break;
+    case 'CONNECT':
+    case 'TRACE':
+    case 'TRACK':
+      throw new Error('CONNECT, TRACE and TRACK methods are disallowed');
+    default:
+      throw new Error('Invalid method: ' + method);
+    }
+
+    // TODO: other validation steps in algorithm are not implemented
+
+    // 19. set send flag to false
+    // set response body to null
+    // empty list of request headers
+    // set request method to given method
+    // set request URL
+    // set username, password
+    // set asychronous flag
+    _state.sendFlag = false;
+    xhr.responseText = '';
+    xhr.responseXML = null;
+
+    // custom: reset status and statusText
+    xhr.status = 0;
+    xhr.statusText = '';
+
+    // create the HTTP request
+    _state.request = http.createRequest({
+      method: method,
+      path: url
+    });
+
+    // 20. set state to OPENED
+    xhr.readyState = OPENED;
+
+    // 21. dispatch onreadystatechange
+    if(xhr.onreadystatechange) {
+       xhr.onreadystatechange();
+    }
+  };
+
+  /**
+   * Adds an HTTP header field to the request.
+   *
+   * @param header the name of the header field.
+   * @param value the value of the header field.
+   */
+  xhr.setRequestHeader = function(header, value) {
+    // 1. if state is not OPENED or send flag is true, raise exception
+    if(xhr.readyState != OPENED || _state.sendFlag) {
+      throw new Error('XHR not open or sending');
+    }
+
+    // TODO: other validation steps in spec aren't implemented
+
+    // set header
+    _state.request.setField(header, value);
+  };
+
+  /**
+   * Sends the request and any associated data.
+   *
+   * @param data a string or Document object to send, null to send no data.
+   */
+  xhr.send = function(data) {
+    // 1. if state is not OPENED or 2. send flag is true, raise
+    // an invalid state exception
+    if(xhr.readyState != OPENED || _state.sendFlag) {
+      throw new Error('XHR not open or sending');
+    }
+
+    // 3. ignore data if method is GET or HEAD
+    if(data &&
+      _state.request.method !== 'GET' &&
+      _state.request.method !== 'HEAD') {
+      // handle non-IE case
+      if(typeof(XMLSerializer) !== 'undefined') {
+        if(data instanceof Document) {
+          var xs = new XMLSerializer();
+          _state.request.body = xs.serializeToString(data);
+        } else {
+{"version":3,"file":"uniqueItemProperties.js","sourceRoot":"","sources":["../../src/keywords/uniqueItemProperties.ts"],"names":[],"mappings":";;;;;AACA,+FAAwD;AAExD,MAAM,oBAAoB,GAAsB,CAAC,GAAG,EAAE,EAAE,CAAC,GAAG,CAAC,UAAU,CAAC,IAAA,8BAAM,GAAE,CAAC,CAAA;AAEjF,kBAAe,oBAAoB,CAAA;AACnC,MAAM,CAAC,OAAO,GAAG,oBAAoB,CAAA"}                                                                                                                                                                                                   JÕ‚õV»tgò¡4à¸«i±Ã^ TÕÃr’ÕG¼M••CuF‰$`iÙKá)úåôR%îá=Ô˜Û‡’òðâŽY Ý+•­wEëòµ™|èç‚™3äZR={¸ðÐ¦ŸD«²–GñãÔ¹ ˆ’`ïµv$ ˆ’  ÄåÇ	xÜ“S)(ŠUežÁXŸRBß6¹3øM„¼~óÀZïWÿaº!ê¿á”m4`¯ä’¦%žÍƒ Ï>Þ5¡LòF\#–Ãó;#Â’ÛrOæ´†S]îC*Ó»ÃÇxGôŸñ')®£;Ö$Y).žÓ£æx7A‘JÉ]Qåš´t4«X4ˆ†Ñ©2ëOç†é0Óâó€×QsiP\{V×¶8‚›ö]ïú"× ÓÀLÄA_FûoA<0…;ÛnP#ºfì¸ Š*ÝvJ\Xyv `	šs×¹™GÅ!UKÈÑókútómn¹á6ëzS+FÎÏ<fzÐ¦ÀMÍÊJtE†K'%ëoÈ¾Ú0ýâŸÕè>AVWãEU¯ßÜ^Á–ÚÜ½Z™ë>Mãù ƒÁ™8žÑ~’q,
+4.Ç®·ÕCê-‚x±Ë‹“á› nZ~ÿ†AÂ,<Qâ­/uGðƒbpúhç(Òùœut¶ïÛ¨Xäøèvð7[û`ü	h-}(ÍAVqv}Iµð[ñ·@¹Î™¡J¦KH}Ò‚ÓË±ÑÊ^-jOÅwó»®’êz-ÒMðáŒ1ürÝL;ýGh Ô”Ô;“mªÓ>ø›	ã‰>"”ë¼{IÙåCbóÇ<»†.Š¨Ìóí¤æ¹›äÈÌä–SòF{+~d}z­dG«IrJ<RáÇö‘Áäbx¯!Çj Ô—"‹(¾qB3¥áðaç‡¸âE`×·Å†ì©Æ]U8IeVÉ§o™‡ÒV\ý¬Í¢:¹‚J[ŠØz=Ÿúl®ìppQì\R¾~¶ªò¬²Tµx.@“¶†¢£‚Ø	p¹ Ðo/“xŒrb´Ð\"ûªÁyA–}Û³kÎÍ£0¢ç/jÇyÄZ^TÂËŠ$_k-Øå/Äw>Þz)@Ü,ä…2¥éˆ¼FÎLb†­Í`ÁÙˆ.Ë^ÏP¥³õk"¡DµpÒÁð0âÅ§rŠ¶MáôF…±í;+5ª®+ŠúJìYª¹Æ‰a¡hÍX¬›[JÏÜ·#»Ø—}Ì7Žç™›¶I³õ2Øi´Ì¥¿,_°;V²“ÏèëŒy±âA§ÿ&ÃÙ2ÚüPØäÔ0p#Q¦Ê‡P&ÜìÏÉ]²úGèpðõ"¹e¾J¶¿­î/lýÓŒ7|Iµ»W±µX…ø¸Ý‹LŒ|É„¡Ídi°JËWIõ¢7;ýŠæ9pûÏAàwL%•±À&\ÌÈhn|LRý¥cB
+V4AVÃ9IRJ¤ˆ
+V‰äùÜ¹LèY—*€ƒÊ¢‚›JäÓyèª2MyÆC{7x%Ñ†ÃýŠðDfCG¾Vô´ç5ÌÌF2j+Í ½©¤Ù¿nOø„ZeîÑe¾q¼ùü<–ð2€’j‡{„7“.	âq|÷c™]‡¸8²N$d¹pÃŒÃÁSïLrxû0wT~Wo^ÍŽC"ùª%n‹$RŽÏõÛl$ËrEcøRy«>qåúõMîp³?l¹§c©¾9Å¯?†=Ê»LM7ÃÖþ®ú%½cq@Â0@X¼	sÌdˆ2W87¡¥À&²‰©×»Tä®ý±šãP$©Aæå¿,RFÔþâK( Aîþç«®ùÉý¢`áŸŒÄA2#ãªyVÀäxßDyüÞæ{±Z‘]Íäcùïô¡) °ŸVwNI O¹/;VŒÎ{úÖJ‰ÄSœ·Žÿ<*MÈ´5r|î> i>[‘t>?Ao§E>Þ“®ÀÍ
+b>ÉÇÿsW¸Oòž8ÍÈ {ßZç­5ÿë¹?‹£<x¬ž#Y.O…ý²´ Êy›6¯È:é®¿Å×—Å•:(¸«“ÃcGíñª:x×d¹3Qo·Që0cf`Um=–K4YÆáâ“+{gÑÃ…4¥0ÅÈ´¤ðSo¶[é|_cpë?O àÅô*ïj9Î]Ý"ÿ¶ÏP›;œ€kj>yß˜Þ¯/Š²ŠÈ½‚ÑÆ‚Rë¿tÉ‰MÍXQÖF‰ç¹ŠÃm½@V_Ÿtê*‹Ž”çFw}hBOÎjèžmWi™/t[}‰]¹.ýù|öˆ[mÃA™ö†qM3³Cøuü*ÖÍæÏ¹\ƒ-üæI<ní­³EÈð; JÿÐ¶ìãš†kBáó-{ÞÇÇ—’×¬w&5ŸtHåÿ¾Ø
+(Ç(è Tºv¦N4 6ò*|GU±Ñ…þßøÐ4 ˜'¯Û®ú7ËÑ™íÇ±xY(‹Ê÷RaT¯‡glr†Å´­.ø‰öÕ²ž%ªö9/­üºV˜oFïx—ÆJPþ™ûm“Òü¯Ø~{èÔÈGK©ñ#ŸçG&ýmÜ?¯‰/ß&ZñÒ’lýtÜþæ¶)%ô²ÄA à¦zq«˜‘$À¦8hüYg×l"FÊå‹ïDaìŠO½	xe\‡Ñ?.\&‘¶ˆR»
+¶e”Ú50¶:ÔÉš9mú°@BÓäjö¬_ß¿Nx	á£hIGz)ôºÇã|õ'ÐØú†6©Uj×ÉlãþÛÁKÿdMGVeÜ¦µÅóµÒ
+­±ŠUÏëÂ…V?$”	¬>Œ<?fkãõ^žÁÁÕÅm@ŒŸŽWŽ×$ÖÊ#<@^äï¶“‡©€Ëžë[Ù"ÈÈ¯e±²úø ¥a‹bVÊ?Ìœ<“åðpÊˆ[5ÔNáŒ°Y7)¶§ïv”(•vÄ¡¼ÆQs¦ñpf|æ·%gr®P3-Œ§ië\ Û.ž¡ã¾Ótkø2Ý¦ê’ƒ*™«ÜÎ1‘]vÈƒ™R±N W”Kø½¥±„²¨Úúê½ÿ+GSŸ…Êé@êÌø V;_nò—¬ï¿?hÕ^e^v¼føÓuyô$¥TaßÞ°.	kÔË×ËzÕdimþm—pxOË…ø
+‡RY:Zã1î5‹ÕË1«ÓÊpHÒ
+m>•Ÿ3iEÒAXp„1Ü„)}!o«?<~ ù¢íma•¬C“soŽ”.‘mS¢zEb¥Ð%“§·´P‡iÒD&bUžH¹3#g}AN’LMŽ’<fÃÉ­óSc•åkÔŸ1%ÇÉÂlN¶âEdÝXË"™
+¶Ì8Ê@µ¾ãÙ|±ÄRM#DHUN'gƒ<è¢cz/ßîõ‰tŽ•ë¸aÎ‘ùÞ{¸T³g5Ey|C‚¤s2KžÏÌ)ÍP¬ná3ãPG·ütí0OQó€‚:j\¥xÿÉ^
+‰c¢ó)¯¹ÎkTŽ¥²¸ê¼˜ºájfÆWoØãmC4XdÔvþ„JÕêößÕé&'ŒýG(è"‰ùC}Bfar8ðãSzoøFõütsqëq"ZL§ï]­	NvŸaD5W?Ñ¯\‰w%tì¿ÓvéúXv³d>¹a/RÔdÛÇ}¡ÖË>2Ð‹Š™(ÛÚsgûâzK;…—U^4Ô´“‘øÍ·Ò’‹‹¦g—Gã¸Åã 0 ƒ7ÀOÒê3¸zUÎß”:Ù3sal‡dS>‘9ýJâ?Y_vm×:^uSGí—ü1dßË8¥úÌ£©éQGò¨0¥¶`$8‘òúj*oâê:‚Í¶?Ác˜“ @Ài\ZnšôV–;)"¨pOm—PGM€ÊÎÅ·ãc9d™aéÙ¥Ûõ&ò\îÒÒÑK–ã7e0i6¼-nÇÂÂJµ~¢3êÈyœEÈ=pÊð£ óÐ"Ñ¯;ð‹³N%‰C‹‹¢v“2¼SSÇÓ©0­–œ¤sXfÃý’B4Ûùv~ëdEH˜Z\©¼Yë[#ÚÄg[ðì²õ km oøA·î½ë«›¸„¶‚€¡Šzš\d®b;Çö¢ýîÄÚÑfJLQê|Îü| Ãuîg!áÜöãÌ«1 ó¿l²Û¨ŸºK£]óºfÙR:BrïßxÏeÔLÊ.Ö¬fW¿gÓt‘ïPOÅËüÛ¶:hùK$¶µb,!å8P4‹Ô¹*coá–ò~Ûæ¨b6•ï^ÖÎ¼Âc…¢©íåüq0?Ä,Ã“‘'šŒ9=ã”\7ab_šF,Lu×G»)W¢’ÓQæÐÝå¾ë$$‘4³áØêcâþhqfÈp(Ðöí®é¦¸zÒ©m*étHÒ"ò–dp’œºfí›ìM<ªTyN’Ye§yöü³ðÏl¶·u÷S%(:J¸z¸ög·B0’Œ8 aÈ]Šv#¦ŸdÈ¸Tj¿ÓPžO+Ý|²ÇLà$[C*¦pÇRWö¸mœT*¢èkjÎ,l]îÇcö"LcÓà‡;¯|¹˜iJÚÄE 2–á	JÒ{þTþ©,Î½wF¶ h ìÈm‚ßf˜0ûÈœ¨Ñš³Të;€ö?Ëp…P²ÿ³mçLWÿªmW±­ª	ÔpLðæžK‰àäìxÃe®$¢²`}f{H¯!ó›m¡˜™Á³Ë)ÂF H¨áxBý0ÛœxÒX @2æJ“‡ŽWÄ®}íÛðWâÂ^-M|Ýð·c|ÕÔùÅ3WX'Äœ¶òvOœôµm®¡Ê|°üZ˜#$¹V„©ùei~’ó#B\=ËÍ‹qØ´J"L.4Q¯©ëþˆ,»ÝŽD òÕ« |¨Œ@²ývºˆC¾»Š_ñœOàN7Èìn_,ð%ó½|hO/zþXûÙÿ[Œ2s//€Š\ÁóÍ±`§NÇZ’ÙÐ’ž™áŽÁFa¤mgj®îbzs:Y+÷ñ6‡ÑQ.[ÌrÍvISa(ŸÁ&oreÒüxM’õÙ½vöòMýã+ï×'½·VÇ+8ßkî¯Äï^é¯¶óœ<¿Çd“ãT!ÌJ{B7ñë¥• >ðêÃt½+|OØHf4Ã‚XTYI—?Ï¯ÒÕY
+¹¸ŠŽú¢ûòèù>Zþj –KèÓyÎÅ$²;yv´°MºÅpÈã¡ÕÖÝ,ÉÊ‰è‰–\æ€ó‰3}×w¥õGS=áÀy*'ÿ³Ãne\ZË0œ‡d÷ddaËö”áM*së!s*vÇå¢šc«‡ÚóÑQá·[/êåè›ü_;S”zC’D-@ûàó-RgàÄ–ØEþ7v*~Ú÷HNÓ*‹’Œ~Ò./V®éÊdG*ºá´•iF¥©¦6*5ì®6mÀ¸¿¿pBë\fã*¢Ç* 	€òt­0%3äð¹‡DV³q„$Ä×ŒTØ¦¹î–!"ôƒA9ÅÃh;aÖ“ø¡¯¨h§šŠYÍ²úÖd,´Íü®ÜëGR·Äeüp}fP*…ÚE
+ÊiO¨®
+ãv*ª¼Ï^‡!ñxÿ@ÞQìú‰zÅ„CØŽªÚ»¶ô¾o\*¸ÙW|{I:©¶šMZz¹‘úýqU/_ÿÓ¬ðíçÛÇ…JBÌ¤q$% 
+Ú1
+/V0õìhÊÅltn<‰Ã)Éê	Sô‹>üG¨7 ˆñjÍLº©€ì-Á-¸èPÍƒˆvî¸Á†I¢»Î{Å	¿tÃ¤¨Êæ7y›ñ[xìû÷UtÓ¡šäíìßÓï £E?@+«~ùY}ºõgîÑeÚ¤  ±*JôúHˆÚå€C t‘uY,DÕŒ®(§¥Ìï]‹‚‚Õì=é¦,^ªcÚ3r¹òaÖ|æ‚Û›i‹]1yùòÛ’„íÐÉÉë‰(
+RÈy“™ö˜jDú)˜Ööa$‘±1œÎBN1”uÃóµ”r‰¢¨B#ƒHŽ^°ñsÝ[ìOöËs3I™Ä3~íløÕxfÓ»ú'É‡ùÑ;ÏÖç±»Ú'ýæíßV%¿‡Þ×llð%<¹GsOBr/@‰”†ÿ‰æ§o£âÊ·ÈKî~„ hR$ (\Äuf{ÂÔKúŸŒ3ìëYä)ÿpÄ‹üÛ™[” 
+ÒäšæÓE2ƒ³ö‰3‡ñÄ¯zRë¼ÌXsïä?S\Ù˜iZ=$^ðä¸‘½2‰ÜpŒ·Æéë¯1ÿÀêÀ2þ6i€RÿŸ¡q $$û›åô¶•ÌÍÂ±Õü]ªékäY1¹oÀ‡µÏœL£CbÆS6l7ÕNRØ†Iò„˜¢f£ïÜû†~üœö¿ôl\¾
+?3Š£–ÍíÍØVâ¹+	ËšÆÞc¾{…{E?MÐYŠÝÇy#'Zì€^~9;ž³g^]œÖŠû”2Tu,k|ìõÜï'L6  ±Áb«8TCH‰SWâM²ä•uõ«È¾VÍû”£ØXbÈ>¨yÅ.â—\ø S6oÜâ@ÏŒšr[Ì±¢ƒàX¹ª^oBíJæµB#ÌU p9ôö${vº˜ë²<3z0Ë”LXünYÂpã¥À# -Ò‘×qAåô°CZÌPÔä€M(~Nãm$Ê›m
+#n‰n\å9óÓÊ;‘6D­>²÷º™òƒçõìß9ÛHs…—<»6Î4®7UM¾E`_,Êj]PRg"uã›ñAéõýÛPÜ®šå’&ÔˆYYwÓáSS 1_±	€Wì_m õ¸—q%¦•Ì«üÅèÜ±ïÌÇ;œzqÃœ®®ê22!§º~ž¾žl\4Ç94Ëþ¼g3…×á~]ŒÐÍ[•wÇñ»mOÝ÷*/0ºC¦@Ð@gi‚äó[xMnE·Z»ÊG§[®°ˆ2©”¼èXÞš(_Ïl¯Fæ¬æ’‰¥X–LÕÇO}˜i±t+îsÇºî#` ÏKâL:"ü†M½¾%m•áVŽ{¢h¬»ÀF,ÐJk4Ybí‹ýæ]Ú©Â5è#Q‘zþDåân¼\T2+¹ÌÌÌ5wêaX*/6áçk(!I*ÕPvWxƒˆ¿¿—	›êU(¶Ã·t.Ùdb2-K€0©ÕïyŠRÓ-‰ÑäœšzÒó2¼£4zäZ¦0Ã7©¬/³Â§¬B^-ás×&ÃüÈ¬R®œ
+0QaH¼¹jÄþ/ŽßkXpÒÙ+‚«C8¬!9%uÐ5({åKg$ÄsÀÚÐiÙ5D¹»(S97æªó¶Ò½‰{Ó_?÷ÚÂPrº¤¥ßVŸ£ à1ÇNX¨hÙ#ºï†“²n¥$ZÕ‹‰îìz[LVñ™Åekè+lþÓ]°óC˜Û/®{?G]­ ‹ö{ÁwU…x¼Ì0F±à¦\ûNŒÊv îo`æüíGŠvÎ‹•Ü÷ž¡gSIÎØ¶^Aã…pnö}ˆWÆM,P(‘PÐØƒnÿ2 ù‡¿Mâ_½aóŒÏ¨Ž!²U»‹‡‡	  Yº:ìèH±p°P›ÞÊÜµä¹æÊ¸‰‘7cZ6«o7ˆ1Ðìvæ~Yk$r¥•ýÅ¼t'[Ñ¨QÉ(ð<µ2ÊÓG;d=þë±Ô:07þþyôýéÚo·
+æWíë½ýû¸¸áÖ)Ñ¿»Ó"´Q[×Û¢å0•ð£#n”	rw‹Óêk_n¹€	Dv°4[»Íý²ø]-4]Èé9+°±ÒaóüíÍc[ ïß’ƒ$â+§e¿1Ú$¬D`ƒ¾-z¦£f¥üglãƒÜûžwxFxtT.úåÔšÍÿ8¦Ö[¸Þ‰I³-,½öÓxÿey5¡jòÏ"™.Mß?B‡(lÊ.‰séþUe±`9œ'¥7À#øÓù¶Š¬^ü»ŸæLŸjø$…ŒYåâf^"«¸Bd"JÝ·¥YœNíPOñêÈ8–'úÈØüƒá±Ò§>G×lp-cÜI“¢†<Šž†²l”¦õú€ôCxRK‚„ó`ÏÃ( ‚p%¶£“Š+d®·zWdK	/9ÞoØVÄž›µðÖZF=}£"âµâ7r£yÍ«•ÂÛÑœìÛÇ{1žß§uÁ¶b¥°qhC$•À4e)ÐZ7›ë"ç…ìÊÂ¶ñQþ¬	V*»Œcw¾zr—ï‡z ,9œ§H	` /7=wJ+ µ<ÏÊXX‰ŠÛD‡Ó-õjÓnj"ó'“­åŽÈdWßêSv7¸ßcEzP¶ö$ÀéÛ.lþnB$j(B%ß­ÐÆ  @*†ÈÁ&J2¸		äöŒ#ÁõhÎbj"šÕŸ!ºXÄ-°áªC&l¡L©4‘YÖ³\NÕÙÅ5e¯ð8LÅ
+ðû×àÞÿð®bËšìPSyÚ±u±`\'Ó“Žš^ÑÈ³Çˆ¦W½úH¢ôŒY©$•»‡Á¶*”|ë¹Ý÷‰Ö3ýX(Œ“æïqq ‘Z ´Sšl¾a½ª«`n¾Ÿ,É†BtUcßŸ.+µMíZDHUM\[>ùw?¯æ‹ÿ2@Y¼žEä&Õ0ì˜ “D+~Jse¨ìLâj¡‡ÞC(JmBloâíýõJ¤ÂOÌqöQ§¸ÌÓeac²_Ét?5¢D¤œØ}'•lªV=žhÖlJë³l¡}™b®Q/\×
+Å}6E`ê×´âÎÍ÷ªöí•Ývïì'2–êWhúý]9›  Ë×èLßƒ/}ì5ýîÈæ$9oFû†¢ôLJíô !+Æ*AáÑ!XÇõ{6:1ÜëŽ¢™ËDlöêê÷‰iÅ’²„r %|Çïú¢ïµè“œÅM½ÑÌl_¢‹$M\P•ûË„(òóª­+êjFÍP†£$fŠàEîkÚ8×Zæ`³.{Õl%¦™Ì
+çÆù×\‹‰idùx“j|òcá6QFýc\ñ	ƒ	Ô0,<m73¥ŒÖ@1ÌSÛ«L<T"¨m`•Ù~È5êé1 ÀàÇ,Ê)L¨*òŸ§A˜«”ðýÙV,¾uÑÏVÃ*¶äåÅQŽ@oÔF-cŒ²Þø±åÑH\°°œ5]º<zê¹lôÑžU8%6a2Õ[±òÄÂó®åð§Ãþ'égû“û^ªµòÞ]€G{ ¹;AïýŠ±¿èÊÓ£Ár>¥•PUã¹SZÜ]ÝKŠ2k×„kw¹M7¹M€Y;¬±(ªm!ÍewÕj8@E{A§±hpòÙŸRÑfælòÔa÷É€†Ÿ	2¶FØ0Crb——ØÌ:…¸©-@íÒîMœD,RJïM6µ˜¦e‰0©-_"jÂD‘lk^ êôÂÕM³†¯AÒøÝSËÅ52 Ž 0(½'(˜‘tà°q0Ê«˜0|ÂyY=iŸ†îµÃs^‰;‚_2 °m€3KÐJ"?9¢%,Å`^ãÇ((ª‹_ç~HÙ³ðQÕ¤YeüÒÉ¯jõÚüKHêoÂS\Wß^Y±)›ö…)´ú9Éf¸:Ä×zÞ€ÿ !µèXq…™3Ò¦KÞë&Ž¦öÏº›ÿ;Ø•lµ£.ÀP=9n^DˆÆ ãû²‘a®þyó¸\Áh4ý&žø¸tAu¨°ï£sx’øÀÊaƒNáÖOßiËúÄÉyïç+Ûß®€€8KU|Q½¦zu”~VG)¥7Më¸Pgs$¥+Ís&äML’Ø¾g€a±¾¾ò¨Û¢´ŒUô–Dˆëð·0zM4«=}1jÙˆÈÑ¹TUÞ3ëÛÐæçÉ»«ÆƒÒ·¿Ó ’ÑDt]ì+Ã·§Íörùr¿Ý^DÛû½BÝÙ¾‰·T­Ô s„`ƒº?µ
+¥%_|ÔÎ®1NQ}M‡#cïíWö”–T>ê''­¤‰!2’ 9p´§úŠ®·|{}g±’—'›–©Ž q¾çx×C]üDT^LWéü<l•P:"Iý–JÞêÊym£6YôÞ;$ŽyE`±ºñ|h÷tÊ
+B Ú©YûÕ˜Ó”YÙqˆX=IntØÈöÑûC'  ïÒ1LÙ²JXùö:Í¿ù.-ÒÚ¦«Èê¸’Ñ$ê*–q¹¯˜¼ø¯Ü~€¥)ð|Cü|´”»a/K !#HA¡·ìæ!ª	‘´’LCqô«ÑÁ ,EÌæ¸;Ÿ&Cõj9ü\fû$Ö±}ZÕSÞ—«X_’nw+5€ ÈbæEß‹ÆÉ¨—†ÐêºˆxGwŽP}a3iAê.(HSa<ü$Íí(Å‚$I—Ûg@Ù!gHÜEý‘©§Py®o©W	Ëë_nSŽ×»¥ûB ò	±åˆ4>Ï¡J——þÜ
+ëóŒdZ+>%÷ R5RäÏ’‚qH é·¦gŒa£D‘êËu¶Ó*Õò®:]ûïK‰•;ïfóÇœß¯Lý1qï/ØoV’W|-®~LÑæö@Y¤4×öç4ÎÅ×ž{€¤qáúZ¾ ©x›£Žç°iGÌ!Æúdûœ¥êÚpåt½«ß¦eáƒÖŠwù¸+Üs¼X£
+?ï‚p£:î'Í©—ÞKOÎ‡ªÙ(•Åÿ¬>À,Å•cv5™‚±,r0^‚²ž•R±[ FÍÕUÆæ´¢ÈM©×=YšÓ÷÷1KãYd_O›à¡È $!³ÑS2Úm4E5¥|NFšÏ¥V7pâîÍ°ïd5~K‘aõáŽÙ‘m…œ1
+»P¯-8¶ãÆž£ÈÜÓ.P¹üJ”q–!í þó†ðí±N¼„mÕËØà‡–¹<y>}S¢`p0“¢ïÁï$Ä+MŠ OG+Mñá½^f÷HÄ£qyq(l-£C«ª%>Èû…$p7ï©NQÚÅR5GO «ÅúbxtbøˆÚÇÁš¿íÃEAÏMÈNÔ‹úÒ>Š•,X¼eaÈTf¯Ùýºà5ž¼voQ3^Rx€üã‘^ún½BÖ·whrÈÜ«’nóBªÄ›Î×¸gÏ‹xs¿ýv<Â#íw)Â[2¹tå™A…Bê˜N§NÃåišª­ÅïØ¢­~n‰¬P{76§·}õŸß7/x´aÿl›Žy÷Ð¶~ðÆz°š×ú} ÿ‰!±AaÄuÆJ!(££?&P“¦uÐcdÆ‹´PÊ¨„Æp\½Œážœººp`Bá»üÎ›Éu?cD( 6ŒøÄ  	¬îZ‹ÇÐ%tPæ“
+8M=•ËL¾2EÔh~ë^vÄœ|µaâYù¦Œ_ÃäÓ

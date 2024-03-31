@@ -1,0 +1,14 @@
+,
+    replaceDecoratorsAndModifiers,
+    replacePropertyName
+  };
+  forEach(nodeFactoryPatchers, (fn) => fn(factory2));
+  return factory2;
+  function createNodeArray(elements, hasTrailingComma) {
+    if (elements === void 0 || elements === emptyArray) {
+      elements = [];
+    } else if (isNodeArray(elements)) {
+      if (hasTrailingComma === void 0 || elements.hasTrailingComma === hasTrailingComma) {
+        if (elements.transformFlags === void 0) {
+          aggregateChildrenFlags(elements);
+     

@@ -1,0 +1,26 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+function _export(target, all) {
+    for(var name in all)Object.defineProperty(target, name, {
+        enumerable: true,
+        get: all[name]
+    });
+}
+_export(exports, {
+    formatVariantSelector: function() {
+        return formatVariantSelector;
+    },
+    eliminateIrrelevantSelectors: function() {
+        return eliminateIrrelevantSelectors;
+    },
+    finalizeSelector: function() {
+        return finalizeSelector;
+    },
+    handleMergePseudo: function() {
+        return handleMergePseudo;
+    }
+});
+const _postcssselectorparser = /*#__PURE__*/ _interop_require_default(require("postcss-selector-parser"));
+const _unesc = /*#__PURE__*/ _interop_require_default(require("postc

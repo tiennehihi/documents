@@ -1,0 +1,9 @@
+ > 0;
+  }
+  function makeSatisfiesExpression(left, right) {
+    return finishNode(factory2.createSatisfiesExpression(left, right), left.pos);
+  }
+  function makeBinaryExpression(left, operatorToken, right, pos) {
+    return finishNode(factory2.createBinaryExpression(left, operatorToken, right), pos);
+  }
+  function makeAsEx

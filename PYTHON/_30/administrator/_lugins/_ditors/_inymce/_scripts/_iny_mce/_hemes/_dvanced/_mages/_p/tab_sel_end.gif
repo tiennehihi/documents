@@ -1,0 +1,4 @@
+h("method");
+    } else {
+        if (node.type === "ArrowFunctionExpression") {
+            tokens.p

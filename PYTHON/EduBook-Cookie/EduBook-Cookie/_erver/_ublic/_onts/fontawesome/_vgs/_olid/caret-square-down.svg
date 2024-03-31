@@ -1,0 +1,13 @@
+: 'missing'
+          },
+          children: gChildren
+        };
+      };
+    }
+  };
+
+  var SvgSymbols = {
+    hooks: function hooks() {
+      return {
+        parseNodeAttributes: function parseNodeAttributes(accumulator, node) {
+          var symbolData = node.getAttribute('data-fa-symbol')

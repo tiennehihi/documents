@@ -1,0 +1,31 @@
+,
+	moduleToInfoMap,
+	runtime,
+	requestShortener,
+	runtimeTemplate,
+	neededNamespaceObjects,
+	asCall,
+	callContext,
+	strictHarmonyModule,
+	asiSafe
+) => {
+	const binding = getFinalBinding(
+		moduleGraph,
+		info,
+		exportName,
+		moduleToInfoMap,
+		runtime,
+		requestShortener,
+		runtimeTemplate,
+		neededNamespaceObjects,
+		asCall,
+		strictHarmonyModule,
+		asiSafe
+	);
+	{
+		const { ids, comment } = binding;
+		let reference;
+		let isPropertyAccess;
+		if ("rawName" in binding) {
+			reference = `${binding.rawName}${comment || ""}${propertyAccess(ids)}`;
+			isPropertyAc

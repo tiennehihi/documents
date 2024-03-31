@@ -1,0 +1,101 @@
+      conf.updateEnv();
+        return conf.memoized;
+      };
+    });
+    var require_primitive = __commonJS(function(exports, module) {
+      'use strict';
+      module.exports = function(args) {
+        var id, i, length = args.length;
+        if (!length) {
+          return '\x02';
+        }
+        id = String(args[i = 0]);
+        while (--length) {
+          id += '\x01' + args[++i];
+        }
+        return id;
+      };
+    });
+    var require_get_primitive_fixed = __commonJS(function(exports, module) {
+      'use strict';
+      module.exports = function(length) {
+        if (!length) {
+          return function() {
+            return '';
+          };
+        }
+        return function(args) {
+          var id = String(args[0]), i = 0, currentLength = length;
+          while (--currentLength) {
+            id += '\x01' + args[++i];
+          }
+          return id;
+        };
+      };
+    });
+    var require_is_implemented8 = __commonJS(function(exports, module) {
+      'use strict';
+      module.exports = function() {
+        var numberIsNaN = Number.isNaN;
+        if (typeof numberIsNaN !== 'function') {
+          return false;
+        }
+        return !numberIsNaN({}) && numberIsNaN(NaN) && !numberIsNaN(34);
+      };
+    });
+    var require_shim6 = __commonJS(function(exports, module) {
+      'use strict';
+      module.exports = function(value) {
+        return value !== value;
+      };
+    });
+    var require_is_nan = __commonJS(function(exports, module) {
+      'use strict';
+      module.exports = require_is_implemented8()() ? Number.isNaN : require_shim6();
+    });
+    var require_e_index_of = __commonJS(function(exports, module) {
+      'use strict';
+      var numberIsNaN = require_is_nan();
+      var toPosInt = require_to_pos_integer();
+      var value = require_valid_value();
+      var indexOf = Array.prototype.indexOf;
+      var objHasOwnProperty = Object.prototype.hasOwnProperty;
+      var abs = Math.abs;
+      var floor = Math.floor;
+      module.exports = function(searchElement) {
+        var i, length, fromIndex, val;
+        if (!numberIsNaN(searchElement)) {
+          return indexOf.apply(this, arguments);
+        }
+        length = toPosInt(value(this).length);
+        fromIndex = arguments[1];
+        if (isNaN(fromIndex)) {
+          fromIndex = 0;
+        } else if (fromIndex >= 0) {
+          fromIndex = floor(fromIndex);
+        } else {
+          fromIndex = toPosInt(this.length) - floor(abs(fromIndex));
+        }
+        for (i = fromIndex; i < length; ++i) {
+          if (objHasOwnProperty.call(this, i)) {
+            val = this[i];
+            if (numberIsNaN(val)) {
+              return i;
+            }
+          }
+        }
+        return -1;
+      };
+    });
+    var require_get = __commonJS(function(exports, module) {
+      'use strict';
+      var indexOf = require_e_index_of();
+      var create = Object.create;
+      module.exports = function() {
+        var lastId = 0, map = [], cache2 = create(null);
+        return {
+          get: function get(args) {
+            var index = 0, set = map, i, length = args.length;
+            if (length === 0) {
+              return set[length] || null;
+       

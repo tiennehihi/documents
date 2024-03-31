@@ -1,0 +1,51 @@
+, keys;
+      var completed = 0;
+      var result = {};
+
+      if (isArray(collection)) {
+        size = collection.length;
+        arrayEach(collection, iterator, createCallback);
+      } else if (!collection) {
+      } else if (iteratorSymbol && collection[iteratorSymbol]) {
+        size = symbolEach(collection, iterator, createCallback);
+        size && size === completed && callback(null, result);
+      } else if (typeof collection === obj) {
+        keys = nativeKeys(collection);
+        size = keys.length;
+        baseEach(collection, iterator, createCallback, keys);
+      }
+      if (!size) {
+        return callback(null, {});
+      }
+
+      function createCallback(key, value) {
+        return function done(err, res) {
+          if (key === null) {
+            throwError();
+          }
+          if (err) {
+            key = null;
+            callback = once(callback);
+            callback(err, objectClone(result));
+            return;
+          }
+          if (!!res === bool) {
+            result[key] = value;
+          }
+          key = null;
+          if (++completed === size) {
+            callback(null, result);
+          }
+        };
+      }
+    };
+  }
+
+  /**
+   * @private
+   * @param {boolean} bool
+   */
+  function createPickSeries(bool) {
+    return function(collection, iterator, callback) {
+      callback = onlyOnce(callback || noop);
+      var size, key, value, keys, iter, item

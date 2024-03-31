@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const util_1 = require("../../compile/util");
+const codegen_1 = require("../../compile/codegen");
+const metadata_1 = require("./metadata");
+const nullable_1 = require("./nullable");
+const error_1 = require("./error");
+const def = {
+    keyword: "values",
+    schemaType: "object",
+    error: (0, error_1.typeError)("object"),
+    code(cxt) {
+        (0, metadata_1.checkMetadata)(cxt);
+        const { gen

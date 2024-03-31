@@ -1,0 +1,13 @@
+mental = isIncrementalCompilation(options);
+    let outputTimeStampMap;
+    let now;
+    outputFiles.forEach(({ name, text, writeByteOrderMark, data }) => {
+      const path = toPath2(state, name);
+      emittedOutputs.set(toPath2(state, name), name);
+      if (data == null ? void 0 : data.buildInfo)
+        setBuildInfo(state, data.buildInfo, projectPath, options, resultFlags);
+      const modifiedTime = (data == null ? void 0 : data.differsOnlyInMap) ? getModifiedTime(state.host, name) : void 0;
+      writeFile(writeFileCallback ? { writeFile: writeFileCallback } : compilerHost, emitterDiagnostics, name, text, writeByteOrderMark);
+      if (data == null ? void 0 : data.differsOnlyInMap)
+        state.host.setModifiedTime(name, modifiedTime);
+      else if 

@@ -1,0 +1,24 @@
+,
+    "free": [
+      "brands"
+    ]
+  },
+  "mattress-pillow": {
+    "changes": [
+      "6.1.0",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid"
+    ],
+    "unicode": "e525",
+    "label": "Mattress Pillow",
+    "voted": false,
+    "svg": {
+      "solid": {
+        "last_modified": 1660321842,
+        "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 51

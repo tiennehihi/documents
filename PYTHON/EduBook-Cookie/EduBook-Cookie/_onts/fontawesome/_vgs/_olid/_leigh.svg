@@ -1,0 +1,19 @@
+/**
+ * @fileoverview Prefer exact proptype definitions
+ */
+
+'use strict';
+
+const Components = require('../util/Components');
+const docsUrl = require('../util/docsUrl');
+const propsUtil = require('../util/props');
+const propWrapperUtil = require('../util/propWrapper');
+const variableUtil = require('../util/variable');
+const report = require('../util/report');
+
+// -----------------------------------------------------------------------------
+// Rule Definition
+// -----------------------------------------------------------------------------
+
+const messages = {
+  pr

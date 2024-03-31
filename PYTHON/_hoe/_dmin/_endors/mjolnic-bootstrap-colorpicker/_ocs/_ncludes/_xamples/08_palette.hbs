@@ -1,0 +1,6 @@
+aitContext);
+    const node = kind === 263 /* ClassDeclaration */ ? factory2.createClassDeclaration(modifiers, name, typeParameters, heritageClauses, members) : factory2.createClassExpression(modifiers, name, typeParameters, heritageClauses, members);
+    return withJSDoc(finishNode(node, pos), hasJSDoc);
+  }
+  function parseNameOfClassDeclarationOrExpression() {
+    return isBindingIdentifier() && !isImplementsClause() ? createIdentifier(

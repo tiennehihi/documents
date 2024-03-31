@@ -1,0 +1,1 @@
+import e from"postcss-selector-parser";const r=r=>{const s=String(Object(r).replaceWith||"[blank]"),t=e().astSync(s),o=Boolean(!("preserve"in Object(r))||r.preserve);return{postcssPlugin:"css-blank-pseudo",Rule:(r,{result:s})=>{if(-1===r.selecto

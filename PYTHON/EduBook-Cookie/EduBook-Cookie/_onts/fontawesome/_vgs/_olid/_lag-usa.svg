@@ -1,0 +1,38 @@
+, callback) => {
+				this.buildQueue.waitFor(module, err => {
+					if (err) return callback(err);
+					this.processDependenciesQueue.waitFor(module, err => {
+						if (err) return callback(err);
+						for (const { module: m } of this.moduleGraph.getOutgoingConnections(
+							module
+						)) {
+							const size = modules.size;
+							modules.add(m);
+							if (modules.size !== size) push(m);
+						}
+						callback();
+					});
+				});
+			},
+			err => {
+				if (err) return callback(err);
+
+				// Create new chunk graph, chunk and entrypoint for the build time execution
+				const chunkGraph = new ChunkGraph(
+					this.moduleGraph,
+					this.outputOptions.hashFunction
+				);
+				const runtime = "build time";
+				const { hashFunction, hashDigest, hashDigestLength } =
+					this.outputOptions;
+				const runtimeTemplate = this.runtimeTemplate;
+
+				const chunk = new Chunk("build time chunk", this._backCompat);
+				chunk.id = chunk.name;
+				chunk.ids = [chunk.id];
+				chunk.runtime = runtime;
+
+				const entrypoint = new Entrypoint({
+					runtime,
+					chunkLoading: false,
+					...options.entryOpt

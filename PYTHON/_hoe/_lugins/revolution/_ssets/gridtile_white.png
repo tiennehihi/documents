@@ -1,0 +1,13 @@
+ is a possible string representation of the value of `select` keyword and each property value is a corresponding schema (from draft-06 it can be boolean) that must be used to validate the data.
+
+The value of `selectDefault` keyword is a schema (also can be boolean) that must be used to validate the data in case `selectCases` has no key equal to the stringified value of `select` keyword.
+
+The validation succeeds in one of the following cases:
+
+- the validation of data using selected schema succeeds,
+- none of the schemas is selected for validation,
+- the value of select is undefined (no property in the data that the data reference points to).
+
+If `select` value (in data) is not a primitive type the validation fails.
+
+This keyword correctly tracks evaluated properties and items to work with `unevaluatedProperties` and `unevaluatedItems` keywords - only properties and items from the subschema that was used (one of `selec

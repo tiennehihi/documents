@@ -1,0 +1,17 @@
+/**
+ * @fileoverview Prevent creating unstable components inside components
+ * @author Ari Perkkiö
+ */
+
+'use strict';
+
+const Components = require('../util/Components');
+const docsUrl = require('../util/docsUrl');
+const isCreateElement = require('../util/isCreateElement');
+const report = require('../util/report');
+
+// ------------------------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------------------------
+
+const COMPONENT_AS_PROPS_INFO = ' If you want to 

@@ -1,0 +1,66 @@
+        comma = true;
+
+                if (tokenizer.charCode() === LEFTCURLYBRACKET) {
+                    range = readMultiplierRange(tokenizer);
+                } else {
+                    range = {
+                        min: 1,
+                        max: 0
+                    };
+                }
+
+                break;
+
+            case LEFTCURLYBRACKET:
+                range = readMultiplierRange(tokenizer);
+                break;
+
+            default:
+                return null;
+        }
+
+        return {
+            type: 'Multiplier',
+            comma: comma,
+            min: range.min,
+            max: range.max,
+            term: null
+        };
+    }
+
+    function maybeMultiplied(tokenizer, node) {
+        var multiplier = readMultiplier(tokenizer);
+
+        if (multiplier !== null) {
+            multiplier.term = node;
+            return multiplier;
+        }
+
+        return node;
+    }
+
+    function maybeToken(tokenizer) {
+        var ch = tokenizer.peek();
+
+        if (ch === '') {
+            return null;
+        }
+
+        return {
+            type: 'Token',
+            value: ch
+        };
+    }
+
+    function readProperty(tokenizer) {
+        var name;
+
+        tokenizer.eat(LESSTHANSIGN);
+        tokenizer.eat(APOSTROPHE);
+
+        name = scanWord(tokenizer);
+
+        tokenizer.eat(APOSTROPHE);
+        tokenizer.eat(GREATERTHANSIGN);
+
+        return maybeMultip

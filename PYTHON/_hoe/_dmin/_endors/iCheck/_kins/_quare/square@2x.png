@@ -1,0 +1,146 @@
+/***********************************************************************
+
+  A JavaScript tokenizer / parser / beautifier / compressor.
+  https://github.com/mishoo/UglifyJS2
+
+  -------------------------------- (C) ---------------------------------
+
+                           Author: Mihai Bazon
+                         <mihai.bazon@gmail.com>
+                       http://mihai.bazon.net/blog
+
+  Distributed under the BSD license:
+
+    Copyright 2012 (c) Mihai Bazon <mihai.bazon@gmail.com>
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+
+        * Redistributions of source code must retain the above
+          copyright notice, this list of conditions and the following
+          disclaimer.
+
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer in the documentation and/or other materials
+          provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER “AS IS” AND ANY
+    EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+    TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+    THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
+
+ ***********************************************************************/
+
+import {
+    AST_Accessor,
+    AST_Assign,
+    AST_BlockStatement,
+    AST_Class,
+    AST_ClassExpression,
+    AST_ClassStaticBlock,
+    AST_DefaultAssign,
+    AST_DefClass,
+    AST_Definitions,
+    AST_Defun,
+    AST_Destructuring,
+    AST_EmptyStatement,
+    AST_Expansion,
+    AST_Export,
+    AST_For,
+    AST_ForIn,
+    AST_Function,
+    AST_LabeledStatement,
+    AST_Lambda,
+    AST_Number,
+    AST_Scope,
+    AST_SimpleStatement,
+    AST_SymbolBlockDeclaration,
+    AST_SymbolCatch,
+    AST_SymbolDeclaration,
+    AST_SymbolFunarg,
+    AST_SymbolRef,
+    AST_SymbolVar,
+    AST_This,
+    AST_Toplevel,
+    AST_Unary,
+    AST_Var,
+
+    TreeTransformer,
+    TreeWalker,
+    walk,
+} from "../ast.js";
+import {
+    keep_name,
+    make_node,
+    map_add,
+    MAP,
+    remove,
+    return_false,
+} from "../utils/index.js";
+import { SymbolDef } from "../scope.js";
+
+import {
+    WRITE_ONLY,
+    UNUSED,
+
+    has_flag,
+    set_flag,
+} from "./compressor-flags.js";
+import {
+    make_sequence,
+    maintain_this_binding,
+    is_empty,
+    is_ref_of,
+    can_be_evicted_from_block,
+} from "./common.js";
+
+const r_keep_assign = /keep_assign/;
+
+/** Drop unused variables from this scope */
+AST_Scope.DEFMETHOD("drop_unused", function(compressor) {
+    if (!compressor.option("unused")) return;
+    if (compressor.has_directive("use asm")) return;
+    if (!this.variables) return; // not really a scope (eg: AST_Class)
+
+    var self = this;
+    if (self.pinned()) return;
+    var drop_funcs = !(self instanceof AST_Toplevel) || compressor.toplevel.funcs;
+    var drop_vars = !(self instanceof AST_Toplevel) || compressor.toplevel.vars;
+    const assign_as_unused = r_keep_assign.test(compressor.option("unused")) ? return_false : function(node) {
+        if (node instanceof AST_Assign
+            && !node.logical
+            && (has_flag(node, WRITE_ONLY) || node.operator == "=")
+        ) {
+            return node.left;
+        }
+        if (node instanceof AST_Unary && has_flag(node, WRITE_ONLY)) {
+            return node.expression;
+        }
+    };
+    var this_def = null;
+    var in_use_ids = new Map();
+    var fixed_ids = new Map();
+    if (self instanceof AST_Toplevel && compressor.top_retain) {
+        self.variables.forEach(function(def) {
+            if (compressor.top_retain(def)) {
+                in_use_ids.set(def.id, def);
+            }
+        });
+    }
+    var var_defs_by_id = new Map();
+    var initializations = new Map();
+
+    // pass 1: find out which symbols are directly used in
+    // this scope (not in nested scopes).
+    var scope = this;
+    va

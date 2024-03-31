@@ -1,0 +1,5 @@
+# ajv-keywords
+
+Custom JSON-Schema keywords for [Ajv](https://github.com/epoberezkin/ajv) validator
+
+[![build]

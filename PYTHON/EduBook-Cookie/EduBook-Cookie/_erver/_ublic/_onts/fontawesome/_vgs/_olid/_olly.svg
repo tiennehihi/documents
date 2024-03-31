@@ -1,0 +1,6 @@
+/*!
+ * Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ * Copyright 2022 Fonticons, Inc.
+ */
+!function(){"use strict";var c={},l={};try{"undefined"!=typeof window&&(c=window),"undefined"!=typeof document&&(l=document)}catch(c){}var z=(c.navigator||{}).userAgent,h=void 0===z?"":z,a=c,m=l;a.document,m.documentElement&&m.head&&"function"==typeof m.addEventListener&&m.createElement,~h.indexOf("MSIE")||h.indexOf("Trident/");function v(l,c){var z,h=Object.keys(l);return Object.getOwnPropertySymbols&&(z=Object.getOwnPropertySymbols(l),c&&(

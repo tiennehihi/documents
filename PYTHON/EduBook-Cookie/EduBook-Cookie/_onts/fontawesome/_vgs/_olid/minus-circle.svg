@@ -1,0 +1,5 @@
+**
+   * If true, an error reading a directory when generating a precache manifest
+   * will cause the build to fail. If false, the problematic directory will be
+   * skipped. For more information, see the definition of `strict` in the `glob`
+   * [do

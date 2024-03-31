@@ -1,0 +1,6 @@
+ion templateElement(value: {
+    raw: string;
+    cooked?: string;
+}, tail?: boolean): TemplateElement;
+declare function templateLiteral(quasis: Array<TemplateElement>, expressions: Array<Expression | TSType>): TemplateLiteral;
+declare function yieldExpression(argument?: Expression | null, delegate

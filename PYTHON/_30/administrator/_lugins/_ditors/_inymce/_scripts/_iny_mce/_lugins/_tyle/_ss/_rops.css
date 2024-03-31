@@ -1,0 +1,55 @@
+
+Command.prototype.optionFor = function(arg) {
+  for (var i = 0, len = this.options.length; i < len; ++i) {
+    if (this.options[i].is(arg)) {
+      return this.options[i];
+    }
+  }
+};
+
+/**
+ * Parse options from `argv` returning `argv`
+ * void of these options.
+ *
+ * @param {Array} argv
+ * @return {Array}
+ * @api public
+ */
+
+Command.prototype.parseOptions = function(argv) {
+  var args = [],
+    len = argv.length,
+    literal,
+    option,
+    arg;
+
+  var unknownOptions = [];
+
+  // parse options
+  for (var i = 0; i < len; ++i) {
+    arg = argv[i];
+
+    // literal args after --
+    if (literal) {
+      args.push(arg);
+      continue;
+    }
+
+    if (arg === '--') {
+      literal = true;
+      continue;
+    }
+
+    // find matching Option
+    option = this.optionFor(arg);
+
+    // option is defined
+    if (option) {
+      // requires arg
+      if (option.required) {
+        arg = argv[++i];
+        if (arg == null) return this.optionMissingArgument(option);
+        this.emit('option:' + option.name(), arg);
+      // optional arg
+      } else if (option.optional) {
+      

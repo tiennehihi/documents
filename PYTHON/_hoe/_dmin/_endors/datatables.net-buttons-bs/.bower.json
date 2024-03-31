@@ -1,0 +1,16 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v1.1.6](https://github.com/es-shims/Function.prototype.name/compare/v1.1.5...v1.1.6) - 2023-08-28
+
+### Commits
+
+- [actions] reuse common workflows [`5f6bfba`](https://github.com/es-shims/Function.prototype.name/commit/5f6bfba9d2c42fbac8f4812396bc71f79464846c)
+- [meta] use `npmignore` to autogenerate an npmignore file [`28ea2f9`](https://github.com/es-shims/Function.prototype.name/commit/28ea2f9a9dd48623cba04e94c491033f1c9d1e90)
+- [Fix] properly recognize `document.all` in IE 6-8 [`316d676`](https://github.com/es-shims/Function.prototype.name/commit/316d67641d54bf221ed5edfdb9e04af3b98caad8)
+- [Fix] only return an own `name` [`d647609`](https://github.com/es-shims/Function.prototype.name/commit/d6476090e110733b52a922f4d0dbfdbc9478c653)
+- [Tests] add browserstack browser tests [`67ae402`](https://github.com/es-shims/Function.prototype.name/commit/67ae402aabcad83df2f7d7e356d059a84fe7

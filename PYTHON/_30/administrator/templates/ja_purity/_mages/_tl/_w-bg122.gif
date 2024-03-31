@@ -1,0 +1,6 @@
+export = Q;
+export as namespace Q;
+
+/**
+ * If value is a Q promise, returns the promise.
+ * If value is a pro

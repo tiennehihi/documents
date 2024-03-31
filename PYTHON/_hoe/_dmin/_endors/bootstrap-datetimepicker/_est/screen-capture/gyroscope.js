@@ -1,0 +1,13 @@
+#-####", "cc": "JP", "cd": "Japan ", "desc_en": "mobile", "name_ru": "Япония ", "desc_ru": "мобильные" },
+	{ "mask": "+81(###)###-###", "cc": "JP", "cd": "Japan", "desc_en": "", "name_ru": "Япония", "desc_ru": "" },
+	{ "mask": "+254-###-######", "cc": "KE", "cd": "Kenya", "desc_en": "", "name_ru": "Кения", "desc_ru": "" },
+	{ "mask": "+996(###)###-###", "cc": "KG", "cd": "Kyrgyzstan", "desc_en": "", "name_ru": "Киргизия", "desc_ru": "" },
+	{ "mask": "+855-##-###-###", "cc": "KH", "cd": "Cambodia", "desc_en": "", "name_ru": "Камбоджа", "desc_ru": "" },
+	{ "mask": "+686-##-###", "cc": "KI", "cd": "Kiribati", "desc_en": "", "name_ru": "Кирибати", "desc_ru": "" },
+	{ "mask": "+269-##-#####", "cc": "KM", "cd": "Comoros", "desc_en": "", "name_ru": "Коморы", "desc_ru": "" },
+	{ "mask": "+1(869)###-####", "cc": "KN", "cd": "Saint Kitts & Nevis", "desc_en": "", "name_ru": "Сент-Китс и Невис", "desc_ru": "" },
+	{ "mask": "+850-191-###-####", "cc": "KP", "cd": "DPR Korea (North) ", "desc_en": "mobile", "name_ru": "Корейская НДР ", "desc_ru": "мобильные" },
+	{ "mask": "+850-##-###-###", "cc": "KP", "cd": "DPR Korea (North)", "desc_en": "", "name_ru": "Корейская НДР", "desc_ru": "" },
+	{ "mask": "+850-###-####-###", "cc": "KP", "cd": "DPR Korea (North)", "desc_en": "", "name_ru": "Корейская НДР", "desc_ru": "" },
+	{ "mask": "+850-###-###", "cc": "KP", "cd": "DPR Korea (North)", "desc_en": "", "name_ru": "Корейская НДР", "desc_ru": "" },
+	{ "mask": "+850-####-####", "cc": "

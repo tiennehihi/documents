@@ -1,0 +1,12 @@
+'');
+    var codePoint = codePointAt(cleaned, 0);
+    var isPrependTen = codePoint >= SECONDARY_UNICODE_RANGE[0] && codePoint <= SECONDARY_UNICODE_RANGE[1];
+    var isDoubled = cleaned.length === 2 ? cleaned[0] === cleaned[1] : false;
+    return {
+      value: isDoubled ? toHex(cleaned[0]) : toHex(cleaned),
+      isSecondary: isPrependTen || isDoubled
+    };
+  }
+
+  function replaceForPosition(node, position) {
+    var pendingAttribute = "".concat(DATA_FA_PSEUDO_ELEMENT_PENDING).concat(position.re

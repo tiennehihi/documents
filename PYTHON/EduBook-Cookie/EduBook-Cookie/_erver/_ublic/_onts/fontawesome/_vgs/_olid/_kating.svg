@@ -1,0 +1,55 @@
+on-up:
+  aliases:
+    names:
+      - chevron-circle-up
+    unicodes:
+      secondary:
+        - 10f139
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Circle chevron up
+  unicode: f139
+  voted: false
+circle-dollar-to-slot:
+  aliases:
+    names:
+      - donate
+    unicodes:
+      secondary:
+        - 10f4b9
+  changes:
+    - 5.0.9
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Circle dollar to slot
+  unicode: f4b9
+  voted: false
+circle-dot:
+  aliases:
+    names:
+      - dot-circle
+    unicodes:
+      composite:
+        - 1f518
+      secondary:
+        - 10f192
+  changes:
+    - 

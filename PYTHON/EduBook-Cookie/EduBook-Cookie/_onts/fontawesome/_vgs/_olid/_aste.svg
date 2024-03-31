@@ -1,0 +1,18 @@
+tring>} */
+		const runtimeRequirements = new Set();
+		const runtime = intersectRuntime(generationRuntime, this._runtime);
+
+		const requestShortener = runtimeTemplate.requestShortener;
+		// Meta info for each module
+		const [modulesWithInfo, moduleToInfoMap] = this._getModulesWithInfo(
+			moduleGraph,
+			runtime
+		);
+
+		// Set with modules that need a generated namespace object
+		/** @type {Set<ConcatenatedModuleInfo>} */
+		const neededNamespaceObjects = new Set();
+
+		// Generate source code and analyse scopes
+		// Prepare a ReplaceSource for the final source
+		for (const info

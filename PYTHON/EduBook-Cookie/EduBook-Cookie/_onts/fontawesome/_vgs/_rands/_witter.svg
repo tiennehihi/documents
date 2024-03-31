@@ -1,0 +1,30 @@
+import {IdentifierRole, isTopLevelDeclaration} from "../parser/tokenizer";
+
+import Transformer from "./Transformer";
+
+export default class ReactHotLoaderTransformer extends Transformer {
+   __init() {this.extractedDefaultExportName = null}
+
+  constructor( tokens,  filePath) {
+    super();this.tokens = tokens;this.filePath = filePath;ReactHotLoaderTransformer.prototype.__init.call(this);;
+  }
+
+  setExtractedDefaultExportName(extractedDefaultExportName) {
+    this.extractedDefaultExportName = extractedDefaultExportName;
+  }
+
+  getPrefixCode() {
+    return `
+      (function () {
+        var enterModule = require('react-hot-loader').enterModule;
+        enterModule && enterModule(module);
+      })();`
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  getSuffixCode() {
+    const topLevelNames = new Set();
+    for (const token of this.tokens.tokens) {
+      if (
+  

@@ -1,0 +1,1 @@
+{"version":3,"file":"generate-patched-file.js","sourceRoot":"","sources":["../../src/eslint-bu

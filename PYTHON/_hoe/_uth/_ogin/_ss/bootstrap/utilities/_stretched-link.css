@@ -1,0 +1,9 @@
+/**
+ * @fileoverview Prevents jsx context provider values from taking values that
+ *               will cause needless rerenders.
+ * @author Dylan Oshima
+ */
+
+'use strict';
+
+const Compon

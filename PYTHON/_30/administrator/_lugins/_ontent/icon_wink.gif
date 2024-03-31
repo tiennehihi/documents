@@ -1,0 +1,9 @@
+ld.id);
+}
+
+function showAddMenu() {
+	var re = document.getElementById('addbutton');
+
+	addMenuLayer.moveRelativeTo(re, 'tr');
+	if (addMenuLayer.isMSIE)
+		addMenuLayer.move

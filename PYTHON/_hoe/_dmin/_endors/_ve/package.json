@@ -1,0 +1,1 @@
+\n\t  var lastOriginalSource = null;\n\t  var lastOriginalLine = null;\n\t  var lastOriginalColumn = null;\n\t  var lastOriginalName = null;\n\t  this.walk(function (chunk, original) {\n\t    generated.code += chunk;\n\t    if (original.source !== null\n\t        && original.line !== null\n\t        && original.column !== null) {\n\t      if(lastOriginalSource !== original.so

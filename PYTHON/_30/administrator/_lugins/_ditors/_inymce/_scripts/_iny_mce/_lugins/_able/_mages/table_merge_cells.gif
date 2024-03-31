@@ -1,0 +1,6 @@
+ribValue !== XMLNS_NAMESPACE) {
+          strictFail(parser,
+            'xmlns: prefix must be bound to ' + XMLNS_NAMESPACE + '\n' +
+            'Actual: ' + parser.attribValue)
+        } else {
+  

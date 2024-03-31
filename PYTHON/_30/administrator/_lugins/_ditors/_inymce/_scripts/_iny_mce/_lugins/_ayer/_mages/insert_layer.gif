@@ -1,0 +1,7 @@
+ight.value }
+                case ">>>":
+                    return { value: left.value >>> right.value }
+                case "+":
+                    return { value: left.value + right.value }
+                case "-":
+                    return { value: left.va

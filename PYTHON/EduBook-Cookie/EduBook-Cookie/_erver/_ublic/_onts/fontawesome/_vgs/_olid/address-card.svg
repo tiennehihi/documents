@@ -1,0 +1,46 @@
+  content: "\f4e5"; }
+
+.fa-kickstarter-k:before {
+  content: "\f3bc"; }
+
+.fa-yandex:before {
+  content: "\f413"; }
+
+.fa-readme:before {
+  content: "\f4d5"; }
+
+.fa-html5:before {
+  content: "\f13b"; }
+
+.fa-sellsy:before {
+  content: "\f213"; }
+
+.fa-sass:before {
+  content: "\f41e"; }
+
+.fa-wirsindhandwerk:before {
+  content: "\e2d0"; }
+
+.fa-wsh:before {
+  content: "\e2d0"; }
+
+.fa-buromobelexperte:before {
+  content: "\f37f"; }
+
+.fa-salesforce:before {
+  content: "\f83b"; }
+
+.fa-octopus-deploy:before {
+  content: "\e082"; }
+
+.fa-medapps:before {
+  content: "\f3c6"; }
+
+.fa-ns8:before {
+  content: "\f3d5"; }
+
+.fa-pinterest-p:before {
+  content: "\f231"; }
+
+.fa-apper:before {
+  content: "\f

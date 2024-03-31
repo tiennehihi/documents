@@ -1,0 +1,12 @@
+/**
+ * @fileoverview HTML reporter
+ * @author Julian Laval
+ */
+"use strict";
+
+//------------------------------------------------------------------------------
+// Helpers
+//------------------------------------------------------------------------------
+
+const encodeHTML = (function() {
+    const encodeHTMLRu

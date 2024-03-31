@@ -1,0 +1,19 @@
+"use strict";
+
+const selectorParser = require("postcss-selector-parser");
+
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function isNestedRule(rule) {
+  if (!rule.parent || rule.parent.type === "root") {
+    return false;
+  }
+
+  if (rule.parent.type === "rule") {
+    return true;
+  }
+
+  return isNestedRule(rule.parent);
+}
+
+function getSingleLocalNamesForComposes(root, rule)

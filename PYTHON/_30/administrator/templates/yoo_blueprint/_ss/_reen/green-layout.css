@@ -1,0 +1,20 @@
+<div align="center">
+	<br>
+	<br>
+	<img src="media/logo.svg" alt="type-fest" height="300">
+	<br>
+	<br>
+	<b>A collection of essential TypeScript types</b>
+	<br>
+	<hr>
+</div>
+<br>
+<br>
+
+[![Build Status](https://travis-ci.com/sindresorhus/type-fest.svg?branch=master)](https://travis-ci.com/sindresorhus/type-fest)
+[![](https://img.shields.io/badge/unicorn-approved-ff69b4.svg)](https://giphy.com/gifs/illustration-rainbow-unicorn-26AHG5KGFxSkUWw1i)
+<!-- Commented out until they actually show anything
+[![npm dependents](https://badgen.net/npm/dependents/type-fest)](https://www.npmjs.com/package/type-fest?activeTab=dependents) [![npm downloads](https://badgen.net/npm/dt/type-fest)](https://www.npmjs.com/package/type-fest)
+-->
+
+Many of the types here should have been built-in. You can help by suggesting some of them to the [TypeScript project](https://github.com/

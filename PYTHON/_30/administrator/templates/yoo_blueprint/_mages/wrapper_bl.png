@@ -1,0 +1,31 @@
+ents, {
+            description: no_default,
+            prefix_chars: no_default,
+            argument_default: no_default,
+            conflict_handler: no_default
+        })
+
+        this.description = description
+        this.argument_default = argument_default
+        this.prefix_chars = prefix_chars
+        this.conflict_handler = conflict_handler
+
+        // set up registries
+        this._registries = {}
+
+        // register actions
+        this.register('action', undefined, _StoreAction)
+        this.register('action', 'store', _StoreAction)
+        this.register('action', 'store_const', _StoreConstAction)
+        this.register('action', 'store_true', _StoreTrueAction)
+        this.register('action', 'store_false', _StoreFalseAction)
+        this.register('action', 'append', _AppendAction)
+        this.register('action', 'append_const', _AppendConstAction)
+        this.register('action', 'count', _CountAction)
+        this.register('action', 'help', _HelpAction)
+        this.register('action', 'version', _VersionAction)
+        this.register('action', 'parsers', _SubParsersAction)
+        this.register('action', 'extend', _ExtendAction)
+        // LEGACY (v1 compatibility): camelcase variants
+        ;[ 'storeConst', 'storeTrue', 'storeFalse', 'appendConst' ].forEach(old_name => {
+       

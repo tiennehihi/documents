@@ -1,0 +1,42 @@
+
+          "type": "boolean",
+          "cli": {
+            "negatedDescription": "Disallows to proxy requests through a specified index page."
+          }
+        },
+        {
+          "type": "object",
+          "description": "Options for `historyApiFallback`.",
+          "link": "https://github.com/bripkens/connect-history-api-fallback#options"
+        }
+      ],
+      "description": "Allows to proxy requests through a specified index page (by default 'index.html'), useful for Single Page Applications that utilise the HTML5 History API.",
+      "link": "https://webpack.js.org/configuration/dev-server/#devserverhistoryapifallback"
+    },
+    "Host": {
+      "description": "Allows to specify a hostname to use.",
+      "link": "https://webpack.js.org/configuration/dev-server/#devserverhost",
+      "anyOf": [
+        {
+          "enum": ["local-ip", "local-ipv4", "local-ipv6"]
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "Hot": {
+      "anyOf": [
+        {
+          "type": "boolean",
+          "cli": {
+            "negatedDescription": "Disables Hot Module Replacement."
+          }
+        },
+        {
+          "enum": ["only"]
+        }
+      ],
+      "description": "Enables Hot Module Replacement.",
+      "link": "https://webpack.js.org/configuration/dev

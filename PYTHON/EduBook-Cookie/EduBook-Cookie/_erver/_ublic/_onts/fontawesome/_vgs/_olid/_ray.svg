@@ -1,0 +1,26 @@
+  "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "plug-circle-minus": {
+    "changes": [
+      "6.1.0",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "e55e",
+    "label": "Plug Circle-minus",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321855,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 576 512\"><path d=\"M96 0C78.

@@ -1,0 +1,6 @@
+n isObjectTypeAnnotation(node: Node | null | undefined, opts?: Opts<ObjectTypeAnnotation> | null): node is ObjectTypeAnnotation;
+declare function isObjectTypeInternalSlot(node: Node | null | undefined, opts?: Opts<ObjectTypeInternalSlot> | null): node is ObjectTypeInternalSlot;
+declare function isObjectTypeCallProperty(node: Node | null | undefined, opts?: Opts<ObjectTypeCallProperty> | null): node is ObjectTypeCallProperty;
+declare function isObjectTypeIndexer(node: Node | null | undefined, opts?: Opts<ObjectTypeIndexer> | null): node is ObjectTypeIndexer;
+declare function isObjectTypeProperty(node: Node | null | undefined, opts?: Opts<ObjectTypeProperty> | null): node is ObjectTypeProperty;
+declare function isObjectTypeSpreadProperty(node: Node | null | undefined, opts?: Op

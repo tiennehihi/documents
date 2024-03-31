@@ -1,0 +1,8 @@
+}
+  }
+} exports.flowParseImportSpecifier = flowParseImportSpecifier;
+
+// parse function type parameters - function foo<T>() {}
+ function flowStartParseFunctionParams() {
+  // Originally this checked if the method is a getter/setter, but if it was, we'd crash soon
+  // anyway, so don't try to propagate t

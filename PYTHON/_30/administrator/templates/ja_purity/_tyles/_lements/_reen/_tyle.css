@@ -1,0 +1,12 @@
+mTimers === 0) {
+                                        resetIsNearInfiniteLimit();
+                                        resolve(clock.now);
+                                        return;
+                                    }
+
+                                    clock.next();
+
+                                    i++;
+
+                                    doRun();
+                                    checkIsNearInfiniteLimit(clock

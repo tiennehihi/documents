@@ -1,0 +1,41 @@
+48 256C48 370.9 141.1 464 256 464z"
+      }
+    },
+    "free": [
+      "regular",
+      "solid"
+    ]
+  },
+  "face-frown": {
+    "aliases": {
+      "names": [
+        "frown"
+      ],
+      "unicodes": {
+        "composite": [
+          "2639"
+        ],
+        "secondary": [
+          "10f119"
+        ]
+      }
+    },
+    "changes": [
+      "3.1.0",
+      "5.0.0",
+      "5.0.9",
+      "5.1.0",
+      "5.11.0",
+      "5.11.1",
+      "6.0.0-beta1",
+      "6.0.0-beta3",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid",
+      "regular"
+   

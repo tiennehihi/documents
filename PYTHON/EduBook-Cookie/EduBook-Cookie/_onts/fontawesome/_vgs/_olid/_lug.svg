@@ -1,0 +1,13 @@
+/**
+ * @fileoverview Utility functions for React pragma configuration
+ * @author Yannick Croissant
+ */
+
+'use strict';
+
+const JSX_ANNOTATION_REGEX = /@jsx\s+([^\s]+)/;
+// Does not check for reserved keywords or unicode characters
+const JS_IDENTIFIER_REGEX = /^[_$a-zA-Z][_$a-zA-Z0-9]*$/;
+
+/**
+ * @param {Context} contex

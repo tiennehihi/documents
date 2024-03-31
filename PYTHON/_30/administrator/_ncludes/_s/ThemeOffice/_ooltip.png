@@ -1,0 +1,17 @@
+{
+  declare module.exports: {}
+}
+```
+
+### New Features
+
+- If supplied, attach filename property to comment node loc. ([#80](https://github.com/babel/babylon/pull/80)) @divmain
+- Add identifier name to node loc field ([#90](https://github.com/babel/babylon/pull/90)) @kittens
+
+### Bug Fixes
+
+- Fix exponential operator to behave according to spec ([#75](https://github.com/babel/babylon/pull/75)) @danez
+- Fix lookahead to not add comments to arrays which are not cloned ([#76](https://github.com/babel/babylon/pull/76)) @danez
+- Fix accidental fall-through in Flow type parsing. ([#82](https://github.com/babel/babylon/pull/82)) @xiemaisi
+- Only allow declares inside declare module ([#73](https://github.com/babel/babylon/pull/73)) @danez
+- Small 

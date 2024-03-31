@@ -1,0 +1,28 @@
+"use strict";
+
+exports.__esModule = true;
+exports.default = createMetaResolver;
+var _utils = require("./utils");
+const PossibleGlobalObjects = new Set(["global", "globalThis", "self", "window"]);
+function createMetaResolver(polyfills) {
+  const {
+    static: staticP,
+    instance: instanceP,
+    global: globalP
+  } = polyfills;
+  return meta => {
+    if (meta.kind === "global" && globalP && (0, _utils.has)(globalP, meta.name)) {
+      return {
+        kind: "global",
+        desc: globalP[meta.name],
+        name: meta.name
+      };
+    }
+    if (meta.kind === "property" || meta.kind === "in") {
+      const {
+        placement,
+        object,
+        key
+      } = meta;
+      if (object && placement === "static") {
+        if (glob

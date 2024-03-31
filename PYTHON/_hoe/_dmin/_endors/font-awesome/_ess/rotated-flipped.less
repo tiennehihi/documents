@@ -1,0 +1,20 @@
+"use strict";
+
+exports.__esModule = true;
+exports.default = void 0;
+
+/**
+ * Represents a plugin’s warning. It can be created using {@link Node#warn}.
+ *
+ * @example
+ * if (decl.important) {
+ *   decl.warn(result, 'Avoid !important', { word: '!important' })
+ * }
+ */
+var Warning = /*#__PURE__*/function () {
+  /**
+   * @param {string} text        Warning message.
+   * @param {Object} [opts]      Warning options.
+   * @param {Node}   opts.node   CSS node that caused the warning.
+   * @param {string} opts.word   Word in CSS source that caused the warning.
+   * @param {number} opts.index  Index in CSS node string that 

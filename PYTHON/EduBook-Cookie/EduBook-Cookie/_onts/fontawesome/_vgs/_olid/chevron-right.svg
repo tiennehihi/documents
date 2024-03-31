@@ -1,0 +1,11 @@
+(https://github.com/rollup/rollup/pull/3598): Treeshake prototype modifications in classes (@lukastaegert)
+- [#3599](https://github.com/rollup/rollup/pull/3599): Retain pure annotations in class fields (@lukastaegert)
+- [#3601](https://github.com/rollup/rollup/pull/3601): Fix white-space in docs (@tu4mo)
+
+## 2.10.9
+
+_2020-05-24_
+
+### Bug Fixes
+
+- Prevent inva

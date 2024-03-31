@@ -1,0 +1,33 @@
+var Marker = require('../../tokenizer/marker');
+
+var Selector = {
+  ADJACENT_SIBLING: '+',
+  DESCENDANT: '>',
+  DOT: '.',
+  HASH: '#',
+  NON_ADJACENT_SIBLING: '~',
+  PSEUDO: ':'
+};
+
+var LETTER_PATTERN = /[a-zA-Z]/;
+var NOT_PREFIX = ':not(';
+var SEPARATOR_PATTERN = /[\s,(>~+]/;
+
+function specificity(selector) {
+  var result = [0, 0, 0];
+  var character;
+  var isEscaped;
+  var isSingleQuoted;
+  var isDoubleQuoted;
+  var roundBracketLevel = 0;
+  var couldIntroduceNewTypeSelector;
+  var withinNotPseudoClass = false;
+  var wasPseudoClass = false;
+  var i, l;
+
+  for (i = 0, l = selector.length; i < l; i++) {
+    character = selector[i];
+
+    if (isEscaped) {
+      // noop
+    } else if (character == Mark

@@ -1,0 +1,23 @@
+rypointChunk(chunk);
+		if (name) {
+			this.namedChunkGroups.set(name, entrypoint);
+		}
+		this.chunkGroups.push(entrypoint);
+		this.asyncEntrypoints.push(entrypoint);
+		connectChunkGroupAndChunk(entrypoint, chunk);
+		if (module) {
+			entrypoint.addOrigin(module, loc, request);
+		}
+		return entrypoint;
+	}
+
+	/**
+	 * This method first looks to see if a name is provided for a new chunk,
+	 * and first looks to see if any named chunks already exist and reuse that chunk instead.
+	 *
+	 * @param {string=} name optional chunk name to be provided
+	 * @returns {Chunk} create a chunk (invoked during seal event)
+	 */
+	addChunk(name) {
+		if (name) {
+			c

@@ -1,0 +1,5 @@
+import expect from 'expect';
+import getSuggestion from '../../../src/util/getSuggestion';
+
+describe('spell check suggestion API', () => {
+  it('should return no suggest

@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = require("path");
+/**
+ * It handles most of the logic required to process embedded TypeScript code (like in Vue components or MDX)
+ *
+ * @param embeddedExtensions List of file extensions that should be treated as an embedded TypeScript source
+ *                           (for example ['.vue'])
+ * @param getEmbeddedSource  Function that returns embedded TypeScript source text and extension that this file
+ *                           would have if it would be a regular TypeScript file
+ */
+function createTypeScriptEmbeddedExtension({ embeddedExtensions, getEmbeddedSource, }) {
+    const embeddedSourceCache = new Map();
+    function getCachedEmbeddedSource(fileName) {
+        if (!embeddedSourceCache.has(fileName)) {
+            embe

@@ -1,0 +1,10 @@
+{
+	"name": "resolve-cwd",
+	"version": "3.0.0",
+	"description": "Resolve the path of a module like `require.resolve()` but from the current working directory",
+	"license": "MIT",
+	"repository": "sindresorhus/resolve-cwd",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "sin

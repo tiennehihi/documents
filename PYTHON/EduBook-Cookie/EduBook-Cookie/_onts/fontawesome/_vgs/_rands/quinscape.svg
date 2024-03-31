@@ -1,0 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const DT_SEPARATOR = /t|\s/i;
+const DATE = /^(\d\d\d\d)-(\d\d)-(\d\d)$/;
+const TIME = /^(\d\d):(\d\d):(\d\d)(?:\.\d+)?(?:z|([+-]\d\d)(?::?(\d\d))?)$/i;
+const DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+function validTimestamp(str, allowDate) {
+    // http://tools.ietf.org/html/rfc3339#section-5.6
+    const dt = str.

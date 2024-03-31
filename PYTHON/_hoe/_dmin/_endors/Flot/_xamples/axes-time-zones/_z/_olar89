@@ -1,0 +1,550 @@
+token show error for current position + 1
+                            // e.g. eat(HYPHENMINUS) will fail on "-foo", but pointing on "-" is odd
+                            if (this.scanner.source.charCodeAt(this.scanner.tokenStart) === tokenType) {
+                                offset = offset + 1;
+                            }
+                    }
+
+                    this.error(message, offset);
+                }
+
+                this.scanner.next();
+            },
+
+            consume: function(tokenType) {
+                var value = this.scanner.getTokenValue();
+
+                this.eat(tokenType);
+
+                return value;
+            },
+            consumeFunctionName: function() {
+                var name = this.scanner.source.substring(this.scanner.tokenStart, this.scanner.tokenEnd - 1);
+
+                this.eat(FUNCTION);
+
+                return name;
+            },
+
+            getLocation: function(start, end) {
+                if (this.needPositions) {
+                    return this.locationMap.getLocationRange(
+                        start,
+                        end,
+                        this.filename
+                    );
+                }
+
+                return null;
+            },
+            getLocationFromList: function(list) {
+                if (this.needPositions) {
+                    var head = this.getFirstListNode(list);
+                    var tail = this.getLastListNode(list);
+                    return this.locationMap.getLocationRange(
+                        head !== null ? head.loc.start.offset - this.locationMap.startOffset : this.scanner.tokenStart,
+                        tail !== null ? tail.loc.end.offset - this.locationMap.startOffset : this.scanner.tokenStart,
+                        this.filename
+                    );
+                }
+
+                return null;
+            },
+
+            error: function(message, offset) {
+                var location = typeof offset !== 'undefined' && offset < this.scanner.source.length
+                    ? this.locationMap.getLocation(offset)
+                    : this.scanner.eof
+                        ? this.locationMap.getLocation(findWhiteSpaceStart$1(this.scanner.source, this.scanner.source.length - 1))
+                        : this.locationMap.getLocation(this.scanner.tokenStart);
+
+                throw new _SyntaxError(
+                    message || 'Unexpected input',
+                    this.scanner.source,
+                    location.offset,
+                    location.line,
+                    location.column
+                );
+            }
+        };
+
+        config = processConfig(config || {});
+        for (var key in config) {
+            parser[key] = config[key];
+        }
+
+        return function(source, options) {
+            options = options || {};
+
+            var context = options.context || 'default';
+            var ast;
+
+            tokenizer(source, parser.scanner);
+            parser.locationMap.setSource(
+                source,
+                options.offset,
+                options.line,
+                options.column
+            );
+
+            parser.filename = options.filename || '<unknown>';
+            parser.needPositions = Boolean(options.positions);
+            parser.onParseError = typeof options.onParseError === 'function' ? options.onParseError : noop$2;
+            parser.onParseErrorThrow = false;
+            parser.parseAtrulePrelude = 'parseAtrulePrelude' in options ? Boolean(options.parseAtrulePrelude) : true;
+            parser.parseRulePrelude = 'parseRulePrelude' in options ? Boolean(options.parseRulePrelude) : true;
+            parser.parseValue = 'parseValue' in options ? Boolean(options.parseValue) : true;
+            parser.parseCustomProperty = 'parseCustomProperty' in options ? Boolean(options.parseCustomProperty) : false;
+
+            if (!parser.context.hasOwnProperty(context)) {
+                throw new Error('Unknown context `' + context + '`');
+            }
+
+            ast = parser.context[context].call(parser, options);
+
+            if (!parser.scanner.eof) {
+                parser.error();
+            }
+
+            return ast;
+        };
+    };
+
+    /* -*- Mode: js; js-indent-level: 2; -*- */
+    /*
+     * Copyright 2011 Mozilla Foundation and contributors
+     * Licensed under the New BSD license. See LICENSE or:
+     * http://opensource.org/licenses/BSD-3-Clause
+     */
+
+    var intToCharMap = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.split('');
+
+    /**
+     * Encode an integer in the range of 0 to 63 to a single base 64 digit.
+     */
+    var encode = function (number) {
+      if (0 <= number && number < intToCharMap.length) {
+        return intToCharMap[number];
+      }
+      throw new TypeError("Must be between 0 and 63: " + number);
+    };
+
+    /**
+     * Decode a single base 64 character code digit to an integer. Returns -1 on
+     * failure.
+     */
+    var decode = function (charCode) {
+      var bigA = 65;     // 'A'
+      var bigZ = 90;     // 'Z'
+
+      var littleA = 97;  // 'a'
+      var littleZ = 122; // 'z'
+
+      var zero = 48;     // '0'
+      var nine = 57;     // '9'
+
+      var plus = 43;     // '+'
+      var slash = 47;    // '/'
+
+      var littleOffset = 26;
+      var numberOffset = 52;
+
+      // 0 - 25: ABCDEFGHIJKLMNOPQRSTUVWXYZ
+      if (bigA <= charCode && charCode <= bigZ) {
+        return (charCode - bigA);
+      }
+
+      // 26 - 51: abcdefghijklmnopqrstuvwxyz
+      if (littleA <= charCode && charCode <= littleZ) {
+        return (charCode - littleA + littleOffset);
+      }
+
+      // 52 - 61: 0123456789
+      if (zero <= charCode && charCode <= nine) {
+        return (charCode - zero + numberOffset);
+      }
+
+      // 62: +
+      if (charCode == plus) {
+        return 62;
+      }
+
+      // 63: /
+      if (charCode == slash) {
+        return 63;
+      }
+
+      // Invalid base64 digit.
+      return -1;
+    };
+
+    var base64 = {
+    	encode: encode,
+    	decode: decode
+    };
+
+    /* -*- Mode: js; js-indent-level: 2; -*- */
+    /*
+     * Copyright 2011 Mozilla Foundation and contributors
+     * Licensed under the New BSD license. See LICENSE or:
+     * http://opensource.org/licenses/BSD-3-Clause
+     *
+     * Based on the Base 64 VLQ implementation in Closure Compiler:
+     * https://code.google.com/p/closure-compiler/source/browse/trunk/src/com/google/debugging/sourcemap/Base64VLQ.java
+     *
+     * Copyright 2011 The Closure Compiler Authors. All rights reserved.
+     * Redistribution and use in source and binary forms, with or without
+     * modification, are permitted provided that the following conditions are
+     * met:
+     *
+     *  * Redistributions of source code must retain the above copyright
+     *    notice, this list of conditions and the following disclaimer.
+     *  * Redistributions in binary form must reproduce the above
+     *    copyright notice, this list of conditions and the following
+     *    disclaimer in the documentation and/or other materials provided
+     *    with the distribution.
+     *  * Neither the name of Google Inc. nor the names of its
+     *    contributors may be used to endorse or promote products derived
+     *    from this software without specific prior written permission.
+     *
+     * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+     * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+     * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+     * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+     * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+     * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+     * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+     * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+     * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+     * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     */
+
+
+
+    // A single base 64 digit can contain 6 bits of data. For the base 64 variable
+    // length quantities we use in the source map spec, the first bit is the sign,
+    // the next four bits are the actual value, and the 6th bit is the
+    // continuation bit. The continuation bit tells us whether there are more
+    // digits in this value following this digit.
+    //
+    //   Continuation
+    //   |    Sign
+    //   |    |
+    //   V    V
+    //   101011
+
+    var VLQ_BASE_SHIFT = 5;
+
+    // binary: 100000
+    var VLQ_BASE = 1 << VLQ_BASE_SHIFT;
+
+    // binary: 011111
+    var VLQ_BASE_MASK = VLQ_BASE - 1;
+
+    // binary: 100000
+    var VLQ_CONTINUATION_BIT = VLQ_BASE;
+
+    /**
+     * Converts from a two-complement value to a value where the sign bit is
+     * placed in the least significant bit.  For example, as decimals:
+     *   1 becomes 2 (10 binary), -1 becomes 3 (11 binary)
+     *   2 becomes 4 (100 binary), -2 becomes 5 (101 binary)
+     */
+    function toVLQSigned(aValue) {
+      return aValue < 0
+        ? ((-aValue) << 1) + 1
+        : (aValue << 1) + 0;
+    }
+
+    /**
+     * Converts to a two-complement value from a value where the sign bit is
+     * placed in the least significant bit.  For example, as decimals:
+     *   2 (10 binary) becomes 1, 3 (11 binary) becomes -1
+     *   4 (100 binary) becomes 2, 5 (101 binary) becomes -2
+     */
+    function fromVLQSigned(aValue) {
+      var isNegative = (aValue & 1) === 1;
+      var shifted = aValue >> 1;
+      return isNegative
+        ? -shifted
+        : shifted;
+    }
+
+    /**
+     * Returns the base 64 VLQ encoded value.
+     */
+    var encode$1 = function base64VLQ_encode(aValue) {
+      var encoded = "";
+      var digit;
+
+      var vlq = toVLQSigned(aValue);
+
+      do {
+        digit = vlq & VLQ_BASE_MASK;
+        vlq >>>= VLQ_BASE_SHIFT;
+        if (vlq > 0) {
+          // There are still more digits in this value, so we must make sure the
+          // continuation bit is marked.
+          digit |= VLQ_CONTINUATION_BIT;
+        }
+        encoded += base64.encode(digit);
+      } while (vlq > 0);
+
+      return encoded;
+    };
+
+    /**
+     * Decodes the next base 64 VLQ value from the given string and returns the
+     * value and the rest of the string via the out parameter.
+     */
+    var decode$1 = function base64VLQ_decode(aStr, aIndex, aOutParam) {
+      var strLen = aStr.length;
+      var result = 0;
+      var shift = 0;
+      var continuation, digit;
+
+      do {
+        if (aIndex >= strLen) {
+          throw new Error("Expected more digits in base 64 VLQ value.");
+        }
+
+        digit = base64.decode(aStr.charCodeAt(aIndex++));
+        if (digit === -1) {
+          throw new Error("Invalid base64 digit: " + aStr.charAt(aIndex - 1));
+        }
+
+        continuation = !!(digit & VLQ_CONTINUATION_BIT);
+        digit &= VLQ_BASE_MASK;
+        result = result + (digit << shift);
+        shift += VLQ_BASE_SHIFT;
+      } while (continuation);
+
+      aOutParam.value = fromVLQSigned(result);
+      aOutParam.rest = aIndex;
+    };
+
+    var base64Vlq = {
+    	encode: encode$1,
+    	decode: decode$1
+    };
+
+    function createCommonjsModule(fn, module) {
+    	return module = { exports: {} }, fn(module, module.exports), module.exports;
+    }
+
+    function getCjsExportFromNamespace (n) {
+    	return n && n['default'] || n;
+    }
+
+    var util = createCommonjsModule(function (module, exports) {
+    /* -*- Mode: js; js-indent-level: 2; -*- */
+    /*
+     * Copyright 2011 Mozilla Foundation and contributors
+     * Licensed under the New BSD license. See LICENSE or:
+     * http://opensource.org/licenses/BSD-3-Clause
+     */
+
+    /**
+     * This is a helper function for getting values from parameter/options
+     * objects.
+     *
+     * @param args The object we are extracting values from
+     * @param name The name of the property we are getting.
+     * @param defaultValue An optional value to return if the property is missing
+     * from the object. If this is not specified and the property is missing, an
+     * error will be thrown.
+     */
+    function getArg(aArgs, aName, aDefaultValue) {
+      if (aName in aArgs) {
+        return aArgs[aName];
+      } else if (arguments.length === 3) {
+        return aDefaultValue;
+      } else {
+        throw new Error('"' + aName + '" is a required argument.');
+      }
+    }
+    exports.getArg = getArg;
+
+    var urlRegexp = /^(?:([\w+\-.]+):)?\/\/(?:(\w+:\w+)@)?([\w.-]*)(?::(\d+))?(.*)$/;
+    var dataUrlRegexp = /^data:.+\,.+$/;
+
+    function urlParse(aUrl) {
+      var match = aUrl.match(urlRegexp);
+      if (!match) {
+        return null;
+      }
+      return {
+        scheme: match[1],
+        auth: match[2],
+        host: match[3],
+        port: match[4],
+        path: match[5]
+      };
+    }
+    exports.urlParse = urlParse;
+
+    function urlGenerate(aParsedUrl) {
+      var url = '';
+      if (aParsedUrl.scheme) {
+        url += aParsedUrl.scheme + ':';
+      }
+      url += '//';
+      if (aParsedUrl.auth) {
+        url += aParsedUrl.auth + '@';
+      }
+      if (aParsedUrl.host) {
+        url += aParsedUrl.host;
+      }
+      if (aParsedUrl.port) {
+        url += ":" + aParsedUrl.port;
+      }
+      if (aParsedUrl.path) {
+        url += aParsedUrl.path;
+      }
+      return url;
+    }
+    exports.urlGenerate = urlGenerate;
+
+    /**
+     * Normalizes a path, or the path portion of a URL:
+     *
+     * - Replaces consecutive slashes with one slash.
+     * - Removes unnecessary '.' parts.
+     * - Removes unnecessary '<dir>/..' parts.
+     *
+     * Based on code in the Node.js 'path' core module.
+     *
+     * @param aPath The path or url to normalize.
+     */
+    function normalize(aPath) {
+      var path = aPath;
+      var url = urlParse(aPath);
+      if (url) {
+        if (!url.path) {
+          return aPath;
+        }
+        path = url.path;
+      }
+      var isAbsolute = exports.isAbsolute(path);
+
+      var parts = path.split(/\/+/);
+      for (var part, up = 0, i = parts.length - 1; i >= 0; i--) {
+        part = parts[i];
+        if (part === '.') {
+          parts.splice(i, 1);
+        } else if (part === '..') {
+          up++;
+        } else if (up > 0) {
+          if (part === '') {
+            // The first part is blank if the path is absolute. Trying to go
+            // above the root is a no-op. Therefore we can remove all '..' parts
+            // directly after the root.
+            parts.splice(i + 1, up);
+            up = 0;
+          } else {
+            parts.splice(i, 2);
+            up--;
+          }
+        }
+      }
+      path = parts.join('/');
+
+      if (path === '') {
+        path = isAbsolute ? '/' : '.';
+      }
+
+      if (url) {
+        url.path = path;
+        return urlGenerate(url);
+      }
+      return path;
+    }
+    exports.normalize = normalize;
+
+    /**
+     * Joins two paths/URLs.
+     *
+     * @param aRoot The root path or URL.
+     * @param aPath The path or URL to be joined with the root.
+     *
+     * - If aPath is a URL or a data URI, aPath is returned, unless aPath is a
+     *   scheme-relative URL: Then the scheme of aRoot, if any, is prepended
+     *   first.
+     * - Otherwise aPath is a path. If aRoot is a URL, then its path portion
+     *   is updated with the result and aRoot is returned. Otherwise the result
+     *   is returned.
+     *   - If aPath is absolute, the result is aPath.
+     *   - Otherwise the two paths are joined with a slash.
+     * - Joining for example 'http://' and 'www.example.com' is also supported.
+     */
+    function join(aRoot, aPath) {
+      if (aRoot === "") {
+        aRoot = ".";
+      }
+      if (aPath === "") {
+        aPath = ".";
+      }
+      var aPathUrl = urlParse(aPath);
+      var aRootUrl = urlParse(aRoot);
+      if (aRootUrl) {
+        aRoot = aRootUrl.path || '/';
+      }
+
+      // `join(foo, '//www.example.org')`
+      if (aPathUrl && !aPathUrl.scheme) {
+        if (aRootUrl) {
+          aPathUrl.scheme = aRootUrl.scheme;
+        }
+        return urlGenerate(aPathUrl);
+      }
+
+      if (aPathUrl || aPath.match(dataUrlRegexp)) {
+        return aPath;
+      }
+
+      // `join('http://', 'www.example.com')`
+      if (aRootUrl && !aRootUrl.host && !aRootUrl.path) {
+        aRootUrl.host = aPath;
+        return urlGene'use strict';
+
+var ToNumber = require('./ToNumber');
+var ToPrimitive = require('./ToPrimitive');
+var Type = require('./Type');
+
+// https://262.ecma-international.org/6.0/#sec-abstract-equality-comparison
+
+module.exports = function AbstractEqualityComparison(x, y) {
+	var xType = Type(x);
+	var yType = Type(y);
+	if (xType === yType) {
+		return x === y; // ES6+ specified this shortcut anyways.
+	}
+	if (x == null && y == null) {
+		return true;
+	}
+	if (xType === 'Number' && yType === 'String') {
+		return AbstractEqualityComparison(x, ToNumber(y));
+	}
+	if (xType === 'String' && yType === 'Number') {
+		return AbstractEqualityComparison(ToNumber(x), y);
+	}
+	if (xType === 'Boolean') {
+		return AbstractEqualityComparison(ToNumber(x), y);
+	}
+	if (yType === 'Boolean') {
+		return AbstractEqualityComparison(x, ToNumber(y));
+	}
+	if ((xType === 'String' || xType === 'Number' || xType === 'Symbol') && yType === 'Object') {
+		return AbstractEqualityComparison(x, ToPrimitive(y));
+	}
+	if (xType === 'Object' && (yType === 'String' || yType === 'Number' || yType === 'Symbol')) {
+		return AbstractEqualityComparison(ToPrimitive(x), y);
+	}
+	return false;
+};
+                                                                                                                                                                                                                                                                                                                                                                                                   QáÑú'K°Au˛Àœc,ÓbÖBä[V2D´,™¢Uà5|~Ê…YBq…˙∫Ü±\ƒ\OTã.Á‚,¶A≈Ìy•Å‘Ô]È/R‰íÄ˙Ù76#ﬁπ…1ÚπËq⁄-⁄È—©wD¡Dÿ¡nØæπrNÚŒsL1W∞ÿó‰íjRŸyA—¸∫A|4I#oñtNˇùrøÚ!&õØi3˛+BF"∏È˜M»õâ =ê)_Ô
+a‚–*€±}-ÉCkúﬂ‚î∫PÈc;Jo… ŒkTÆùÖÔÑ˘“©øÄãàÒ”c@0$1(ÜÉÑ1C21∞‡4fLYÁµ¢^é@#ö•Dº‘#=ú7N‹™‹˛H¨;E¨Ëıçpöå¢ñKI˛ üΩ¶<Fö`QmÖéb“πxrA U5l»äõoò˜sÓ∆¯0)«É≤Å®Ú•,	yˇü~±˚ e”1íı?Ø“‡)´/y–‚*∆Ëü¢ºmø∆“ô?‘ ˜ië2‰J∂„r∫@8È¯H üfë+yΩß1	TıaexÎm /Ê\ pÛÄ≠„8 öoUæ{´Çy@L÷¸]çqz◊–®Å	Öúæ‘vfáwÔ¢t9±–09˛ã¸l0>àÌÛêÊ~—Ú˝–[&æj⁄ºƒe®É¢˝˛åÂÒå†°å¸¶¯•õ|gx\ÊK´© AÚIi√*vì¶Îê1jBô[ô±Ã=;}î‚vn√é3Út˛%úi≤VñqùÎø¯‹_ﬁ˘–¥éd§∆A˛ê≈êhd "ﬂéÍæö§%Æ
+˚A&˝ d‚µJ|‡PH,	D÷ÙËæÖÂ â|7~+π‰%˛iÛÄD±æ–[|ÒHãåÁ∏ßVÊxﬁ∫UÍ¬i°Fl»ó,•ÈÂ’#ƒpàº,Ö>Ãz√:≈‹∆1Q"˝∞qûÙ9|l'N;}[ÅA$Ê2Eêˇö¬íÅƒ¬äƒtuÆ\‚M:YñRIâ>áÓÁóò] -öÃÃq¯¿ºC`-û(U£K
+AxiEßé«%o´ ƒÍ§D0”Â1pº:úWWx_◊7ÑåW‚A\ë“¬xœBåXeI åÆÒ!FE√f‘¡Í2zây@“-&ÈÃø¯{…‚5sûﬂirÃt «…µ34Nº˝yëMÆï⁄!BH§câM`£åõú…pvvº√“∆ç∏–‚_j=∂’gT‘&ïô{\:â»˚TEa∆ |MJWrIl|√g£ú˛ªoÌH˚„mß∞ˆ@,Âø9∫DC"&µ¶dgvë∆Ô'≤0µ·d‚»’Z˘Nüwƒ◊ i»IÆJ;¸5u;X“a%0DSÆ|e»CÎ)bï—®áôã ÖÍ¢b-˙¡t˜è	+”5ÎzGGXÇÜ¥€K•(bµg”Ñ&ì!"ÄëQ¨"§7:è_gˆ!∆ÔN…‚èpSióXQ:≈˜t≠Q*}6h∑ËÒh.Ìî(∆t¯˝ΩË°6f›(óc’‘@ø7À—E±GHw˝âÇﬂpÌjG˙k’îiÃZ}U„:>…~Ò©5—â¸˝‚æÛZxæSç˛*±T3g∆~ÿ¯À%@Œ€Ñ£[ú)(Ÿ®¡m€c28úLx3(‹.øﬁ4˛#]®◊C¢#À–TE>$÷K`Ú˜hã"∞,D»∆:6$´≠≤‚ æÎE RhJ4˙¸OˆMC#⁄°˚‚Ô‹ÑÜÈ¥ØÔê˝[8?ÿy®qå˜⁄º)¢¸N9/ˆù†’äMìW–K>lÓWZ3πÍ‹¶}ÁïQfıÍ»±ÛâoR*ùÃ–»qçﬂDŸbN€fXΩ1ÇùQ$∆éP(¶ﬂ80ëﬂüÔ»í|Ç1P◊±HÛÿ™__˛©¸ÆIzm˚éÉ0&™nZ—9éK Ii≈I‡–Ó]¸Ùÿ≤•˜∂31ΩNT≈&”ÜeÄ¢ç#Ü`,d”ıΩÒßx∫Î¥8`∫ˆõ)O[#Pijo2µ4‰≈A :Eˇ´íÉ√JÀı[&ÂéÒ6<ƒ"y‚LFÌñá?,¿ıâZã'ËÁ
+∆ÿ)òöÌñZÆVô†˚»∆1qûóU“ÏuÃUÅ<øàÚw_5—ı˙⁄–,íÏ‰<ÏŸuÈ#àYªyxÔc(Ñ˚ÖÕ∂¿˜†ÀÀ‰‘`Ò@_D$KãÀ;yÚˆV=%≠Æ  °HñÌèìΩGß©; _«ôÄ≠¥¿:h

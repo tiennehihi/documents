@@ -1,0 +1,17 @@
+d: diag(
+    6198,
+    1 /* Error */,
+    "All_destructured_elements_are_unused_6198",
+    "All destructured elements are unused.",
+    /*reportsUnnecessary*/
+    true
+  ),
+  All_variables_are_unused: diag(
+    6199,
+    1 /* Error */,
+    "All_variables_are_unused_6199",
+    "All variables are unused.",
+    /*reportsUnnecessary*/
+    true
+  ),
+  Definitions_of_the_following_identifiers_conflict_with_those_in_another_file_Colon_0: diag(6200, 1 /* Error */, "Defi

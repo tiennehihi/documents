@@ -1,0 +1,3 @@
+-class-selector>",
+            "supports-condition": "not <supports-in-parens>|<supports-in-parens> [and <supports-in-parens>]*|<supports-in-parens> [or <supports-in-parens>]*",
+            "supports-in-parens": "( <supports-condition> )|<suppo

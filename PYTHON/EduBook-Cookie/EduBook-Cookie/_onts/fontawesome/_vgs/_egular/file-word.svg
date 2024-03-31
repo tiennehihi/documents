@@ -1,0 +1,25 @@
+  path = combinePaths(currentDirectory, path);
+  return pathComponents(path, getRootLength(path));
+}
+function getPathFromPathComponents(pathComponents2, length2) {
+  if (pathComponents2.length === 0)
+    return "";
+  const root = pathComponents2[0] && ensureTrailingDirectorySeparator(pathComponents2[0]);
+  return root + pathComponents2.slice(1, length2).join(directorySeparator);
+}
+function normalizeSlashes(path) {
+  return path.includes("\\") ? path.replace(backslashRegExp, directorySeparator) : path;
+}
+function reducePathComponents(components) {
+  if (!some(components))
+    return [];
+  const reduced = [components[0]];
+  for (let i = 1; i < components.length; i++) {
+    const component = components[i];
+    if (!component)
+      continue;
+    if (component === ".")
+      continue;
+    if (component === "..") {
+      if (reduced.length > 1) {
+ 

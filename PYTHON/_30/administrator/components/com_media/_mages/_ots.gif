@@ -1,0 +1,6 @@
+{
+  "name": "camelcase-css",
+  "description": "Convert a kebab-cased CSS property into a camelCased DOM property.",
+  "version": "2.0.1",
+  "license": "MIT",
+  "author": "Steven Vac

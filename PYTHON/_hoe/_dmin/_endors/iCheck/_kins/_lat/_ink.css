@@ -1,0 +1,60 @@
+,
+		"Description": [
+			"ALA-LC Romanization, 1997 edition"
+		],
+		"Added": "2009-12-09",
+		"Comments": [
+			"Romanizations recommended by the American Library Association and the Library of Congress, in \"ALA-LC Romanization Tables: Transliteration Schemes for Non-Roman Scripts\" (1997), ISBN 978-0-8444-0940-5."
+		]
+	},
+	{
+		"Type": "variant",
+		"Subtag": "aluku",
+		"Description": [
+			"Aluku dialect",
+			"Boni dialect"
+		],
+		"Added": "2009-09-05",
+		"Prefix": [
+			"djk"
+		],
+		"Comments": [
+			"Aluku dialect of the \"Busi Nenge Tongo\" English-based Creole continuum in Eastern Suriname and Western French Guiana"
+		]
+	},
+	{
+		"Type": "variant",
+		"Subtag": "ao1990",
+		"Description": [
+			"Portuguese Language Orthographic Agreement of 1990 (Acordo Ortográfico da Língua Portuguesa de 1990)"
+		],
+		"Added": "2015-05-06",
+		"Prefix": [
+			"pt",
+			"gl"
+		],
+		"Comments": [
+			"Portuguese orthography conventions established in 1990 but not brought into effect until 2009"
+		]
+	},
+	{
+		"Type": "variant",
+		"Subtag": "aranes",
+		"Description": [
+			"Aranese"
+		],
+		"Added": "2018-04-22",
+		"Prefix": [
+			"oc"
+		],
+		"Comments": [
+			"Occitan variant spoken in the Val d'Aran"
+		]
+	},
+	{
+		"Type": "variant",
+		"Subtag": "arevela",
+		"Description": [
+			"Eastern Armenian"
+		],
+		"Added": 

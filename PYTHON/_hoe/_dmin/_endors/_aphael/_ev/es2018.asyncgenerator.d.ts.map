@@ -1,0 +1,1 @@
+   const spaceStart = this.state.pos;\n    const comments = [];\n    loop: while (this.state.pos < this.length) {\n      const ch = this.input.charCodeAt(this.state.pos);\n      switch (ch) {\n        case charCodes.space:\

@@ -1,0 +1,39 @@
+
+    - 5.9.0
+    - 5.12.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Scale unbalanced flip
+  unicode: f516
+  voted: true
+schlix:
+  changes:
+    - 5.0.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: SCHLIX
+  unicode: f3ea
+  voted: false
+school:
+  aliases:
+    unicodes:
+      composite:
+        - 1f3eb
+      secondary:
+        - 10f549
+  changes:
+    - 5.0.13
+    - 6.0.0-beta1
+    - 6.0.0-b

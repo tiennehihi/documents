@@ -1,0 +1,3 @@
+ not immediately following the declaration."),
+  Multiple_constructor_implementations_are_not_allowed: diag(2392, 1 /* Error */, "Multiple_constructor_implementations_are_not_allowed_2392", "Multiple constructor implementations are not allowed."),
+  Duplicate_function_implementation: diag(2393, 1 /* Error */, "Duplicate_function_implementation_2393", "Duplicate function imple

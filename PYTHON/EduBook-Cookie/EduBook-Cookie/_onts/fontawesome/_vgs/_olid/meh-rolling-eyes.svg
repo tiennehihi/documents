@@ -1,0 +1,19 @@
+oken();
+      while (this.tokens.currentIndex() < nextNonTypeIndex) {
+        this.tokens.removeToken();
+      }
+      this.tokens.removeToken();
+      // We ate a ( token, so we need to process the tokens in between and then the ) token so that
+      // we remain balanced.
+      this.processBalancedCode();
+      this.processToken();
+      return true;
+    }
+    return false;
+  }
+
+  processPossibleTypeRange() {
+    if (this.tokens.currentToken().isType) {
+      this.tokens.removeInitialToken();
+      while (this.tokens.currentToken().isType) {
+        

@@ -1,0 +1,26 @@
+ {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.@{fa-css-prefix}.@{fa-css-prefix}-500px {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.@{fa-css-prefix}.@{fa-css-prefix}-amazon {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.@{fa-css-prefix}.@{fa-css-prefix}-calendar-plus-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-css-prefix}.@{fa-css-prefix}-calendar-plus-o:before { content: @fa-var-calendar-plus; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-calendar-minus-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-css-prefix}.@{fa-css-prefix}-calendar-minus-

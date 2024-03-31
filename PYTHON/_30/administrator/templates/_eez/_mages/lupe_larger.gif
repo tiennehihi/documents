@@ -1,0 +1,12 @@
+se "SequenceExpression":
+      var lastIndex = expr.expressions.length - 1;
+      path.get("expressions").forEach(function (exprPath) {
+        if (exprPath.key === lastIndex) {
+          result = self.explodeExpression(exprPath, ignoreResult);
+        } else {
+          self.explodeExpression(exprPath, true);
+        }
+      });
+      return result;
+    case "LogicalExpression":
+      after 

@@ -1,0 +1,42 @@
+  }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "brands"
+        }
+      ]
+    }
+  },
+  "envelope": {
+    "aliases": {
+      "unicodes": {
+        "composite": [
+          "1f582",
+          "2709",
+          "f003"
+        ],
+        "secondary": [
+          "10f0e0"
+        ]
+      }
+    },
+    "changes": [
+      "2.0.0",
+      "5.0.0",
+      "5.10.1",
+      "5.10.2",
+      "6.0.0-beta1",
+      "6.1.0",
+      "6.2.0",
+      "6.2.1"
+    ],
+    "ligatures": [],
+    "unicode": "f0e0",
+    "label": "Envelope",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1667828915,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L23

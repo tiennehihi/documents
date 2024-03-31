@@ -1,0 +1,24 @@
+import selectorParser from 'postcss-selector-parser'
+import unescape from 'postcss-selector-parser/dist/util/unesc'
+import escapeClassName from '../util/escapeClassName'
+import prefixSelector from '../util/prefixSelector'
+import { movePseudos } from './pseudoElements'
+import { splitAtTopLevelOnly } from './splitAtTopLevelOnly'
+
+/** @typedef {import('postcss-selector-parser').Root} Root */
+/** @typedef {import('postcss-selector-parser').Selector} Selector */
+/** @typedef {import('postcss-selector-parser').Pseudo} Pseudo */
+/** @typedef {import('postcss-selector-parser').Node} Node */
+
+/** @typedef {{format: string, respectPrefix: boolean}[]} RawFormats */
+/** @typedef {import('postcss-selector-parser').Root} ParsedFormats */
+/** @typedef {RawFormats | ParsedFormats} AcceptedFormats */
+
+let MERGE = ':merge'
+
+/**
+ * @param {RawFormats} formats
+ * @param {{context: any, candidate: string, base: string | null}} options
+ * @returns {ParsedFormats | null}
+ */
+expo

@@ -1,0 +1,34 @@
+64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V368c0-8.8-7.2-16-16-16H464z"
+        }
+      }
+    },
+    "familyStylesByLicense": {
+      "free": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "school-lock": {
+    "changes": [
+      "6.1.0",
+      "6.2.0",
+      "6.2.1"
+    ],
+    "ligatures": [],
+    "unicode": "e56f",
+    "label": "School Lock",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1667828915,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 512\"><path d=\"M302.2 5.4c10.7-7.2 24.8-7.2 35.5 0L473.7 96H592c26.5 0 48 21.5 48 48V272c0-61.9-50.1-112-112-112s-112 50.1-112 112v24.6c-19.1 11.1-32 31.7-32 55.4H320.3l-.3 0c-35.3 0-64 28.7-64 64v96h64v0H48c-26.5 0-48-21.5-48-48V144c0-26.5 21.5-48 48-48H166.3L302.2 5.4zM80 208v64c0 8.8 7.2 16 16 16h32c8.8 0 16-

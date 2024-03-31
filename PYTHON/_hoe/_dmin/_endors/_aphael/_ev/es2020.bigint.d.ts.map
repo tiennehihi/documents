@@ -1,0 +1,1 @@
+ YieldExpression cannot be true if there is no argument")}),{type:"boolean"})),default:!1},argument:{optional:!0,validate:(0,_utils.assertNodeType)("Expression")}}}),defineType("AwaitExpression",{builder:["

@@ -1,0 +1,35 @@
+Mảng 1:
+[[1 2 3 0]
+ [4 5 6 0]
+ [7 8 9 0]]
+Mảng 2:
+[[9 8 7 1]
+ [6 5 4 1]
+ [4 3 2 1]]
+Cộng hai mảng:
+[[10 10 10  1]
+ [10 10 10  1]
+ [11 11 11  1]]
+Trừ hai mảng:
+[[-8 -6 -4 -1]
+ [-2  0  2 -1]
+ [ 3  5  7 -1]]
+Nhân hai mảng:
+[[ 9 16 21  0]
+ [24 25 24  0]
+ [28 24 18  0]]
+Mảng nối theo chiều dọc là:[[1 2 3 0]
+ [4 5 6 0]
+ [7 8 9 0]
+ [9 8 7 1]
+ [6 5 4 1]
+ [4 3 2 1]]
+Mảng nối theo chiều ngang là:[[1 2 3 0 9 8 7 1]
+ [4 5 6 0 6 5 4 1]
+ [7 8 9 0 4 3 2 1]]
+Min của mảng 1 là:0
+Max của mảng 1 là: 9
+Sum của mảng 1 là: 45
+Min của các dòng của mảng 1 là:[1 2 3 0]
+Max của từng cột của mảng 1 là:[3 6 9]
+Sum của từng dòng trong mảng 1 là: [12 15 18  0]

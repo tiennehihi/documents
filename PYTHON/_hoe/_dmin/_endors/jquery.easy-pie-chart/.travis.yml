@@ -1,0 +1,5 @@
+'use strict';
+module.exports = function generate_custom(it, $keyword, $ruleType) {
+  var out = ' ';
+  var $lvl = it.level;
+  var 

@@ -1,0 +1,17 @@
+    ]
+    }
+  },
+  "connectdevelop": {
+    "changes": [
+      "4.3.0",
+      "5.0.0"
+    ],
+    "ligatures": [],
+    "unicode": "f20e",
+    "label": "Connect Develop",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "brands": {
+          "lastModified": 1660014462,
+          "raw": "<svg xmlns

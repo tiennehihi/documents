@@ -1,0 +1,14 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * TemplateTag transformer that trims whitespace on the end result of a tagged template
+ * @param  {String} side = '' - The side of the string to trim. Can be 'start' or 'end' (alternatively 'left' or 'right')
+ * @return {Object}           - a TemplateTag transformer
+ */
+var trimResultTransformer = function trimResultTransformer() {
+  var side = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  return {
+    onEndResult: function onEndResult(endRe

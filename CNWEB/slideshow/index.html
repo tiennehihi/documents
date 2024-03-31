@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link rel="icon" href="" type="image/x-icon">
+        <link rel="stylesheet" href="./style.css">
+        <title>Document</title>
+    </head>
+    <body style="height: 2000px;">
+        <div id="slide">
+            <div id="slider"></div>
+            <div class="btn">
+                <input type="button" value="back" onclick="back()" class="back" id="back">
+                <input type="button" value="play" onclick="play()" class="play" id="play">
+                <input type="button" value="stop" onclick="stop()" class="stop" id="stop">
+                <input type="button" value="next" onclick="next()" class="next" id="next">
+            </div>
+        </div>
+        
+        <!-- Bài 2 -->
+        <!-- https://heroicons.com/ -->
+        <h1 class="title-2" style="margin-top: 120px;">Bài 2: Search</h1>
+        <!-- Modal -->
+        <nav class="d-flex align-items-center ">
+            <img width="150px" src="https://keenanpayne.com/images/posts/web-development/css-tricks-social.png" alt="">
+            <ul class="d-flex list-unstyled gap-3 m-0 flex-grow-1">
+                <li><a href="">Articles</a></li>
+                <li><a href="">Videos</a></li>
+                <li><a href="">Almanac</a></li>
+                <li><a href="">Newsletter</a></li>
+            </ul>
+            <button id="search-btn" class="bg-white border-0 ">
+                <svg width="30px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m15.75 15.75-2.489-2.489m0 0a3.375 3.375 0 1 0-4.773-4.773 3.375 3.375 0 0 0 4.774 4.774ZM21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+            </button>
+        </nav>
+    
+        <div id="search-modal" class="modal modal-lg">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <svg width="26px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="modal__btn-search">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>                          
+                        <input type="text" class="modal-search-input" placeholder="Search...">
+                        <button type="button" class="btn-close" id="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modal-body">
+                        <div class="modal-body__article">
+                            <header class="modal-body__header">
+                                <h2 class="modal-body__header-title">Showing popular results</h2>
+                                <ul class="modal-body__header-list">
+                                    <li class="modal-body__header-item">Relevance</li>
+                                    <li class="modal-body__header-item">Newest</li>
+                                    <li class="modal-body__header-item">Oldest</li>
+                                </ul>
+                            </header>
+                            <div class="modal-body__content">
+                                <div class="modal-body__content-item">
+                                    <span class="modal-body__content-item-title">Loading Web Fonts with the Web Font Loader</span>
+                                    <br>
+                                    <span class="modal-body__content-item-desc">loading-web-fonts-with-the-web-font-loader</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body__article-filter">
+                            <h2 class="modal-body__article-filter-title">Filter Options</h2>
+                            <div class="modal-body__article-filter-1-postTypes">
+                                <h3 class="modal-body__article-filter-sub-heading">Post Types</h3>
+                                <div class="modal-body__article-filter-content">
+                                    <div>
+                                        <input type="checkbox">
+                                        <label for="">Post (6319)</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox">
+                                        <label for="">Post (333)</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox">
+                                        <label for="">Post (222)</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox">
+                                        <label for="">Post (111)</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox">
+                                        <label for="">Post (000)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </body>
+    <script src="./main.js"></script>
+    <!-- <script src="./test.js"></script> -->
+</html>

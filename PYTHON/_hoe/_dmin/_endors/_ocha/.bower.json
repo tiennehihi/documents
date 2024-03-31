@@ -1,0 +1,14 @@
+sions, moduleName, loader, state);
+  } else {
+    return tryLoadModuleUsingRootDirs(extensions, moduleName, containingDirectory, loader, state);
+  }
+}
+function tryLoadModuleUsingPathsIfEligible(extensions, moduleName, loader, state) {
+  var _a;
+  const { baseUrl, paths, configFile } = state.compilerOptions;
+  if (paths && !pathIsRelative(moduleName)) {
+    if (state.traceEnabled) {
+      if (baseUrl) {
+        trace(state.host, Diagnostics.baseUrl_option_is_set_to_0_using_this_value_to_resolve_non_relative_module_name_1, baseUrl, moduleName);
+      }
+      trace(state.host, Diagnostics.path

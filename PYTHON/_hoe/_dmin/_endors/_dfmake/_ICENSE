@@ -1,0 +1,18 @@
+onentName = getComponentNameFromType(ctor) || 'Component';
+
+      if (!didWarnAboutUninitializedState.has(componentName)) {
+        didWarnAboutUninitializedState.add(componentName);
+
+        error('`%s` uses `getDerivedStateFromProps` but its initial state is ' + '%s. This is not recommended. Instead, define the initial state by ' + 'assigning an object to `this.state` in the constructor of `%s`. ' + 'This ensures that `getDerivedStateFromProps` arguments have a consistent shape.', componentName, instance.state === null ? 'null' : 'undefined', componentName);
+      }
+    } // If new component APIs are defined, "unsafe" lifecycles won't be called.
+    // Warn about these lifecycles if they are present.
+    // Don't warn about react-lifecycles-compat polyfilled methods though.
+
+
+    if (typeof ctor.getDerivedStateFromProps === 'function' || typeof instance.getSnapshotBeforeUpdate === 'function') {
+      var foundWillMountName = null;
+      var foundWillReceivePropsName = null;
+      var foundWillUpdateName = null;
+
+      if (typeof instance.componentWillMount 

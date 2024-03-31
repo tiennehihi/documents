@@ -1,0 +1,19 @@
+# jiti
+
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![bundle][bundle-src]][bundle-href]
+[![License][license-src]][license-href]
+
+Runtime Typescript and ESM support for Node.js.
+
+> [!IMPORTANT]
+> This is the support branch for jiti v1. Check out [jiti/main](https://github.com/unjs/jiti/tree/main) for the latest version and [unjs/jiti#174](https://github.com/unjs/jiti/issues/174) for the roadmap.
+
+## Features
+
+- Seamless typescript and ESM syntax support
+- Seamless interoperability between ESM and CommonJS
+- Synchronous API to replace `require`
+- Super slim and zero dependency
+- Smart syntax detection to avoid extra tran

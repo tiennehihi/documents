@@ -1,0 +1,10 @@
+,
+  getModifiers: () => getModifiers,
+  getModuleInstanceState: () => getModuleInstanceState,
+  getModuleNameStringLiteralAt: () => getModuleNameStringLiteralAt,
+  getModuleSpecifierEndingPreference: () => getModuleSpecifierEndingPreference,
+  getModuleSpecifierResolverHost: () => getModuleSpecifierResolverHost,
+  getNameForExportedSymbol: () => getNameForExportedSymbol,
+  getNameFromImportAttribute: () => getNameFromImportAttribute,
+  getNameFromIndexInfo: () => getNameFromIndexInfo,
+  getNameFromPropertyName: (

@@ -1,0 +1,11 @@
+     * ```
+     *
+     * If `options` is a string, then it specifies the encoding:
+     *
+     * ```js
+     * import { appendFile } from 'node:fs';
+     *
+     * appendFile('message.txt', 'data to append', 'utf8', callback);
+     * ```
+     *
+     * The `path` may be specified as a numeric file descriptor that has been o

@@ -1,0 +1,49 @@
+    - 5.5.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Cloud with Rain
+  unicode: f73d
+  voted: false
+cloud-showers-heavy:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f740
+  changes:
+    - 5.5.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Cloud with Heavy Showers
+  unicode: f740
+  voted: false
+cloud-showers-water:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Cloud Showers-water
+  unicode: e4e4
+  voted: false
+cloud-sun:
+  aliases:
+   

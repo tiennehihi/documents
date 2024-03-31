@@ -1,0 +1,192 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.JsonDecoder = void 0;
+const decodeUtf8_1 = require("../../util/buffers/utf8/decodeUtf8");
+const Reader_1 = require("../../util/buffers/Reader");
+const fromBase64Bin_1 = require("../../util/base64/fromBase64Bin");
+const REGEX_REPLACE_ESCAPED_CHARS = /\\(b|f|n|r|t|"|\/|\\)/g;
+const escapedCharReplacer = (char) => {
+    switch (char) {
+        case '\\b':
+            return '\b';
+        case '\\f':
+            return '\f';
+        case '\\n':
+            return '\n';
+        case '\\r':
+            return '\r';
+        case '\\t':
+            return '\t';
+        case '\\"':
+            return '"';
+        case '\\/':
+            return '/';
+        case '\\\\':
+            return '\\';
+    }
+    return char;
+};
+// Starts with "data:application/octet-stream;base64," - 64 61 74 61 3a 61 70 70 6c 69 63 61 74 69 6f 6e 2f 6f 63 74 65 74 2d 73 74 72 65 61 6d 3b 62 61 73 65 36 34 2c
+const hasBinaryPrefix = (u8, x) => u8[x] === 0x64 &&
+    u8[x + 1] === 0x61 &&
+    u8[x + 2] === 0x74 &&
+    u8[x + 3] === 0x61 &&
+    u8[x + 4] === 0x3a &&
+    u8[x + 5] === 0x61 &&
+    u8[x + 6] === 0x70 &&
+    u8[x + 7] === 0x70 &&
+    u8[x + 8] === 0x6c &&
+    u8[x + 9] === 0x69 &&
+    u8[x + 10] === 0x63 &&
+    u8[x + 11] === 0x61 &&
+    u8[x + 12] === 0x74 &&
+    u8[x + 13] === 0x69 &&
+    u8[x + 14] === 0x6f &&
+    u8[x + 15] === 0x6e &&
+    u8[x + 16] === 0x2f &&
+    u8[x + 17] === 0x6f &&
+    u8[x + 18] === 0x63 &&
+    u8[x + 19] === 0x74 &&
+    u8[x + 20] === 0x65 &&
+    u8[x + 21] === 0x74 &&
+    u8[x + 22] === 0x2d &&
+    u8[x + 23] === 0x73 &&
+    u8[x + 24] === 0x74 &&
+    u8[x + 25] === 0x72 &&
+    u8[x + 26] === 0x65 &&
+    u8[x + 27] === 0x61 &&
+    u8[x + 28] === 0x6d &&
+    u8[x + 29] === 0x3b &&
+    u8[x + 30] === 0x62 &&
+    u8[x + 31] === 0x61 &&
+    u8[x + 32] === 0x73 &&
+    u8[x + 33] === 0x65 &&
+    u8[x + 34] === 0x36 &&
+    u8[x + 35] === 0x34 &&
+    u8[x + 36] === 0x2c;
+const findEndingQuote = (uint8, x) => {
+    const len = uint8.length;
+    let char = uint8[x];
+    let prev = 0;
+    while (x < len) {
+        if (char === 34 && prev !== 92)
+            break;
+        if (char === 92 && prev === 92)
+            prev = 0;
+        else
+            prev = char;
+        char = uint8[++x];
+    }
+    if (x === len)
+        throw new Error('Invalid JSON');
+    return x;
+};
+const fromCharCode = String.fromCharCode;
+const readShortUtf8StrAndUnescape = (reader) => {
+    const buf = reader.uint8;
+    const len = buf.length;
+    const points = [];
+    let x = reader.x;
+    let prev = 0;
+    while (x < len) {
+        let code = buf[x++];
+        if ((code & 0x80) === 0) {
+            if (prev === 92) {
+                switch (code) {
+                    case 98: // \b
+                        code = 8;
+                        break;
+                    case 102: // \f
+                        code = 12;
+                        break;
+                    case 110: // \n
+                        code = 10;
+                        break;
+                    case 114: // \r
+                        code = 13;
+                        break;
+                    case 116: // \t
+                        code = 9;
+                        break;
+                    case 34: // \"
+                        code = 34;
+                        break;
+                    case 47: // \/
+                        code = 47;
+                        break;
+                    case 92: // \\
+                        code = 92;
+                        break;
+                    default:
+                        throw new Error('Invalid JSON');
+                }
+                prev = 0;
+            }
+            else {
+                if (code === 34)
+                    break;
+                prev = code;
+                if (prev === 92)
+                    continue;
+            }
+        }
+        else {
+            const octet2 = buf[x++] & 0x3f;
+            if ((code & 0xe0) === 0xc0) {
+                code = ((code & 0x1f) << 6) | octet2;
+            }
+            else {
+                const octet3 = buf[x++] & 0x3f;
+                if ((code & 0xf0) === 0xe0) {
+                    code = ((code & 0x1f) << 12) | (octet2 << 6) | octet3;
+                }
+                else {
+                    if ((code & 0xf8) === 0xf0) {
+                        const octet4 = buf[x++] & 0x3f;
+                        let unit = ((code & 0x07) << 0x12) | (octet2 << 0x0c) | (octet3 << 0x06) | octet4;
+                        if (unit > 0xffff) {
+                            unit -= 0x10000;
+                            const unit0 = ((unit >>> 10) & 0x3ff) | 0xd800;
+                            unit = 0xdc00 | (unit & 0x3ff);
+                            points.push(unit0);
+                            code = unit;
+                        }
+                        else {
+                            code = unit;
+                        }
+                    }
+                }
+            }
+        }
+        points.push(code);
+    }
+    reader.x = x;
+    return fromCharCode.apply(String, points);
+};
+class JsonDecoder {
+    constructor() {
+        this.reader = new Reader_1.Reader();
+    }
+    read(uint8) {
+        this.reader.reset(uint8);
+        return this.readAny();
+    }
+    readAny() {
+        this.skipWhitespace();
+        const reader = this.reader;
+        const x = reader.x;
+        const uint8 = reader.uint8;
+        const char = uint8[x];
+        switch (char) {
+            case 34: // "
+                return uint8[x + 1] === 0x64 // d
+                    ? this.tryReadBin() || this.readStr()
+                    : this.readStr();
+            case 91: // [
+                return this.readArr();
+            case 102: // f
+                return this.readFalse();
+            case 110: // n
+                return this.readNull();
+            case 116: // t
+             

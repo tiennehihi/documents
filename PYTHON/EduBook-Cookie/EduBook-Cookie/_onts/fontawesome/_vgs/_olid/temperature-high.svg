@@ -1,0 +1,20 @@
+Annotation | null;
+}
+interface TSPropertySignature extends BaseNode {
+    type: "TSPropertySignature";
+    key: Expression;
+    typeAnnotation?: TSTypeAnnotation | null;
+    computed?: boolean;
+    kind: "get" | "set";
+    optional?: boolean | null;
+    readonly?: boolean | null;
+}
+interface TSMethodSignature extends BaseNode {
+    type: "TSMethodSignature";
+    key: Expression;
+    typeParameters?: TSTypeParameterDeclaration | null;
+    parameters: Array<ArrayPattern | Identifier | ObjectPattern | RestElement>;
+    typeAnnotation?: TSTypeAnnotation | null;
+    computed?: boolean;
+    kind: "method" | "get" | "set";
+    optional?: boolean | null

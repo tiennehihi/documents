@@ -1,0 +1,27 @@
+				return finalCallback(null, stats);
+								}
+							);
+						});
+					});
+				});
+			});
+		};
+
+		const run = () => {
+			this.hooks.beforeRun.callAsync(this, err => {
+				if (err) return finalCallback(err);
+
+				this.hooks.run.callAsync(this, err => {
+					if (err) return finalCallback(err);
+
+					this.readRecords(err => {
+						if (err) return finalCallback(err);
+
+						this.compile(onCompiled);
+					});
+				});
+			});
+		};
+
+		if (this.idle) {
+		

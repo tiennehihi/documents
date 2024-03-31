@@ -1,0 +1,1 @@
+ull || shallowEqual(node, opts);\n}\nexport function isObjectExpression(\n  node: t.Node | null | undefined,\n  opts?: Opts<t.ObjectExpression> | null,\n): node is t.ObjectExpression {\n  if (!node) return false;\n\n  if (node.type !== \"ObjectExpression\") return false;\n\n  return opts == null 

@@ -1,0 +1,24 @@
+{
+  "name": "optionator",
+  "version": "0.8.3",
+  "author": "George Zahariev <z@georgezahariev.com>",
+  "description": "option parsing and help generation",
+  "homepage": "https://github.com/gkz/optionator",
+  "keywords": [
+    "options",
+    "flags",
+    "option parsing",
+    "cli"
+  ],
+  "files": [
+    "lib",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./lib/",
+  "bugs": "https://github.com/gkz/optionator/issues",
+  "license": "MIT",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "repository"

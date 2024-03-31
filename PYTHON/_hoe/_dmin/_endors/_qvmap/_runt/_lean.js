@@ -1,0 +1,3 @@
+{
+  "Commands:": "Comandi:",
+  "Options:": "Opzi

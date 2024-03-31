@@ -1,0 +1,19 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = generate;
+var _sourceMap = require("./source-map.js");
+var _printer = require("./printer.js");
+function normalizeOptions(code, opts) {
+  var _opts$recordAndTupleS;
+  const format = {
+    auxiliaryCommentBefore: opts.auxiliaryCommentBefore,
+    auxiliaryCommentAfter: opts.auxiliaryCommentAfter,
+    shouldPrintComment: opts.shouldPrintComment,
+    retainLines: opts.retainLines,
+    retainFunctionParens: opts.retainFunctionParens,
+    comments: opts.comments == null || opts.comments,
+    compact: opts.compact,
+    mi

@@ -1,0 +1,2 @@
+const set = require('regenerate')();
+set.addRang

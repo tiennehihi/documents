@@ -1,0 +1,23 @@
+import { WorkboxPlugin } from 'workbox-core/types.js';
+import { Strategy, StrategyOptions } from 'workbox-strategies/Strategy.js';
+import { StrategyHandler } from 'workbox-strategies/StrategyHandler.js';
+import './_version.js';
+interface PrecacheStrategyOptions extends StrategyOptions {
+    fallbackToNetwork?: boolean;
+}
+/**
+ * A {@link workbox-strategies.Strategy} implementation
+ * specifically designed to work with
+ * {@link workbox-precaching.PrecacheController}
+ * to both cache and fetch precached assets.
+ *
+ * Note: an instance of this class is created automatically when creating a
+ * `PrecacheController`; it's generally not necessary to create this yourself.
+ *
+ * @extends workbox-strategies.Strategy
+ * @memberof workbox-precaching
+ */
+declare class PrecacheStrategy extends Strategy {
+    private readonly _fallbackToNetwork;
+    static readonly defaultPrecacheCacheabilityPlugin: WorkboxPlugin;
+    static readonly copyRedirectedCacheableRespon

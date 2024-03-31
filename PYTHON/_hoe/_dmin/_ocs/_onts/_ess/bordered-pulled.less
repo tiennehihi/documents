@@ -1,0 +1,13 @@
+import { Linter } from "../index";
+
+export interface NodeJSAndCommonJS extends Linter.RulesRecord {
+    /**
+     * Rule to require `return` statements after callbacks.
+     *
+     * @since 1.0.0-rc-1
+     * @see https://eslint.org/docs/rules/callback-return
+     */
+    "callback-return": Linter.RuleEntry<[string[]]>;
+
+    /**
+  

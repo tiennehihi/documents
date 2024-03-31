@@ -1,0 +1,23 @@
+/**
+ * @fileoverview Enforce ES5 or ES6 class for React Components
+ * @author Dan Hamilton
+ */
+
+'use strict';
+
+const componentUtil = require('../util/componentUtil');
+const docsUrl = require('../util/docsUrl');
+const report = require('../util/report');
+
+// ------------------------------------------------------------------------------
+// Rule Definition
+// ------------------------------------------------------------------------------
+
+const messages = {
+  shouldUseES6Class: 'Component should use es6 class instead of createClass',
+  shouldUseCreateClass: 'Component should use createClass instead of es6 class',
+};
+
+module.exports = {
+  meta: {
+   

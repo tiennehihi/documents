@@ -1,0 +1,2 @@
+/* big.js v5.2.2 https://github.com/MikeMcl/big.js/LICENCE */
+!function(e){"use strict";var r,i=20,s=1,P=1e6,o=-7,f=21,c="[big.js] ",u=c+"Invalid ",b=u+"decimal places",h=u+"rounding mode",x=c+"Division by zero",l={},D=void 0,a=/^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i;function R(e,r,t,n){var i=e.c,s=e.e+r+1;if(s<i.length){if(1===t)n=5<=i[s];else if(2===t)n=5<i[s]||

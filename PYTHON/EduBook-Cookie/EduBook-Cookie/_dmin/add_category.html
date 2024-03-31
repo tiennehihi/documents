@@ -1,0 +1,87 @@
+dLoopState = convertedLoopState;
+    convertedLoopState = void 0;
+    const ancestorFacts = enterSubtree(32670 /* FunctionExcludes */, 65 /* FunctionIncludes */);
+    let updated;
+    const parameters = visitParameterList(node.parameters, visitor, context);
+    const body = transformFunctionBody(node);
+    if (node.kind === 177 /* GetAccessor */) {
+      updated = factory2.updateGetAccessorDeclaration(node, node.modifiers, node.name, parameters, node.type, body);
+    } else {
+      updated = factory2.updateSetAccessorDeclaration(node, node.modifiers, node.name, parameters, body);
+    }
+    exitSubtree(ancestorFacts, 229376 /* FunctionSubtreeExcludes */, 0 /* None */);
+    convertedLoopState = savedConvertedLoopState;
+    return updated;
+  }
+  function visitShorthandPropertyAssignment(node) {
+    return setTextRange(
+      factory2.createPropertyAssignment(
+        node.name,
+        visitIdentifier(factory2.cloneNode(node.name))
+      ),
+      /*location*/
+      node
+    );
+  }
+  function visitComputedPropertyName(node) {
+    return visitEachChild(node, visitor, context);
+  }
+  function visitYieldExpression(node) {
+    return visitEachChild(node, visitor, context);
+  }
+  function visitArrayLiteralExpression(node) {
+    if (some(node.elements, isSpreadElement)) {
+      return transformAndSpreadElements(
+        node.elements,
+        /*isArgumentList*/
+        false,
+        !!node.multiLine,
+        /*hasTrailingComma*/
+        !!node.elements.hasTrailingComma
+      );
+    }
+    return visitEachChild(node, visitor, context);
+  }
+  function visitCallExpression(node) {
+    if (getInternalEmitFlags(node) & 1 /* TypeScriptClassWrapper */) {
+      return visitTypeScriptClassWrapper(node);
+    }
+    const expression = skipOuterExpressions(node.expression);
+    if (expression.kind === 108 /* SuperKeyword */ || isSuperProperty(expression) || some(node.arguments, isSpreadElement)) {
+      return visitCallExpressionWithPotentialCapturedThisAssignment(
+        node,
+        /*assignToCapturedThis*/
+        true
+      );
+    }
+    return factory2.updateCallExpression(
+      node,
+      Debug.checkDefined(visitNode(node.expression, callExpressionVisitor, isExpression)),
+      /*typeArguments*/
+      void 0,
+      visitNodes2(node.arguments, visitor, isExpression)
+    );
+  }
+  function visitTypeScriptClassWrapper(node) {
+    const body = cast(cast(skipOuterExpressions(node.expression), isArrowFunction).body, isBlock);
+    const isVariableStatementWithInitializer = (stmt) => isVariableStatement(stmt) && !!first(stmt.declarationList.declarations).initializer;
+    const savedConvertedLoopState = convertedLoopState;
+    convertedLoopState = void 0;
+    const bodyStatements = visitNodes2(body.statements, classWrapperStatementVisitor, isStatement);
+    convertedLoopState = savedConvertedLoopState;
+    const classStatements = filter(bodyStatements, isVariableStatementWithInitializer);
+    const remainingStatements = filter(bodyStatements, (stmt) => !isVariableStatementWithInitializer(stmt));
+    const varStatement = cast(first(classStatements), isVariableStatement);
+    const variable = varStatement.declarationList.declarations[0];
+    const initializer = skipOuterExpressions(variable.initializer);
+    let aliasAssignment = tryCast(initializer, isAssignmentExpression);
+    if (!aliasAssignment && isBinaryExpression(initializer) && initializer.operatorToken.kind === 28 /* CommaToken */) {
+      aliasAssignment = tryCast(initializer.left, isAssignmentExpression);
+    }
+    const call = cast(aliasAssignment ? skipOuterExpressions(aliasAssignment.right) : initializer, isCallExpression);
+    const func = cast(skipOuterExpressions(call.expression), isFunctionExpression);
+    const funcStatements = func.body.statements;
+    let classBodyStart = 0;
+    let classBodyEnd = -1;
+    const statements = [];
+    if (aliasAssignmen

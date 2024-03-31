@@ -1,0 +1,14 @@
+ithub.com/rollup/rollup/pull/3757): Fix api docs loadconfigfile (@maxwell8888)
+- [#3762](https://github.com/rollup/rollup/pull/3762): Handle line-comments when removing line-breaks to prevent ASI (@lukastaegert)
+
+## 2.26.9
+
+_2020-09-01_
+
+### Bug Fixes
+
+- Add regular expression support to watch include/exclude types (#3754)
+
+### Pull Requests
+
+- [#3754](https://github.com/rollup/rollup/pull/3754): Add RegExp to the include and exclude fields of the Watcher

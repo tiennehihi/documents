@@ -1,0 +1,13 @@
+var consumeNumber = require('../../tokenizer/utils').consumeNumber;
+var TYPE = require('../../tokenizer').TYPE;
+
+var PERCENTAGE = TYPE.Percentage;
+
+module.exports = {
+    name: 'Percentage',
+    structure: {
+        value: String
+    },
+    parse: function() {
+        var start = this.scanner.tokenStart;
+        var 

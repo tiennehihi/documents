@@ -1,0 +1,13 @@
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var module$1 = require('module');
+var url = require('url');
+var path = require('path');
+
+/**
+ * @fileoverview Universal module importer
+ */
+
+//-----------------------------------------------------------------

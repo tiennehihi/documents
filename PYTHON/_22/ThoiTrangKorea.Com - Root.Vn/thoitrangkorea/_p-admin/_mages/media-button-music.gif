@@ -1,0 +1,10 @@
+/**
+ * Javascript implementation of basic PEM (Privacy Enhanced Mail) algorithms.
+ *
+ * See: RFC 1421.
+ *
+ * @author Dave Longley
+ *
+ * Copyright (c) 2013-2014 Digital Bazaar, Inc.
+ *
+ * A Forge PEM object

@@ -1,0 +1,18 @@
+renceNode(node, typeName, typeArguments) {
+    return node.typeName !== typeName || node.typeArguments !== typeArguments ? update(createTypeReferenceNode(typeName, typeArguments), node) : node;
+  }
+  function createFunctionTypeNode(typeParameters, parameters, type) {
+    const node = createBaseDeclaration(184 /* FunctionType */);
+    node.typeParameters = asNodeArray(typeParameters);
+    node.parameters = asNodeArray(parameters);
+    node.type = type;
+    node.transformFlags = 1 /* ContainsTypeScript */;
+    node.modifiers = void 0;
+    node.jsDoc = void 0;
+    node.locals = void 0;
+    node.nextContainer = void 0;
+    node.typeArguments = void 0;
+    return node;
+  }
+  function updateFunctionTypeNode(node, typeParameters, parameters, type) {
+    return node.typeParameters !== typeParameters || node.parameters !== parameters || node.type !== type ? finishUpdateFu

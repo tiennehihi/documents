@@ -1,0 +1,3 @@
+/**
+Returns the type that is wrapped inside a `Promise` type.
+If the type is a nested Promise, it is unwrapped recursively un

@@ -1,0 +1,43 @@
+<a name="eslint-plugin-flowtype"></a>
+# eslint-plugin-flowtype
+
+[![NPM version](http://img.shields.io/npm/v/eslint-plugin-flowtype.svg?style=flat-square)](https://www.npmjs.org/package/eslint-plugin-flowtype)
+[![Travis build status](http://img.shields.io/travis/gajus/eslint-plugin-flowtype/master.svg?style=flat-square)](https://travis-ci.com/github/gajus/eslint-plugin-flowtype)
+[![js-canonical-style](https://img.shields.io/badge/code%20style-canonical-blue.svg?style=flat-square)](https://github.com/gajus/canonical)
+
+[Flow type](http://flowtype.org/) linting rules for ESLint.
+
+* [eslint-plugin-flowtype](#eslint-plugin-flowtype)
+    * [Installation](#eslint-plugin-flowtype-installation)
+    * [Configuration](#eslint-plugin-flowtype-configuration)
+        * [Shareable configurations](#eslint-plugin-flowtype-configuration-shareable-configurations)
+        * [Community maintained configurations](#eslint-plugin-flowtype-configuration-community-maintained-configurations)
+    * [Settings](#eslint-plugin-flowtype-settings)
+        * [`onlyFilesWithFlowAnnotation`](#eslint-plugin-flowtype-settings-onlyfileswithflowannotation)
+    * [Rules](#eslint-plugin-flowtype-rules)
+        * [`array-style-complex-type`](#eslint-plugin-flowtype-rules-array-style-complex-type)
+        * [`array-style-simple-type`](#eslint-plugin-flowtype-rules-array-style-simple-type)
+        * [`arrow-parens`](#eslint-plugin-flowtype-rules-arrow-parens)
+        * [`boolean-style`](#eslint-plugin-flowtype-rules-boolean-style)
+        * [`define-flow-type`](#eslint-plugin-flowtype-rules-define-flow-type)
+        * [`delimiter-dangle`](#eslint-plugin-flowtype-rules-delimiter-dangle)
+        * [`enforce-line-break`](#eslint-plugin-flowtype-rules-enforce-line-break)
+        * [`generic-spacing`](#eslint-plugin-flowtype-rules-generic-spacing)
+        * [`interface-id-match`](#eslint-plugin-flowtype-rules-interface-id-match)
+        * [`newline-after-flow-annotation`](#eslint-plugin-flowtype-rules-newline-after-flow-annotation)
+        * [`no-dupe-keys`](#eslint-plugin-flowtype-rules-no-dupe-keys)
+        * [`no-duplicate-type-union-intersection-members`](#eslint-plugin-flowtype-rules-no-duplicate-type-union-intersection-members)
+        * [`no-existential-type`](#eslint-plugin-flowtype-rules-no-existential-type)
+        * [`no-flow-fix-me-comments`](#eslint-plugin-flowtype-rules-no-flow-fix-me-comments)
+        * [`no-internal-flow-type`](#eslint-plugin-flowtype-rules-no-internal-flow-type)
+        * [`no-mixed`](#eslint-plugin-flowtype-rules-no-mixed)
+        * [`no-mutable-array`](#eslint-plugin-flowtype-rules-no-mutable-array)
+        * [`no-primitive-constructor-types`](#eslint-plugin-flowtype-rules-no-primitive-constructor-types)
+        * [`no-types-missing-file-annotation`](#eslint-plugin-flowtype-rules-no-types-missing-file-annotation)
+        * [`no-unused-expressions`](#eslint-plugin-flowtype-rules-no-unused-expressions)
+        * [`no-weak-types`](#eslint-plugin-flowtype-rules-no-weak-types)
+        * [`object-type-curly-spacing`](#eslint-plugin-flowtype-rules-object-type-curly-spacing)
+        * [`object-type-delimiter`](#eslint-plugin-flowtype-rules-object-type-delimiter)
+        * [`quotes`](#eslint-plugin-flowtype-rules-quotes)
+        * [`require-compound-type-alias`](#eslint-plugin-flowtype-rules-require-compound-type-alias)
+        * [`requ

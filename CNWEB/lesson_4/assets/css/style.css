@@ -1,0 +1,39 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.app {
+    overflow: hidden;
+}
+
+.row .box-purple,
+.row .box-yellow {
+    height: 100px;
+}
+
+.row .box-purple {
+    background-color: purple;
+}
+
+.row .box-yellow {
+    background-color: yellow;
+}
+
+.row .box {
+    height: 300px;
+    border: 2px solid #000;
+    width: calc((100% / 3) - 16px);
+    margin-bottom: 32px;
+}
+
+.box-head,
+.box-body {
+    display: flex;
+    justify-content: space-between;
+}
+
+.box-head {
+    margin-bottom: 24px;
+}

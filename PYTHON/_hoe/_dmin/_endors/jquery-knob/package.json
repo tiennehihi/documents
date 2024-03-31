@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const codegen_1 = require("ajv/dist/compile/codegen");
+const transform = {
+    trimStart: (s) => s.trimStart(),
+    trimEnd: (s) => s.trimEnd(),
+    trimLeft: (s) => s.trimStart(),
+    trimRight: (s) => s.trimEnd(),
+    trim: (s) => s.trim(),
+    toLowerCase: (s) => s.toLowerCase(),
+    toUpperCase: (s) => s.toUpperCase(),
+    toEnumCase: (s, cfg) => (cfg === null || cfg === void 0 ? void 0 : cfg.hash[configKey(s)]) || s,
+};
+const getDef = Object.assign(_getDef, { transform });
+function _getDef() {
+    retu

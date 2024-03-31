@@ -1,0 +1,179 @@
+@media (max-width: 280px) {
+    .playlist,
+    .dashboard {
+        max-width: 90%;
+        height: 75vh;
+        top: 55%;
+        padding: 0;
+    }
+    .dashboard {
+        background-image: none;
+    }
+    .change-volum {
+        display: none;
+    }
+    .titleWeb {
+        top: 4%;
+    }
+    .playlist_body {
+        max-height: 440px;
+    }
+    .input[type="range"].progress {
+        width: 90%;
+    }
+    .icon-volume .btn,
+    .control .btn{
+        font-size: 14px;
+    }
+    .volum-progress {
+        width: 142px;
+    }
+    .song .title {
+        max-width: 140px;
+    }
+    .song .author {
+        max-width: 132px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .option {
+        display: none;
+    }
+}
+@media (min-width: 281px) and (max-width: 320px) {
+    .playlist,
+    .dashboard {
+        max-width: 90%;
+        height: 92vh;
+    }
+    .titleWeb {
+        display: none;
+    }
+    .change-volum {
+        display: none;
+    }
+    .input[type="range"].progress {
+        width: 90%;
+    }
+    .icon-volume .btn,
+    .control .btn{
+        font-size: 18px;
+    }
+    .volum-progress {
+        width: 142px;
+    }
+    .song .title {
+        max-width: 140px;
+    }
+    .song .author {
+        max-width: 132px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+@media (min-width: 321px) and (max-width: 390px) {
+    .playlist,
+    .dashboard {
+        max-width: 90%;
+        height: 72vh;
+    }
+    .dashboard {
+        background-image: none;
+    }
+    .change-volum {
+        display: none;
+    }
+    .titleWeb {
+        top: 4%;
+    }
+    .volum-progress {
+        width: 168px;
+    }
+    .playlist_body {
+        max-height: 524px;
+    }
+    .song .author {
+        max-width: 132px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .song .title {
+        max-width: 140px;
+    }
+}
+
+@media (min-width: 391px) and (max-width: 420px) {
+    .playlist,
+    .dashboard {
+        max-width: 90%;
+        top: 45%;
+        /* background-image: none; */
+    }
+    .change-volum {
+        display: none;
+    }
+    .playlist {
+        top: 50%;
+    }
+    .dashboard {
+        background-image: none;
+    }
+    .titleWeb {
+        top: 4%;
+    }
+    .playlist_body {
+        max-height: 450px;
+    }
+    
+}
+@media (min-width: 420px) and (max-width: 625px) {
+    /* .playlist,
+    .dashboard {
+        max-width: 90%;
+    }
+    .dashboard {
+        background-image: none;
+        top: 45%;
+    }
+    .change-volum {
+        display: none;
+    }
+    .titleWeb {
+        top: 4%;
+    }
+    .playlist_body {
+        max-height: 450px;
+    } */
+    .playlist,
+    .dashboard {
+        max-width: 90%;
+        height: 72vh;
+    }
+    .dashboard {
+        background-image: none;
+    }
+    .change-volum {
+        display: none;
+    }
+    .titleWeb {
+        top: 4%;
+    }
+    .volum-progress {
+        width: 168px;
+    }
+    .playlist_body {
+        max-height: 524px;
+    }
+    .song .author {
+        max-width: 132px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .song .title {
+        max-width: 140px;
+    }
+}

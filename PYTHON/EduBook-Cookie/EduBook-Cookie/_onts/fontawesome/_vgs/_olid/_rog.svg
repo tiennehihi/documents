@@ -1,0 +1,6 @@
+ory."),
+  Do_not_erase_const_enum_declarations_in_generated_code: diag(6007, 3 /* Message */, "Do_not_erase_const_enum_declarations_in_generated_code_6007", "Do not erase const enum declarations in generated code."),
+  Do_not_emit_outputs_if_any_errors_were_reported: diag(6008, 3 /* Message */, "Do_not_emit_outputs_if_any_errors_were_reported_6008", "Do not emit outputs if any errors were reported."),
+  Do_not_emit_comments_to_output: diag(6009, 3 /* Message */, "Do_not_emit_comments_to_output_6009", "Do not emit comments to output."),
+  Do_not_emit_outputs: diag(6010, 3 /* Message */, "Do_not_emit_outputs_6010", "Do not emit outputs."),
+  Allow_default_imports_from_modules_with_no_default_export_This_does_not_affect_code_emit_just_typechecking: diag(6011, 3 /* Message */, "Allow_default_

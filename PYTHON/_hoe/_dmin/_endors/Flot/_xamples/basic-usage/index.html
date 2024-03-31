@@ -1,0 +1,36 @@
+gnment:
+            return parent.objectAssignmentInitializer === node
+                ? 1 /* Read */
+                : isInDestructuringAssignment(parent)
+                    ? 2 /* Write */
+                    : 1 /* Read */;
+        case ts.SyntaxKind.PropertyAssignment:
+            return parent.name === node
+                ? 0 /* None */
+                : isInDestructuringAssignment(parent)
+                    ? 2 /* Write */
+                    : 1 /* Read */;
+        case ts.SyntaxKind.ArrayLiteralExpression:
+        case ts.SyntaxKind.SpreadElement:
+        case ts.SyntaxKind.SpreadAssignment:
+            return isInDestructuringAssignment(parent)
+                ? 2 /* Write */
+                : 1 /* Read */;
+        case ts.SyntaxKind.ParenthesizedExpression:
+        case ts.SyntaxKind.NonNullExpression:
+        case ts.SyntaxKind.TypeAssertionExpression:
+        case ts.SyntaxKind.AsExpression:
+            // (<number>foo! as {})++
+            return getAccessKind(parent);
+        case ts.SyntaxKind.ForOfStatement:
+        case ts.SyntaxKind.ForInStatement:
+            return parent.initializer === node
+                ? 2 /* Write */
+                : 1 /* Read */;
+        case ts.SyntaxKind.ExpressionWithTypeArguments:
+            return parent.parent.token === ts.SyntaxKind.ExtendsKeyword &&
+                parent.parent.parent.kind !== ts.SyntaxKind.InterfaceDeclaration
+                ? 1 /* Read */
+                : 0 /* None */;
+        case ts.SyntaxKind.ComputedPropertyName:
+        case ts.SyntaxKind.E

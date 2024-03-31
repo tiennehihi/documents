@@ -1,0 +1,2 @@
+checkMap = [];
+    checkMap[constants_default.PASS_PRIO] = true

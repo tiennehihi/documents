@@ -1,0 +1,17 @@
+classic
+        style: solid
+  label: Arrows up down left right
+  unicode: f047
+  voted: false
+arrows-up-to-line:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Arrows Up-to-l

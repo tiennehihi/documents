@@ -1,0 +1,7 @@
+which patterns are considered "greedy" in
+Regular Expressions vs bash path expansion. This may be fixable,
+but not without incurring some complexity and performance costs,
+and the trade-off seems to not be worth pursuing.
+
+Note that `fnmatch(3)` in libc is an extremely naive string comparison
+matcher, which does not do anything spec

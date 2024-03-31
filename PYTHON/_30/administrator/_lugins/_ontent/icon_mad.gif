@@ -1,0 +1,10 @@
+/* Hide the advanced tab */
+#advanced_tab {
+	display: none;
+}
+
+#metatitle, #metakeywords, #metadescription, #metaauthor, #metacopyright {
+	width: 280px;
+}
+
+#doctype, #docenco

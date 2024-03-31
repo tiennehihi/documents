@@ -1,0 +1,16 @@
+ity, check for prior redundancies.
+        if (count_delete + count_insert > 1) {
+          if (count_delete !== 0 && count_insert !== 0) {
+            // Factor out any common prefixies.
+            commonlength = diff_commonPrefix(text_insert, text_delete);
+
+            if (commonlength !== 0) {
+              if (
+                pointer - count_delete - count_insert > 0 &&
+                diffs[pointer - count_delete - count_insert - 1][0] ==
+                  DIFF_EQUAL
+              ) {
+                diffs[pointer - count_delete - count_insert - 1][1] +=
+                  text_insert.substring(0, commonlength);
+              } else {
+               

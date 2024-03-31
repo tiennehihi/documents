@@ -1,0 +1,9 @@
+object | null | undefined, opts?: object | null): node is TSOptionalType;
+export function assertTSOptionalType(node: object | null | undefined, opts?: object | null): void;
+export function isTSParameterProperty(node: object | null | undefined, opts?: object | null): node is TSParameterProperty;
+export function assertTSParameterProperty(node: object | null | undefined, opts?: object | null): void;
+export function isTSParenthesizedType(node: object | null | undefined, opts?: object | null): node is TSParenthesizedType;
+export function assertTSParenthesizedType(node: object | null | undefined, opts?: object | null): void;
+export function isTSPropertySignature(node: object | null | undefined, opts?: object | null): node is TSPropertySignature;
+export function assertTSPropertySignature(node: object | null | undefined, opts?: object | null): void;
+export function isTSQualifiedName(node: object | null | undefined, opts?: object | null): node is TSQualifiedNa

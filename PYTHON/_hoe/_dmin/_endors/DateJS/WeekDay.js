@@ -1,0 +1,1 @@
+* // => [1]\n\t     *\n\t     * _.dropRight([1, 2, 3], 5);\n\t     * // => []\n\t     *\n\t     * _.dropRight([1, 2, 3], 0);\n\t     * // => [1, 2, 3]\n\t     */\n\t    function dropRight(array, n, guard) {\n

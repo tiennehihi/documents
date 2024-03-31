@@ -1,0 +1,12 @@
+      relName(state, status.newerInputFileName)
+      );
+    case 7 /* OutOfDateWithUpstream */:
+      return reportStatus(
+        state,
+        Diagnostics.Project_0_is_out_of_date_because_output_1_is_older_than_input_2,
+        relName(state, configFileName),
+        relName(state, status.outOfDateOutputFileName),
+        relName(state, status.newerProjectName)
+      );
+    case 4 /* OutputMissing */:
+      return repo

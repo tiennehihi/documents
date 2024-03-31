@@ -1,0 +1,4 @@
+//.CommonJS
+var CSSOM = {
+    CSSRule: require("./CSSRule").CSSRule,
+    MatcherList: require("./MatcherList

@@ -1,0 +1,6 @@
+5[SyntaxKind5["FirstLiteralToken"] = 9 /* NumericLiteral */] = "FirstLiteralToken";
+  SyntaxKind5[SyntaxKind5["LastLiteralToken"] = 15 /* NoSubstitutionTemplateLiteral */] = "LastLiteralToken";
+  SyntaxKind5[SyntaxKind5["FirstTemplateToken"] = 15 /* NoSubstitutionTemplateLiteral */] = "FirstTemplateToken";
+  SyntaxKind5[SyntaxKind5["LastTemplateToken"] = 18 /* TemplateTail */] = "LastTemplateToken";
+  SyntaxKind5[SyntaxKind5["FirstBinaryOperator"] = 30 /* LessThanToken */] = "FirstBinaryOperator";
+  Synta

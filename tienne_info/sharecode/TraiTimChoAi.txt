@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> TRÁI TIM CHO AI </title>
+    <style>
+        html, body {
+            background: rgb(17, 17, 17);
+            margin: 0px;
+            height: 100vh;
+            overflow: hidden;
+        }
+        span {
+            background: url("https://bigdata-vn.com/wp-content/uploads/2021/09/1632206363_273_Tong-hop-icon-trai-tim-dep.png");
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            pointer-events: none;
+            background-size: cover;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            animation: animate 6s linear;
+        }
+        @keyframes animate {
+            0% {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+                filter: hue-rotate(0);
+            }
+            100% {
+                transform: translate(-50%, -6000%);
+                opacity: 0;
+                filter: hue-rotate(720deg);
+            }
+        }
+        h1 {
+            font-family: 'Lobster', cursive;
+            color: pink;
+            text-align: center;
+            font-weight: 700;
+            font-size: 100px;
+            opacity: 0.3;
+            padding: 300px;  
+            border: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tên Crush</h1>
+</body>
+<script>
+    const body = document.querySelector('body');
+    body.addEventListener('mousemove', (e) => {
+        const x = e.offsetX;
+        const y = e.offsetY;
+        const span = document.createElement('span');
+        span.style.left = x + 'px';
+        span.style.top = y + 'px';
+        const size = Math.random() * 35;
+        span.style.width = size + 'px';
+        span.style.height = size + 'px';
+        body.appendChild(span);
+        setTimeout(() => {
+            span.remove();
+        }, 3000)
+    })
+
+    const html = document.querySelector('html');
+    html.addEventListener('click', (e) => {
+        const x = e.offsetX;
+        const y = e.offsetY;
+        const span = document.createElement('span');
+        span.style.left = x + 'px';
+        span.style.top = y + 'px';
+        const size = Math.random() * 40;
+        span.style.width = size + 'px';
+        span.style.height = size + 'px';
+        html.appendChild(span);
+        setTimeout(() => {
+            span.remove();
+        }, 3000)
+    })
+</script>
+</html>

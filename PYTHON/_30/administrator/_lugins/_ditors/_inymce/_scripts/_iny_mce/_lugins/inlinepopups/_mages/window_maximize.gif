@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+var which = require("../")
+if (process.argv.length < 3)
+  usage()
+
+function usage () {
+  co

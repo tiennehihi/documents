@@ -1,0 +1,5 @@
+var makeFallbackFunction = require('./lib/rules-fabric');
+
+module.exports = function postcssInitial(opts) {
+  opts = opts || {};
+  opts.reset 

@@ -1,0 +1,34 @@
+'use strict';
+
+const path = require('path');
+const { promisify } = require('util');
+const glob = promisify(require('glob'));
+const minimatch = require('minimatch');
+const { defaults } = require('@istanbuljs/schema');
+const isOutsideDir = require('./is-outside-dir');
+
+class TestExclude {
+    constructor(opts = {}) {
+        Object.assign(
+            this,
+            {relativePath: true},
+            defaults.testExclude
+        );
+
+        for (const [name, value] of Object.entries(opts)) {
+            if (value !== undefined) {
+                this[name] = value;
+            }
+        }
+
+        if (typeof this.include === 'string') {
+            this.include = [this.include];
+        }
+
+        if (typeof this.exclude === 'string') {
+            this.exclude = [this.exclude];
+        }
+
+        if (typeof this.extension === 'string') {
+            this.extension = [this.extension];
+        } else if 

@@ -1,0 +1,1 @@
+{"version":3,"file":"index.cjs","sources":["index.js"],"sourcesContent":["import browserslist from 'browserslist'\n\nconst plugin = opts => {\n\treturn {\n\t\tpostcssPlugin: 'postcss-browser-comments',\n\t\tOnce(root) {\n\t\t\t// client browserslist\n\t\t\tconst clientBrowserList = browserslist(\n\t\t\t\tObject(opts).browsers || null,

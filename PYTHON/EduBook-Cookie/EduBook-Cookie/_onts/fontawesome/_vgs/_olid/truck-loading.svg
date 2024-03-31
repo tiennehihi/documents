@@ -1,0 +1,14 @@
+ NoComments */;
+      if (emitFlags)
+        setEmitFlags(name, emitFlags);
+      return name;
+    }
+    return getGeneratedNameForNode(node);
+  }
+  function getInternalName(node, allowComments, allowSourceMaps) {
+    return getName(node, allowComments, allowSourceMaps, 32768 /* LocalName */ | 65536 /* InternalName */);
+  }
+  function getLocalName(node, allowComments, allowSourceMaps, ignoreAssignedName) {
+    return getName(node, allowComments, allowSourceMaps, 32768 /* LocalName */, ignoreAssignedName);
+  }
+  function getExpor

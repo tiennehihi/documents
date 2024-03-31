@@ -1,0 +1,51 @@
+/// <reference types="node" />
+
+declare module "node-forge" {
+    type Byte = number;
+    type Bytes = string;
+    type Hex = string;
+    type Base64 = string;
+    type Utf8 = string;
+    type OID = string;
+    type Encoding = "raw" | "utf8";
+
+    namespace jsbn {
+        interface RandomGenerator {
+            nextBytes(bytes: number[]): void;
+        }
+        class BigInteger {
+            static ZERO: BigInteger;
+            static ONE: BigInteger;
+            constructor(a: null);
+            constructor(a: number, c: RandomGenerator);
+            constructor(a: number, b: number, c: RandomGenerator);
+            constructor(a: string, b?: number);
+            constructor(a: number[], b?: number);
+            constructor(a: BigInteger);
+            data: number[];
+            t: number;
+            s: number;
+            am(i: number, x: number, w: BigInteger, j: number, c: number, n: number): number;
+            toString(b?: number): string;
+            bitLength(): number;
+            negate(): BigInteger;
+            abs(): BigInteger;
+            compareTo(a: BigInteger): number;
+            bitLength(): number;
+            mod(a: BigInteger): BigInteger;
+            modPowInt(e: number, m: BigInteger): BigInteger;
+            clone(): BigInteger;
+            intValue(): number;
+            byteValue(): number;
+            shortValue(): number;
+            signum(): number;
+            toByteArray(): number[];
+            equals(a: BigInteger): boolean;
+            min(a: BigInteger): BigInteger;
+            max(a: BigInteger): BigInteger;
+            and(a: BigInteger): BigInteger;
+            or(a: BigInteger): BigInteger;
+            xor(a: BigInteger): BigInteger;
+            andNot(a: BigInteger): BigInteger;
+            not(): BigInteger;
+            shiftLe

@@ -1,0 +1,26 @@
+/**
+ * @fileoverview A class to operate forking.
+ *
+ * This is state of forking.
+ * This has a fork list and manages it.
+ *
+ * @author Toru Nagashima
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const assert = require("assert"),
+    CodePathSegment = require("./code-path-segment");
+
+//------------------------------------------------------------------------------
+// Helpers
+//------------------------------------------------------------------------------
+
+/**
+ * Determines whether or not a given segment is reachable.
+ * @param {CodePathSegment} segment The segment to check.
+ * @returns 

@@ -1,0 +1,348 @@
+      var fatalError = workInProgressRootFatalError;
+      prepareFreshStack(root, NoLanes);
+      markRootSuspended$1(root, lanes);
+      ensureRootIsScheduled(root, now());
+      throw fatalError;
+    }
+
+    if (exitStatus === RootDidNotComplete) {
+      // The render unwound without completing the tree. This happens in special
+      // cases where need to exit the current render without producing a
+      // consistent tree or committing.
+      //
+      // This should only happen during a concurrent render, not a discrete or
+      // synchronous update. We should have already checked for this when we
+      // unwound the stack.
+      markRootSuspended$1(root, lanes);
+    } else {
+      // The render completed.
+      // Check if this render may have yielded to a concurrent event, and if so,
+      // confirm that any newly rendered stores are consistent.
+      // TODO: It's possible that even a concurrent render may never have yielded
+      // to the main thread, if it was fast enough, or if it expired. We could
+      // skip the consistency check in that case, too.
+      var renderWasConcurrent = !includesBlockingLane(root, lanes);
+      var finishedWork = root.current.alternate;
+
+      if (renderWasConcurrent && !isRenderConsistentWithExternalStores(finishedWork)) {
+        // A store was mutated in an interleaved event. Render again,
+        // synchronously, to block further mutations.
+        exitStatus = renderRootSync(root, lanes); // We need to check again if something threw
+
+        if (exitStatus === RootErrored) {
+          var _errorRetryLanes = getLanesToRetrySynchronouslyOnError(root);
+
+          if (_errorRetryLanes !== NoLanes) {
+            lanes = _errorRetryLanes;
+            exitStatus = recoverFromConcurrentError(root, _errorRetryLanes); // We assume the tree is now consistent because we didn't yield to any
+            // concurrent events.
+          }
+        }
+
+        if (exitStatus === RootFatalErrored) {
+          var _fatalError = workInProgressRootFatalError;
+          prepareFreshStack(root, NoLanes);
+          markRootSuspended$1(root, lanes);
+          ensureRootIsScheduled(root, now());
+          throw _fatalError;
+        }
+      } // We now have a consistent tree. The next step is either to commit it,
+      // or, if something suspended, wait to commit it after a timeout.
+
+
+      root.finishedWork = finishedWork;
+      root.finishedLanes = lanes;
+      finishConcurrentRender(root, exitStatus, lanes);
+    }
+  }
+
+  ensureRootIsScheduled(root, now());
+
+  if (root.callbackNode === originalCallbackNode) {
+    // The task node scheduled for this root is the same one that's
+    // currently executed. Need to return a continuation.
+    return performConcurrentWorkOnRoot.bind(null, root);
+  }
+
+  return null;
+}
+
+function recoverFromConcurrentError(root, errorRetryLanes) {
+  // If an error occurred during hydration, discard server response and fall
+  // back to client side render.
+  // Before rendering again, save the errors from the previous attempt.
+  var errorsFromFirstAttempt = workInProgressRootConcurrentErrors;
+
+  if (isRootDehydrated(root)) {
+    // The shell failed to hydrate. Set a flag to force a client rendering
+    // during the next attempt. To do this, we call prepareFreshStack now
+    // to create the root work-in-progress fiber. This is a bit weird in terms
+    // of factoring, because it relies on renderRootSync not calling
+    // prepareFreshStack again in the call below, which happens because the
+    // root and lanes haven't changed.
+    //
+    // TODO: I think what we should do is set ForceClientRender inside
+    // throwException, like we do for nested Suspense boundaries. The reason
+    // it's here instead is so we can switch to the synchronous work loop, too.
+    // Something to consider for a future refactor.
+    var rootWorkInProgress = prepareFreshStack(root, errorRetryLanes);
+    rootWorkInProgress.flags |= ForceClientRender;
+
+    {
+      errorHydratingContainer(root.containerInfo);
+    }
+  }
+
+  var exitStatus = renderRootSync(root, errorRetryLanes);
+
+  if (exitStatus !== RootErrored) {
+    // Successfully finished rendering on retry
+    // The errors from the failed first attempt have been recovered. Add
+    // them to the collection of recoverable errors. We'll log them in the
+    // commit phase.
+    var errorsFromSecondAttempt = workInProgressRootRecoverableErrors;
+    workInProgressRootRecoverableErrors = errorsFromFirstAttempt; // The errors from the second attempt should be queued after the errors
+    // from the first attempt, to preserve the causal sequence.
+
+    if (errorsFromSecondAttempt !== null) {
+      queueRecoverableErrors(errorsFromSecondAttempt);
+    }
+  }
+
+  return exitStatus;
+}
+
+function queueRecoverableErrors(errors) {
+  if (workInProgressRootRecoverableErrors === null) {
+    workInProgressRootRecoverableErrors = errors;
+  } else {
+    workInProgressRootRecoverableErrors.push.apply(workInProgressRootRecoverableErrors, errors);
+  }
+}
+
+function finishConcurrentRender(root, exitStatus, lanes) {
+  switch (exitStatus) {
+    case RootInProgress:
+    case RootFatalErrored:
+      {
+        throw new Error('Root did not complete. This is a bug in React.');
+      }
+    // Flow knows about invariant, so it complains if I add a break
+    // statement, but eslint doesn't know about invariant, so it complains
+    // if I do. eslint-disable-next-line no-fallthrough
+
+    case RootErrored:
+      {
+        // We should have already attempted to retry this tree. If we reached
+        // this point, it errored again. Commit it.
+        commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
+        break;
+      }
+
+    case RootSuspended:
+      {
+        markRootSuspended$1(root, lanes); // We have an acceptable loading state. We need to figure out if we
+        // should immediately commit it or wait a bit.
+
+        if (includesOnlyRetries(lanes) && // do not delay if we're inside an act() scope
+        !shouldForceFlushFallbacksInDEV()) {
+          // This render only included retries, no updates. Throttle committing
+          // retries so that we don't show too many loading states too quickly.
+          var msUntilTimeout = globalMostRecentFallbackTime + FALLBACK_THROTTLE_MS - now(); // Don't bother with a very short suspense time.
+
+          if (msUntilTimeout > 10) {
+            var nextLanes = getNextLanes(root, NoLanes);
+
+            if (nextLanes !== NoLanes) {
+              // There's additional work on this root.
+              break;
+            }
+
+            var suspendedLanes = root.suspendedLanes;
+
+            if (!isSubsetOfLanes(suspendedLanes, lanes)) {
+              // We should prefer to render the fallback of at the last
+              // suspended level. Ping the last suspended level to try
+              // rendering it again.
+              // FIXME: What if the suspended lanes are Idle? Should not restart.
+              var eventTime = requestEventTime();
+              markRootPinged(root, suspendedLanes);
+              break;
+            } // The render is suspended, it hasn't timed out, and there's no
+            // lower priority work to do. Instead of committing the fallback
+            // immediately, wait for more data to arrive.
+
+
+            root.timeoutHandle = scheduleTimeout(commitRoot.bind(null, root, workInProgressRootRecoverableErrors, workInProgressTransitions), msUntilTimeout);
+            break;
+          }
+        } // The work expired. Commit immediately.
+
+
+        commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
+        break;
+      }
+
+    case RootSuspendedWithDelay:
+      {
+        markRootSuspended$1(root, lanes);
+
+        if (includesOnlyTransitions(lanes)) {
+          // This is a transition, so we should exit without committing a
+          // placeholder and without scheduling a timeout. Delay indefinitely
+          // until we receive more data.
+          break;
+        }
+
+        if (!shouldForceFlushFallbacksInDEV()) {
+          // This is not a transition, but we did trigger an avoided state.
+          // Schedule a placeholder to display after a short delay, using the Just
+          // Noticeable Difference.
+          // TODO: Is the JND optimization worth the added complexity? If this is
+          // the only reason we track the event time, then probably not.
+          // Consider removing.
+          var mostRecentEventTime = getMostRecentEventTime(root, lanes);
+          var eventTimeMs = mostRecentEventTime;
+          var timeElapsedMs = now() - eventTimeMs;
+
+          var _msUntilTimeout = jnd(timeElapsedMs) - timeElapsedMs; // Don't bother with a very short suspense time.
+
+
+          if (_msUntilTimeout > 10) {
+            // Instead of committing the fallback immediately, wait for more data
+            // to arrive.
+            root.timeoutHandle = scheduleTimeout(commitRoot.bind(null, root, workInProgressRootRecoverableErrors, workInProgressTransitions), _msUntilTimeout);
+            break;
+          }
+        } // Commit the placeholder.
+
+
+        commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
+        break;
+      }
+
+    case RootCompleted:
+      {
+        // The work completed. Ready to commit.
+        commitRoot(root, workInProgressRootRecoverableErrors, workInProgressTransitions);
+        break;
+      }
+
+    default:
+      {
+        throw new Error('Unknown root exit status.');
+      }
+  }
+}
+
+function isRenderConsistentWithExternalStores(finishedWork) {
+  // Search the rendered tree for external store reads, and check whether the
+  // stores were mutated in a concurrent event. Intentionally using an iterative
+  // loop instead of recursion so we can exit early.
+  var node = finishedWork;
+
+  while (true) {
+    if (node.flags & StoreConsistency) {
+      var updateQueue = node.updateQueue;
+
+      if (updateQueue !== null) {
+        var checks = updateQueue.stores;
+
+        if (checks !== null) {
+          for (var i = 0; i < checks.length; i++) {
+            var check = checks[i];
+            var getSnapshot = check.getSnapshot;
+            var renderedValue = check.value;
+
+            try {
+              if (!objectIs(getSnapshot(), renderedValue)) {
+                // Found an inconsistent store.
+                return false;
+              }
+            } catch (error) {
+              // If `getSnapshot` throws, return `false`. This will schedule
+              // a re-render, and the error will be rethrown during render.
+              return false;
+            }
+          }
+        }
+      }
+    }
+
+    var child = node.child;
+
+    if (node.subtreeFlags & StoreConsistency && child !== null) {
+      child.return = node;
+      node = child;
+      continue;
+    }
+
+    if (node === finishedWork) {
+      return true;
+    }
+
+    while (node.sibling === null) {
+      if (node.return === null || node.return === finishedWork) {
+        return true;
+      }
+
+      node = node.return;
+    }
+
+    node.sibling.return = node.return;
+    node = node.sibling;
+  } // Flow doesn't know this is unreachable, but eslint does
+  // eslint-disable-next-line no-unreachable
+
+
+  return true;
+}
+
+function markRootSuspended$1(root, suspendedLanes) {
+  // When suspending, we should always exclude lanes that were pinged or (more
+  // rarely, since we try to avoid it) updated during the render phase.
+  // TODO: Lol maybe there's a better way to factor this besides this
+  // obnoxiously named function :)
+  suspendedLanes = removeLanes(suspendedLanes, workInProgressRootPingedLanes);
+  suspendedLanes = removeLanes(suspendedLanes, workInProgressRootInterleavedUpdatedLanes);
+  markRootSuspended(root, suspendedLanes);
+} // This is the entry point for synchronous tasks that don't go
+// through Scheduler
+
+
+function performSyncWorkOnRoot(root) {
+  {
+    syncNestedUpdateFlag();
+  }
+
+  if ((executionContext & (RenderContext | CommitContext)) !== NoContext) {
+    throw new Error('Should not already be working.');
+  }
+
+  flushPassiveEffects();
+  var lanes = getNextLanes(root, NoLanes);
+
+  if (!includesSomeLane(lanes, SyncLane)) {
+    // There's no remaining sync work left.
+    ensureRootIsScheduled(root, now());
+    return null;
+  }
+
+  var exitStatus = renderRootSync(root, lanes);
+
+  if (root.tag !== LegacyRoot && exitStatus === RootErrored) {
+    // If something threw an error, try rendering one more time. We'll render
+    // synchronously to block concurrent data mutations, and we'll includes
+    // all pending updates are included. If it still fails after the second
+    // attempt, we'll give up and commit the resulting tree.
+    var errorRetryLanes = getLanesToRetrySynchronouslyOnError(root);
+
+    if (errorRetryLanes !== NoLanes) {
+      lanes = errorRetryLanes;
+      exitStatus = recoverFromConcurrentError(root, errorRetryLanes);
+    }
+  }
+
+  if (exitStatus === RootFatalErrored) {
+    var fatalError = workInProgressRootFatalError;
+    pre

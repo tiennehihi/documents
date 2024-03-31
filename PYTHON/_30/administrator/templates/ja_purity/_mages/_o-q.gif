@@ -1,0 +1,9 @@
+export {
+    AddressInfo,
+    CertMeta,
+    ClientOptions,
+    CloseEvent,
+    createWebSocketStream,
+    Data,
+    ErrorEvent,
+    Event,

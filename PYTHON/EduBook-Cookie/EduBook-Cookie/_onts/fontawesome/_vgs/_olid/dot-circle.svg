@@ -1,0 +1,5 @@
+import type { Vocabulary, ErrorNoParams } from "ajv";
+import type { DefinitionOptions } from "./_types";
+import { PatternRequiredError } from "./patternRequired";
+import { SelectError } from "./select";
+export default function ajvKeywords(opts?: Defin

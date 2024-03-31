@@ -1,0 +1,6 @@
+;(function (sax) { // wrapper for non-node envs
+  sax.parser = function (strict, opt) { return new SAXParser(strict, opt) }
+  sax.SAXParser = SAXParser
+
+  // When we pass the MAX_BUFFER_LENGTH position, start checking for buffer overruns.
+  // When we check, schedule the next

@@ -1,0 +1,5 @@
+one.scm",
+                           fs.readFileSync("path/to/module-one.scm"))
+```
+
+#### SourceMapGenerator.prototype.applySourceMap(sourceMapConsumer[, source

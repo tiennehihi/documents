@@ -1,0 +1,66 @@
+# Tapable
+
+The tapable package expose many Hook classes, which can be used to create hooks for plugins.
+
+``` javascript
+const {
+	SyncHook,
+	SyncBailHook,
+	SyncWaterfallHook,
+	SyncLoopHook,
+	AsyncParallelHook,
+	AsyncParallelBailHook,
+	AsyncSeriesHook,
+	AsyncSeriesBailHook,
+	AsyncSeriesWaterfallHook
+ } = require("tapable");
+```
+
+## Installation
+
+``` shell
+npm install --save tapable
+```
+
+## Usage
+
+All Hook constructors take one optional argument, which is a list of argument names as strings.
+
+``` js
+const hook = new SyncHook(["arg1", "arg2", "arg3"]);
+```
+
+The best practice is to expose all hooks of a class in a `hooks` property:
+
+``` js
+class Car {
+	constructor() {
+		this.hooks = {
+			accelerate: new SyncHook(["newSpeed"]),
+			brake: new SyncHook(),
+			calculateRoutes: new AsyncParallelHook(["source", "target", "routesList"])
+		};
+	}
+
+	/* ... */
+}
+```
+
+Other people can now use these hooks:
+
+``` js
+const myCar = new Car();
+
+// Use the tap method to add a consument
+myCar.hooks.brake.tap("WarningLampPlugin", () => warningLamp.on());
+```
+
+It's required to pass a name to identify the plugin/reason.
+
+You may receive arguments:
+
+``` js
+myCar.hooks.accelerate.tap("LoggerPlugin", newSpeed => console.log(`Accelerating to ${newSpeed}`));
+```
+
+For sync hooks, `tap` is the only valid method t

@@ -1,0 +1,60 @@
+apedText;
+  return getJSDocTagsWorker(param.parent, noCache).filter((tag) => isJSDocTemplateTag(tag) && tag.typeParameters.some((tp) => tp.name.escapedText === name));
+}
+function getJSDocTypeParameterTags(param) {
+  return getJSDocTypeParameterTagsWorker(
+    param,
+    /*noCache*/
+    false
+  );
+}
+function getJSDocTypeParameterTagsNoCache(param) {
+  return getJSDocTypeParameterTagsWorker(
+    param,
+    /*noCache*/
+    true
+  );
+}
+function hasJSDocParameterTags(node) {
+  return !!getFirstJSDocTag(node, isJSDocParameterTag);
+}
+function getJSDocAugmentsTag(node) {
+  return getFirstJSDocTag(node, isJSDocAugmentsTag);
+}
+function getJSDocImplementsTags(node) {
+  return getAllJSDocTags(node, isJSDocImplementsTag);
+}
+function getJSDocClassTag(node) {
+  return getFirstJSDocTag(node, isJSDocClassTag);
+}
+function getJSDocPublicTag(node) {
+  return getFirstJSDocTag(node, isJSDocPublicTag);
+}
+function getJSDocPublicTagNoCache(node) {
+  return getFirstJSDocTag(
+    node,
+    isJSDocPublicTag,
+    /*noCache*/
+    true
+  );
+}
+function getJSDocPrivateTag(node) {
+  return getFirstJSDocTag(node, isJSDocPrivateTag);
+}
+function getJSDocPrivateTagNoCache(node) {
+  return getFirstJSDocTag(
+    node,
+    isJSDocPrivateTag,
+    /*noCache*/
+    true
+  );
+}
+function getJSDocProtectedTag(node) {
+  return getFirstJSDocTag(node, isJSDocProtectedTag);
+}
+function getJSDocProtectedTagNoCache(node) {
+  return getFirstJSDocTag(
+    node,
+    isJSDocProtectedTag,
+    /*noCache*/
+  

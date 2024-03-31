@@ -1,0 +1,11 @@
+'use strict';
+
+var composer = require('./compose/composer.js');
+var Document = require('./doc/Document.js');
+var errors = require('./errors.js');
+var log = require('./log.js');
+var lineCounter = require('./parse/line-counter.js');
+var parser = require('./parse/parser.js');
+
+function parseOptions(options) {
+  

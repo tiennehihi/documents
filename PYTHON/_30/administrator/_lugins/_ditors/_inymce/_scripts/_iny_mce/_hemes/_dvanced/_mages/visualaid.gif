@@ -1,0 +1,7 @@
+ideFunction,
+
+                // Collect tokens
+                onToken(token) {
+                    if (tokenTranslator) {
+
+                        // Use `tokens`, `ecmaVersion`, and `jsxAttrValueToken` i

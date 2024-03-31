@@ -1,0 +1,32 @@
+-96V224H512l0 80H128z"
+        }
+      }
+    },
+    "familyStylesByLicense": {
+      "free": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "watchman-monitoring": {
+    "changes": [
+      "5.15.0"
+    ],
+    "ligatures": [],
+    "unicode": "e087",
+    "label": "Watchman Monitoring",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "brands": {
+          "lastModified": 1660014478,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM121.69,429.122C70.056,388.972,36.741,326.322,36.741,256a218.519,218.519,0,0,1,9.587-64.122l102.9-17.895-.121,10.967-13.943,2.013s-.144,12.5-.144,19.549a12.778,12.778,0,0,0,4.887,10.349l9.468,7.4Zm105.692-283.27,8.48-7.618s6.

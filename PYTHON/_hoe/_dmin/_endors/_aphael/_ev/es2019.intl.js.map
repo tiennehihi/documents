@@ -1,0 +1,10 @@
+      return time;
+    }
+    throw new Error('Cannot parse time: ' + time);
+}
+exports.toUnixTimestamp = toUnixTimestamp;
+function validateUid(uid) {
+    if (typeof uid !== 'number')
+        throw TypeError(ERRSTR.UID);
+}
+function validateGid

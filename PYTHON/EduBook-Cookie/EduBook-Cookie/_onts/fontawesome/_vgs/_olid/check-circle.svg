@@ -1,0 +1,26 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = normalizeFile;
+function _fs() {
+  const data = require("fs");
+  _fs = function () {
+    return data;
+  };
+  return data;
+}
+function _path() {
+  const data = require("path");
+  _path = function () {
+    return data;
+  };
+  return data;
+}
+function _debug() {
+  const data = require("debug");
+  _debug = function () {
+    return data;
+  };
+ 

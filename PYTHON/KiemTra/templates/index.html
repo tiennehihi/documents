@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <title></title>
+</head>
+<body style="text-align: center;">
+    <div class="main"> 
+        <form method="post" action="{{ url_for('registration_form') }}" class="form">
+            {% if error_message %}
+                <p style="color: red;">{{ error_message }}</p>
+            {% elif success_message %}
+                <p style="color: green;">{{ success_message }}</p>
+            {% endif %}
+
+            <p class="title">Register Form<p/>
+
+            <div class="form-group">
+                <label class="form-label" for="name">Name:</label>
+                <input class="form-control" type="text" name="name">
+            <div/>
+            <div class="form-group">
+                <label class="form-label" for="age">Age:</label>
+                <select name="age" required class="form-control">
+                    {% for age in range(1, 99) %}
+                        <option value="{{ age }}">{{ age }}</option>
+                    {% endfor %}
+                </select>
+            <div/>
+            <div class="form-group">
+                <label class="form-label" for="sex">Sex:</label>
+                <div class="gender">
+                    <input type="radio" name="sex" value="male" required> Male
+                    <input type="radio" name="sex" value="female" required> Female    
+                <div/>
+            <div/>
+            <div class="form-group">
+                <label class="form-label" for="working_exp">Working experiences:</label>
+                <select name="working_exp" required class="form-control">
+                    <option value="1">Dưới 5 năm</option>
+                    <option value="2">Trên 5 năm</option>
+                </select>
+            <div/>
+            <div class="form-group">
+                <label class="form-label" for="Highest_Graduation">Highest Graduation:</label>
+                <select name="highest" required class="form-control">
+                    <option value="1">Tiểu Học</option>
+                    <option value="2">Trung Học</option>
+                    <option value="3">Trung Học Phổ Thông</option>
+                    <option value="4">Đại Học</option>
+                </select>
+            <div/>
+            <input type="submit" value="SUBMIT" class="submit">
+            <input type="reset" value="RESET" class="reset">
+        </form>    
+    <div/>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnNewline }) {
+    let spaceBefore = false;
+    let atNewline = startOnNewline;
+    let hasSpace = startOnNewline;
+    let comment = '';
+    let commentSep = '';
+    let hasNewline = false;
+    let hasNewlineAfterProp = false;
+    let reqSpace = false;
+    let anchor = null;
+    let tag = null;
+    let comma = null;
+    let found = null;
+    let start = null;
+    for (const token of tokens) {
+        if (reqSpace) {
+            if (token.type !== 'space' &&
+                token.type !== 'newline' &&
+                token.type !== 'comma')
+                onError(token.offset, 'MISSING_CHAR', 'Tags and anchors must be separated from the next token by white space');
+            reqSpace = false;
+        }
+        switch (token.type) {
+            case 'space':
+                // At the doc level, tabs

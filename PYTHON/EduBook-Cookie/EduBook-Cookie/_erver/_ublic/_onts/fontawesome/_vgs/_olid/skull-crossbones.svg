@@ -1,0 +1,53 @@
+digg:
+  changes:
+    - 4.1.0
+    - 5.0.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: Digg Logo
+  unicode: f1a6
+  voted: false
+digital-ocean:
+  changes:
+    - 5.0.0
+    - 5.7.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: Digital Ocean
+  unicode: f391
+  voted: false
+discord:
+  changes:
+    - 5.0.0
+    - 5.15.4
+    - 6.0.0-beta1
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: Discord
+  unicode: f392
+  voted: false
+discourse:
+  changes:
+    - 5.0.0
+    - 5.0.3
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+    

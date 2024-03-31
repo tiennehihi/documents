@@ -1,0 +1,24 @@
+var isDigit = require('../tokenizer').isDigit;
+var cmpChar = require('../tokenizer').cmpChar;
+var TYPE = require('../tokenizer').TYPE;
+
+var DELIM = TYPE.Delim;
+var WHITESPACE = TYPE.WhiteSpace;
+var COMMENT = TYPE.Comment;
+var IDENT = TYPE.Ident;
+var NUMBER = TYPE.Number;
+var DIMENSION = TYPE.Dimension;
+var PLUSSIGN = 0x002B;    // U+002B PLUS SIGN (+)
+var HYPHENMINUS = 0x002D; // U+002D HYPHEN-MINUS (-)
+var N = 0x006E;           // U+006E LATIN SMALL LETTER N (n)
+var DISALLOW_SIGN = true;
+var ALLOW_SIGN = false;
+
+function isDelim(token, code) {
+    return token !== null && token.type === DELIM && token.value.charCodeAt(0) === code;
+}
+
+function skipSC(token, offset, getNextToken) {
+    while (token !== null && (token.type === WHITESPACE || token.type === COMMENT)) {
+        token = getNextToken(++offset);
+  

@@ -1,0 +1,2 @@
+nction used when targeting React JSX emit, e.g. 'React.createElement' or 'h'."),
+  Specify_the_JSX_Fragment_reference_used_for_fragments_when_targeting_React_JSX_emit_e_g_React_Fragment_or_Fragment: diag(6648, 3 /* Message */, "Specify_the_JSX_Fragment_reference_used_for_fragments_when_targeting_React_JSX_emit_e_g_React_Fragme_6648", "Specify the JSX Fragment reference used for fragments when targeting React JSX emit e.g. 'R

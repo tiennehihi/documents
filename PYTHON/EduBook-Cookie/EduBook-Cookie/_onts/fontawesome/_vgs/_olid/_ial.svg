@@ -1,0 +1,17 @@
+   next();
+    expectContextual(ContextualKeyword._as);
+
+    parseImportSpecifierLocal();
+
+    return;
+  }
+
+  expect(tt.braceL);
+  while (!eat(tt.braceR) && !state.error) {
+    if (first) {
+      first = false;
+    } else {
+      // Detect an attempt to deep destructure
+      if (eat(tt.colon)) {
+        unexpected(
+          "ES2015 named imports do not destructure. Use an

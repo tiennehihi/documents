@@ -1,0 +1,389 @@
+udeSpecs, validatedExcludeSpecs } = spec;
+  if (!length(validatedIncludeSpecs) || !length(validatedExcludeSpecs))
+    return false;
+  basePath = normalizePath(basePath);
+  const keyMapper = createGetCanonicalFileName(useCaseSensitiveFileNames2);
+  if (validatedFilesSpec) {
+    for (const fileName of validatedFilesSpec) {
+      if (keyMapper(getNormalizedAbsolutePath(fileName, basePath)) === pathToCheck)
+        return false;
+    }
+  }
+  return matchesExcludeWorker(pathToCheck, validatedExcludeSpecs, useCaseSensitiveFileNames2, currentDirectory, basePath);
+}
+function invalidDotDotAfterRecursiveWildcard(s) {
+  const wildcardIndex = startsWith(s, "**/") ? 0 : s.indexOf("/**/");
+  if (wildcardIndex === -1) {
+    return false;
+  }
+  const lastDotIndex = endsWith(s, "/..") ? s.length : s.lastIndexOf("/../");
+  return lastDotIndex > wildcardIndex;
+}
+function matchesExclude(pathToCheck, excludeSpecs, useCaseSensitiveFileNames2, currentDirectory) {
+  return matchesExcludeWorker(
+    pathToCheck,
+    filter(excludeSpecs, (spec) => !invalidDotDotAfterRecursiveWildcard(spec)),
+    useCaseSensitiveFileNames2,
+    currentDirectory
+  );
+}
+function matchesExcludeWorker(pathToCheck, excludeSpecs, useCaseSensitiveFileNames2, currentDirectory, basePath) {
+  const excludePattern = getRegularExpressionForWildcard(excludeSpecs, combinePaths(normalizePath(currentDirectory), basePath), "exclude");
+  const excludeRegex = excludePattern && getRegexFromPattern(excludePattern, useCaseSensitiveFileNames2);
+  if (!excludeRegex)
+    return false;
+  if (excludeRegex.test(pathToCheck))
+    return true;
+  return !hasExtension(pathToCheck) && excludeRegex.test(ensureTrailingDirectorySeparator(pathToCheck));
+}
+function validateSpecs(specs, errors, disallowTrailingRecursion, jsonSourceFile, specKey) {
+  return specs.filter((spec) => {
+    if (!isString(spec))
+      return false;
+    const diag2 = specToDiagnostic(spec, disallowTrailingRecursion);
+    if (diag2 !== void 0) {
+      errors.push(createDiagnostic(...diag2));
+    }
+    return diag2 === void 0;
+  });
+  function createDiagnostic(message, spec) {
+    const element = getTsConfigPropArrayElementValue(jsonSourceFile, specKey, spec);
+    return createDiagnosticForNodeInSourceFileOrCompilerDiagnostic(jsonSourceFile, element, message, spec);
+  }
+}
+function specToDiagnostic(spec, disallowTrailingRecursion) {
+  Debug.assert(typeof spec === "string");
+  if (disallowTrailingRecursion && invalidTrailingRecursionPattern.test(spec)) {
+    return [Diagnostics.File_specification_cannot_end_in_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0, spec];
+  } else if (invalidDotDotAfterRecursiveWildcard(spec)) {
+    return [Diagnostics.File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0, spec];
+  }
+}
+function getWildcardDirectories({ validatedIncludeSpecs: include, validatedExcludeSpecs: exclude }, basePath, useCaseSensitiveFileNames2) {
+  const rawExcludeRegex = getRegularExpressionForWildcard(exclude, basePath, "exclude");
+  const excludeRegex = rawExcludeRegex && new RegExp(rawExcludeRegex, useCaseSensitiveFileNames2 ? "" : "i");
+  const wildcardDirectories = {};
+  const wildCardKeyToPath = /* @__PURE__ */ new Map();
+  if (include !== void 0) {
+    const recursiveKeys = [];
+    for (const file of include) {
+      const spec = normalizePath(combinePaths(basePath, file));
+      if (excludeRegex && excludeRegex.test(spec)) {
+        continue;
+      }
+      const match = getWildcardDirectoryFromSpec(spec, useCaseSensitiveFileNames2);
+      if (match) {
+        const { key, path, flags } = match;
+        const existingPath = wildCardKeyToPath.get(key);
+        const existingFlags = existingPath !== void 0 ? wildcardDirectories[existingPath] : void 0;
+        if (existingFlags === void 0 || existingFlags < flags) {
+          wildcardDirectories[existingPath !== void 0 ? existingPath : path] = flags;
+          if (existingPath === void 0)
+            wildCardKeyToPath.set(key, path);
+          if (flags === 1 /* Recursive */) {
+            recursiveKeys.push(key);
+          }
+        }
+      }
+    }
+    for (const path in wildcardDirectories) {
+      if (hasProperty(wildcardDirectories, path)) {
+        for (const recursiveKey of recursiveKeys) {
+          const key = toCanonicalKey(path, useCaseSensitiveFileNames2);
+          if (key !== recursiveKey && containsPath(recursiveKey, key, basePath, !useCaseSensitiveFileNames2)) {
+            delete wildcardDirectories[path];
+          }
+        }
+      }
+    }
+  }
+  return wildcardDirectories;
+}
+function toCanonicalKey(path, useCaseSensitiveFileNames2) {
+  return useCaseSensitiveFileNames2 ? path : toFileNameLowerCase(path);
+}
+function getWildcardDirectoryFromSpec(spec, useCaseSensitiveFileNames2) {
+  const match = wildcardDirectoryPattern.exec(spec);
+  if (match) {
+    const questionWildcardIndex = spec.indexOf("?");
+    const starWildcardIndex = spec.indexOf("*");
+    const lastDirectorySeperatorIndex = spec.lastIndexOf(directorySeparator);
+    return {
+      key: toCanonicalKey(match[0], useCaseSensitiveFileNames2),
+      path: match[0],
+      flags: questionWildcardIndex !== -1 && questionWildcardIndex < lastDirectorySeperatorIndex || starWildcardIndex !== -1 && starWildcardIndex < lastDirectorySeperatorIndex ? 1 /* Recursive */ : 0 /* None */
+    };
+  }
+  if (isImplicitGlob(spec.substring(spec.lastIndexOf(directorySeparator) + 1))) {
+    const path = removeTrailingDirectorySeparator(spec);
+    return {
+      key: toCanonicalKey(path, useCaseSensitiveFileNames2),
+      path,
+      flags: 1 /* Recursive */
+    };
+  }
+  return void 0;
+}
+function hasFileWithHigherPriorityExtension(file, literalFiles, wildcardFiles, extensions, keyMapper) {
+  const extensionGroup = forEach(extensions, (group2) => fileExtensionIsOneOf(file, group2) ? group2 : void 0);
+  if (!extensionGroup) {
+    return false;
+  }
+  for (const ext of extensionGroup) {
+    if (fileExtensionIs(file, ext) && (ext !== ".ts" /* Ts */ || !fileExtensionIs(file, ".d.ts" /* Dts */))) {
+      return false;
+    }
+    const higherPriorityPath = keyMapper(changeExtension(file, ext));
+    if (literalFiles.has(higherPriorityPath) || wildcardFiles.has(higherPriorityPath)) {
+      if (ext === ".d.ts" /* Dts */ && (fileExtensionIs(file, ".js" /* Js */) || fileExtensionIs(file, ".jsx" /* Jsx */))) {
+        continue;
+      }
+      return true;
+    }
+  }
+  return false;
+}
+function removeWildcardFilesWithLowerPriorityExtension(file, wildcardFiles, extensions, keyMapper) {
+  const extensionGroup = forEach(extensions, (group2) => fileExtensionIsOneOf(file, group2) ? group2 : void 0);
+  if (!extensionGroup) {
+    return;
+  }
+  for (let i = extensionGroup.length - 1; i >= 0; i--) {
+    const ext = extensionGroup[i];
+    if (fileExtensionIs(file, ext)) {
+      return;
+    }
+    const lowerPriorityPath = keyMapper(changeExtension(file, ext));
+    wildcardFiles.delete(lowerPriorityPath);
+  }
+}
+function convertCompilerOptionsForTelemetry(opts) {
+  const out = {};
+  for (const key in opts) {
+    if (hasProperty(opts, key)) {
+      const type = getOptionFromName(key);
+      if (type !== void 0) {
+        out[key] = getOptionValueWithEmptyStrings(opts[key], type);
+      }
+    }
+  }
+  return out;
+}
+function getOptionValueWithEmptyStrings(value, option) {
+  if (value === void 0)
+    return value;
+  switch (option.type) {
+    case "object":
+      return "";
+    case "string":
+      return "";
+    case "number":
+      return typeof value === "number" ? value : "";
+    case "boolean":
+      return typeof value === "boolean" ? value : "";
+    case "listOrElement":
+      if (!isArray(value))
+        return getOptionValueWithEmptyStrings(value, option.element);
+    case "list":
+      const elementType = option.element;
+      return isArray(value) ? mapDefined(value, (v) => getOptionValueWithEmptyStrings(v, elementType)) : "";
+    default:
+      return forEachEntry(option.type, (optionEnumValue, optionStringValue) => {
+        if (optionEnumValue === value) {
+          return optionStringValue;
+        }
+      });
+  }
+}
+function getDefaultValueForOption(option) {
+  switch (option.type) {
+    case "number":
+      return 1;
+    case "boolean":
+      return true;
+    case "string":
+      const defaultValue = option.defaultValueDescription;
+      return option.isFilePath ? `./${defaultValue && typeof defaultValue === "string" ? defaultValue : ""}` : "";
+    case "list":
+      return [];
+    case "listOrElement":
+      return getDefaultValueForOption(option.element);
+    case "object":
+      return {};
+    default:
+      const value = firstOrUndefinedIterator(option.type.keys());
+      if (value !== void 0)
+        return value;
+      return Debug.fail("Expected 'option.type' to have entries.");
+  }
+}
+
+// src/compiler/moduleNameResolver.ts
+function trace(host, message, ...args) {
+  host.trace(formatMessage(message, ...args));
+}
+function isTraceEnabled(compilerOptions, host) {
+  return !!compilerOptions.traceResolution && host.trace !== void 0;
+}
+function withPackageId(packageInfo, r) {
+  let packageId;
+  if (r && packageInfo) {
+    const packageJsonContent = packageInfo.contents.packageJsonContent;
+    if (typeof packageJsonContent.name === "string" && typeof packageJsonContent.version === "string") {
+      packageId = {
+        name: packageJsonContent.name,
+        subModuleName: r.path.slice(packageInfo.packageDirectory.length + directorySeparator.length),
+        version: packageJsonContent.version
+      };
+    }
+  }
+  return r && { path: r.path, extension: r.ext, packageId, resolvedUsingTsExtension: r.resolvedUsingTsExtension };
+}
+function noPackageId(r) {
+  return withPackageId(
+    /*packageInfo*/
+    void 0,
+    r
+  );
+}
+function removeIgnoredPackageId(r) {
+  if (r) {
+    Debug.assert(r.packageId === void 0);
+    return { path: r.path, ext: r.extension, resolvedUsingTsExtension: r.resolvedUsingTsExtension };
+  }
+}
+function formatExtensions(extensions) {
+  const result = [];
+  if (extensions & 1 /* TypeScript */)
+    result.push("TypeScript");
+  if (extensions & 2 /* JavaScript */)
+    result.push("JavaScript");
+  if (extensions & 4 /* Declaration */)
+    result.push("Declaration");
+  if (extensions & 8 /* Json */)
+    result.push("JSON");
+  return result.join(", ");
+}
+function extensionsToExtensionsArray(extensions) {
+  const result = [];
+  if (extensions & 1 /* TypeScript */)
+    result.push(...supportedTSImplementationExtensions);
+  if (extensions & 2 /* JavaScript */)
+    result.push(...supportedJSExtensionsFlat);
+  if (extensions & 4 /* Declaration */)
+    result.push(...supportedDeclarationExtensions);
+  if (extensions & 8 /* Json */)
+    result.push(".json" /* Json */);
+  return result;
+}
+function resolvedTypeScriptOnly(resolved) {
+  if (!resolved) {
+    return void 0;
+  }
+  Debug.assert(extensionIsTS(resolved.extension));
+  return { fileName: resolved.path, packageId: resolved.packageId };
+}
+function createResolvedModuleWithFailedLookupLocationsHandlingSymlink(moduleName, resolved, isExternalLibraryImport, failedLookupLocations, affectingLocations, diagnostics, state, cache, alternateResult) {
+  if (!state.resultFromCache && !state.compilerOptions.preserveSymlinks && resolved && isExternalLibraryImport && !resolved.originalPath && !isExternalModuleNameRelative(moduleName)) {
+    const { resolvedFileName, originalPath } = getOriginalAndResolvedFileName(resolved.path, state.host, state.traceEnabled);
+    if (originalPath)
+      resolved = { ...resolved, path: resolvedFileName, originalPath };
+  }
+  return createResolvedModuleWithFailedLookupLocations(
+    resolved,
+    isExternalLibraryImport,
+    failedLookupLocations,
+    affectingLocations,
+    diagnostics,
+    state.resultFromCache,
+    cache,
+    alternateResult
+  );
+}
+function createResolvedModuleWithFailedLookupLocations(resolved, isExternalLibraryImport, failedLookupLocations, affectingLocations, diagnostics, resultFromCache, cache, alternateResult) {
+  if (resultFromCache) {
+    if (!(cache == null ? void 0 : cache.isReadonly)) {
+      resultFromCache.failedLookupLocations = updateResolutionField(resultFromCache.failedLookupLocations, failedLookupLocations);
+      resultFromCache.affectingLocations = updateResolutionField(resultFromCache.affectingLocations, affectingLocations);
+      resultFromCache.resolutionDiagnostics = updateResolutionField(resultFromCache.resolutionDiagnostics, diagnostics);
+      return resultFromCache;
+    } else {
+      return {
+        ...resultFromCache,
+        failedLookupLocations: initializeResolutionFieldForReadonlyCache(resultFromCache.failedLookupLocations, failedLookupLocations),
+        affectingLocations: initializeResolutionFieldForReadonlyCache(resultFromCache.affectingLocations, affectingLocations),
+        resolutionDiagnostics: initializeResolutionFieldForReadonlyCache(resultFromCache.resolutionDiagnostics, diagnostics)
+      };
+    }
+  }
+  return {
+    resolvedModule: resolved && {
+      resolvedFileName: resolved.path,
+      originalPath: resolved.originalPath === true ? void 0 : resolved.originalPath,
+      extension: resolved.extension,
+      isExternalLibraryImport,
+      packageId: resolved.packageId,
+      resolvedUsingTsExtension: !!resolved.resolvedUsingTsExtension
+    },
+    failedLookupLocations: initializeResolutionField(failedLookupLocations),
+    affectingLocations: initializeResolutionField(affectingLocations),
+    resolutionDiagnostics: initializeResolutionField(diagnostics),
+    alternateResult
+  };
+}
+function initializeResolutionField(value) {
+  return value.length ? value : void 0;
+}
+function updateResolutionField(to, value) {
+  if (!(value == null ? void 0 : value.length))
+    return to;
+  if (!(to == null ? void 0 : to.length))
+    return value;
+  to.push(...value);
+  return to;
+}
+function initializeResolutionFieldForReadonlyCache(fromCache, value) {
+  if (!(fromCache == null ? void 0 : fromCache.length))
+    return initializeResolutionField(value);
+  if (!value.length)
+    return fromCache.slice();
+  return [...fromCache, ...value];
+}
+function readPackageJsonField(jsonContent, fieldName, typeOfTag, state) {
+  if (!hasProperty(jsonContent, fieldName)) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.package_json_does_not_have_a_0_field, fieldName);
+    }
+    return;
+  }
+  const value = jsonContent[fieldName];
+  if (typeof value !== typeOfTag || value === null) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Expected_type_of_0_field_in_package_json_to_be_1_got_2, fieldName, typeOfTag, value === null ? "null" : typeof value);
+    }
+    return;
+  }
+  return value;
+}
+function readPackageJsonPathField(jsonContent, fieldName, baseDirectory, state) {
+  const fileName = readPackageJsonField(jsonContent, fieldName, "string", state);
+  if (fileName === void 0) {
+    return;
+  }
+  if (!fileName) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.package_json_had_a_falsy_0_field, fieldName);
+    }
+    return;
+  }
+  const path = normalizePath(combinePaths(baseDirectory, fileName));
+  if (state.traceEnabled) {
+    trace(state.host, Diagnostics.package_json_has_0_field_1_that_references_2, fieldName, fileName, path);
+  }
+  return path;
+}
+function readPackageJsonTypesFields(jsonContent, baseDirectory, state) {
+  return readPackageJsonPathField(jsonContent, "typings", baseDirectory, state) || readPackageJsonPathField(jsonContent, "types", baseDirectory, state);
+}
+function readPackageJsonTSConfigField(jsonContent, baseDirectory, state) {
+  return readPackageJsonPathFiel

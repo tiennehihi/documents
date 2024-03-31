@@ -1,0 +1,3 @@
+ TSFunctionType | TSMethodSignature | VariableDeclarator;
+    ObjectProperty: ObjectExpression | ObjectPattern | RecordExpression;
+    ObjectTypeAnnotation: ArrayTypeAnnotation | DeclareClass | DeclareExportDeclaration | DeclareInterface | DeclareOpaqueType | DeclareTypeAlias | DeclaredPredicate | FunctionTypeAnnotation | FunctionTypeParam | IndexedAccessType | InterfaceDeclaration | InterfaceTypeAnnotation | IntersectionTypeAnnotation | NullableTypeAnnotation | ObjectTypeCallProperty | ObjectTypeIndexer | ObjectTypeInternalSlot | Object

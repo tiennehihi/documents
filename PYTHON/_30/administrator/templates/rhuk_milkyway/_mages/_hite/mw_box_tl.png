@@ -1,0 +1,11 @@
+import { CoverageMap, CoverageSummary, FileCoverage } from "istanbul-lib-coverage";
+
+/**
+ * returns a reporting context for the supplied options
+ */
+export function createContext(options?: Partial<ContextOptions>): Context;
+/**
+ * returns the default watermarks that would be used when not
+ * overridden
+ */
+exp

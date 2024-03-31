@@ -1,0 +1,12 @@
+n,
+  isTemplateMiddle: () => isTemplateMiddle,
+  isTemplateMiddleOrTemplateTail: () => isTemplateMiddleOrTemplateTail,
+  isTemplateSpan: () => isTemplateSpan,
+  isTemplateTail: () => isTemplateTail,
+  isTextWhiteSpaceLike: () => isTextWhiteSpaceLike,
+  isThis: () => isThis,
+  isThisContainerOrFunctionBlock: () => isThisContainerOrFunctionBlock,
+  isThisIdentifier: () => isThisIdentifier,
+  isThisInTypeQuery: () => isThisInTypeQuery,
+  isThisInitializedDeclaration: () => isThisInitializedDeclaration,
+  isThisInitializedObjectBindingExpression: () => isThisInitializedObjectBindingExp

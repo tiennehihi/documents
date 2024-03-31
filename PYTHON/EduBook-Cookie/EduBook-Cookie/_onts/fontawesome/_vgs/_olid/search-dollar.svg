@@ -1,0 +1,12 @@
+ null): void;
+export function isParenthesizedExpression(node: object | null | undefined, opts?: object | null): node is ParenthesizedExpression;
+export function assertParenthesizedExpression(node: object | null | undefined, opts?: object | null): void;
+export function isPattern(node: object | null | undefined, opts?: object | null): node is Pattern;
+export function assertPattern(node: object | null | undefined, opts?: object | null): void;
+export function isPatternLike(node: object | null | undefined, opts?: object | null): node is PatternLike;
+export function assertPatternLike(node: object | null | undefined, opts?: object | null): void;
+export function isPipelineBareFunction(node: object | null | undefined, opts?: object | null): node is PipelineBareFunction;
+export function assertPipelineBareFunction(node: object | null | undefined, opts?: object | null): void;
+export function isPipelinePrimaryTopicReference(node: object | null | undefined, opts?: object | null): node is PipelinePrimaryTopicReference;
+export function assertPipelinePrimaryTopicReference(node: object | null | undefined, opts?: object | null): void;
+export function isPipelineTopicExpr

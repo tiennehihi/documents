@@ -1,0 +1,22 @@
+/*
+  Copyright 2018 Google LLC
+
+  Use of this source code is governed by an MIT-style
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/MIT.
+*/
+
+import {
+  BasePartial,
+  FileDetails,
+  ManifestEntry,
+  ManifestTransform,
+} from '../types';
+import {additionalManifestEntriesTransform} from './additional-manifest-entries-transform';
+import {errors} from './errors';
+import {maximumSizeTransform} from './maximum-size-transform';
+import {modifyURLPrefixTransform} from './modify-url-prefix-transform';
+import {noRevisionForURLsMatchingTransform} from './no-revision-for-urls-matching-transform';
+
+/**
+ * A `ManifestTransform` function can be 

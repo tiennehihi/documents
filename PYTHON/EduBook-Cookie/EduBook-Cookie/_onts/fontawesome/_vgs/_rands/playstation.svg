@@ -1,0 +1,24 @@
+import fs from 'fs'
+import path from 'path'
+
+/**
+ * Find the @config at-rule in the given CSS AST and return the relative path to the config file
+ *
+ * @param {import('postcss').Root} root
+ * @param {import('postcss').Result} result
+ */
+export function findAtConfigPath(root, result) {
+  let configPath = null
+  let relativeTo = null
+
+  root.walkAtRules('config', (rule) => {
+    relativeTo = rule.source?.input.file ?? result.opts.from ?? null
+
+    if (relativeTo === null) {
+      throw rule.error(
+        'The `@config` directive cannot be used without setting `from` in your PostCSS config.'
+      )
+    }
+
+    if (configPath) {
+      throw rule.error('Only one `@confi

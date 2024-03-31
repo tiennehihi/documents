@@ -1,0 +1,34 @@
+V384H96c-17.7 0-32 14.3-32 32z"
+        }
+      }
+    },
+    "familyStylesByLicense": {
+      "free": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "book-journal-whills": {
+    "aliases": {
+      "names": [
+        "journal-whills"
+      ],
+      "unicodes": {
+        "secondary": [
+          "10f66a"
+        ]
+      }
+    },
+    "changes": [
+      "5.3.0",
+      "5.11.0",
+     

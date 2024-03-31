@@ -1,0 +1,37 @@
+/**
+ * @fileoverview Rule to require braces in arrow function body.
+ * @author Alberto Rodríguez
+ */
+"use strict";
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const astUtils = require("./utils/ast-utils");
+
+//------------------------------------------------------------------------------
+// Rule Definition
+//------------------------------------------------------------------------------
+
+/** @type {import('../shared/types').Rule} */
+module.exports = {
+    meta: {
+        type: "suggestion",
+
+        docs: {
+            description: "Require braces around arrow function bodies",
+            recommended: false,
+            url: "https://eslint.org/docs/latest/rules/arrow-body-style"
+        },
+
+        schema: {
+            anyOf: [
+                {
+                    type: "array",
+                    items: [
+                        {
+                            enum: ["always", "never"]
+                        }
+                    ],
+         

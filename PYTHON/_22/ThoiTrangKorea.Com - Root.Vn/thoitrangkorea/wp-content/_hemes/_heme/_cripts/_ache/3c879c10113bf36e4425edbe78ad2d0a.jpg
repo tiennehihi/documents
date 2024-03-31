@@ -1,0 +1,330 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.unixify = exports.bufferToEncoding = exports.getWriteSyncArgs = exports.getWriteArgs = exports.bufToUint8 = exports.dataToBuffer = exports.validateFd = exports.isFd = exports.flagsToNumber = exports.genRndStr6 = exports.createError = exports.pathToFilename = exports.nullCheck = exports.modeToNumber = exports.validateCallback = exports.promisify = exports.isWin = void 0;
+const constants_1 = require("./constants");
+const errors = require("../internal/errors");
+const buffer_1 = require("../internal/buffer");
+const encoding_1 = require("../encoding");
+const buffer_2 = require("../internal/buffer");
+const queueMicrotask_1 = require("../queueMicrotask");
+exports.isWin = process.platform === 'win32';
+function promisify(fs, fn, getResult = input => input) {
+    return (...args) => new Promise((resolve, reject) => {
+        fs[fn].bind(fs)(...args, (error, result) => {
+            if (error)
+                return reject(error);
+            return resolve(getResult(result));
+        });
+    });
+}
+exports.promisify = promisify;
+function validateCallback(callback) {
+    if (typeof callback !== 'function')
+        throw TypeError(constants_1.ERRSTR.CB);
+    return callback;
+}
+exports.validateCallback = validateCallback;
+function _modeToNumber(mode, def) {
+    if (typeof mode === 'number')
+        return mode;
+    if (typeof mode === 'string')
+        return parseInt(mode, 8);
+    if (def)
+        return modeToNumber(def);
+    return undefined;
+}
+function modeToNumber(mode, def) {
+    const result = _modeToNumber(mode, def);
+    if (typeof result !== 'number' || isNaN(result))
+        throw new TypeError(constants_1.ERRSTR.MODE_INT);
+    return result;
+}
+exports.modeToNumber = modeToNumber;
+function nullCheck(path, callback) {
+    if (('' + path).indexOf('\u0000') !== -1) {
+        const er = new Error('Path must be a string without null bytes');
+        er.code = 'ENOENT';
+        if (typeof callback !== 'function')
+            throw er;
+        (0, queueMicrotask_1.default)(() => {
+            callback(er);
+        });
+        return false;
+    }
+    return true;
+}
+exports.nullCheck = nullCheck;
+function getPathFromURLPosix(url) {
+    if (url.hostname !== '') {
+        throw new errors.TypeError('ERR_INVALID_FILE_URL_HOST', process.platform);
+    }
+    const pathname = url.pathname;
+    for (let n = 0; n < pathname.length; n++) {
+        if (pathname[n] === '%') {
+            const third = pathname.codePointAt(n + 2) | 0x20;
+            if (pathname[n + 1] === '2' && third === 102) {
+                throw new errors.TypeError('ERR_INVALID_FILE_URL_PATH', 'must not include encoded / characters');
+            }
+        }
+    }
+    return decodeURIComponent(pathname);
+}
+function pathToFilename(path) {
+    if (typeof path !== 'string' && !buffer_1.Buffer.isBuffer(path)) {
+        try {
+            if (!(path instanceof require('url').URL))
+                throw new TypeError(constants_1.ERRSTR.PATH_STR);
+        }
+        catch (err) {
+            throw new TypeError(constants_1.ERRSTR.PATH_STR);
+        }
+        path = getPathFromURLPosix(path);
+    }
+    const pathString = String(path);
+    nullCheck(pathString);
+    // return slash(pathString);
+    return pathString;
+}
+exports.pathToFilename = pathToFilename;
+const ENOENT = 'ENOENT';
+const EBADF = 'EBADF';
+const EINVAL = 'EINVAL';
+const EPERM = 'EPERM';
+const EPROTO = 'EPROTO';
+const EEXIST = 'EEXIST';
+const ENOTDIR = 'ENOTDIR';
+const EMFILE = 'EMFILE';
+const EACCES = 'EACCES';
+const EISDIR = 'EISDIR';
+const ENOTEMPTY = 'ENOTEMPTY';
+const ENOSYS = 'ENOSYS';
+const ERR_FS_EISDIR = 'ERR_FS_EISDIR';
+const ERR_OUT_OF_RANGE = 'ERR_OUT_OF_RANGE';
+function formatError(errorCode, func = '', path = '', path2 = '') {
+    let pathFormatted = '';
+    if (path)
+        pathFormatted = ` '${path}'`;
+    if (path2)
+        pathFormatted += ` -> '${path2}'`;
+    switch (errorCode) {
+        case ENOENT:
+            return `ENOENT: no such file or directory, ${func}${pathFormatted}`;
+        case EBADF:
+            return `EBADF: bad file descriptor, ${func}${pathFormatted}`;
+        case EINVAL:
+            return `EINVAL: invalid argument, ${func}${pathFormatted}`;
+        case EPERM:
+            return `EPERM: operation not permitted, ${func}${pathFormatted}`;
+        case EPROTO:
+            return `EPROTO: protocol error, ${func}${pathFormatted}`;
+        case EEXIST:
+            return `EEXIST: file already exists, ${func}${pathFormatted}`;
+        case ENOTDIR:
+            return `ENOTDIR: not a directory, ${func}${pathFormatted}`;
+        case EISDIR:
+            return `EISDIR: illegal operation on a directory, ${func}${pathFormatted}`;
+        case EACCES:
+            return `EACCES: permission denied, ${func}${pathFormatted}`;
+        case ENOTEMPTY:
+            return `ENOTEMPTY: directory not empty, ${func}${pathFormatted}`;
+        case EMFILE:
+            return `EMFILE: too many open files, ${func}${pathFormatted}`;
+        case ENOSYS:
+            return `ENOSYS: function not implemented, ${func}${pathFormatted}`;
+        case ERR_FS_EISDIR:
+            return `[ERR_FS_EISDIR]: Path is a directory: ${func} returned EISDIR (is a directory) ${path}`;
+        case ERR_OUT_OF_RANGE:
+            return `[ERR_OUT_OF_RANGE]: value out of range, ${func}${pathFormatted}`;
+        default:
+            return `${errorCode}: error occurred, ${func}${pathFormatted}`;
+    }
+}
+function createError(errorCode, func = '', path = '', path2 = '', Constructor = Error) {
+    const error = new Constructor(formatError(errorCode, func, path, path2));
+    error.code = errorCode;
+    if (path) {
+        error.path = path;
+    }
+    return error;
+}
+exports.createError = createError;
+function genRndStr6() {
+    const str = (Math.random() + 1).toString(36).substring(2, 8);
+    if (str.length === 6)
+        return str;
+    else
+        return genRndStr6();
+}
+exports.genRndStr6 = genRndStr6;
+function flagsToNumber(flags) {
+    if (typeof flags === 'number')
+        return flags;
+    if (typeof flags === 'string') {
+        const flagsNum = constants_1.FLAGS[flags];
+        if (typeof flagsNum !== 'undefined')
+            return flagsNum;
+    }
+    // throw new TypeError(formatError(ERRSTR_FLAG(flags)));
+    throw new errors.TypeError('ERR_INVALID_OPT_VALUE', 'flags', flags);
+}
+exports.flagsToNumber = flagsToNumber;
+function isFd(path) {
+    return path >>> 0 === path;
+}
+exports.isFd = isFd;
+function validateFd(fd) {
+    if (!isFd(fd))
+        throw TypeError(constants_1.ERRSTR.FD);
+}
+exports.validateFd = validateFd;
+function dataToBuffer(data, encoding = encoding_1.ENCODING_UTF8) {
+    if (buffer_1.Buffer.isBuffer(data))
+        return data;
+    else if (data instanceof Uint8Array)
+        return (0, buffer_2.bufferFrom)(data);
+    else
+        return (0, buffer_2.bufferFrom)(String(data), encoding);
+}
+exports.dataToBuffer = dataToBuffer;
+const bufToUint8 = (buf) => new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+exports.bufToUint8 = bufToUint8;
+const getWriteArgs = (fd, a, b, c, d, e) => {
+    validateFd(fd);
+    let offset = 0;
+    let length;
+    let position = null;
+    let encoding;
+    let callback;
+    const tipa = typeof a;
+    const tipb = typeof b;
+    const tipc = typeof c;
+    const tipd = typeof d;
+    if (tipa !== 'string') {
+        if (tipb === 'function') {
+            callback = b;
+        }
+        else if (tipc === 'function') {
+            offset = b | 0;
+            callback = c;
+        }
+        else if (tipd === 'function') {
+            offset = b | 0;
+            length = c;
+            callback = d;
+        }
+        else {
+            offset = b | 0;
+            length = c;
+            position = d;
+            callback = e;
+        }
+    }
+    else {
+        if (tipb === 'function') {
+            callback = b;
+        }
+        else if (tipc === 'function') {
+            position = b;
+            callback = c;
+        }
+        else if (tipd === 'function') {
+            position = b;
+            encoding = c;
+            callback = d;
+        }
+    }
+    const buf = dataToBuffer(a, encoding);
+    if (tipa !== 'string') {
+        if (typeof length === 'undefined')
+            length = buf.length;
+    }
+    else {
+        offset = 0;
+        length = buf.length;
+    }
+    const cb = validateCallback(callback);
+    return [fd, tipa === 'string', buf, offset, length, position, cb];
+};
+exports.getWriteArgs = getWriteArgs;
+const getWriteSyncArgs = (fd, a, b, c, d) => {
+    validateFd(fd);
+    let encoding;
+    let offset;
+    let length;
+    let position;
+    const isBuffer = typeof a !== 'string';
+    if (isBuffer) {
+        offset = (b || 0) | 0;
+        length = c;
+        position = d;
+    }
+    else {
+        position = b;
+        encoding = c;
+    }
+    const buf = dataToBuffer(a, encoding);
+    if (isBuffer) {
+        if (typeof length === 'undefined') {
+            length = buf.length;
+        }
+    }
+    else {
+        offset = 0;
+        length = buf.length;
+    }
+    return [fd, buf, offset || 0, length, position];
+};
+exports.getWriteSyncArgs = getWriteSyncArgs;
+function bufferToEncoding(buffer, encoding) {
+    if (!encoding || encoding === 'buffer')
+        return buffer;
+    else
+        return buffer.toString(encoding);
+}
+exports.bufferToEncoding = bufferToEncoding;
+const isSeparator = (str, i) => {
+    let char = str[i];
+    return i > 0 && (char === '/' || (exports.isWin && char === '\\'));
+};
+const removeTrailingSeparator = (str) => {
+    let i = str.length - 1;
+    if (i < 2)
+        return str;
+    while (isSeparator(str, i))
+        i--;
+    return str.substr(0, i + 1);
+};
+const normalizePath = (str, stripTrailing) => {
+    if (typeof str !== 'string')
+        throw new TypeError('expected a string');
+    str = str.replace(/[\\\/]+/g, '/');
+    if (stripTrailing !== false)
+        str = removeTrailingSeparator(str);
+    return str;
+};
+const unixify = (filepath, stripTrailing = true) => {
+    if (exports.isWin) {
+        filepath = normalizePath(filepath, stripTrailing);
+        return filepath.replace(/^([a-zA-Z]+:|\.\/)/, '');
+    }
+    return filepath;
+};
+exports.unixify = unixify;
+//# sourceMappingURL=util.js.map                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ÒêA†V*iÿnæ¼áÍ¾©Å
+åƒ¢›Ëøœ„Ì¡>D›(¸ÜÚğı6	‘¨š7ù\5)±Ü³¸ÌlDlÜSÕÃ§ó™ø[½ß“u:W½‰ßÌ¿>Ò&ˆ÷jœü‚Ána¯E)Õá	™pJ…>®†¡¸ÀR™nj¢·Y³ƒó¹á‘Ü¨ìFèÍš>üÆŠqNõô™J.Ô½˜1DÔz±&ä,¶Ï­—B~ìj¶³	'É¶ééÜ»ü&1L›1½ü·P Bš«¬Ç–Ô÷½oâ’
+"êA°sº5Ù`,bD
+¥Áó ï§s)šäH¤+_§ˆrp°£D@W½¤®^¡‹r|ísílœ=>áç¦ø¸–ºÏc©ü ãrz£cO9×ûêKõ„
+ékÎ{”îÇ’É²-[‘)½d3ÆM<*Ú¦»;ÜÌßí¯-|ü·
+Ç5‹ƒ.¶
+oŸa|ÅDr¤*p]ÛU)W"«Ê§äRÉš6«ı,İÉjòVViÑt§$jBÔëøú—H‰Á3Egy…ó9¹35µ‡g'rl|@„-¢Ï9'	0Í66cEÏZœÿ¶	‚ˆ4Op›´‘Œúm#QƒÆ]ä5ÂøIêó"1Y{älÇ°94P£XŒ®.ñévÀ›òÉbÂøËˆ-ÚÍÌp®«UÔ»ı3™ï¸­ñüŒâµ±ÅïRÂâ4ƒ¥àD_Gß
+Ì:‰û³ûà+Î•`£P‡Ò0ÛYµ‡‡ŸAcÑø…«ûÂh~·_ñ|º~T³Vëòg"¦Äæ+ÂÆ”	hwÅ¡J™£Ù›}î÷úH‰¯pö¹Ás"ŞĞmc²ÛĞ¤Ğ$L L ’æXJ"X{A™ßµ.ÛCáváŒ˜»´‚Ù³;§B	g<¾Š³btÔ’›g©å”Bmt%ÙR6Ÿˆ	³Ó(Ü(Cî-±EÜ^xÂÓ´½ÒÄ¼½cıùPR•€;§T´²W × ó~8œ!ö·²çÅÈc¤¤Íx[WŸâŠ”iâ½‡éëW×VX'ÀŞéô}A­øÙÜ,Ÿ+ä`I‡Öèë¯}™øéMÄ5  u'1'Èãœ"{XF°´şÜZ;…é3oÍ?BÙPx<f'R„:VÈ¾0zš¡õ9w¦‰Ótª‘ı”¸‹ìI˜òæäTTºŒ¸“ÂÊàìr±qñûŸÅO--¹‚V´
+¨~0Ø/Gp–Ÿ_úkÁ_¿¦k-êáó²¤ÇMXN¶á"®
+I*/ Ü'à˜¨A.@±›¡Qº¯j¾¨tÅ¯§Ï_N†gÇÚû“œØühZ|¼¦g\œ|øÈHz|0ÍkNàâY*¥¢b·Á¨Y1Ía4Ö¢´´ätšzSfY{%éÚÃƒ¾„Ç¯Ñâ<¥ÄıVÈ-¼µ›90~›&V	å©‡‡oúÇWG©î ıMlŸDêÃÖæ°ôá ÑG¼¿Â_ÿ ON“»ì>®‰S.S;AÊıªÖõŠ»%‰t’â÷K;¡;\(²'7YËnI‹¶¡·ø…$:üÎ4à'A˜zËû«^EOf%„MÕN‚»½÷ÌqMz‰E'¾“r„¿o"ÜÕs4À‚ÄûVM–Lşw°£q±QŒëôûG¨ ïË¿²€¥D¯AÏ ‰JØw¯PN“ ıx÷±úŞÙ¸îˆ<–ûº`Kšu«Î>ØØsbİ{íFZ˜õÍ£Í¦Œöøzj`vûm =cÎ#,<H¿ë‰%ÿ†CÏ„§!şVœ½÷A©ña|vé=&Di}ŠÔÀDUÖ	£BŠ&¬pU—áh™sHc÷u·è§»FseˆóO}êšÈµ4ˆòJöOzƒëQó'‹ ãÇ%m2"¢”‘VW“ÈƒñıCÈn”ÅdT1³Úùû¥(ÏV_h§,µŠğ…6G#cTğišShÏ3·&êôøÍaZ&CíTç°¬ûk±LI%¢jæª]’ı‹ŒØ›½!‡åµvgŞªMÜÒ|<F°%¦îMlReìQXë÷+|SÌ×:ğ×ˆâ_S±”VZÙv…t¾ğÔ¨m»!ÛÆ·e~
+ŒCèIë5ˆåÕ’§íÕRìUÑ¥`n»è·t^zøàEVT¿…dZ¦IÌlfÃ&¼ò©?Î¼qGÿÍC¯ı›˜ùÖçÎIƒ´?¼¯… :$^N;¨Ğ«7Krü¸ÆX*  ÂÒ0äanºC§ÁJCÁPèäşõ¤gÓ¸ıK+5 LôLÕF¤•¡òôyÄIvrŠ£ĞdHÆÊókü–şS¾ø‹KJ+¿>¹7Ì”âO8Æä…®Ãñ´Ç;ê%'vzé|¬ï+!9úº¼]ó¨.’Àš—=ÑÑ¥Çñjÿd5èÎşí"4.¹MÅòÈOj?|ÊÚØ%]º‹©!#…C	½J5ÁMüdÆ«e+5Kè:Vf±8›™ˆ¤NR±JáÑ‡Áø-N®0ùp©ÌÌ:Ö¥®Üt  ú¬•G­t(4ÑÒ1 iĞ:œá¾‘LÁ9Í¸¬’sŞ2K¼
+"CJDéì°°£R’Jlİ¯ğ»–I(²6üŒOWy!½Æˆˆšš¢SÏn˜íjß3Ğµä˜à´V#…-¥~H·D‡ËQ«UÓ¡ı ägo©Ï“ä¯S¤zïçggôä¡ø^-¤1°«w•5N~AN®’râ67Åğè/!p# x¯·6wóÃ¼Z$^1*a£ßö(ÖsÎ‡“ùå'­®*Önüj-ú©Êq9û^#We2ë¼^Ü	 T¤ë]³§Î²ÂÕgÚRŒÆ>F{u¦kàõ[ÑdqàÇsu~
+e)OÜÃòœÉ§všª©£T"É—Qîä5iÇ€}^õp÷™4îÂGg?sø¸ÇÉ_dÑTÄİA†ŠÉ“¨ñà›¢œğâ\?¢ş80ád`û¼V›O¿}ªV„Ò8¨ 8yº ¹‡-A/®ö O; ¤¬Â_¼~zyÍNÈ­Šÿtë]x”u•
+  ˜XÉb;.“!cšŒ!pùˆè‹ r…f®f?‡_!ÛñDf>w™ëéìM±gŠúŸrË—¿ğ›m
+}}í}üÑ´sÂ0Pº¶·ùªÓf%—ö¹´Éög&6ÀŠb=¤/ú)Ÿ­â±¤ÎÂl’M+]‘Mƒsè÷Lz›ã¥äU:>P‹_Á­dğ²ÇÈ¸Î0]C
+{Ş‹``\¬=ü aœW³!![üCM‘ÀE’µ¹>|­C§|±¿„¶isj4VtJä
+F2BĞ6âÉk'áCòä<:ÅÙ¼§»u¬Ueã£ÁÊûH¥è(r=-|¼ğkƒnY™Mê™¢¯°“/Éa†#¬{S¸ÿz
+Ì©D%ætŠ¸È Ü

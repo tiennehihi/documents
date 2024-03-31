@@ -1,0 +1,71 @@
+{
+  "name": "memfs",
+  "version": "4.7.7",
+  "description": "In-memory file-system with Node's fs API.",
+  "keywords": [
+    "fs",
+    "filesystem",
+    "fs.js",
+    "memory-fs",
+    "memfs",
+    "file",
+    "file system",
+    "mount",
+    "memory",
+    "in-memory",
+    "virtual",
+    "test",
+    "testing",
+    "mock",
+    "fsa",
+    "file system access",
+    "native file system",
+    "webfs",
+    "crudfs",
+    "opfs",
+    "casfs",
+    "content addressable storage"
+  ],
+  "homepage": "https://github.com/streamich/memfs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/streamich/memfs.git"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/streamich"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "streamich",
+    "url": "https://github.com/streamich"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "dist",
+    "README.md",
+    "LICENSE",
+    "demo/runkit.js"
+  ],
+  "scripts": {
+    "build": "tsc -p . && rimraf --glob lib/__tests__ 'lib/**/__tests__'",
+    "build:webfs": "NODE_ENV=production webpack --config ./src/webfs/webpack.config.js",
+    "clean": "rimraf lib types",
+    "demo:crud-and-cas": "webpack serve --config ./demo/crud-and-cas/webpack.config.js",
+    "demo:fsa-to-node-sync-tests": "webpack serve --config ./demo/fsa-to-node-sync-tests/webpack.config.js",
+    "demo:fsa-to-node-zipfile": "webpack serve --config ./demo/fsa-to-node-zipfile/webpack.config.js",
+    "demo:git-fsa": "webpack serve --config ./demo/git-fsa/webpack.config.js",
+    "demo:git-opfs": "webpack serve --config ./demo/git-opfs/webpack.config.js",
+    "demo:webfs": "webpack serve --config ./src/webfs/webpack.config.js",
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --check .",
+    "test": "jest --maxWorkers 2",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch",
+    "tslint": "tslint \"src/**/*.ts\" -t verbose",
+    "typecheck": "tsc -p .",
+    "watch": "watch \"npm run build\" ./src"
+  },
+  "commitlint"

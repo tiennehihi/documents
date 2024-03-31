@@ -1,0 +1,15 @@
+/**
+ * Source: ftp://ftp.unicode.org/Public/UCD/latest/ucd/SpecialCasing.txt
+ */
+var SUPPORTED_LOCALE = {
+    tr: {
+        regexp: /\u0130|\u0049|\u0049\u0307/g,
+        map: {
+            İ: "\u0069",
+            I: "\u0131",
+            İ: "\u0069",
+        },
+    },
+    az: {
+        regexp: /\u0130/g,
+        ma

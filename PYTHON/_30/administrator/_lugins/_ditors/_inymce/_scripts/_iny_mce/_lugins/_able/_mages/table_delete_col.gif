@@ -1,0 +1,4 @@
+t_section = this._Section(this, undefined)
+        this._current_section = this._root_section
+
+        this._whitespace_matcher = /[ \t\n\r\f\v]+/g // eq

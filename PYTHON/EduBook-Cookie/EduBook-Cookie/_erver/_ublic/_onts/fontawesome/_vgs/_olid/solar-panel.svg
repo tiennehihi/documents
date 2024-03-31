@@ -1,0 +1,48 @@
+        - 10f7c4
+  changes:
+    - 5.6.0
+    - 5.8.2
+    - 5.10.2
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: SIM Card
+  unicode: f7c4
+  voted: true
+simplybuilt:
+  changes:
+    - 4.3.0
+    - 5.0.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: SimplyBuilt
+  unicode: f215
+  voted: false
+sink:
+  aliases:
+    unicodes:
+      secondary:
+        - 10e06d
+  changes:
+    - 5.13.0
+    - 5.13.1
+    - 5.14.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      -

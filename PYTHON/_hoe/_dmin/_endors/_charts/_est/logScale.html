@@ -1,0 +1,57 @@
+rtyInfoRecord(name, BOOLEAN, false, // mustUseProperty
+    name.toLowerCase(), // attributeName
+    null, // attributeNamespace
+    false, // sanitizeURL
+    false);
+  }); // These are the few React props that we set as DOM properties
+  // rather than attributes. These are all booleans.
+
+  ['checked', // Note: `option.selected` is not updated if `select.multiple` is
+  // disabled with `removeAttribute`. We have special logic for handling this.
+  'multiple', 'muted', 'selected' // NOTE: if you add a camelCased prop to this list,
+  // you'll need to set attributeName to name.toLowerCase()
+  // instead in the assignment below.
+  ].forEach(function (name) {
+    properties[name] = new PropertyInfoRecord(name, BOOLEAN, true, // mustUseProperty
+    name, // attributeName
+    null, // attributeNamespace
+    false, // sanitizeURL
+    false);
+  }); // These are HTML attributes that are "overloaded booleans": they behave like
+  // booleans, but can also accept a string value.
+
+  ['capture', 'download' // NOTE: if you add a camelCased prop to this list,
+  // you'll need to set attributeName to name.toLowerCase()
+  // instead in the assignment below.
+  ].forEach(function (name) {
+    properties[name] = new PropertyInfoRecord(name, OVERLOADED_BOOLEAN, false, // mustUseProperty
+    name, // attributeName
+    null, // attributeNamespace
+    false, // sanitizeURL
+    false);
+  }); // These are HTML attributes that must be positive numbers.
+
+  ['cols', 'rows', 'size', 'span' // NOTE: if you add a camelCased prop to this list,
+  // you'll need to set attributeName to name.toLowerCase()
+  // instead in the assignment below.
+  ].forEach(function (name) {
+    properties[name] = new PropertyInfoRecord(name, POSITIVE_NUMERIC, false, // mustUseProperty
+    name, // attributeName
+    null, // attributeNamespace
+    false, // sanitizeURL
+    false);
+  }); // These are HTML attributes that must be numbers.
+
+  ['rowSpan', 'start'].forEach(function (name) {
+    properties[name] = new PropertyInfoRecord(name, NUMERIC, false, // mustUseProperty
+    name.toLowerCase(), // attributeName
+    null, // attributeNamespace
+    false, // sanitizeURL
+    false);
+  });
+  var CAMELIZE = /[\-\:]([a-z])/g;
+
+  var capitalize = function (token) {
+    return token[1].toUpperCase();
+  }; // This is a list of all SVG attributes that need special casing, namespacing,
+  // or boolean

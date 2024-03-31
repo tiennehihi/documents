@@ -1,0 +1,17 @@
+pe(
+          /*firstDeclaration*/
+          void 0,
+          declaredType,
+          declaration,
+          type
+        );
+      }
+    }
+    if ((_a = symbol.parent) == null ? void 0 : _a.valueDeclaration) {
+      const possiblyAnnotatedSymbol = getFunctionExpressionParentSymbolOrSymbol(symbol.parent);
+      if (possiblyAnnotatedSymbol.valueDeclaration) {
+        const typeNode2 = getEffectiveTypeAnnotationNode(possiblyAnnotatedSymbol.valueDeclaration);
+        if (typeNode2) {
+          const annotationSymbol = getPropertyOfType(getTypeFromTypeNode(typeNode2), symbol.escapedName);
+          if (annotationSymbol) {
+   

@@ -1,0 +1,11 @@
+ttps://github.com/rollup/rollup/pull/4188): Fix typo in renderHelpers.ts (@eltociear)
+- [#4189](https://github.com/rollup/rollup/pull/4189): Move long path recursion prevention to MemberExpression (@lukastaegert)
+- [#4190](https://github.com/rollup/rollup/pull/4190): Stop recommending node-builtins (@curran)
+
+## 2.53.3
+
+_2021-07-21_
+
+### Bug Fixes
+
+- Solve an issue that could lead to severe memory issues and crashes wh

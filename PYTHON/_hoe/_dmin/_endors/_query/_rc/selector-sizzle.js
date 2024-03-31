@@ -1,0 +1,1 @@
+nItems: 0,\n                    maxItems: schema.length\n                };\n            }\n            return {\n                type: \"array\",\n                minItems: 0,\n                maxItems: 0\n            };\n\n        }\n\n        // Given a full schema, leave it alone\n        return schema || null;\n    }\n\n    /**\n     *

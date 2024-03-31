@@ -1,0 +1,8 @@
+/**
+ * Expose `pathtoRegexp`.
+ */
+
+module.exports = pathtoRegexp;
+
+/**
+ * Match matching groups in

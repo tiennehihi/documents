@@ -1,0 +1,36 @@
+# w3c-hr-time
+
+This module implements the W3C [High Resolution Time Level 2][HR-TIME] specification. It provides exactly three exports:
+
+- `Performance` class
+- `getGlobalMonotonicClockMS(): number`
+- `clockIsAccurate: boolean`
+
+In all APIs, a "high-resolution timestamp" means a number in milliseconds that may have a fractional part, if the system clock is accurate enough (see "Clock accuracy" section below). It is identical to the [`DOMHighResTimeStamp`][] type in the High Resolution Time spec.
+
+Portability is paramount to this module. It uses only APIs exposed from Node.js core like `Date.now()` and `process.hrtime()` and does not use or require any native modules. It also employs the [browser-process-hrtime][] module for graceful degrades for platforms that do not have `process.hrtime()` (such as browsers).
+
+## `Performance` class
+
+```js
+const { Performance } = require("w3c-hr-time");
+const performance = new Performance();
+
+console.log(performance.timeOrigin);
+// Prints a number close to Date.now() but that may have fractional parts, like
+// 1514888563819.351.
+
+console.log(new Date(performance.timeOrigin));
+// Prints a date close to new Date(), like 2018-01-02T10:22:43.819Z.
+
+setTimeout(() => {
+  console.log(performance.now());
+  // Prints a number close to 5000, like 5008.023059.
+}, 5000);
+```
+
+Perhaps the most interesting export is the [`Performance`][] class. By constructing the class, you can get an instance quite similar to the `window.performance` object in browsers. Specifically, the following APIs are implemented:
+
+* [`performance.now(): number`][`Performance#now()`] returns the high-resolution duration since the construction of the `Performance` object.
+* [`performance.timeOrigin: number`][`Performance#timeOrigin`] is a high-resolution timestamp of the `Performance` object's construction, expressed in [Unix time][].
+* [`performance.toJSON(): object`][`Performance#toJSON()`] returns an object with `timeOrigin` property set to the corresponding value of this object. This allows serializing the `Performance`

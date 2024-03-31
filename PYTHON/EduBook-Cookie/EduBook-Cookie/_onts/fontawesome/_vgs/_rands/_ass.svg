@@ -1,0 +1,80 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+const RuntimeGlobals = require("../RuntimeGlobals");
+const RuntimeModule = require("../RuntimeModule");
+const SelfModuleFactory = require("../SelfModuleFactory");
+const Template = require("../Template");
+const CommonJsExportsDependency = require("./CommonJsExportsDependency");
+const CommonJsFullRequireDependency = require("./CommonJsFullRequireDependency");
+const CommonJsRequireContextDependency = require("./CommonJsRequireContextDependency");
+const CommonJsRequireDependency = require("./CommonJsRequireDependency");
+const CommonJsSelfReferenceDependency = require("./CommonJsSelfReferenceDependency");
+const ModuleDecoratorDependency = require("./ModuleDecoratorDependency");
+const RequireHeaderDependency = require("./RequireHeaderDependency");
+const RequireResolveContextDependency = require("./RequireResolveContextDependency");
+const RequireResolveDependency = require("./RequireResolveDependency");
+const RequireResolveHeaderDependency = require("./RequireResolveHeaderDependency");
+const RuntimeRequirementsDependency = require("./RuntimeRequirementsDependency");
+
+const CommonJsExportsParserPlugin = require("./CommonJsExportsParserPlugin");
+const CommonJsImportsParserPlugin = require("./CommonJsImportsParserPlugin");
+
+const {
+	JAVASCRIPT_MODULE_TYPE_AUTO,
+	JAVASCRIPT_MODULE_TYPE_DYNAMIC
+} = require("../ModuleTypeConstants");
+const {
+	evaluateToIdentifier,
+	toConstantDependency
+} = require("../javascript/JavascriptParserHelpers");
+const CommonJsExportRequireDependency = require("./CommonJsExportRequireDependency");
+
+/** @typedef {import("../../declarations/WebpackOptions").JavascriptParserOptions} JavascriptParserOptions */
+/** @typedef {import("../Compilation")} Compilation */
+/** @typedef {import("../Compiler")} Compiler */
+/** @typedef {import("../Dependency").DependencyLocation} DependencyLocation */
+/** @typedef {import("../Module").BuildInfo} BuildInfo */
+/** @typedef {import("../javascript/JavascriptParser")} Parser */
+
+const PLUGIN_NAME = "CommonJsPlugin";
+
+class CommonJsPlugin {
+	/**
+	 * Apply the plugin
+	 * @param {Compiler} compiler the compiler instance
+	 * @returns {void}
+	 */
+	apply(compiler) {
+		compiler.hooks.compilation.tap(
+			PLUGIN_NAME,
+			(compilation, { contextModuleFactory, normalModuleFactory }) => {
+				compilation.dependencyFactories.set(
+					CommonJsRequireDependency,
+					normalModuleFactory
+				);
+				compilation.dependencyTemplates.set(
+					CommonJsRequireDependency,
+					new CommonJsRequireDependency.Template()
+				);
+
+				compilation.dependencyFactories.set(
+					CommonJsFullRequireDependency,
+					normalModuleFactory
+				);
+				compilation.dependencyTemplates.set(
+					CommonJsFullRequireDependency,
+					new CommonJsFullRequireDependency.Template()
+				);
+
+				compilation.dependencyFactories.set(
+					CommonJsRequireContextDependency,
+					contextModuleFactory
+				);
+				compilation.dependencyTemplates.set(
+					CommonJsRequireContextDependency,
+					new CommonJsRequireContextDependency.

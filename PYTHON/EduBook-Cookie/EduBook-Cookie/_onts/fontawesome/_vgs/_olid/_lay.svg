@@ -1,0 +1,2 @@
+import { GenerateSWOptions, GetManifestOptions, InjectManifestOptions, WebpackGenerateSWOptions, WebpackInjectManifestOptions } from '../types';
+export declare class WorkboxConfigError extend

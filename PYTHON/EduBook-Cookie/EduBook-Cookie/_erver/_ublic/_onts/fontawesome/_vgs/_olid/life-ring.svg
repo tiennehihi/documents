@@ -1,0 +1,32 @@
+   "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "circle-chevron-up": {
+    "aliases": {
+      "names": [
+        "chevron-circle-up"
+      ],
+      "unicodes": {
+        "secondary": [
+          "10f139"
+        ]
+      }
+    },
+    "changes": [
+      "3.1.0",
+      "5.0.0",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f139",
+    "label": "Circle chevron up",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321799,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM377 271c9.4 9.4 9.4 24.6 0 

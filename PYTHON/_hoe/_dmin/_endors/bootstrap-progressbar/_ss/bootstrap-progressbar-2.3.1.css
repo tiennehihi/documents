@@ -1,0 +1,599 @@
+rl": "https://developer.mozilla.org/docs/Web/CSS/overflow-wrap"
+  },
+  "overflow-x": {
+    "syntax": "visible | hidden | clip | scroll | auto",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Overflow"
+    ],
+    "initial": "visible",
+    "appliesto": "blockContainersFlexContainersGridContainers",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/overflow-x"
+  },
+  "overflow-y": {
+    "syntax": "visible | hidden | clip | scroll | auto",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Overflow"
+    ],
+    "initial": "visible",
+    "appliesto": "blockContainersFlexContainersGridContainers",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/overflow-y"
+  },
+  "overscroll-behavior": {
+    "syntax": "[ contain | none | auto ]{1,2}",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Box Model"
+    ],
+    "initial": "auto",
+    "appliesto": "nonReplacedBlockAndInlineBlockElements",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "nonstandard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/overscroll-behavior"
+  },
+  "overscroll-behavior-x": {
+    "syntax": "contain | none | auto",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Box Model"
+    ],
+    "initial": "auto",
+    "appliesto": "nonReplacedBlockAndInlineBlockElements",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "nonstandard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/overscroll-behavior-x"
+  },
+  "overscroll-behavior-y": {
+    "syntax": "contain | none | auto",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Box Model"
+    ],
+    "initial": "auto",
+    "appliesto": "nonReplacedBlockAndInlineBlockElements",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "nonstandard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/overscroll-behavior-y"
+  },
+  "padding": {
+    "syntax": "[ <length> | <percentage> ]{1,4}",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "length",
+    "percentages": "referToWidthOfContainingBlock",
+    "groups": [
+      "CSS Box Model"
+    ],
+    "initial": [
+      "padding-bottom",
+      "padding-left",
+      "padding-right",
+      "padding-top"
+    ],
+    "appliesto": "allElementsExceptInternalTableDisplayTypes",
+    "computed": [
+      "padding-bottom",
+      "padding-left",
+      "padding-right",
+      "padding-top"
+    ],
+    "order": "uniqueOrder",
+    "alsoAppliesTo": [
+      "::first-letter"
+    ],
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding"
+  },
+  "padding-block": {
+    "syntax": "<'padding-left'>{1,2}",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "logicalWidthOfContainingBlock",
+    "groups": [
+      "CSS Logical Properties"
+    ],
+    "initial": "0",
+    "appliesto": "allElements",
+    "computed": "asLength",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding-block"
+  },
+  "padding-block-end": {
+    "syntax": "<'padding-left'>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "logicalWidthOfContainingBlock",
+    "groups": [
+      "CSS Logical Properties"
+    ],
+    "initial": "0",
+    "appliesto": "allElements",
+    "computed": "asLength",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding-block-end"
+  },
+  "padding-block-start": {
+    "syntax": "<'padding-left'>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "logicalWidthOfContainingBlock",
+    "groups": [
+      "CSS Logical Properties"
+    ],
+    "initial": "0",
+    "appliesto": "allElements",
+    "computed": "asLength",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding-block-start"
+  },
+  "padding-bottom": {
+    "syntax": "<length> | <percentage>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "length",
+    "percentages": "referToWidthOfContainingBlock",
+    "groups": [
+      "CSS Box Model"
+    ],
+    "initial": "0",
+    "appliesto": "allElementsExceptInternalTableDisplayTypes",
+    "computed": "percentageAsSpecifiedOrAbsoluteLength",
+    "order": "uniqueOrder",
+    "alsoAppliesTo": [
+      "::first-letter"
+    ],
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding-bottom"
+  },
+  "padding-inline": {
+    "syntax": "<'padding-left'>{1,2}",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "logicalWidthOfContainingBlock",
+    "groups": [
+      "CSS Logical Properties"
+    ],
+    "initial": "0",
+    "appliesto": "allElements",
+    "computed": "asLength",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding-inline"
+  },
+  "padding-inline-end": {
+    "syntax": "<'padding-left'>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "logicalWidthOfContainingBlock",
+    "groups": [
+      "CSS Logical Properties"
+    ],
+    "initial": "0",
+    "appliesto": "allElements",
+    "computed": "asLength",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding-inline-end"
+  },
+  "padding-inline-start": {
+    "syntax": "<'padding-left'>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "logicalWidthOfContainingBlock",
+    "groups": [
+      "CSS Logical Properties"
+    ],
+    "initial": "0",
+    "appliesto": "allElements",
+    "computed": "asLength",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding-inline-start"
+  },
+  "padding-left": {
+    "syntax": "<length> | <percentage>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "length",
+    "percentages": "referToWidthOfContainingBlock",
+    "groups": [
+      "CSS Box Model"
+    ],
+    "initial": "0",
+    "appliesto": "allElementsExceptInternalTableDisplayTypes",
+    "computed": "percentageAsSpecifiedOrAbsoluteLength",
+    "order": "uniqueOrder",
+    "alsoAppliesTo": [
+      "::first-letter"
+    ],
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding-left"
+  },
+  "padding-right": {
+    "syntax": "<length> | <percentage>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "length",
+    "percentages": "referToWidthOfContainingBlock",
+    "groups": [
+      "CSS Box Model"
+    ],
+    "initial": "0",
+    "appliesto": "allElementsExceptInternalTableDisplayTypes",
+    "computed": "percentageAsSpecifiedOrAbsoluteLength",
+    "order": "uniqueOrder",
+    "alsoAppliesTo": [
+      "::first-letter"
+    ],
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding-right"
+  },
+  "padding-top": {
+    "syntax": "<length> | <percentage>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "length",
+    "percentages": "referToWidthOfContainingBlock",
+    "groups": [
+      "CSS Box Model"
+    ],
+    "initial": "0",
+    "appliesto": "allElementsExceptInternalTableDisplayTypes",
+    "computed": "percentageAsSpecifiedOrAbsoluteLength",
+    "order": "uniqueOrder",
+    "alsoAppliesTo": [
+      "::first-letter"
+    ],
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/padding-top"
+  },
+  "page-break-after": {
+    "syntax": "auto | always | avoid | left | right | recto | verso",
+    "media": [
+      "visual",
+      "paged"
+    ],
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Pages"
+    ],
+    "initial": "auto",
+    "appliesto": "blockElementsInNormalFlow",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/page-break-after"
+  },
+  "page-break-before": {
+    "syntax": "auto | always | avoid | left | right | recto | verso",
+    "media": [
+      "visual",
+      "paged"
+    ],
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Pages"
+    ],
+    "initial": "auto",
+    "appliesto": "blockElementsInNormalFlow",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/page-break-before"
+  },
+  "page-break-inside": {
+    "syntax": "auto | avoid",
+    "media": [
+      "visual",
+      "paged"
+    ],
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Pages"
+    ],
+    "initial": "auto",
+    "appliesto": "blockElementsInNormalFlow",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/page-break-inside"
+  },
+  "paint-order": {
+    "syntax": "normal | [ fill || stroke || markers ]",
+    "media": "visual",
+    "inherited": true,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Text"
+    ],
+    "initial": "normal",
+    "appliesto": "textElements",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "experimental",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/paint-order"
+  },
+  "perspective": {
+    "syntax": "none | <length>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "length",
+    "percentages": "no",
+    "groups": [
+      "CSS Transforms"
+    ],
+    "initial": "none",
+    "appliesto": "transformableElements",
+    "computed": "absoluteLengthOrNone",
+    "order": "uniqueOrder",
+    "stacking": true,
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/perspective"
+  },
+  "perspective-origin": {
+    "syntax": "<position>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "simpleListOfLpc",
+    "percentages": "referToSizeOfBoundingBox",
+    "groups": [
+      "CSS Transforms"
+    ],
+    "initial": "50% 50%",
+    "appliesto": "transformableElements",
+    "computed": "forLengthAbsoluteValueOtherwisePercentage",
+    "order": "oneOrTwoValuesLengthAbsoluteKeywordsPercentages",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/perspective-origin"
+  },
+  "place-content": {
+    "syntax": "<'align-content'> <'justify-content'>?",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Box Alignment"
+    ],
+    "initial": "normal",
+    "appliesto": "multilineFlexContainers",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/place-content"
+  },
+  "place-items": {
+    "syntax": "<'align-items'> <'justify-items'>?",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Box Alignment"
+    ],
+    "initial": [
+      "align-items",
+      "justify-items"
+    ],
+    "appliesto": "allElements",
+    "computed": [
+      "align-items",
+      "justify-items"
+    ],
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/place-items"
+  },
+  "place-self": {
+    "syntax": "<'align-self'> <'justify-self'>?",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Box Alignment"
+    ],
+    "initial": [
+      "align-self",
+      "justify-self"
+    ],
+    "appliesto": "blockLevelBoxesAndAbsolutelyPositionedBoxesAndGridItems",
+    "computed": [
+      "align-self",
+      "justify-self"
+    ],
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/place-self"
+  },
+  "pointer-events": {
+    "syntax": "auto | none | visiblePainted | visibleFill | visibleStroke | visible | painted | fill | stroke | all | inherit",
+    "media": "visual",
+    "inherited": true,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "Pointer Events"
+    ],
+    "initial": "auto",
+    "appliesto": "allElements",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/pointer-events"
+  },
+  "position": {
+    "syntax": "static | relative | absolute | sticky | fixed",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Positioning"
+    ],
+    "initial": "static",
+    "appliesto": "allElements",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "stacking": true,
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/position"
+  },
+  "quotes": {
+    "syntax": "none | [ <string> <string> ]+",
+    "media": "visual",
+    "inherited": true,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Generated Content"
+    ],
+    "initial": "dependsOnUserAgent",
+    "appliesto": "allElements",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/quotes"
+  },
+  "resize": {
+    "syntax": "none | both | horizontal | vertical | block | inline",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Basic User Interface"
+    ],
+    "initial": "none",
+    "appliesto": "elementsWithOverflowNotVisibleAndReplacedElements",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/resize"
+  },
+  "right": {
+    "syntax": "<length> | <percentage> | auto",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "lpc",
+    "percentages": "referToWidthOfContainingBlock",
+    "groups": [
+      "CSS Positioning"
+    ],
+    "initial": "auto",
+    "appliesto": "positionedElements",
+    "computed": "lengthAbsolutePercentageAsSpecifiedOtherwiseAuto",
+    "order": "uniqueOrder",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/right"
+  },
+  "rotate": {
+    "syntax": "none | <angle> | [ x | y | z | <number>{3} ] && <angle>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "transform",
+    "percentages": "no",
+    "groups": [
+      "CSS Transforms"
+    ],
+    "initial": "none",
+    "appliesto": "transformableElements",
+    "computed": "asSpecified",
+    "order": "perGrammar",
+    "stacking": true,
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/rotate"
+  },
+  "row-gap": {
+    "syntax": "normal | <length-percentage>",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "lpc",
+    "percentages": "referToDimensionOfContentArea",
+    "groups": [
+      "CSS Box Alignment"
+    ],
+    "initial": "normal",
+    "appliesto": "multiColumnElementsFlexContainersGridContainers",
+    "computed": "asSpecifiedWithLengthsAbsoluteAndNormalComputingToZeroExceptMultiColumn",
+    "order": "perGrammar",
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/row-gap"
+  },
+  "ruby-align": {
+    "syntax": "start | center | space-between | space-around",
+    "media": "visual",
+    "inherited": true,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Ruby"
+    ],
+    "initial": "space-around",
+    "appliesto": "rubyBasesAnnimport { Parser } from './';
+
+declare const parser: {
+    parsers: {
+        typescript: Parser;
+    };
+};
+export = parser;
+                                                                                                                                                                                                                                                                                                                                                                                                    :1¸80QÂIÆ
+yb³$ $@w¤rN¿]'|_w^OœX™à$#M1/y&Hp®ÿíJÆÙ?w a%Òª×s¯×ı¹Ç‘2rş·7äàz¬³Vg/:÷óÛÕlÙÏ¦i¾Zı­ü‘ağñŠåÖ!æCÙjkb.?\.‘‰;bv‹{Èvƒô?òöœÏİs¹ú<[v—WŸf—·WóëCÅDØ2Û'k‘v¿h.1şéìµQ´Ê‰–
+{;Ñ¢ı¹a´EwíX8ôrÿp¡oûÍ“œi7ôëÆÍå‡ë§¯À×;ÅÌ‚	&w¹{Øoz´öcËh“5®ÄTŸ"úMrOA-,ÑtÑóëˆWç GhÔ[ıÃi öW8úGWÚC²áÕŞOx\W“œzƒiOş¯úÍQ¯'zÛ©¾ÚÔ‹¢ï˜TYöñÈCduG©ßRåÌ3jì’Ö=ÂhîÕ8âº£TŒ%I4JU	Vƒ¦ºVì¥€=b©®FQÚ	¨©±İÚëEoîõrl7£RAõİQ±şÇ±@FÉ_Ñ°8|YÈûbEd0 ÂkrqMÎ7¢õÏ¶« ìa "°€GÜ Áä½š¾®%@sÑRÉu_oŞ$p}·˜qŠÚë©Öä@@£iéô­t@‰–ïĞ¸Á[ ,G›jq›¾–wOô A³Q¬~1j[r	”™õe¥'S»¥«'Û-“>ÏD]peYA’ªQc“Æ9Tl|ùT§l
+pËÚâÛËºú2"ê¬ÆPŒxNÚ’º5õ×S»ûmÛbè(†bèŸ(†^¶R‚õ­I³Ìß(­ãàvtXó„ãÔÎÿàzÇÿàÃçËåÇGzêt³\Îw½"ç·İüãçIÃšº¾[İ}ş(:ìSÂåõêîòîóİáˆPMyJ„úş¡Ì_M«-¯MYV¢Âü˜8Ë]y7½ì-DTßû_—³8~Íë	ËĞ™õÛoëó}¿ı~‚Ş=1y2,eFØç<cI1võ·ŞTEóÈ]Î¿l=]“Œ=8væÇ©o‹Ã t·â^—‡·362h-¤l·ÏÔÄMc{C¿y¸şÿò¯{oÊã\wë\ãdGiïeœœÆ^ïÙ.ù¿ñƒ…ìEı}Ûî;>+ñM1fÛÏÏ×~^4,/¯ÿÛ1Ä¯ÅÔ4»»›MµHl‹G°z¢ÿp{óûüQ´ëÕÍıüPß¦'¿Î›öìt¢Œ¸d¢âlÿÂ¹Ò‚¶šÃ®)¾«›I†Qq[D¬ZYi‡¢p1uˆ€Ÿè	_7a}TïÆı²Ş¸Ô—†ú‰PÓo'c} I‘Ìr`É]İ|wâÃ&ñ` $Å8“[„¨ˆ#0+®k§w®Ö'Ú-òšrß
+ç{SZÊ¹TÚ>ÑfÑƒã´'^°ûÁš¸šƒPÓØ?NãNF\·?·OŠh+%ışBız%üMÊ7•¼İ"BW7­a„MÃè[{Úi7›f´ieOçw&ş¡,`¨V2Ã«3X¦Èİº™ŠŠ_ıíê¾ÌBÄ3foÎ£Ó¢H(÷S_ïÙ¾³Ô»»ñ<Õ¹¸L¶BšvŞ\÷×ïïêRtFÏ·íôğ„]ß[Ö_xKŠÃQeÑQıƒeÑË”Ğ›é÷-8ûxµ«ljJvØjõçÍí€Ê§ÛËûG€åP±€{¬­Ş‚2úUJQâ™	öß-e[Áİ t`B‡{M$ğ£z¤ WïÔwˆ½DpmuW¼…ôàîì¤gñ`îÛ%f¤2U;u	7t™ù%œ]0æU>GCWUH	Z[ƒoÌ©ôYÒ˜µ+wcç3á½Ï¤€”‘o?ä£Å<VŞvå½XÜ}3şëçİ?¥Ğ3nş·Á_Gñ÷ÏêAï,8±#ñ•¢ö˜JÌáYt”ß•lôL¯gî{â0QL×ÎÖ[W~ìÚƒòÿş(UmbO›x‘°¾›}úôñçG
+{Ö«jÒß·Ç^€=?‚D‰oÀDìœâ·H«ÈŠ²¥Ü£Ğ	uê¿ì+)!8œJd±«³‚C)½ÆşBÈ'îÿê­¬©°bãIÍ„	o„AWÎ]ú”Z˜[®'OİıÕ—bÕñİÅÁ/qÇ‹–#Ù$%‚œêÉ­Ì5K[*Jf€‘å}â
+ôEù4¢rª–Šñİ™æ[{È%'ÿËŞ•õ¶tÙ¿Bô³K`-,V=f<‹p>4ŒúM¡•Hİ’eH¶í_?÷œ[ÚlÙ?ÉF«#$¦(’âR¬ºu×sH^E–-Ä±éÑæg5O ŒAL+1æx• š®ác3/¡Jåş´¸ÙÃ@Ü´ä…¢Q¼Lia@¨Z´œ´šPj $§C:{¹Yüˆ<xGZ4OÇßUåwUù!ÿ9Í…]ávÛA6E.TFä¢BéDRã!µ ó@îÓ+ÔGŒ6¹@\Iv*ÇgñÀ_#©‘Û³¬÷@-€C¡HYBÊ_ŠØA5¦a»“|Iz€QX:ÙXÚ»<O™˜0¯§ÓÖ6¥µ­)­m–­mV­mV­Í{d?§l•W#@jëØk/C‹wnŞ¤Ñ+’3A‚„éğëÌ¬uŠ¼JHU ºúBÈ%Ûï
+å.ÌëPŞI2%C¤Ü„G	bß“9ª×j)¼®°DwÕV-GXµa:ªåĞF([°Šœî¬á Cwh‰Äš1ª"y`”OJä7ÈÉŞgÀğ:*”Ä“ì:É®“ì:É®•ìÚ«Ráv<í¿¬„¾—³`ØŸ]W×³ÑbËôMn§³­°ıíı×ñh><˜tS6Â1¸ vWäˆÂØ¡Iš€Âœ\µÍ4yDó;RKbHÅT'K#m$ ¿¢¸Ó^‚üSmóôÑÈxåŠƒ´­Ç˜_´BVŒ@
+§âÕœ,Ñ´\»ğ®ó-rÃL”åÃÄYkİÎı.<ó¾-	2j“êá†Øq‹ÉÎ¤{©š¨ÿ‡(ÿ­IäÙDSv‰\XTÚÆµ)»aå¢ÀVV¬@k¦.ı?—¿
+_1ê1Wÿ¾É‡	ØcşßSæø©»}wÛÇqq;Åi·Ó}ÓáæÔÄ®«_åĞÁ¸ú2˜-Fİ¶ç¸ßıÑßNõG··È>'ü ~:ƒüúå—}<MÊ©mÛ&»ğŞ ,5”0_“—Êyb‹[®›¯lª/¼è*BˆKGoÉ }¥M©ÊĞC=òGŸInŒöŒqVc˜¶¡(ï(<‡fBKvã%06ZWyÄO&ÃE&Zès‰ÆEÆ“¯C:¿ˆaµ¼dŠJ
+êˆº‰­’Ì!2¦±Ô0¡÷µ€p×U±Pœ©OÌr—Tà]ä…e€@0Ù³ÎÜŒêu€8¦¡´@»€šÖv.°àİ,(óºÒ¢:Ÿˆ‚ÏÊF±IKA.åY	]ZŞ
+`Ó»D$h=¢"¶\ƒåá™„ıPñ©¸«±K›„GéYe<m`¹Ø§h•¥èÑBNL:0£È»ZÀ*é<tRzU“Å{‡şëÕ„©Ó¢YXaM(mÈ£V#“XØ¿©÷ÜŠ¶¦« ’„€U„¢@¡.éX
+Wä4ˆNƒèo9ˆö²ç__©ùij
+î;»ô4³úÿ¾üÇ‡%" û¹ƒn	—~-K“½Ë&PfXèÕ½@·RRB}ö©@ŸImğSºšâ× Ë‚ß—¢•/@q/|£?	!B8ˆˆ”ª‹ºzá³»ò‚k2‰]šŸ!×–°e‚•}€&Éƒ4Æ¯ÆçpJ":+0wÀ‘Á]ø[ĞPrÙ•P€”±ÄÖm '“Nh<–¬ığ3éP!a1h¢~“_­U…JÒ~Æ¹w í÷%
+ %ú_äÇ?Uå÷hl&Ã8£–ğ¢Eíç(ñHüAòZÃĞ)¤]^Z3–AË&®D0]s
+DÅ³;_î—‹¹Y}7«½Xˆ‹:õ\%³:—¼8ˆŞ"’=„Y0ëw6ô`ŒÓ·ÜÕÅ/×š‰¦= *=£Š¥ëÈèù1Ş^^»“k¥ıĞ“·ü4¤NCê†Ô~÷`ö6îÖW¿ıÕ¬6·ßuÓûí¬ş¢×ßbú[é`ÃûI+‡ìÑ×§À4·³é·ÑøõZ«G¾ßû³ígŞò×;ÔŒù`önşâäŞ9eÌ)†pŒ|ÓËÀ˜ÆŠü}‘a <¡Ì¹Ï±â^­vœ/\ş=L3‹Ü¼›+üY¸½6“µËñs‘&Š.|||QrŠÊ‘)Û“½&q¸’&y[Ğ Çš-¢<8¯¬sØ\S"×Oş¦VBñÉhıÁ±äCóÎcÉ[†•k5ËZX@ÁgØØ6jü°Æ#&S6#UŒßN$hSúôï5¥k^mJæÊ©/6EL’¦.Lÿ kˆõÓˆ«ò$°ÑÙà0e3>yzÏV­Î†gyĞNœR×êLmC ù9AãøÅ×˜œ—8Á6‚ÕÌ#çË#—‰¢9:Ù3Iù->³tÛ²nrÔ%7İPVuÇQ‘‘ºØQv±Sé^TG¶T¼$v9év/$³Æ—*ŞS©{ÿ$€&¾<ÄhiÔ\#®—Ó1€•İƒ ZtÎ¾IW¸_Sù >à–Õ`LéŞ-x‚Ïbb´ä|GæQÑ|ğwT1óŸïí¼Eü=#íÌ\FÔğU™÷³KµoıW¤Zõ…íx²m·_Ä>Àyí¥§ª r ¸İfÎíàÅº&ã$N'uìğ‰ª-Yç«ÀÄFŸ•?û24Ìœç–Š±ª(»á8òxÑZÆ•Hœàä
+ã&1´Ôx¬±‡½AéÀIc`ìA5&;pù/²%Ñ² Û?|ÆSÜì9ÑâxÛzÔ¹¨‹Ü{f°ú$Âàtİõ:X8*—íémïû¶÷–½ó»Ùô¦÷‘²÷‰ íÆÓ»á,¿ùDïlcãMŞßü>¿ío§ÍïGw“¶_ŸH[ÊØO«6;9»Ó™ÀS¦·ÁQaL¤,dú”¾‰dƒå™:	’¥sgxú	K²‘%ısÊÏm+vş!AAÏ½öZœÇqœíòœîh[^ó"¥Ÿ µLÔ8}…ízÉ5{µI«>­¤êê¡ÈŠµ.SÊùÀ¦±p°‰/öÜÊ¼¢Ğã–†šyÀ±M <âÆÖPW®`¹\)`°\QÊÏŠÀ¯L$@nE8w¹e*#3#8®@“kÜÉ ,@¾"SLD“;§Qê]R—°|EB¤za`ïkj½Eş8£8²ŠÖq3Ä%÷UÜ·ˆ™Œ»u>^	Q‘`ê”LG·¨‘÷*"Í<.¤]/l¾ù¶ºÊVy˜àÔ;_9„+5š;Ö1¹uNƒí4Ø{°í«etÃA÷ÇÇZwƒÛGƒî—mµÅ`¦Sñ¡Ô‡n·úp¾q+ïS¬ßÙDûÉ#Uïèı» ´[	zKô.­šs½R>‡·3kdZÜ°é¥Ãs4Q>fhşôx`Å{d§McPo¡PÍÁ¬ZîÖÙ/§±Nd ë–§(×sj™¤c2O}îÒçöHF³n<x%yµıåìM’°ÿg$É¸¯×ÏLkúja^÷ÓyMj:·Ö©ÛÚ\2Ş°eAÉšœD´EnUbQCÒ&•p”{Éÿ¹)ë&%]rƒÑeUw(e&¼Q¶TVYê¬v’—’ÍÎ( L^2c¤Ñ5Ô¬×àõf~½e"šõê´Š,±Î¤Rç
+T@n§…ÉD¢(07Ë!LòMO#5MÃLtæïghÍ¸ê9(å"ä¾ô¨Û†¾

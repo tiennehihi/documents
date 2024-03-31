@@ -1,0 +1,19 @@
+classic",
+          "style": "brands"
+        }
+      ]
+    }
+  },
+  "aviato": {
+    "changes": [
+      "5.0.0"
+    ],
+    "ligatures": [],
+    "unicode": "f421",
+    "label": "Aviato",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "brands": {
+          "lastModified": 1660014468,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 512\"><path d=\"M107.2 283.5l-19-41.8H36.1l-19 41.8H0l62.2-131.4 62.2 131.4h-17.2zm-45-98.1l-19.6 42.5h39.2l-19.6-42.5zm112.7 102.4l-62.2-131.4h17.1l45.1 96 45.1-96h17l-62.1 131.4zm80.6-4.3V156.4H271v127.1h-15.5zm209.1-115.6v115.6h-17.3V167.9h-41.2v-11.5h99.6v11.5h-41.1zM640 218.8c0 9.2-1.7 17.8-5.1 25

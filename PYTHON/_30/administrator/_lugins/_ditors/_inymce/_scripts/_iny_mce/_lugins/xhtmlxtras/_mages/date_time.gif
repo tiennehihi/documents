@@ -1,0 +1,1 @@
+member){const{privateNamesMap,file}=this,{object}=member.node,{name}=member.node.property.id;return _core.template.expression`BASE(REF, PROP)[PROP]`({BASE:file.addHelper("classPrivateFieldLooseBase"),REF:_core.types.cloneNode(object),PROP:_core.types.cloneNode(privateNamesMap.get(name).

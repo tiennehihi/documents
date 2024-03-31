@@ -1,0 +1,48 @@
+.header-nav-top {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 12px;
+}
+
+.nav-filter {
+    padding: 5px;
+    padding-left: 5px;
+}
+
+.fa-filter {
+    color: #dfd2d2;
+    padding-left: 6px;
+}
+
+.now {
+    font-weight: bold;
+    color: red;
+    border-left: 1px solid #ccc;
+    padding: 5px;
+}
+
+.header-nav-filter {
+    border-bottom: 1px solid #ccc;
+}
+
+.home,
+.home-next-content {
+    font-size: 12px;
+    line-height: 20px;
+    white-space: nowrap;
+}
+
+.home {
+    color: rgb(128, 128, 137);
+}
+
+.home-next-content {
+    color: #333;
+}
+
+.home:hover {
+    text-decoration: underline;
+}
+
+.home-next-content:hover {
+    opacity: 0.8;
+}

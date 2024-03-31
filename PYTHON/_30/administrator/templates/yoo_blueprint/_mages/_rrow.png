@@ -1,0 +1,6 @@
+'use strict';
+
+const matchOperatorsRegex = /[|\\{}()[\]^$+*?.-]/g;
+
+module.exports = string => {
+	if (typeo

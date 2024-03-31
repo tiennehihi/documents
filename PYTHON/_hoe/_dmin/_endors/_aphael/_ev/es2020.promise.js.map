@@ -1,0 +1,1 @@
+{"version":3,"names":["JSXAttribute","node","print","name","value","token","JSXIdentifier","word","JSXNamespacedName","namespace","JSXMemberExpression","object","property","JSXSpreadAttribute","argument","JSXExpressionContainer","expression","JSXSpreadChild","JSXText","raw","getPossibleRaw","undefined","JSXElement","ope

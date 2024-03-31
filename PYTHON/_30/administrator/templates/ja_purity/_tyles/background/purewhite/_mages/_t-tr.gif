@@ -1,0 +1,20 @@
+{
+  "application/1d-interleaved-parityfec": {
+    "source": "iana"
+  },
+  "application/3gpdash-qoe-report+xml": {
+    "source": "iana",
+    "charset": "UTF-8",
+    "compressible": true
+  },
+  "application/3gpp-ims+xml": {
+    "source": "iana",
+    "compressible": true
+  },
+  "application/3gpphal+json": {
+    "source": "iana",
+    "compressible": true
+  },
+  "application/3gpphalforms+json": {
+    "source": "iana",
+    "compressibl

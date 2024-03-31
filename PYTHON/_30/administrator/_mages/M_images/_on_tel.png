@@ -1,0 +1,31 @@
+ array = argument instanceof regenerate ?
+				dataToArray(argument.data) :
+				argument;
+			$this.data = dataIntersection($this.data, array);
+			return $this;
+		},
+		'contains': function(codePoint) {
+			return dataContains(
+				this.data,
+				isNumber(codePoint) ? codePoint : symbolToCodePoint(codePoint)
+			);
+		},
+		'clone': function() {
+			var set = new regenerate;
+			set.data = this.data.slice(0);
+			return set;
+		},
+		'toString': function(options) {
+			var result = createCharacterClassesFromData(
+				this.data,
+				options ? options.bmpOnly : false,
+				options ? options.hasUnicodeFlag : false
+			);
+			if (!result) {
+				// For an empty set, return something that can be inserted `/here/` to
+				// form a valid regular expression. Avoid `(?:)` since that matches the
+				// empty string.
+				return '[]';
+			}
+			// Use `\0` instead of `\x00` where possible.
+	

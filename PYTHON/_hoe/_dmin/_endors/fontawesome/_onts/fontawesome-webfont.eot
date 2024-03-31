@@ -1,0 +1,868 @@
+ista solo tiene hijos directos que estÃ¡n permitidos dentro de elementos <li>",
+      "fail": "El elemento de lista tiene hijos directos que no estÃ¡n permitidos dentro de elementos <li>"
+    },
+    "structured-dlitems": {
+      "pass": "Cuando no estÃ¡ vacÃ­o, el elemento tiene tanto elementos <dt> como <dd>",
+      "fail": "Cuando no estÃ¡ vacÃ­o, el elemento no tiene al menos un elemento <dt> seguido por, al menos, un elemento <dd>"
+    },
+    "caption": {
+      "pass": "El elemento multimedia tiene una pista de subtÃ­tulos",
+      "incomplete": "Comprobar que hay disponibles subtÃ­tulos para el elemento"
+    },
+    "frame-tested": {
+      "pass": "El marco incorporado fue probado con axe-core",
+      "fail": "El marco incorporado no se pudo probar con axe-core",
+      "incomplete": "El marco incorporado aÃºn tiene que probarse con axe-core"
+    },
+    "css-orientation-lock": {
+      "pass": "La pantalla es manejable y no existe bloqueo de orientaciÃ³n",
+      "fail": "Se aplica bloqueo de orientaciÃ³n CSS y hace que la pantalla sea inmanejable",
+      "incomplete": "No se puede determinar  si hay bloqueo de orientaciÃ³n CSS"
+    },
+    "meta-viewport-large": {
+      "pass": "La etiqueta <meta> no impide un zum significativo en dispositivos mÃ³viles",
+      "fail": "La etiqueta <meta> limita el zum en dispositivos mÃ³viles"
+    },
+    "meta-viewport": {
+      "pass": "La etiqueta <meta> no impide el zum en dispositivos mÃ³viles",
+      "fail": "${data} en la etiqueta <meta> impide el zum en dispositivos mÃ³viles"
+    },
+    "header-present": {
+      "pass": "La pÃ¡gina tiene un 'header'",
+      "fail": "La pÃ¡gina no tiene un 'header'"
+    },
+    "heading-order": {
+      "pass": "Horden de encabezados vÃ¡lido",
+      "fail": "Orden de encabezados no vÃ¡lido"
+    },
+    "internal-link-present": {
+      "pass": "Encontrado enlace de salto ('skip') vÃ¡lido",
+      "fail": "No se han encontrado enlaces de salto ('skip') vÃ¡lidos"
+    },
+    "landmark": {
+      "pass": "La pÃ¡gina tiene una regiÃ³n punto de referencia",
+      "fail": "La pÃ¡gina no tiene una regiÃ³n punto de referencia"
+    },
+    "meta-refresh": {
+      "pass": "La etiqueta <meta> no refresca la pÃ¡gina inmediatamente",
+      "fail": "La etiqueta <meta> fuerza el refresco programado de la pÃ¡gina"
+    },
+    "p-as-heading": {
+      "pass": "Los elementos <p> no se han diseÃ±ado como encabezados",
+      "fail": "DeberÃ­an usarse elementos de encabezado en vez de elementos <p> con estilos"
+    },
+    "region": {
+      "pass": "Todo el contenido de la pÃ¡gina estÃ¡ incluido en puntos de referencia",
+      "fail": "La pÃ¡gina tiene contenido no incluido en puntos de referencia"
+    },
+    "skip-link": {
+      "pass": "Existe el destino del enlace de salto ('skip')",
+      "incomplete": "El destino del enlace de salto ('skip') deberÃ­a volverse visible en la activaciÃ³n",
+      "fail": "No hay destino para el enlace de salto ('skip')"
+    },
+    "unique-frame-title": {
+      "pass": "El atributo title del elemento es Ãºnico",
+      "fail": "El atributo title del elemento no es Ãºnico"
+    },
+    "duplicate-id-active": {
+      "pass": "El documento no tiene elementos activos que compartan el mismo atributo id",
+      "fail": "El documento tiene elementos activos con el mismo atributo id: ${data}"
+    },
+    "duplicate-id-aria": {
+      "pass": "El documento no tiene elementos referidos con ARIA o etiquetas que compartan el mismo atributo id",
+      "fail": "El documento tiene mÃºltiples elementos referidos con ARIA con el mismo atributo id: ${data}"
+    },
+    "duplicate-id": {
+      "pass": "El documento no tiene elementos estÃ¡ticos que compartan el mismo atributo id",
+      "fail": "El documento tiene mÃºltiples elementos estÃ¡ticos con el mismo atributo id"
+    },
+    "aria-label": {
+      "pass": "El atributo aria-label existe y no estÃ¡ vacÃ­o",
+      "fail": "El atributo aria-label no existe o estÃ¡ vacÃ­o"
+    },
+    "aria-labelledby": {
+      "pass": "El atributo aria-labelledby existe y hace referencia a elementos visibles para lectores de pantalla",
+      "fail": "El atributo aria-labelledby no existe, hace referencia a elementos inexistentes o hace referencia a elementos vacÃ­os"
+    },
+    "avoid-inline-spacing": {
+      "pass": "No se han especificado estilos 'inline' con '!important' que afecten al espaciado de texto",
+      "fail": {
+        "singular": "Eliminar '!important' de inline styles ${data.values}, porque su anulaciÃ³n no estÃ¡ admitida en la mayorÃ­a de navegadores",
+        "plural": "Eliminar '!important' de inline style ${data.values}, porque su anulaciÃ³n no estÃ¡ admitida en la mayorÃ­a de navegadores"
+      }
+    },
+    "button-has-visible-text": {
+      "pass": "El elemento tiene texto interno visible para lectores de pantalla",
+      "fail": "El elemento no tiene texto interno visible para lectores de pantalla"
+    },
+    "doc-has-title": {
+      "pass": "El documento tiene un elemento <title> no vacÃ­o",
+      "fail": "El documento no tiene un elemento <title> no vacÃ­o"
+    },
+    "exists": {
+      "pass": "El elemento no existe",
+      "fail": "El elemento existe"
+    },
+    "has-alt": {
+      "pass": "El elemento tiene un atributo alt",
+      "fail": "El elemento no tiene un atributo alt"
+    },
+    "has-visible-text": {
+      "pass": "El elemento tiene texto visible para lectores de pantalla",
+      "fail": "El elemento no tiene texto visible para lectores de pantalla"
+    },
+    "is-on-screen": {
+      "pass": "El elemento no es visible",
+      "fail": "El elemento es visible"
+    },
+    "non-empty-alt": {
+      "pass": "El elemento tiene un atributo alt no vacÃ­o",
+      "fail": "El elemento no tiene atributo alt o el atributo alt estÃ¡ vacÃ­o"
+    },
+    "non-empty-if-present": {
+      "pass": {
+        "default": "El elemento no tiene un atributo de valor",
+        "has-label": "El elemento tiene un atributo de valor no vacÃ­o"
+      },
+      "fail": "El elemento tiene un atributo de valor y el atributo de valor estÃ¡ vacÃ­o"
+    },
+    "non-empty-title": {
+      "pass": "El elemento tiene un atributo title",
+      "fail": "El elemento no tiene atributo title o el atributo title estÃ¡ vacÃ­o"
+    },
+    "non-empty-value": {
+      "pass": "El elemento tiene un atributo de valor no vacÃ­o",
+      "fail": "El elemento no tiene un atributo de valor o el atributo de valor estÃ¡ vacÃ­o"
+    },
+    "role-none": {
+      "pass": "La semÃ¡ntica predeterminada del elemento se anulÃ³ mediante role=\"none\"",
+      "fail": "La semÃ¡ntica predeterminada del elemento no se anulÃ³ mediante role=\"none\""
+    },
+    "role-presentation": {
+      "pass": "La semÃ¡ntica predeterminada del elemento se anulÃ³ mediante role=\"presentation\"",
+      "fail": "La semÃ¡ntica predeterminada del elemento no se anulÃ³ mediante role=\"presentation\""
+    },
+    "caption-faked": {
+      "pass": "La primera fila de una tabla no se usa como tÃ­tulo ('caption')",
+      "fail": "La primera fila de la tabla deberÃ­a ser un tÃ­tulo ('caption') en vez de una celda de tabla"
+    },
+    "html5-scope": {
+      "pass": "El atributo scope solo se usa en elementos de encabezados de tabla (<th>)",
+      "fail": "En HTML 5, los atributos scope solo se pueden usar en elementos de encabezados de tabla (<th>)"
+    },
+    "same-caption-summary": {
+      "pass": "El contenido del atributo summary y de <caption> no estÃ¡n duplicados",
+      "fail": "El contenido del atributo summary y del elemento <caption> son idÃ©nticos"
+    },
+    "scope-value": {
+      "pass": "El atributo scope se usa correctamente",
+      "fail": "El valor del atributo scope solo puede ser 'row' o 'col'"
+    },
+    "td-has-header": {
+      "pass": "Todas las celdas de datos no vacÃ­as tienen encabezados de tabla",
+      "fail": "Algunas celdas de datos no vacÃ­as no tienen encabezados de tabla"
+    },
+    "td-headers-attr": {
+      "pass": "El atributo headers se usa exclusivamente para hacer referencia a otras celdas de la tabla",
+      "fail": "El atributo headers no se usa exclusivamente para hacer referencia a otras celdas de la tabla"
+    },
+    "th-has-data-cells": {
+      "pass": "Todas las celdas de encabezados de tabla hacen referencia a celdas de datos",
+      "fail": "No todas las celdas de encabezados de tabla hacen referencia a celdas de datos",
+      "incomplete": "Hay celdas de datos de la tabla ausentes o vacÃ­as"
+    },
+    "hidden-content": {
+      "pass": "Se ha analizado todo el contenido de la pÃ¡gina.",
+      "fail": "Hubo problemas al analizar el contenido de esta pÃ¡gina.",
+      "incomplete": "Hay contenido oculto en la pÃ¡gina que no fue analizado. NecesitarÃ¡s activar la visualizaciÃ³n de este contenido a fin de analizarlo."
+    }
+  },
+  "failureSummaries": {
+    "any": {
+      "failureMessage": "Corregir cualquiera de las siguientes incidencias:{{~it:value}}\n  {{=value.split('\\n').join('\\n  ')}}{{~}}"
+    },
+    "none": {
+      "failureMessage": "Corregir (todas) las siguientes incidencias:{{~it:value}}\n  {{=value.split('\\n').join('\\n  ')}}{{~}}"
+    }
+  },
+  "incompleteFallbackMessage": "Corregir (todas) las siguientes incidencias:{{~it:value}}\n  {{=value.split('\\n').join('\\n  ')}}{{~}}"
+}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     x€ùÍæé«JäàpEb¶m=ëTˆ#~í÷¨ıbö4b¤ğ`±½F>Ê”e8Yø°VÎy“Ñº¶H)ÅÎ_(-yÒíj#¿Lñš/&Ã
+^¾.¹zM¶ôŒá[x¹öÛ7OÓæß}e	VÚ«ßÚz©`Ûj‡ÒÛ¤yR°|ï®=y8±ØÚDAÁU ¶r†Gr¢/µL67÷Ü±íéÁq|Ü,edlTüÍæ²¥ãÛ¡º¿Nb¶tû@à­ƒšŞ×x¯¯Ík[Oí†‚à.ôl¶OB±Ì=]j"/Øp3íèD§Ww­ÆÇ?.W¬Û3õ_5¢ìá²ğEJxÇÅ‡¤äôlQˆe*ªŠË7‘RèiTŠ™ê¬¢Ê{grêÈ¶Ğt”[d‹êä¨¦¬j³KĞxñ“±DKvc6‡òf2±÷o”ÒóÊÁRˆĞœòRôÈ8îëö‘¶3ôzÓá\8Dd›éL—]
+\¹e¹~¦ëâwäğt:¸ïå“zeM¹~Kİ¼A‡ª.ıÀà	pIûÍˆék8y:ÌÿQÀRZ ëîÈSNÑ
+Q”¡ŒŠ9ÄSºZç0lEe½dí·ÉÑ–Fğ}Ä4Åxš Ñ×|E
+Óù74„BÉnn']J$$@)ã[‰¯ïÂ—cé,Ø5Ø‘=ñye§Zx¼Tçê41¶¬²Bİí.M
+Œ›?_a?¿[O¼ñFá
+b#ĞŠ†1½Êèü‘:'V+5¶¢%œ!n¨Lõ±EÓ(I–Ï˜Ò^lBñ_Ï©dfw¿š[¦;E²nĞa½İÍ‡Å%ãgƒo^Ñ~L•	\;Ì¡áJ&‡Ñ¸Ø/.µİm~`›¡¿‰‹£mĞÛ ©>.3¸j[·Í$R&sÖ4Õ<P~—åÆ–F-(OSCŒ°•ZÑµ­Éõ Sâzc»š^|Ğ¶¨[†`1Õ%0M2x½i`ˆÄÙk”‡’ÁMAå7#È`x63åBE]ÊB—=Şâ¼Vsm Ô"k‘ìÑCı¬±nGTo¢Å0~È¥§7ÒbN ‰·km‘Œ§6­-–û¨„ûÂ®WÍÓÿŸ×q°š‘İ)¡¨î±ü³yEü×W·:J1C|†ïá±æ3ú5„sÅ–Ãºb÷g	‚¾“)ÿvVâŞ&BsXR8ÒäÏPm˜ßRn’V­MDPõÒœÄŒí›jtÃÌ€¦âéHdÑ%¢«äkÅ…ó†ŒåCrd©i>._Òw:Z_C‡İ8r.mñ>±È²?sÁlXí«©1È_JÒÅÍ2KFÊÙÎ_L5Oúˆ·R$Øb?iÊ$ÒúzP<›GƒøÍm=é
+ıÎjk´*éğ¾-éÑ·YÉŸ¿l}ô[ñòdÂ°\æl^rÁª‡‚ ^Mª$¥Š¸V‡1ãG²Æô$¼9Ü
+ !¨ƒÌï2H¢eUÙÂsJpãCÕ9éá‚£³®Ğ’p;EëÉ2Ä•Ï*°~„ÄN(œïkDï›Æoi¡&‹¢CNĞûvù.Etu´t„Âv`ØÙc/¤¥kì®uÅÇ³Vj©Q†,ºãš—Ò;ÈİQö4ÙoÏ\[P}t¼jPúyRõŸmûY°…ê¦æ€şhÍ‹u	²„Oê 1ÃVj.¶©:Ë®ÖYƒñû6õ?îàÀj—c*z
+§`…èşºìó:x¨1ï#G¹{&İ‹ §—£ªñGúC’ÊzŒNÒšéZ.RÙ2Z÷.LäzJÙpQšÒLnSvÜ…_Ÿ±û5œèàÙ'Øì ¢7IƒENè_MÙebştòİÕ)a‹d$;G-œ¿VIìÍ[ì@?\¬;Oè™èjÊMÚÕlHû_šÍ¬<S0á$X<)nÜ«Ø¸ŸŒÇ—æME'—Ë&ËKÉØ'Ib"ßï¬Ên¶Ü¥ŠÁ0PAiÙ¢v»¾Ëµ7F´¾-U:Lr<R³a"“­æã{Æ°™‘İ5ğ‚ Z¤dG>á™†²7T§¯pIê+fO9Ãqå&\&€_¯‡_CãE®œˆ<_ëŠ!…” @”RT5æ6Ã u´í•VáŞœ™ı,øØş—Î†Áæè÷#3
+¥j¨ldJ)xÃly‹ğQ·º´!é´5$¶©¥ãÂ½+ŸÅ¼±ìÿÅù¼,¦º!ìÙ³ép[‚”„SeVÓ„wvmuZb	={—ğ	2rÈŞ9Á§:$ğ—Dp–¶Ÿ¼=İü¦>ÓfW¬	¾³¢ˆ[ 7‹DG¥YìmñŒ™~ú‘JŞÂnPÂYGµÄz	WğÏúj]PtD:ü&Øé°¡%…ÛõSC~j")Ã+œ'±uà÷Œ@’ ³ü€İæËÛP~¨û×>ãß+Éwí5ÂgŸN¿ÆìfAº|ybp-¹{TÚ_İ²ejö›ué`ù\›~uîğGDÀ©£{úw¡ATfég´¥Ù#J¼±]öW¤Tª¨,ÍL­qxQ ÅÙìT<ä:šwŠ¸Y€ÚVöVöOßòEwŠõ«iüv²'mú/WaC-¨¢æ‚eùøó$İûz3Æ}[n>+©rèçk•–úÀ½óÖı@ÿ¯§öŸc¬-°!¿ä‘¶Ñû!)„ş(\Š¬KKrLw±âíiş}"Áhª?KûˆIá=JÏmğÁ‚XH¡aæ™oóKç—3¿ƒñúãŒ6YNÛúıÿdÛÁì§*†v»Ø®ê(fai‰\BVÈY>b>9j‘É†$œ0æ†8pìL’Ğ5îª¨XS³Í*IÌ²ËÔ¯­kğİğÔËÜÑqøNÆà÷}¯f‰ù™£Ø­nQŒó†ÖµÜû-O¡SYÿ\®5
+¶Šè–Këš—?¡LÁuƒ ŒÁŒ¯fòÙºz,úÖ~åQWê-2Ë¶;iZxJ§få¨]íevÅå¼K¬­$Ë"Ò‰Ó±h‘îÊõ/Áà|K+×©ŒR¤?“Ñ>¿1©ø QÌ`êönÚÌ×{Hÿ‘™GìL©ÆÔ¥»èâö
+eüXµòNy•ø>šÿmZ%¤È7OË6Dv$zv<»\.ª–¢ÓB5,8š:ğ«¾
+`XÇô·Ö”íP‹éZ›\Püå­-ÚC("ğ +äQH§ojy²6T 'l¶ŸDXÌ'1ßqZùrLk)°ŠqŒç¨ºK™Ü2ŞÓuAb@çË!¸Ô»“zşy‘)7b“g[ç¿7§Áîç´û°X¢Ê±;f‘)J	d6Œ¤b¾¹Øá9Ñ³z:"”:œ.±¾×Ç'?ÁÛ&	dSÚV™}İÇ02[¾
+jq­¦¥Z±µ×Ù™ĞƒªŒ6DŒbĞ2<6>¡ƒ³e=|¨²`MVşp‹5ÊLø1)ÇÄ¨¥ªªJ55‚8vñã'S 9€‡†Œêó‡¯)P7o!mÍñbñ
+sZéS¬[*·3räŞPa£Lqm”Õu¬Í~8ƒ´¯~<Ó6°!?b¿ÿVù¥ä±æÉÎ.Üx¤ıšŒñê¶ñ^<³K¯t„‘-²¨Ù8MIMÃ$®Ü)nMÅûÍš¢á ·¡Ï.3N”Jà· ¶F@‘·Iæ8#ŸHò&v²îÑ}ZÏ&)6ÜĞ2&úEoGU«–¥¥ËR„BA-<4 Ğê†Ò²µÛ$”$¹Z:1{ËìX²–ScH}f>Óš¬€ó5l¯XvÜÊeÙããûGÍ‡Cë˜³3>8ËrF[-DÚ!ötÙ++"´Z.ıOŒåAA½nvJÄ®clF••@%cWÇj5¨—S†3ÿ¹_ö{àç›%9ia|;<ô w—)ö?”ÀÿêŒQöšbuµ*z[n½ªˆñI‰é?eWímcÁÕéDüìiz.<jGøÅ´d™VÉ(2Qpì$ƒî6Ú`É)ğ+;¾ø´1	åŒ'?! ñ7‰†•x9)•¡ëM„w!Q½P~PT‹pÖ¥¬ÛrbªôŠÙ±8"z[©VøE™˜4ITq\ÛeŞêgL~ug®¼şnö¦<M<wKm©¹…V{cÈx·–ö†g'2ìB?ß~>Ø‚,·ƒ ¸¢	‰851àÉ_ûÂ‡*\ëÙŞ°§†ÊîõëUÆ¾·õO_ìÒÇuœíR&i†D¤Ÿ¶Œh7ğÓ³l’÷ ·]	¿·Œ»RYˆ2 ‚‚V3éÔ€Tñè€+¼F[æà”1˜`­Jf®sÈ"~ËËÿkë 6qFò±5ÌCbI^ñ²pŸıv‡‚lé›®nìoóÿN
+€‡¹ÁÚ>#!«şÈËŒÙQ
+J„˜#«“˜MæYHÁD#SŒ®#=#t¤Yªdì«şëxıP¦ŠıoG»n“H5Tˆ³/»m_bˆ-kÅ¯S¹¡µ\âîªÈHÌ¡äCÜÓ[9¾HŒjQMN¿êkÇÑÜé/³²lCY]mÂÙUA %
+Ñà’ŠÍ£!›7ª ã`Éœ2#%›¹§ú ¼«;Y•$#IÕ~ÃX	[œ”VØá]Ù×\l¯K™Ò†šF’u×:‹tûåŞóTÏ½"òÍíDô±[ßt4„óã	é?¡[?>æáÊW­Â¢€©ÀİÒÌqK÷'ìÈñ256<²]‚E"pAÉ˜‰	ùòzğ*oêìj"~ÆMİ±6Y–G¿G‚Ï­4›·ÅuˆÆu¼k7,ŠàÇZóó ıuïÉ#/Ú9™;  ÿä FğO}.(îÖŠ¢IJ¨dt‚ˆ(¶s–hk§ÄŒ.AiÔfxœàGò7éĞk»Úb «E?”áNÂ”ûÓåö‚ÉĞ¬ïŠj”Ÿ˜QT(­QXq…~™Ş-7@¾HŠÃ5SªìÔn8…÷‘ÇPw*poì>€x2¨?°=¦
+'”µ´WÅXJ…)SI–QÚÆÎåûğŸ4+Ú´gzÙƒ¼¤~dk)}Ô^¥„uúô:•a6øá„ğ‹Eê-®\İq³«}9âŠÊÊ.k¼ã%+sl¹ª~†İÄzÍêéÇşßŸoÁ/«Ïà÷vã÷ûÅDÕ‰ øÅ[Š¾èäl¥”cá„óG}ø˜xğªKØB’˜M3Z|æañğĞ¤?@ôdM‚·ãOäƒ„Y|ì÷TnæêX®Áğôq—Íb“KpÜrQB«qlËòU”˜Œ0õ,–8ËÛÇ‡“‘ejğæØl“(µÖSI-¤Ö$¥±‰f´h'	û™mš³×/‹ıI:Nï¬Ü|SyË®G´Ësİ4q&·l±CÚøûœ6Æaíõïj;>‚ÿ>÷ÿ}ÿÚ½{µ¸FÿÏ»îßOĞvÙÎ¿ßgkvLyáÿİàÁAYh-Û »ñ5Vß-Bº§ì¼`HŞ&¶gÖY(  ñ]â«‹å|§œvŸŠ6J§À%I ‡‚õÖÀ6$’5M å£pHÏÚrñk\Ğ­5ëc´ÿ¡¡óK©¶¤jÃ8úéüAQŠ3 /¡Œsåz}JeD\êÛÚ¦ÜMYÊvmÚ[îö¸æÃ[îE{‘3Çì(ÍØa¦Ã˜½‚…ç}£AæÏŞ™ÊÓ¼Õ8“¤¯œ·püû7[ùj~ÙxsEèû§v°\ƒ?TëS8xS=<¦n¥ot.X˜øÇÍë4œ~Ì¡ó9V`¢åÏüÄ”.|ÔÜIX-½‘»oFË(8îÁùıÁ‡–÷l)óªMÑR1KEŒuŠƒR)&,:™ÕÀSÂ]Ld“Up±*ñvÈ‡æ3§¶yLÈ—”%Êot[°t©ßk4r™zm9ZìJÚfõ³ç4ê&G*²“»íJ=¤*KMÎÁà²ój,B}®G95¡5>{v>N “‰…º3›óÖ~‘sÓÙ–aú›á!T SXwëÙ´RMâ<÷8@¥-tq¤t’3H`ö‹Ä+*FSÈ“„@“’Çátİ-‚‘‚…/°]ëÉ{”ö,a>±‘Ê>ïîÕİòïöç’m}ßB³§^)©è_z`Ò/´yÓËÛSNË¨ôò¹üSõ&	IzÔç9œUÚìÈ²¶'RÀ7ïıXN-è7[óejæ‹M^@âïW¿ïßÂ]=-ä³¨+Äs°MrˆÎÏVsç+a,Ï—%l¾]@šO‰Š29^-™~J»ÆŸO->zë+3OçÅ‚ˆ3H3(¡2s?ŠWÌ¯HrIÉÆœe#œE7İOj+‚¸ÔÎ£¬bÊÑT­æ‚°†¢aî.âÕrõ³ä­M÷e”6ù‘˜nŞõçJs§*ñÇ­vå?fš²# h†íÙ0ä´AŸòØ]ò^â7j‚´›’©Õ|‰ şm²²¹ğ~g†œôh$DÅ$NŸ¿š<ÖÌ¢oÈÒ:kÏV\æÊÏŞ4›íKˆ¶9Á >ÂŒ‘Ã«Ùåà™÷0Õñğ?BÈ Åæ>2ªnDmS3ÊÈµ“ãW‹	™ÔË_É¨ÑÕ¤“yæJAëË&zÏº”0~rj®ÑUd´5«köejgQ¡ª˜È’)ß(ıÈqsİ¨Øb¥¬Ï,cûé'Èå	ğH"d§Ã¬ÆXÍ<Ì#òèGt‹ÉÈŠ1 àâ„‘úH|›Ÿ6ÄT·ªJŒ¿iŸ©¥38 ièØ–}?¡¡ö8Õ<qa½½Á[#P…qõn:ú«‡bO#vBUss9‰UN×Ü#ß%›Òµ¶]ìù’n(€ W–ıã¬^$ÍáÿBĞÅ~23}š‹ÛKÔEgC¤JhAL„‹è*¹ßÚ
+7­¡D”¦1ïUiÎ‡z–Ğö>ÃŒ©„š/ÌÁıïã;ÒkÊÌî¸àµOhù  Äôà°EzFg1@¨>’„¥È¥È‚Të¦Ì0W£‘ò»Z©:‹ešoßÚ¨­_•X":…DIW‹%#ÃªÔL°pd‘?jt^DWûÂ©#¬Z ï´½Ôí•x:Ù/çZEå%ÿ!SÈ‘ì³°š+R°{¢aı¶A¡ü€r©z°Ú…@°[‹¡‡QFİÅ>”@ƒw‘*%ĞÁî®wpW¯P“•ÎßÛOæS+"¹æãò\@­5LÙSpı>óPº»¦ë—Ÿ¦ó«#1Nè‰pÙiŠkëÇW¹"Q€Ú7Ì$6èûIŸõ|lá´ë”?œ_]”¸ 2lü»“m6ç#¦ ‚’RS•¥1¬MŠ«ZXí›Äª%3–“¿*ØŠ’jca³LUQmò‡İıõ2’¶Jû!‡ÉiÉ óE	UzÌŒ¶º¦QPú­šÓí,Sj9K+F«£İº6Ú•X×]—§-<qòöxğq£gâig»ÑŞé"hˆØÂigkKŠÑŸ:Óx¶Z-ÀàşÇb9XÑß6ÔÕÚÒü§nÈ¿Z¹QqÛx*ÆçH+œRh¤>—ä,ÖLéÍ>1Mö]·ÉÙYp3æZèoÃ±IZv}yy
+z¥GÂ„&¥:¥À&g(x«_¿ÆÀå±Å&?Ñ¥£qı}´˜J=ô_ë€Y$«o€ Á*}PK)Ê‹&gå0İä‚tñë!;I²9¼LAt	#cY…«M§"
+ï0?í{Ô»øtºê)tâ7\LŸ–5İòGDÅÍl\EÃ{i%¯Ã¨YL4Âš…Š[µzÃ›ÚtŸ”ª21  ZÑıç:EˆÅõWÔğ÷>Lï®¤xbÉò`ª`l­4MUÅgv|¥E° SÆ»[©èò\=+£÷¡Eí%ğ<´b4$"€ƒÕ$awÔ³iëß1"!¹»CAQHN'ÈÇ=Æéz]´‚W×³9¡ôŠ1½Ğ±Ë~ÜX«*í¼<H‚Ümˆ¼Ÿs ?İ¥Uª¼pD»›&ü£½=üá:ñ´ï2ÂÖe¥ÏHÉË	%†Û?áO‹	2–Şä õrÊx“dÃú4bÒ°‚’ Î4Í‡ã˜ê%©ÅY;±}ÿî¿êìŠUªÛjY&yï ˜º ¯ÖÀ‰lìôºØ²ÍÒ+ğùÂ5LùİŒéŞI0	ĞaP†w¨Œ}‰/ïMÿaQ²Èô{bPé…ÂäQFÃœêšT ĞN2@vÍÃ6á÷
+:âÖ> /û;G¶é'ÚŠ*±:I½o2‹µª±‡“TOíJRı!®É‹bò¯naG†~dªµwŸ)ŞÒ£¿i¡I„S`j¦Ş9|ğ$Iud¯ÔgbŸg¡qéì/öüqŠ½ÏñAGÈ«x¤îşÏAºBô3Ÿ_Dşt€ç±}˜E£ÿfB¥ZÛYäe<+EÁA]8Eª‡¨/b¹ş+3î¦FÀlbã;Y2ÇµjL/ÛÏÍÚÑrU'VÇÏŸäÿ|Ğnİöyi'ˆ ›q oH—ØL¥*ã«?+_ßÊ©*Û*ô¿–]•c;C6…	ƒ÷WÁÿ-b/ŒdªÕ¥§X£À5”Í¡Í¾cgË8¥niuÀ$dÏKşÛ
+„Öó“Yû¶?}eæ=vœAÀN²¢¤ê3úS¹c·İ&¤®½È¾$ˆKiç÷7ŠØob¤Ö€ŸsßdÂÓŸ»X\¦0}Ö"â·¼èÌ—ÙJÿ4’“ŸÓ­ï#‹İHÊ¿QÙ&á;Ä•„M«pectedClass, details) => {
+      if (!(object instanceof expectedClass)) {
+        details['expectedClassName'] = expectedClass.name;
+        throw new WorkboxError('incorrect-class', details);
+      }
+    };
+
+    const isOneOf = (value, validValues, details) => {
+      if (!validValues.includes(value)) {
+        details['validValueDescription'] = `Valid values are ${JSON.stringify(validValues)}.`;
+        throw new WorkboxError('invalid-value', details);
+      }
+    };
+
+    const isArrayOfClass = (value, // Need general type to do check later.
+    expectedClass, // eslint-disable-line
+    details) => {
+      const error = new WorkboxError('not-array-of-class', details);
+
+      if (!Array.isArray(value)) {
+        throw error;
+      }
+
+      for (const item of value) {
+        if (!(item instanceof expectedClass)) {
+          throw error;
+        }
+      }
+    };
+
+    const finalAssertExports = {
+      hasMethod,
+      isArray,
+      isInstance,
+      isOneOf,
+      isType,
+      isArrayOfClass
+    };
+
+    /*
+      Copyright 2018 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    // Can't change Function type right now.
+    // eslint-disable-next-line @typescript-eslint/ban-types
+
+    const quotaErrorCallbacks = new Set();
+
+    /*
+      Copyright 2019 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    /**
+     * Adds a function to the set of quotaErrorCallbacks that will be executed if
+     * there's a quota error.
+     *
+     * @param {Function} callback
+     * @memberof workbox-core
+     */
+    // Can't change Function type
+    // eslint-disable-next-line @typescript-eslint/ban-types
+
+    function registerQuotaErrorCallback(callback) {
+      {
+        finalAssertExports.isType(callback, 'function', {
+          moduleName: 'workbox-core',
+          funcName: 'register',
+          paramName: 'callback'
+        });
+      }
+
+      quotaErrorCallbacks.add(callback);
+
+      {
+        logger.log('Registered a callback to respond to quota errors.', callback);
+      }
+    }
+
+    /*
+      Copyright 2018 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    const _cacheNameDetails = {
+      googleAnalytics: 'googleAnalytics',
+      precache: 'precache-v2',
+      prefix: 'workbox',
+      runtime: 'runtime',
+      suffix: typeof registration !== 'undefined' ? registration.scope : ''
+    };
+
+    const _createCacheName = cacheName => {
+      return [_cacheNameDetails.prefix, cacheName, _cacheNameDetails.suffix].filter(value => value && value.length > 0).join('-');
+    };
+
+    const eachCacheNameDetail = fn => {
+      for (const key of Object.keys(_cacheNameDetails)) {
+        fn(key);
+      }
+    };
+
+    const cacheNames$1 = {
+      updateDetails: details => {
+        eachCacheNameDetail(key => {
+          if (typeof details[key] === 'string') {
+            _cacheNameDetails[key] = details[key];
+          }
+        });
+      },
+      getGoogleAnalyticsName: userCacheName => {
+        return userCacheName || _createCacheName(_cacheNameDetails.googleAnalytics);
+      },
+      getPrecacheName: userCacheName => {
+        return userCacheName || _createCacheName(_cacheNameDetails.precache);
+      },
+      getPrefix: () => {
+        return _cacheNameDetails.prefix;
+      },
+      getRuntimeName: userCacheName => {
+        return userCacheName || _createCacheName(_cacheNameDetails.runtime);
+      },
+      getSuffix: () => {
+        return _cacheNameDetails.suffix;
+      }
+    };
+
+    /*
+      Copyright 2020 Google LLC
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+
+    function stripParams(fullURL, ignoreParams) {
+      const strippedURL = new URL(fullURL);
+
+      for (const param of ignoreParams) {
+        strippedURL.searchParams.delete(param);
+      }
+
+      return strippedURL.href;
+    }
+    /**
+     * Matches an item in the cache, ignoring specific URL params. This is similar
+     * to the `ignoreSearch` option, but it allows you to ignore just specific
+     * params (while continuing to match on the others).
+     *
+     * @private
+     * @param {Cache} cache
+     * @param {Request} request
+     * @param {Object} matchOptions
+     * @param {Array<string>} ignoreParams
+     * @return {Promise<Response|undefined>}
+     */
+
+
+    async function cacheMatchIgnoreParams(cache, request, ignoreParams, matchOptions) {
+      const strippedRequestURL = stripParams(request.url, ignoreParams); // If the request doesn't include any ignored params, match as normal.
+
+      if (request.url === strippedRequestURL) {
+        return cache.match(request, matchOptions);
+      } // Otherwise, match by comparing keys
+
+
+      const keysOptions = Object.assign(Object.assign({}, matchOptions), {
+        ignoreSearch: true
+      });
+      const cacheKeys = await cache.keys(request, keysOptions);
+
+      for (const cacheKey of cacheKeys) {
+        const strippedCacheKeyURL = stripParams(cacheKey.url, ignoreParams);
+
+        if (strippedRequestURL === strippedCacheKeyURL) {
+          return cache.match(cacheKey, matchOptions);
+        }
+      }
+
+      return;
+    }
+
+    /*
+      Copyright 2019 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    let supportStatus$1;
+    /**
+     * A utility function that determines whether the current browser supports
+     * constructing a [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream/ReadableStream)
+     * object.
+     *
+     * @return {boolean} `true`, if the current browser can successfully
+     *     construct a `ReadableStream`, `false` otherwise.
+     *
+     * @private
+     */
+
+    function canConstructReadableStream() {
+      if (supportStatus$1 === undefined) {
+        // See https://github.com/GoogleChrome/workbox/issues/1473
+        try {
+          new ReadableStream({
+            start() {}
+
+          });
+          supportStatus$1 = true;
+        } catch (error) {
+          supportStatus$1 = false;
+        }
+      }
+
+      return supportStatus$1;
+    }
+
+    /*
+      Copyright 2019 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    let supportStatus;
+    /**
+     * A utility function that determines whether the current browser supports
+     * constructing a new `Response` from a `response.body` stream.
+     *
+     * @return {boolean} `true`, if the current browser can successfully
+     *     construct a `Response` from a `response.body` stream, `false` otherwise.
+     *
+     * @private
+     */
+
+    function canConstructResponseFromBodyStream() {
+      if (supportStatus === undefined) {
+        const testResponse = new Response('');
+
+        if ('body' in testResponse) {
+          try {
+            new Response(testResponse.body);
+            supportStatus = true;
+          } catch (error) {
+            supportStatus = false;
+          }
+        }
+
+        supportStatus = false;
+      }
+
+      return supportStatus;
+    }
+
+    /*
+      Copyright 2019 Google LLC
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    /**
+     * A helper function that prevents a promise from being flagged as unused.
+     *
+     * @private
+     **/
+
+    function dontWaitFor(promise) {
+      // Effective no-op.
+      void promise.then(() => {});
+    }
+
+    /*
+      Copyright 2018 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    /**
+     * The Deferred class composes Promises in a way that allows for them to be
+     * resolved or rejected from outside the constructor. In most cases promises
+     * should be used directly, but Deferreds can be necessary when the logic to
+     * resolve a promise must be separate.
+     *
+     * @private
+     */
+
+    class Deferred {
+      /**
+       * Creates a promise and exposes its resolve and reject functions as methods.
+       */
+      constructor() {
+        this.promise = new Promise((resolve, reject) => {
+          this.resolve = resolve;
+          this.reject = reject;
+        });
+      }
+
+    }
+
+    /*
+      Copyright 2018 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    /**
+     * Runs all of the callback functions, one at a time sequentially, in the order
+     * in which they were registered.
+     *
+     * @memberof workbox-core
+     * @private
+     */
+
+    async function executeQuotaErrorCallbacks() {
+      {
+        logger.log(`About to run ${quotaErrorCallbacks.size} ` + `callbacks to clean up caches.`);
+      }
+
+      for (const callback of quotaErrorCallbacks) {
+        await callback();
+
+        {
+          logger.log(callback, 'is complete.');
+        }
+      }
+
+      {
+        logger.log('Finished running callbacks.');
+      }
+    }
+
+    /*
+      Copyright 2018 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+
+    const getFriendlyURL = url => {
+      const urlObj = new URL(String(url), location.href); // See https://github.com/GoogleChrome/workbox/issues/2323
+      // We want to include everything, except for the origin if it's same-origin.
+
+      return urlObj.href.replace(new RegExp(`^${location.origin}`), '');
+    };
+
+    /*
+      Copyright 2019 Google LLC
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    /**
+     * Returns a promise that resolves and the passed number of milliseconds.
+     * This utility is an async/await-friendly version of `setTimeout`.
+     *
+     * @param {number} ms
+     * @return {Promise}
+     * @private
+     */
+
+    function timeout(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    /*
+      Copyright 2019 Google LLC
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    const MAX_RETRY_TIME = 2000;
+    /**
+     * Returns a promise that resolves to a window client matching the passed
+     * `resultingClientId`. For browsers that don't support `resultingClientId`
+     * or if waiting for the resulting client to apper takes too long, resolve to
+     * `undefined`.
+     *
+     * @param {string} [resultingClientId]
+     * @return {Promise<Client|undefined>}
+     * @private
+     */
+
+    async function resultingClientExists(resultingClientId) {
+      if (!resultingClientId) {
+        return;
+      }
+
+      let existingWindows = await self.clients.matchAll({
+        type: 'window'
+      });
+      const existingWindowIds = new Set(existingWindows.map(w => w.id));
+      let resultingWindow;
+      const startTime = performance.now(); // Only wait up to `MAX_RETRY_TIME` to find a matching client.
+
+      while (performance.now() - startTime < MAX_RETRY_TIME) {
+        existingWindows = await self.clients.matchAll({
+          type: 'window'
+        });
+        resultingWindow = existingWindows.find(w => {
+          if (resultingClientId) {
+            // If we have a `resultingClientId`, we can match on that.
+            return w.id === resultingClientId;
+          } else {
+            // Otherwise match on finding a window not in `existingWindowIds`.
+            return !existingWindowIds.has(w.id);
+          }
+        });
+
+        if (resultingWindow) {
+          break;
+        } // Sleep for 100ms and retry.
+
+
+        await timeout(100);
+      }
+
+      return resultingWindow;
+    }
+
+    /*
+      Copyright 2020 Google LLC
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    /**
+     * A utility method that makes it easier to use `event.waitUntil` with
+     * async functions and return the result.
+     *
+     * @param {ExtendableEvent} event
+     * @param {Function} asyncFn
+     * @return {Function}
+     * @private
+     */
+
+    function waitUntil(event, asyncFn) {
+      const returnPromise = asyncFn();
+      event.waitUntil(returnPromise);
+      return returnPromise;
+    }
+
+    /*
+      Copyright 2018 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+
+    var _private = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        assert: finalAssertExports,
+        cacheMatchIgnoreParams: cacheMatchIgnoreParams,
+        cacheNames: cacheNames$1,
+        canConstructReadableStream: canConstructReadableStream,
+        canConstructResponseFromBodyStream: canConstructResponseFromBodyStream,
+        dontWaitFor: dontWaitFor,
+        Deferred: Deferred,
+        executeQuotaErrorCallbacks: executeQuotaErrorCallbacks,
+        getFriendlyURL: getFriendlyURL,
+        logger: logger,
+        resultingClientExists: resultingClientExists,
+        timeout: timeout,
+        waitUntil: waitUntil,
+        WorkboxError: WorkboxError
+    });
+
+    /*
+      Copyright 2019 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    /**
+     * Get the current cache names and prefix/suffix used by Workbox.
+     *
+     * `cacheNames.precache` is used for precached assets,
+     * `cacheNames.googleAnalytics` is used by `workbox-google-analytics` to
+     * store `analytics.js`, and `cacheNames.runtime` is used for everything else.
+     *
+     * `cacheNames.prefix` can be used to retrieve just the current prefix value.
+     * `cacheNames.suffix` can be used to retrieve just the current suffix value.
+     *
+     * @return {Object} An object with `precache`, `runtime`, `prefix`, and
+     *     `googleAnalytics` properties.
+     *
+     * @memberof workbox-core
+     */
+
+    const cacheNames = {
+      get googleAnalytics() {
+        return cacheNames$1.getGoogleAnalyticsName();
+      },
+
+      get precache() {
+        return cacheNames$1.getPrecacheName();
+      },
+
+      get prefix() {
+        return cacheNames$1.getPrefix();
+      },
+
+      get runtime() {
+        return cacheNames$1.getRuntimeName();
+      },
+
+      get suffix() {
+        return cacheNames$1.getSuffix();
+      }
+
+    };
+
+    /*
+      Copyright 2019 Google LLC
+
+      Use of this source code is governed by an MIT-style
+      license that can be found in the LICENSE file or at
+      https://opensource.org/licenses/MIT.
+    */
+    /**
+     * Allows developers to copy a response and modify its `headers`, `status`,
+     * or `statusText` values (the values settable via a
+     * [`ResponseInit`]{@link https://developer.mozilla.org/en-US/docs/Web/API/Response/Response#Syntax}
+     * object in the constructor).
+     * To modify these values, pass a function as the second argument. That
+     * function will be invoked with a single object with the response properties
+     * `{headers, status, statusText}`. The return value of this function will
+     * be used as the `ResponseInit` for the new `Response`. To change the values
+     * either modify the passed parameter(s) and return it, or return a totally
+     * new object.
+     *
+     * This method is intentionally limited to same-origin responses, regardless of
+     * whether CORS was used or not.
+     *
+     * @param {Response} response
+     * @param {Function} modifier
+     * @memberof workbox-core
+     */
+
+    async function copyResponse(.           |5¨mXmX  6¨mX¤    ..          |5¨mXmX  6¨mX,i    Bs   ÿÿÿÿÿÿ Ÿÿÿÿÿÿÿÿÿÿÿÿÿ  ÿÿÿÿs w - t e  Ÿm p l a t e   . j SW-TEM~1JS   7¨mX|X  9¨mX¥
+  B. t s   ÿÿ ¡ÿÿÿÿÿÿÿÿÿÿÿÿ  ÿÿÿÿs w - t e  ¡m p l a t e   . d SW-TEM~1TS   Ü¨mXmX  İ¨mX’Ã"	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = _createTester;
+
+var _breakLoop = require('./breakLoop.js');
+
+var _breakLoop2 = _interopRequireDefault(_breakLoop);
+
+var _wrapAsync = require('./wrapAsync.js');
+
+var _wrapAsync2 = _interopRequireDefault(_wrapAsync);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _createTester(check, getResult) {
+    return (eachfn, arr, _iteratee, cb) => {
+        var testPassed = false;
+        var testResult;
+        const iteratee = (0, _wrapAsync2.default)(_iteratee);
+        eachfn(arr, (value, _, callback) => {
+            iteratee(value, (err, result) => {
+                if (err || err === false) return callback(err);
+
+                if (check(result) && !testResult) {
+                    testPassed = true;
+                    testResult = getResult(true, value);
+                    return callback(null, _breakLoop2.default);
+                }
+                callback();
+            });
+        }, err => {
+            if (err) return cb(err);
+            cb(null, testPassed ? testResult : getResult(false));
+        });
+    };
+}
+module.exports = exports.default;                                                                                                                                                                                                                                                                                                                    20Îİi—Z6Ü4Ÿ–nkL¿6J×
+Ï‡8pÍbİ¦¯j§ß9º&Æí¼©uÌº§ZQokN¹>¾Ön?yÊ*G2÷YŸ
+CÉ/ÀM¤ÿ«å0Ö¤ØI%âÆÊX1­»\Ø%#¤Î“QÊØ±fãÚ~vu×ç	?DwWÍ¸¾?|ÍíL~•ût,ùj»§Jm;M¤á3İÒqo¤=­i,õÏsU|Ø™µ44%yd‰ò¹´¬Õæ†Yd%,Es']ŠäéüOĞ8 „€408?ÁÔ+–YãˆŞÑ·ºj¨CˆºbÏ¡0¼+
+VÖº N+Ì†‡…+ÆµAëşxT$“ÄÄWh¾gfr…‚üùõìV.u……8	!Ğhåy†’Cêß¥^v Ûôè:˜5ïK¿Eéğ·ÀÈ¡á÷×mù!@Áoubj]4ü„–A‘Y0¨ö^–Úe+oV=2[v»İFò%f7uh7óQIS„9#7õ«qŒY >Z2zè†Êi`Œ³Q’B©1‘ñ)
+§~l7Şq`äœoÀÄæ®â¢Áuº[ù2¶É­¹<9ïqOï.D u%Ì
+‰†İ‡»‘º::V)/™l±—¿û<µ‡öÙéALòt»cés÷RòùAş™ @t¤0nè6G˜h.p+„A3Nf&	¢í2½j<(î—ÕN#€zçz¸xVä}ñK³“€Çq9ÚK‡N"*š5Î¶Â£¿˜Ô²'GIÁÒ@W^qqn“î-CŞHÇÖÉ‰$9¸Õ´ô árÁB'4@ÿ7S ƒxÏW¼hŠÏ(˜ı-À‰yµĞN*ÎQ× Q»Ò1ÅnÀEÂ"1ñJRéi#‹eİ~´˜oILFMM$‹ˆİ]ëqöIÓS¡Ø,Õ:© ")…Å:ç„ªWÑ™¹1E¨ª˜#Ob´íş»:>"Sˆ¼T”³üÕÿp|>¯1ôì-øU9àÂ÷ıXØ‹Fšj±@Ó”bS9ëwQj¬d’¬,áƒÑ¦/¾(…,ZI ºPŠÒDÉÂ*ëyIuúîggå'-	ÓE„£
+»$Z±}J çûC	:§L]ìˆ†Ù¹4J8ÔdtEb’Z&8êK?«,-
+´ê>+â3ë=Ò¡PFÁxJ,k{g¬zãDà sÁCq>=®/+¹ØÍrœÌˆÄt%Ã•Ã*í‡à—‡û‹ŸŞ$É?ÑmC”k¶"Ò‘—e6¼¹­1¾¶HaãÜÏ_)+…É9ó¯}(èÈ>»<íö‚ÈJÈÊ¸¨ÍòOt’s!Ò¬!åI|JÔóòg×}¡~ˆ¹$-¿¾»®€şç¡Ç¼oI„Ê;=Æ (Õë^b@QçˆSbx&<œ'íÁÏr6şbnf}é»ç0³uöïüâ–¬ƒ7Ú6—‰`îÑøÌ1HŠg¬£nÜw|ùÒÌXéĞİ3â;;Ø <“±å¶±š{ûF4=áj‹72~4˜©<¶ÌsxÀ±æx ¨¯ï8”
+5!}ŠbX¨P1óN0ˆobü)+HØ«ˆäã…g³:à¸œ·]&­n&Au>3!˜±{Zü!yµØÍ2˜î‹n1b˜EMb*Ø„PT~†¡Ù¦6× Ok˜æcĞYÙ0Ò%–¦³¡Ø|Ğ¾“4év#–TKY/‘%¸ŒLÒİ’:ÅL©g˜¸2ØÄ¤Ç[¶…³İ.EÅ!×«×H=’k\MÜtuã}`·4ªÍN7÷½¦ÔWÁfÀuì¸ÉMãH‚R°J§M˜¢\G+ï<³Ã®8y°S|~MÓ
+9Ãšoô¶Sl÷juÎĞ·•û²z™dfĞ«–ïp”0ŒÓPôÛJ±¬Æ3j#Ñ5€şç¶M¤Ù2a T­æásEÒëö»Âu2âC¯1/5<^êbtÁötdO‰}h<QÂüw9…†‘"¡TpªáGä€^ aé;D«ã›Ölav¹Š²LÛ¨ô¨ba†eœ•y'ÒëÁLeQ"—¬óAÃ|1àGú(:à«€R IQ"ˆùÎ‰ˆ¨Ïşà±¦AgêÃ|˜mã”šêé{&\@…A’ˆ]“×›‘óÚ÷ÆH€8Ë|RNhw¬e”‹
+¾u±ÄÌŸşŠká¿çüÁû#Ö¢ĞO‘ìQÅZÁ½¥~ò¦&©¨Ñ#c¶Eù³ÍØèœ2CB"#|¤g„ˆ~™v¨ÑÔmÁš©§Ä@Öú+ëÎ(=¬Tf[ó¬óP»í›«ôíş5¥ÀôşBËÖkAQîişŸ|¤/J€ÒÑC«M™ßÊú+-ÁxÛ(¥oAÎ0ˆİü‰'WS¥°ÀOäXVY
+g>—›‘O
+#
+¿È
+>YğÖï8+©>˜Ï3¿->ö8&MÅjÌzw»k#x“PíØv@€õmãæuè
+èbÀºcuFØ/_¼…ÏOU„œëãT¡
+G—r¹ü€ kjo°R¾Ü½T_óøš›Ù„ø‡¨ ÷˜jpØ¨0İ ¦šeûc¤¢–e­(N.R¯½oéÊ5Š~µş±BÓÂyu‚—¿ÚÇÜ y/KëmO$lñ	)ä€ o«ìöğRª«mJ3¡E£7ª.çãLµ\„™—V
+N;):ÊK4^Û^€n0Â‹úÅ7it³Bªü„B„}Yôè[3ò³ä/:§ÊöÂ›u•.±`]Æo-QÜš7·­e˜²cM5r 0İ©Mz³‡‡ˆÛà.s™IH°ªÏ·H-V«neÿšÓVÖïÒI ”6Fë`šWnÏı4Òùî,Ù(Ú´»X€ë5¢c„A  '²†Rà:*(¸&eÓßÊP]rn‹u*ÿğ9fè=0Ğ½°cÅ±q §ãÇRÀª-\}cÃXNZ´øÅÚZl±Yd…’ßİ;!cgq{¦½Ÿàm"J”ºAßšõĞ-˜KÕ–	
+ˆ´Ø>w\¤¾-ES¤pªXHÚBCûgG¢Vş–L½å{tú×>Hüæåµ=Õ1óp*i¾<Caò«QpJWúÂZt/xûÈ¥ş›˜[Wß„æñÕkŸz2¯ÖVz[Ê)^yí7ä'm½ôœh'`$4D, ¿‘«N£Ë¾kİĞÄ¾G}Ñ¹¿Ë_sÄhTh ë]_±ŞÏn2Ë~¤?¾ªC´²Ütj	ÿ6§øñÊıÓâ=â½¹joQq bn=\Ô_f×ÇçëºĞÛî“5À£i•lÄr˜µ•WÛ&†Öàk×YmH!ZQÄ¾*<%	ò×Ö«…Ññûm,8G˜—Õc”ÁÈ)ÁP‡£&4¬½j¬EpAÙŞ,±¡´Mğ·ôE½=ÒÒ˜ 0qº”Gu)Q¶èù4Ç©ÿ:BUa™”ëJÆrJëV…€È$2ˆI¬º	„‡g¡ãPXqµ?˜5E?KÉdé)Šô×Ñ¸RßôÚº2ÑşwI‚¼…UGEdQµÔºÀŒréuË2†Ù9’İ–($*êTc‡¦ÂÚİ˜UÓºï¹«ê:÷"İ<ÙÌ…/¦n<¦pH‚®ÄUbÜöC©¹dÜµ
+ÎŞX­Hé\v×"A/"³JÔ»Gş:õæqkŠqxHŠÃ7¡ïHªá†t„ş¼—bËJ-ÖJ—öç¸¢¦æÅgë1®k¡Ò²~FLª—¹AŸıT›ÇK‘tSgJÌh·má€`ÂêGÈ|ŸŒ9­4zC¤W—¨¼Š¹ˆÅ	#æ!ØYQuBIè¯2PõŒg«£¦$gMÍ©®mÅ(æ­èÂüegşÄ‡F½~—Ú
+§úYö@ŸÎJ€šæßš[ÿFıÑŸ¸ê_4k¦Öm²Û±é.ˆHcô¥YÍ0Ñ0½EİVéü÷ãxv°İíè;«Àäµé8ì_H[ùĞapçœ”ÌÅ&(‰XÖŠbRÆƒ·*-Bæs1K3
+]Š¼±‰=(Rö«f¢ò‚™,VÀt
+Hà›_5	‡Ğ*°Àf)Â2ı…Åşí)ˆ‡@T™mÚÀa¸ vs·!N„;”—ÈK×%1³„Ä60ó=µ`s3m™¶GEbObÀÿÉÎ©Ò(ìıeÿ8ò£L{S~(2*ÛUAò‘aS…e±}øIŸÉ³úò|ôíé;!cß ½“ÿÛ—ßSÂö§q*1e1™^n$%zÚšÜv 8˜úš.Y:gd“Ø¨ßLZ¬“R*Fk¯B~ì|vX¨Ò§;Iñ›,Ö‡ó¯ÀqÀRBÅ;¬¦ÔUªöQƒ@ Åè š=ÍGÌ2``_®A†ïVÖÜ#+†q¢^dÔ‹¾nŸ™|m^ypátèhI	qiò%ôúf&8»Ô§¦¨{¾!ÚÛoh!çc[«ø^úG|¦~Y7V”İ PÓŞjÀUÇÏwÔ6L‹¿®ìÏ_âöÄÃÑ¸	Í¹
+¡`„dúÙA¨r˜*ä8ß¥‡©åaÓ¯˜ŞT»î9I§Î,ê"ö@ç_±…OãâŞ¬( ¿!½¬ß@ ,p4 , ;+òü§ ¢kª[Fç¬ûÊÒİ0F‡:qv’vÔ«ä¶j¢#yHºÚ	d¼GS°%Î×ï7ÃÙápH3']Ñrù}Û¨®ñÇ»í,B~}Éóß(ĞQ6¿Ì9¸>Ë«U;ŠLÔQ¼ ˜7Ù¾;i*`/çò×˜³fQwà
+3=<¤Cc*‹ÏgÅ4Òú<¯ÿ#AYVè@á¡ƒÚ¦·	â)!1Ç<D?g¹Ií°I„’ÇE?í3a7ÙZı#ÄÄóˆ( ’bÕ ƒÊrñëoŠ	&V ˆìcúaè¶¾¤4©!o°¢r…a2¨mì˜)c@pö0
+o3\9RG£B+\uÙt†¼<¹ğöÎ.‰(z$âa2Œe_–¹‹a5dn‘À*5¨qÁGîÒÖBÿµâ¸üê¯|ÖºÃùîÎ\ksŞÃî‘k£@° k”½ñ"AíÔ€ ™D¦;#V$»¶!QPÿÊ7úÉ\÷å@óY¾„:5ÈMwMP?41º×BÕÆ
+jı;¾Œš]¡^¨Ë°hF™è?B#ACB[Ú§òJ²æÑ¦FA¨¤&.á™(úLÌğR€PÓA­÷]İœ‚\öÊÉğÿúQHÃ'î•şßÈÎ°æIlx”µ¸†–ŠÜ8‰-ú’0˜Ø‹=
+?˜j0ÓaL)ò|¥¹xuŒ])µşLf7d/±¡­—JOÑdQÒÙÖ¬Xo13©­dG9ÇË<Q%µ¦G×^Ev]”àìRµÙ¬™wNÚyl¬m;…İ>ı~ôaTØÈ-{ûSİ}@Ëi8‚Â_ÈV øAC5Öğ_–BÃ¤,ó88×Gwn¡2ğÚ6	v<ïü-(J.ğÓÆ¡i?¬²x¤¨7aYÌ”RÅ?=àk…«ÔsQd—%•ĞL€8¯!9"÷@…%6@
+ƒ÷7W¥Lf|…O}Æ`È@åÛj&¤>‰óøÎƒ58HbAÔRå§ŸuÀ¬§DÃ55‘}£’(csóšÈÅÁ·ÀƒÅµìzK…ªê-íOÅ_ş÷%v} n…ÇLãHTğ®…óœ¤‚ÀorK¸ˆ „¤Çÿ	ƒ §õ·®Ø•†m¦ùƒÓùF&dë™qb¸ÿ`®n?×§ÎpSIå¥ı°ØM¡Ï]²¾Ó"sBn4k½òÂ(âĞœÉ)”´¸ÁÇkZg¿g†O9ÓAyª±’Á‰á•Ğl…¶ÁB–‚y::bà*ÙDúk¥M	Q
+^•+²ó›2%îâÏ (­tóDc@G»gd£’ı(!„£	Zü˜@ôI^îxÑÌÔÛ7DÅj¬…+ÈQ6w4?´$‰à[·0ìt¤%ÇŒÃpJÆw­’‰­î¶“	b†qÏªhÉˆüL!PU“ÊV:[ÖÁïÍºmåYNC(İà®5ŸÁòNq3O¸,$Á
+ƒ+I[æ³Oœ :®øéŒÖEä8G³…šrd¾PğÌxTûyş&´ƒ\ÊZ€?‡a“ h;‘£p Hxóx îóRï9¡•Ë¼Pa>”nÛÙ\æ~/ôYÅú;,…Åã²ƒÄ3ÜOœƒE‚¸ T¢B={Â˜í-ò|Qk›Æ zÒüsñÃX$Ô{oWx–*A¼™É®C=ÊC4'¢ëc×M“Á©U¬HÛeU‰Ë°{¹m7šâh„0°ÏÜ^Î‚>aE¥>Úª²ØÑI àh€âÓ>¨ßˆâ[*cµ6I)ébß^›kyU¡ÅğŒ½dnUô)YlƒÏÜTã36c°õ¥|¹åå²4x¬%ñÚŞzêÇ)|×ïÕˆ91ğOÎ£jô‰ i²¿/ /pÉ8Çác¦‹hI ²j’:pQ ƒñ¯Ø§HéÈt±¢ªâÅ¯%5ÇıˆãŠ.âUŠC©±HpXÆÍ_×şc–OÜ]Ô›ü€jÛŠ,± #6ªÒÇ”0íE²Ì7!¦´täš–âR%dåòÁ}ÔàªE|#¨áÑué§ÎßLè5TçoíøE÷h#š6]ºÊ[SÈ4Bá~{?ÍxÀ¤€ ÙgÑæjÊD¹íNmM^åÊ…ZyV©ÎzÆ/dl@‚gæ	áH"Úƒ:İ6›Tà[f>ÿÊ®"hşœïCÁ«nlºGTD$b¿ø#Ñ„,ü~7X©dß0ßEUà{B@)“Yñ¢Õ2&"]TÙ"Gü 5JÌŠ‹9"„¿`uÿåFSó3µ¶Oº^Ÿè¢o©hh);¡Ê¦ŞJdÒxyÙÈU‘»KûÂ`y¨B(%™ÊsĞ†¤L¼$HPĞ¾‹1ÔË¬%»,­x(¥ ”q¢òQ¥¨ÉÄbU3BŒ:ß,D1ÇŒ	 D€Á¿£Y0T~“^ká@4¡N;İşŒËæX}³R_şÌ¸.ù¡# %ím~ IŠë††4Ù(ÂŞ×4´…¹5ºOùù•	ÀïŞDm”óSã	±ë_àKú‡šXDŠ*[À~·NV·‰ygá¢€ï‘äÊ`
+S1ƒãEN   pUÚ_„“¤\yÜsF™n@l}÷gÂ#¥Ã	øêf-ıp6ö#Ô
+;S
+EùË[¥n²“dl^k“”rŠê™«uN7ÚÖÒGü~?*ô@ÌÏëEı„)fÈo0Â“L´HYqÿÓ) À«ğš â¾*ñúò‡i âú8Õ0[K¢×Z…Ç¼B@[TävH8Ël„3²˜ Æóf>‹æ•çEp´ÛÛMïæíf™sØ÷<š¨Z{=»¯ÆyÕPB.çº[”z8Ìõ‘üÏ%ƒ{˜lÿƒ0„&M
+Ğq›gg]3&Bş7»sá7Ş(=vìíĞgıGv‘|vé£‚Ğe8æ¥HA|Ãª“ÛôN¤í"µU!T  × ¢¯Ê}_ìÊ{òZA¯ˆz©”\ÿX5,ğkºËšgI)zß?ŒüÌÍ_,¡9·08½@íÖ¨ú2AzöÍB¡éí4—˜fÕˆ§İZwÛçúé­~ Ù™ïßŞ4°ûôk¢'ºs©ö¡ë$ËP‘ë´ûi÷Î >¨+•&H8uîü&)Ioôwáäb÷\ÜÜä<9\Ô“zåAHcØ4^‹&ê-İ‹
+¦ö1ƒîÅB¦Ô†yS§ÇÅ¸:š” ,6@3j»Q­2¢a‚íôIÜ`cµmõÛÆ¥æ)a;ŞiæÄÁ¢RßşÊÈ?BÓ ğGİ)8´{eòhşà$dÓ9Ä±	¼”ZÜg¸ué|ZòX5#Ã~"Ë}¥ÒsÓÏEÕÚOÄ{9e1.R5Ú‡E[×àfd‘X,˜&zLPF€ğt¦û÷Lë¨_Ş×¤)$tOB˜B#ØfNdÄI-`Â¨ü‹]7bM0+tF_Œ…çVéÑ'-á£òP;¯F±c/Ôà5  ¦åhl-3Çkg¸Â936:åì	¸¼–|%ñ¬ä#;äoVü+!Z<ûİJm™—kDØçæ–‹|]“Œ-¾ç¼ßvòÉ5(ˆ[t×1}«™‘zÊG×œìrÈüJÒgH00Öqâ´O~â¢°@¨†¾°v©Ş¡Â!Âßpâe‡R8Zâ *å–İcYpãB|šoMg••ÑœĞdäNå+OQ”ŒÃÀi4Ï`´ÿÖe £œÆ¤†)WÛ]?Í5ãøë £»zwb!NÆì¥ˆ±¥ÌD¸¥»ÓvN¹îÍ	iê‰Pöš±ñOĞ¸
+€¦İ”Eä Gûò ÃXÅôL`G36<ãiQBùd‘îÛ‹|ˆPÈªf+«ø©¾;ùÛ”ªÎ>V)£[£|´7)4“
+ìğûIêš-·­I
+„ “œÑ—uŞO% N¶a “©_¨Jä
+®G.é2ê>u¼ëŠí{¡bÔÎ¡¹W96Í<ĞA»ıâÂÿüƒàÃyjJoKK!ÉrâTZÄjĞáWÄ8ÚCÇ7Ø¹v4¾eô<(x¼!›ÊÏ¯[õ<~	+Qs,êÿĞƒeg¹¤“*ã‹Ç©ŸŸV1…¯5õÔJZ7Ncn¢Ç Rıó2E5%!9$åƒÙ€I‡9ş‹ºñ|‘1rmÛYí[]şXá¦/™Ñ¥ipå#n;Ï›<³}ö=ê‚@W €ìl¬x¹ÌÈp ÉĞœ¿¬‘F»´¨“1îÌårtLÀ
+d¥Ø$³Ò"¶©¬û	‡ì´Ÿìòb¯¸Ê`RˆÍ#íP ïËãŒAVúâì“›öqs=QîşÀÿ9c Lút6l¤°ú‹teù(¯J-jl0ãìØŸ‘˜Õ‹ÓF3Èş²2@ùıŠ}ñ:@I{Ï”G	IåÏÏA¿¸àò9ó5£´Z	WQÚó^´é¾UˆÉoüñÀö/ñÌ×¯¶ÊÂkY½SAí/¤¨b XŠp§è{l"R¨I½ÙË”ªñ”‚+»õ"»Òv w”W;q
+–XÑé1ÔJæp¥d²¬!uû8§çÖX3"¤J™F:{WKº‚š.„G‰v&òÖ7átäÄŸ;„G:&™ öôŠ¶ªw ,Íş±\ X–%oÊX“+ÏB~ –yÒ³D†ˆéò½Ak…z+Vüñµ&~ÕşiØ)Ÿ¥Ó§HÁ´&nsmÃ‹ÎeyõfE˜Û5Ïò__}5µ¤úš'‘Kxõ ÏIŠU
+Ë”ñ¢Kvrä?ì^´´¬Õ’ÍôBCÓÁ`eI£ÀdÆAŠrŸŸiãºô9İùæ‡]Ü›[1WV_ò’Ø«|Q ÿsÆ²Úe ’‘ı/É¹#ÏØX´¦Àqóî İ(ñß"Râ’ÀÊÚ©Ÿ¾ù–Ïbôª§ù²0»áTª§*HÒÜHÛ¯d¾x•™½·>Wü¨…RUÿÎãr©ûz&{uîÕíÊ>¹PX4IÃõû¹ÈôæôÍ
+}ıJ{8Es·[V:ÔÆÖ'ç÷‹àhRÒ˜­îÍµ,Ó	±1¶Î®´n8%ßJŒåŸÁNÍ8€> |Ğo¨ÄŒ=,–GÄ.h&ÓşWHìåMw‘CT‰˜MtrÀ„dÿÊA§—I;A(Œ˜Èÿ­ š8ÙïI2(Sº?¬<yìİ˜5ÊmŠŒhµh Q9A—jçh*u³wr.s½\½×ûÚ*“œHWÑD]g­Ë:³G^ÔD7œzåñù/Z›^şíêAîÏ‹ïÄ8ú\X>(ËB-Øgú -"ş¼h~\Ç¤tïÚù,rM{ª;ÕØ€şÿç¯;èÍ	 g£[4Jó¤kƒíÉf0GöUi<‹ÕIıo€ÀTïÆ =—M4Í@ÖúpÉÀ‰e~wÉS‚F1N sÑj°ä6‚äA,«…G¨b+ UÆ.×±•YqAÂ4)ªŞÙXXbØû|iß¸ÅXùÛ*ŞãŸ¬RIŞ®Ş\P~éúôs, »ÈÙÜy3qç¯Æç}ÂÏj\c2¨‹‚I*‚ÃŸeŒ)’‰Â‚
+{øa£
+:2Ca …ÇQ©Ë?B‰”jŸüà>Î5ªPgzóNâ—@;Ox_j8¶ú#9."hıê`2† XšiÔ”ú
+M>ÒQ‹)šAá¨x^åI6ß5åT¹ÛRü&šñ"éZËbÖï€–Ú2ä…N‹¤—å(Å¿¾'íÓÖCÓQtÜË_~Ÿ\Üm|Eßbøvtë¾lä¾ª—6?ü%­5Ã€÷÷ë—âVF@@©Š[N¤˜÷Ï->À{¦</T 0™ªÄ4d¶t½vs3×#70î’G»İfºá½ŠdBW½Ç8Åı~»~fG7DTè¤‰j,¾j`;÷ì=»2İş#d€H£İ6Aa5×­ƒGê©vŠá›dˆµëx¦8#zûLº-¼qâ$C·˜‹™ˆø­“NÏğcñVrWòûK9GV +èEÛ³9a¾@ı44âhuäE-B&9‰A…ñ’yîhè1¨P©¡,óßé˜:²›8œ×º^0ƒ;˜1,º%5šD~¸´¸Úì&ƒ%ŒX´'Â“µü„­S¨·¬n8©—_!Ş§ÿj@ıñë°BËŒL•1L\j~×›ª½{÷ş5¬x~¡gõí~-0fÈ$Ö}±G…#—,AÖç·÷ÑŞ%bBæP3‡¶@Ù8HÏ<»°•m¢ç0ÿ	e¹©qfú©.‚¬2Ø–œú­–?K”+Æ6FU yÅ¹(Ëgö­(í‰$œíG¡XCƒªs¬$0ß~P°:7u)¸ q•¶Pê@¥Šû@ÜÁOôH@áß‰ê Põ:r Ò&Ñ*šØ\‹2ÈÄ®›ÒÆ‰Öãñryå½v´eºùdx§£Y›LtGæ!Ç w-Qü;Q2İ(¾9ÓxÂ\-a˜dF½ÇØÃ (ÆéÃïŸrV¤V£J‹‘GâŸ‡MFgìÃÎQgp™1^ÄªwÅ‡qÌ^¤<qé†qUç×ÂÅ÷!ÄUÇfb¸Q‹`Ğ÷x%K²M|Åx½2è%]cHEDT+muS¡TKË’­8ıû*ñ+ŠÂ‡@ètÕUÉè„À}_D'À:H’b ÉÆÀŸŒm:«&Ÿç¹Ì“ä'#ÀbÒ¦Ö#G´æìÕ¸Í LÓ“’<§'"-KÖ|[$®E¼x(h+)WÛ É!Ò’Î¨rÛéŸ½ãÏ©áò5ÍiÊßÆLü¾®>-Ğe±÷ûèñÍU^$! ‚eª‹2úy“¢È¬èË>˜dŒ6m Ù‡KAÃ•|pCYvŠ‘déKLàKEKı3…c€( ‹I1¬¬ê1tM³Fh<Ïô^¨ééáR•¢“¯¬Op(Vr†Õe{9!¡¼á³şE³w¡5«2‘!¯õpõ?¹œ€-B÷…ÕY@lKŠŸÜy¾İ†Ïfü,ú_y²ê Æ±ÁÃyV~õ]Yå 3¢¾[¶Ö©)¢vş¢HÖíà3¾Ïı¼|ùûÓzgoíEŞCó…óûD) U@¸@J]F!LRã‹÷8Â'ÀT‰•×s°•$°9…[Æ’8—›ä/ƒüU†îK €…m“óÀáÑaaûåÊÊ:¡¤ğBUúZ°Ôí'Å«ÚµqíJ?FíÂ}¥Õ–¨f®'zH1 tÑàZ¬+MdDb7IWQBğÏ,{è”}’’k
+7·=ˆ|h˜†xgß¥Ô›²ñĞH9vXâéÏ*q0áŸØĞ`åÀ`-è$Yª¤òFƒ¬Q0ôÓ„dËRlÑi+yâ²ÿf¬Ú")`‹oK3ŒáhÑ«:PX¤Ii°yŒlï™’k‘Ø“ÖÇŒtDqÌ²d]öKÔ'ë„r¡WÈ !…Er(SAØT?ÉˆˆiU^WKY°¡uå’¢Çş#„„×Ù˜‚&Fç´ñ…;‡E¦¨t¨á‡éÿDfØ‰yÅöU—£*¬³ı™ŞIßù2{‡ÇÕ^šDG@ó"4
+èˆöX@î_‹ ¡Ùê~§ÜÖ‹ÉÎÂÃ¨
+§-%5ƒrLmÅç76Îß_ÍAw;VDŸ,M]÷‚G„¥ù/(Ö‡Ÿ(ØI[çUS.#Ğ”<åKşôW¸¸ÒÍáÑ3Ó¥éo  áS»yù5Z6b &Çä2–%¯Ê{Û(s“ä[Ëhz¹;ûo<‰£mu†¾Ò­èî~ı¾ö¸™uğ½ùİ²¶ÃÖNui<ö¬}şìwğŒSŒ+{¨QÆ©“²Aàq‹SO7èÅœÅò„Ë¦ã¾#LRÔÁ,	5!Óâ³,mé	¯â{s7;¥°ş±‡—DkpÎÆ/6«ÇîLÌóë©F{;—Ætï¶¿aÛeoËËÖ=Õò¾€şÕ2œï2 É«­èz§ôÉC`BÆRØÚ5÷zâÓ"ÊúuZÛóÁ’'ÙCO
+­.Hø§w´æ¡ y-ËæŠˆ³À%XŠ8„ƒä¦Ô¢íÙc°jŠª—‹ıÆ§Š˜ €X¤;oA£˜ÊßâñyÇØÏ;áÍ_ô‚†y£W6ŒİÀ‹øhrE¹ª~rXS%zÌ×’"  xÿxìÏ™jVNÕ­ì×B,å¢Äö¸‚ÍgUåoÊnÒ(c.2…ÀÚ…ğìKâîì±fü(¡ò¸íúÒOue1ñ€É6uÀ®)±¥'Ïö:nıúÎ°ı]$7Om€1M×–ÌP(.½àgøÙ‰Ee0 @¼œl ¤@b©¬–‹uíG®ù#‹ÔºÈ9d!ŸôÚ—­µÅ¤rs”Qbéæ×ZõË±3xûà ø@+ş%¥|‘¥ñ¸®ÈŸŠíxj2€«ÿŸA»f§ÁÜ˜@£Ÿ©\4®€å)ö€Šø*‡ht¸‡/4ÁSG¥“ôÁÚjØËÔ¿E—‡OÄçJ¥Oò‡½ãë]É}ó›ä¹š±Õ–s'§¾ë<ï³Ç«Änc ÀŠKaíÀÿÄXYaüÚ²4Ä¨?ÈeõXşûÃªn`&×Ó&tøopJd ìë	lòR-¼,Ff`¯2íHÆÙŠo	Z1;º ƒ-´Šgæ#»¯(H\X’ÿşmğğ$x£í{­İï‹h›¶’ãLoÆ3nPò[ÚËg›×‚~wwá®NÔÕ“„—G^F9¿3¾áí™÷"óæ±).ó|uÁc§.ü†ãÜ]İÄ)¡1wgRÏˆR¬òÒ}yU†/ì70¤:ZØæ‡#óBì‚Kl3Œé¶ çÃNsÎQWˆ¥5}[ZÇªš…¢ùÁñM
+-V·t,şogTÈ •íß26§,›.|ïŠ{§½ªÔˆW©r³$mÔ,Äé0åË	½)£¬–ˆqS*wÖn›0‡Ao°ÎX¡*\z±Vöö)M>vÆv‘şò@…ÙÛşÇ¶7u— ­V:n)$&…Ij5B·y~Í„U¶¦b”'¢àÜõn8ÆBQË{$İX,Úñ’"=¬¢|I/ì¡J Dƒ©ö%VŸè”63y?rÂ“Ió+à‹±åöWïúo;å*k=hõ5ÿ¶.D	 a†·¬Qxe™Ô8Â^=8õıèWÜìŸDYdüÜ¿ÂC™ğ;Àz(#¼#ƒ|İ=,«hT$°OÃÎ«HÁ¦ÿ¾ÑÂ„áŞ€@cL'iLÆj«/wÑ{EdŞü ĞÍÍÍ;<nNùÎ×vDDDÎ ,´3t‹ÉN‹şÆñ’ u7Øo`"`0±s™[–Â¦€¤üs9º»O…6¯ÒcÓòAÀW8§Àä[6šÂíK¨% B5öî3 ÕÂªöİ‡s“RÄ¶-@‘e§üùV#%œCMÍÚ~Rqû}ÒÍæøá¢•¾jëJÏ½¾>Z`o#3³•‚Óp0RJ	KåêUeğÕp7â š%À¯Jq˜ôÅjfz²78¡K“•C­”A;!Æ `’¯Ã$&·\Îr ı®Kç©çPšu©,‹ø_v'¡âÖÂˆÍÅØjç^Š‰<¬Ó­5QŒı>ğ“¯5…MöP+’×hGùŒã^0Èæ0@ÑÏŒ.åÚ€‡½eÇÌ€e²èôuÌ Ã‡+!FBã@#ÁšÖÉ_Í‘àºq²HÌ""',ÆL$hwØÔ`¢k³rX'œ°²¾HÛ^Ğèt_^~ÔÄpp¨
+/FZãÃÂhaĞ0ĞŠd„w®l6OpğêÊuzØšœå)ùlœô±İLÅ•IÒ¶ü¹àŠÍs¬B n,ØhÓÌ|‘Ğ:.Ä¥-JĞe=Üğ™®ÌÁc›oµ¤Éò
+7ysK±·½qÂdE7LË]%àV3[$2Òù` '8krš¨4kkğræúcóxášÈ4˜¤4:»FÂ1§2|b?R‰üÖc¬×›u²eô€/xfv¦ÛPŞ³OëGpı$° ´dK+¸ÇéÔßB¶SÇ¡ZÍ?Kˆ•ptìÓ•CÉ°ƒğÙ•N3 QÂä¸Œƒ-ş‘•&CµºX§·!<àR‡òNépSÓKâİ‚_>O³`mÇ;BÿG¨	 ş—tÏ†ÏQúàÄr‰ğ(éWÃ1€Ï„šŒœàïD¦mo'FiĞós}¡—=CkÌ7QXÿÜH-’Õw]­__^B•D“Øià0Ê˜:‰ûú££NúÌVo‹|È¶ãw€·&İ¾í+ ”³Öˆ…‚Ñ~w7sfiUcI<Üšg7g]‚¸]D;æF†ƒĞÀÃA¿yXåÒæÄ_Û¦ÍÙ«6uDéˆîC°:Õ¦Ãs¹²Lğj…Guµm	¡n@¢lÄ$ëx±?ÜÂJh$ç®¥wD]L§§Ê%Yç¨‡¶‚Xf¥­ò±ÓÉÊÇâ½Ûş¯è”MUDÂÅEë_ªİ‚<€ˆ8£ËCä(}œ¨eºœCB`BoÌ*‡ÍdàK¬2FÕGKº¶T\¤TõX«`•aUÌ†´f‘UfÀb`[«„Ğ±ô¾cv®l‡ôÏ§²\[ÉEğ
+8h¶úÌ¤[•Vº?¿TW0Aˆ6v¾‹µ`bj8Èœu};J¦£+Ö9€×ÖĞ(­¾¸i?™<lùŸËé |ÍèíVèUÁ„¾Š…Ü±bÆ§¼ÁJ,Şd8æuï¼Øıäğ¹¶ß·=VNUOËÚ]½ÈL¹/`}kË•:bIÑ™‡nvyñØ´àiå—ÉtÑ¡¢-°å> p ‡_Ù½Ú„dd¥Ï˜ù…¦‚nè?¶û¾Zé½TğI ‚$ táS´"ÿ>4–µŒ˜ bE6œ±`–;¿õŸ/”BÖøw~)TS-5ìò™{_0­Û„Áz§íÃuÈf,„ÍQ'¥Ü¨X´gú‘Ó4XÊ‡6ÑÉ)ÛNNRíÈx+-~”Š!€Xš·´QËHÀ.î	@ÍáÓ@B" ùšœü¬r§D“E‚×Ñ<r³[BÉ”ši
+Ì!#‚%ÆN`
+§¯Şó£ÙĞ‹.^Ç(ÙÊŸ¾*j0J
+­}PŸòù¬ı{Ÿÿ]J €&¦íŸÃ¾ä â1¾B›çf%Œj0QàÆNå6…'sn»m”Ì0i‘\«±‹Â¡“ ÇfèfğÌJş,ÍÚ_/çøtw?(Ïûæàşqìòh {q‹ıĞ>üTÃÈCN¢!‡?Xéï‚MŸÍ€*>“ëcdA¾Î¨(aç›@ÑW[Gç½üœ3œJ	šøğ^Ü Ö@4°LTÙb¹WÛX3†NUT¸KâuhÆÌÂ{Ë#îõGÅš%Çğ±XŸ¤e"’â•GxôèÅ5?'ğ%Êæ;wç¤ÉTj•3¤ÚÌ†$Å:a¦g¡ƒì°~2yH‘Ï†|);ş,Äæp”İ2¨(jŠ˜AúšÜ×Ÿ5ğª#IÅZL6”R¿Ä"L+Á-‚‚tÅ¨0SˆÈôˆNhù¨M˜—³ÇIàÜíÔmE4ÀÕ€Xñâ––°€ê1g_-2Û8¿Te4ÅAcz;ˆ-£  ,¡u9?ëäzÉT$&Rb|Ù
+~¬2ó–Y€*#è”ôš$ LC•ôÏÓ ,lN*úÑVû·§Ï°‘8.S"Í7èG¾ıA#-ğÈ½Ğ.I3áªÓµò?‚µ¢µBf ¬aHeÇ”}€Å’à¹Óõk{2‰›¹†ßüóĞe„?İæÒwüEõ„Z~ˆ$¤„J+fç:¤‡†ÄÍzoS¶'gçø:¬y—)½[¦OW{fY1b†#¿£Iå¥5÷: ğ\òæl¡\2CŠeXs¿mEäçp.Ù7áÅš±Bd¯ùfĞÑPÃ•>¦øØÕ-v‚ÁÈ¯1·ÍGÈúş,û‘â3,êÆ#lq³Ò¹‚¢Få‚Ìó¢xİ=ø,é*_Ó/İÖuç‰€Ó=xF»ØPmásÂ6pì’üp%•LÅİ£!SÚBäC5›¶Ÿø[(_:÷Nöÿ‚Ş%¿¾ëšØş+¡‡Î¿ŸD:<]Î@ñºHL^ —J MÅ)­ùf±ÉÛ „¦‚;Í¤ÉE‚†B`^‹O,=6èÃk€Q&¢cÉ¤.¤‰ÂïÃ¢]¢Më‡±ÎïœÊÁÄÀ¹‡àjƒÕ÷³V$aº(o}^{{yİ›˜ÁëØb(h»á¦›«%$ót®ãà¥*mr¼tÿNæl:İ¹²sÒáWìğKûŸ(AW[V«_":ÂèH æo¹‰kö¦¦wsGÒœùe]_7+²¯!ÅHµS›>yøÏ´FÛ‚—rL`ˆòc1ÂL58;vBÁûJ­›ƒYkZu·’Ô½ÎÚ¯ƒcÚ%57’¡„/ßæéÕã)±[°QóŞ§•N«¢hÏ Bh kXİÊ[Dá(â õÓ}¶$uijogp-MgçÔÍ ™HÒÀ­•XÅnå¨¶ ñ«B-gÜŠaGKğ„:Dòä/0¹ºìÔ\^ÛGô|«¿ı18ÛL±ˆØ !·Xue‹õÜ²eB 7³‡Ë¸{qeİßì×1HHàOD¯`úÃëÿğó BV0Ç%w²;ÂÅyÀfĞYş•
+O¦… 2\äVQ¤Èƒ‚—©Ö€úntØ¸Íğ?Ûf,"¿Œ£àÈ˜ €ÓÅâ3=¢)¢ü4½ie®jp::–¡)¦ˆLê¡›Iã¦syãa5ÜˆÒhãrg—¨wùä]EšèÃÿœ‚ÿ@@r­Ù2öËCTkñ…Å÷¿Æ2k‚Ñ!0:Q—xVájSJ`aa0¼6,i/Švë‹Pr¦²´FÄ5(JPš.µöÊ_°]h`$ø7'z]ôoùwµázÒ‘ÀîÂÎˆ_ÌTÊŠÕk·@•‚Áæ}»oB;7»|6»ºªÛ‚¥·hbÉ
+—›=óÕva1M(
+Û3²tÎ’J6DÀÚ•p/ŒC ·g.õ`±ìÏ1—Y©(‚ÏmM5!ê#£ğLñ2æ2kÜ‰(õÀ °b6n5/3kmkUtöà˜M'f$²½ŠPöÚQÇJ ŸÊ!}té^8¶PS/J^ñË¯z$Ïfs_+ßú ¾°ø	—´5j›`“tÈK™É;›1îÂmD3É:VœM2ñ°–2xğ¹FohyÔZíg_	5™3µ½WşÈÅlËBL¬±gÃEíf ÚY ’ i	ÁWçÇâ›¿ü2kµ…ãÌ'‹Ïÿ°èÃg7ÚõÛÓ5yø9= ’9"»è(ı%Ú¶ô‹ïœPÄ£eK0¨±üï/âLMëˆ›Y\Ü&Æ(HYÜÏŒ‘YŒƒñîi>h’óÏ‡ÜãçÎKLç­ĞKÆ¡•m}eë[¶»y¨î~âSjùw†¨PvGÔ®M-Q+R tD¶'NmøÛ¶Á:;9µ52”ÎGböeÎÀùƒV9Í%ÑĞèÚ‘|Õ¦—İğ%„ù!„öµU”˜RZbÏ:d¥Ñ‹5=h’0G<ƒÃ„şwW´Ü"(ê§y÷F§EÃ³Ìõm6áo¯’Úf^„s–ŞœÁb>¡›´VMDá$’*Kèï¬TWCÃëT7î}o8ŠYùW¡ ópø·€öRl—]ÖÙÎ+8! ¬fµø:‚uĞqcDªÏˆ¨e‚µîpüEÂÖO-~‰½´¤š˜²©ÁEVg$>Hãd1d´4b¡şÈ;}~Ï½¯=Ğ6xŒ@b0™57[>'¼ÉjÜ¾
+ŒW¹¢›è]}§N«(š:šçêØ’è¹„Å.‰æ¬3BØ2è¡Ã ˆ^Q­#9±!£_¾qG%q7#†»	$ÛıÿêL½ü˜qÊK„&O¨]Ùxüò³4ì'ïn‰÷÷‰û Ÿ‰”×ØÁbùRiû	 …6Ä«•«p½ÒCbÍ`tõ§"GD!¾•Cúü÷aÓ:ã3GørÉÄÏRyZ¿éºNÓÌoš®Ë¸ú™¿&qqPB&Cq`b'’à¸®Ùô)ßxĞ±
+k[Zg³Ñèfm1%ŸÒ¦×QÚ”ŞæáÆ	ZÀ…§òXTa-ì&ó‡¢<®-e˜Vk+µåeô)¿YgŒyS÷”p±˜ä4İõ(Tµ’ısu6ëî—Ö€”¶˜*•Ww™Ó%ıÿÒ®p
+ Ğ¢—ï„â,&„àäRN6Í0‰Û¼¯¶wj…5*ŒO-3ü}‰KÔï>)(¼Oq]SˆÇ/´=¶±‹ÀT}{z¯Ân±K’ækB§0kc2­y÷öÊ\på=O©]¦4á{)ş¤.à+ÙÇW‰qNP3FPÚPÖwÀôuÆÚèİœ½6mÒ¸(uçKú_CØÊiO!b6ˆ˜Éjó(¦ÆšÈ•h|C¿~|F2Ôèæí–Z–ŞÑL[éÉ©5huñûYb4¾|ˆF+ˆ$Á„ŒçŠB6©kMŒ5“/¾‚À.TÚdv^Yô.           ƒ5¨mXmX  6¨mX¤    ..          ƒ5¨mXmX  6¨mXf¤    Ar u n n e  Ör . h t m l     ÿÿRUNNER~1HTM  7¨mXmX  9¨mX¥u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         

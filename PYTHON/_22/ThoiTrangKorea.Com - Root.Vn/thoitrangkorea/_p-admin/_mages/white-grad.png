@@ -1,0 +1,12 @@
+ror;
+    }
+
+    obj.safeBags = _decodeSafeContents(safeContents, strict, password);
+    pfx.safeContents.push(obj);
+  }
+}
+
+/**
+ * Decrypt PKCS#7 EncryptedData structure.
+ *
+ * @param data ASN.1 encoded Encrypte

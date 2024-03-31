@@ -1,0 +1,16 @@
+SESTree.ImportExpression, {
+    type: NodeTypes[number];
+}> | Extract<TSESTree.ImportNamespaceSpecifier, {
+    type: NodeTypes[number];
+}> | Extract<TSESTree.ImportSpecifier, {
+    type: NodeTypes[number];
+}> | Extract<TSESTree.JSXAttribute, {
+    type: NodeTypes[number];
+}> | Extract<TSESTree.JSXClosingElement, {
+    type: NodeTypes[number];
+}> | Extract<TSESTree.JSXClosingFragment, {
+    type: NodeTypes[number];
+}> | Extract<TSESTree.JSXElement, {
+    type: NodeTypes[number];
+}> | Extract<TSESTree.JSXEmptyExpression, {
+    ty

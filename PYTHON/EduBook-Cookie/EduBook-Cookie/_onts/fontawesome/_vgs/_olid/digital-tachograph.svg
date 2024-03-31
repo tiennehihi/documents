@@ -1,0 +1,29 @@
+actory} */
+		let factoryCacheKey2;
+		/** @type {Map<string, Dependency[]>} */
+		let factoryCacheValue;
+		/** @type {string} */
+		let listCacheKey1;
+		/** @type {string} */
+		let listCacheKey2;
+		/** @type {Dependency[]} */
+		let listCacheValue;
+
+		let inProgressSorting = 1;
+		let inProgressTransitive = 1;
+
+		const onDependenciesSorted = err => {
+			if (err) return callback(err);
+
+			// early exit without changing parallelism back and forth
+			if (sortedDependencies.length === 0 && inProgressTransitive === 1) {
+				return callback();
+			}
+
+			// This is nested so we need to allow one additional task
+			this.processDependenciesQueue.increaseParallelism();
+
+			for (const item of sortedDependencies) {
+				inProgressTransitive++;
+				this.handleModuleCreation(item, err => {
+					// In V8, the Error objects keep a reference to the functions on the stack. The

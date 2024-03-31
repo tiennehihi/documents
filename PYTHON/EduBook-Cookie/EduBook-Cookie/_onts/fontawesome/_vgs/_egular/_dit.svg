@@ -1,0 +1,28 @@
+isFlags*/
+      true
+    );
+  }
+  Debug2.formatFlowFlags = formatFlowFlags;
+  function formatRelationComparisonResult(result) {
+    return formatEnum(
+      result,
+      RelationComparisonResult,
+      /*isFlags*/
+      true
+    );
+  }
+  Debug2.formatRelationComparisonResult = formatRelationComparisonResult;
+  function formatCheckMode(mode) {
+    return formatEnum(
+      mode,
+      CheckMode,
+      /*isFlags*/
+      true
+    );
+  }
+  Debug2.formatCheckMode = formatCheckMode;
+  function formatSignatureCheckMode(mode) {
+    return formatEnum(
+      mode,
+      SignatureCheckMode,
+      /*isF

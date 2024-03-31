@@ -1,0 +1,44 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.moduleResolve = moduleResolve;
+exports.resolve = resolve;
+function _assert() {
+  const data = require("assert");
+  _assert = function () {
+    return data;
+  };
+  return data;
+}
+function _fs() {
+  const data = _interopRequireWildcard(require("fs"), true);
+  _fs = function () {
+    return data;
+  };
+  return data;
+}
+function _process() {
+  const data = require("process");
+  _process = function () {
+    return data;
+  };
+  return data;
+}
+function _url() {
+  const data = require("url");
+  _url = function () {
+    return data;
+  };
+  return data;
+}
+function _path() {
+  const data = require("path");
+  _path = function () {
+    return data;
+  };
+  return data;
+}
+function _module() {
+  const data = require("module");

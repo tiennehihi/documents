@@ -1,0 +1,15 @@
+anges": [
+      "1.0.0",
+      "5.0.0",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f07e",
+    "label": "Arrows left right",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321782,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M406.6 374.6l96-96c12.5-12.5 12.5-32.8 0-45.3l-96-

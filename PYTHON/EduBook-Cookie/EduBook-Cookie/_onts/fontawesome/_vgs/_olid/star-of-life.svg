@@ -1,0 +1,10 @@
+declare function isCompatTag(tagName?: string): boolean;
+
+type ReturnedChild = JSXSpreadChild | JSXElement | JSXFragment | Expression;
+declare function buildChildren(node: JSXElement | JSXFragment): ReturnedChild[];
+
+declare function assertNode(node?: any): asserts node is Node;
+
+declare function assertArrayExpression(node: object | null | undefined, opts?: object | null): asserts node is ArrayExpression;
+declare function assertAssignmentExpression(node: object | null | undefined, opts?: object | null): asserts node is AssignmentExpression;
+declare function assertBinaryExpression(node: object | null | undefined, opts?: object | null

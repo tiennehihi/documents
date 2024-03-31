@@ -1,0 +1,32 @@
+/**
+ * @fileoverview Enforce that namespaces are not used in React elements
+ * @author Yacine Hmito
+ */
+
+'use strict';
+
+const elementType = require('jsx-ast-utils/elementType');
+const docsUrl = require('../util/docsUrl');
+const isCreateElement = require('../util/isCreateElement');
+const report = require('../util/report');
+
+// ------------------------------------------------------------------------------
+// Rule Definition
+// ------------------------------------------------------------------------------
+
+const messages = {
+  noNamespace: 'React component {{name}} must not be in a namespace, as React does not support them',
+};
+
+module.exports = {
+  meta: {
+    docs: {
+      description: 'Enforce that namespaces are not used in React elements',
+      category: 'Possible Errors',
+      recommended: false,
+      url: docsUrl('no-namespace'),
+    },
+
+    messages,
+
+    sche

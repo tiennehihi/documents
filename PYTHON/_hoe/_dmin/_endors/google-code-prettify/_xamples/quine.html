@@ -1,0 +1,40 @@
+Imports.add(variable);
+                }
+            }
+        }
+        for (let variable of moduleImports) {
+            if (variable instanceof ExportDefaultVariable) {
+                variable = variable.getOriginalVariable();
+            }
+            if (variable instanceof SyntheticNamedExportVariable) {
+                variable = variable.getBaseVariable();
+            }
+            const chunk = this.chunkByModule.get(variable.module);
+            if (chunk !== this) {
+                this.imports.add(variable);
+                if (!(variable instanceof NamespaceVariable && this.outputOptions.preserveModules) &&
+                    variable.module instanceof Module) {
+                    chunk.exports.add(variable);
+                    this.checkCircularDependencyImport(variable, module);
+                }
+            }
+        }
+        if (this.includedNamespaces.has(module) ||
+            (module.info.isEntry && module.preserveSignature !== false) ||
+            module.includedDynamicImporters.some(importer => this.chunkByModule.get(importer) !== this)) {
+            this.ensureReexportsAreAvailableForModule(module);
+        }
+        for (const { node, resolution } of module.dynamicImports) {
+            if (node.included &&
+                resolution instanceof Module &&
+                this.chunkByModule.get(resolution) === this &&
+                !this.includedNamespaces.has(resolution)) {
+                this.includedNamespaces.add(resolution);
+                this.ensureReexportsAreAvailableForModule(resolution);
+            }
+        }
+    }
+}
+function getChunkNameFromModule(module) {
+    var _a, _b, _c, _d;
+    return ((_d = (_b = (_a = module.chunkNames.find(({ isUserDefined }) => isUserDefined)) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : (_c = module.chunkNames[0]) === null || _c === void 0 ? void 0 : _

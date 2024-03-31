@@ -1,0 +1,15 @@
+.push(filePattern);
+				});
+			}
+		}
+
+		// store result
+		cache.files = result;
+		dataCache.set(this, cache);
+
+		return result;
+	}
+
+	/**
+	 * Returns ignore matchers that should always be ignored regardless of
+	 * the matching `files` field

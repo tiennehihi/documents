@@ -1,0 +1,24 @@
+module.exports = new Set([
+	// Non-binary properties:
+	'General_Category',
+	'Script',
+	'Script_Extensions',
+	// Binary properties:
+	'Alphabetic',
+	'Any',
+	'ASCII',
+	'ASCII_Hex_Digit',
+	'Assigned',
+	'Bidi_Control',
+	'Bidi_Mirrored',
+	'Case_Ignorable',
+	'Cased',
+	'Changes_When_Casefolded',
+	'Changes_When_Casemapped',
+	'Changes_When_Lowercased',
+	'Changes_When_NFKC_Casefolded',
+	'Changes_When_Titlecased',
+	'Changes_When_Uppercased',
+	'Dash',
+	'Default_Ignorable_Code_Point',
+	'Deprecated'

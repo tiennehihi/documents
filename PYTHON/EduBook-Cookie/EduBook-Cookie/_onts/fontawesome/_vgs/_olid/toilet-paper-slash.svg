@@ -1,0 +1,19 @@
+node = node.parent;
+  }
+  return [child, node];
+}
+function skipTypeParentheses(node) {
+  while (isParenthesizedTypeNode(node))
+    node = node.type;
+  return node;
+}
+function skipParentheses(node, excludeJSDocTypeAssertions) {
+  const flags = excludeJSDocTypeAssertions ? 1 /* Parentheses */ | 16 /* ExcludeJSDocTypeAssertion */ : 1 /* Parentheses */;
+  return skipOuterExpressions(node, flags);
+}
+function isDeleteTarget(node) {
+  if (node.kind !== 211 /* PropertyAccessExpression */ && node.kind !== 212 /* ElementAccessExpression */) {
+    return false;
+  }
+  node = walkUpParenthesizedExpressions(node.parent);
+  return node && node.kind === 220 /* DeleteExpression *

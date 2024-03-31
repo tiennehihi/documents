@@ -1,0 +1,31 @@
+64"; }
+
+.fa-dice-five::before {
+  content: "\f523"; }
+
+.fa-square-rss::before {
+  content: "\f143"; }
+
+.fa-rss-square::before {
+  content: "\f143"; }
+
+.fa-land-mine-on::before {
+  content: "\e51b"; }
+
+.fa-i-cursor::before {
+  content: "\f246"; }
+
+.fa-stamp::before {
+  content: "\f5bf"; }
+
+.fa-stairs::before {
+  content: "\e289"; }
+
+.fa-i::before {
+  content: "\49"; }
+
+.fa-hryvnia-sign::before {
+  content: "\f6f2"; }
+
+.fa-hryvnia::before {
+  content: "\f

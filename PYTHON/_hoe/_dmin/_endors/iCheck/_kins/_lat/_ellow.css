@@ -1,0 +1,55 @@
+function sign(input, output) {
+  return [input, output];
+}
+
+var u32 = "u32";
+var i32 = "i32";
+var i64 = "i64";
+var f32 = "f32";
+var f64 = "f64";
+
+var vector = function vector(t) {
+  var vecType = [t]; // $FlowIgnore
+
+  vecType.vector = true;
+  return vecType;
+};
+
+var controlInstructions = {
+  unreachable: sign([], []),
+  nop: sign([], []),
+  // block ?
+  // loop ?
+  // if ?
+  // if else ?
+  br: sign([u32], []),
+  br_if: sign([u32], []),
+  br_table: sign(vector(u32), []),
+  "return": sign([], []),
+  call: sign([u32], []),
+  call_indirect: sign([u32], [])
+};
+var parametricInstructions = {
+  drop: sign([], []),
+  select: sign([], [])
+};
+var variableInstructions = {
+  get_local: sign([u32], []),
+  set_local: sign([u32], []),
+  tee_local: sign([u32], []),
+  get_global: sign([u32], []),
+  set_global: sign([u32], [])
+};
+var memoryInstructions = {
+  "i32.load": sign([u32, u32], [i32]),
+  "i64.load": sign([u32, u32], []),
+  "f32.load": sign([u32, u32], []),
+  "f64.load": sign([u32, u32], []),
+  "i32.load8_s": sign([u32, u32], [i32]),
+  "i32.load8_u": sign([u32, u32], [i32]),
+  "i32.load16_s": sign([u32, u32], [i32]),
+  "i32.load16_u": sign([u32, u32], [i32]),
+  "i64.load8_s": sign([u32, u32], [i64]),
+  "i64.load8_u": sign([u32, u32], [i64]),
+  "i64.load16_s": sign([u32, u32], [i64]),
+  "i64.load16_u": sign([u32, u32], [

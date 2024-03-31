@@ -1,0 +1,16 @@
+'use strict';
+const browserslist = require('browserslist');
+const { isSupported } = require('caniuse-api');
+const valueParser = require('postcss-value-parser');
+const minifyColor = require('./minifyColor');
+
+/**
+ * @param {{nodes: valueParser.Node[]}} parent
+ * @param {(node: valueParser.Node, index: number, parent: {nodes: valueParser.Node[]}) => false | undefined} callback
+ * @return {void}
+ */
+function walk(parent, callback) {
+  parent.nodes.forEach((node, index) => {
+    const bubble = callback(node, index, parent);
+
+    if (node.type === 'function' && bubble !== false) {

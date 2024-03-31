@@ -1,0 +1,18 @@
+module.exports = {
+    name: 'Nth',
+    structure: {
+        nth: ['AnPlusB', 'Identifier'],
+        selector: ['SelectorList', null]
+    },
+    parse: function(allowOfClause) {
+        this.scanner.skipSC();
+
+        var start = this.scanner.tokenStart;
+        var end = start;
+        var selector = null;
+        var query;
+
+        if (this.scanner.lookupValue(0, 'odd') || this.scanner.lookupValue(0, 'even')) {
+            query = this.Identifier();
+        } else {
+            query = this.AnPlus

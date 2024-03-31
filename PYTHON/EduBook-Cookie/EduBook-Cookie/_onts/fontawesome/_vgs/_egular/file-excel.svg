@@ -1,0 +1,11 @@
+2[CharacterCodes2["closeBracket"] = 93] = "closeBracket";
+  CharacterCodes2[CharacterCodes2["closeParen"] = 41] = "closeParen";
+  CharacterCodes2[CharacterCodes2["colon"] = 58] = "colon";
+  CharacterCodes2[CharacterCodes2["comma"] = 44] = "comma";
+  CharacterCodes2[CharacterCodes2["dot"] = 46] = "dot";
+  CharacterCodes2[CharacterCodes2["doubleQuote"] = 34] = "doubleQuote";
+  CharacterCodes2[CharacterCodes2["equals"] = 61] = "equals";
+  CharacterCodes2[CharacterCodes2["exclamation"] = 33] = "exclamation";
+  CharacterCodes2[CharacterCodes2["greaterThan"] = 62] = "greaterThan";
+  CharacterCodes2[CharacterCodes2["hash"] = 35] = "hash";
+  CharacterCodes2[CharacterCodes

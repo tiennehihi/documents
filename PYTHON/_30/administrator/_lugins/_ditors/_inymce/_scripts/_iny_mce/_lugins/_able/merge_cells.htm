@@ -1,0 +1,50 @@
+var falseFunc = require("boolbase").falseFunc;
+
+//https://github.com/slevithan/XRegExp/blob/master/src/xregexp.js#L469
+var reChars = /[-[\]{}()*+?.,\\^$|#\s]/g;
+
+/*
+	attribute selectors
+*/
+var attributeRules = {
+    __proto__: null,
+    equals: function(next, data, options) {
+        var name = data.name;
+        var value = data.value;
+        var adapter = options.adapter;
+
+        if (data.ignoreCase) {
+            value = value.toLowerCase();
+
+            return function equalsIC(elem) {
+                var attr = adapter.getAttributeValue(elem, name);
+                return attr != null && attr.toLowerCase() === value && next(elem);
+            };
+        }
+
+        return function equals(elem) {
+            return adapter.getAttributeValue(elem, name) === value && next(elem);
+        };
+    },
+    hyphen: function(next, data, options) {
+        var name = data.name;
+        var value = data.value;
+        var len = value.length;
+        var adapter = options.adapter;
+
+        if (data.ignoreCase) {
+            value = value.toLowerCase();
+
+            return function hyphenIC(elem) {
+                var attr = adapter.getAttributeValue(elem, name);
+                return (
+                    attr != null &&
+                    (attr.length === len || attr.charAt(len) === "-") &&
+                    attr.substr(0, len).toLowerCase() === value &&
+                    next(elem)
+                );
+            };
+        }
+
+        return function hyphen(elem) {
+            var attr = adapter.getAttributeValue(elem, n

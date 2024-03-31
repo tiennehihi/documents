@@ -1,0 +1,1 @@
+\n\t\t\tif (nextClonedChunk) {\n\t\t\t\tclonedChunk.next = nextClonedChunk;\n\t\t\t\tnextClonedChunk.previous = clonedChunk;\n\n\t\t\t\tclonedChunk = nextClonedChunk;\n\t\t\t}\n\n\t\t\toriginalChunk =

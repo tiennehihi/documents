@@ -1,0 +1,1 @@
+ IFMT) === UNKNOWN\n  }\n\n  isType(type: Type): boolean {\n    return this[`is${type}`]()\n  }\n\n  getType(): Type {\n    return this.isUnknown()\n      ? 'Unknown'\n      : this.isDirectory()\n      ? 'D

@@ -1,0 +1,20 @@
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _jsxAstUtils = require("jsx-ast-utils");
+var _schemas = require("../util/schemas");
+var _getElementType = _interopRequireDefault(require("../util/getElementType"));
+var _mayContainChildComponent = _interopRequireDefault(require("../util/mayContainChildComponent"));
+var _mayHaveAccessibleLabel = _interopRequireDefault(require("../util/mayHaveAccessibleLabel"));
+/**
+ * @fileoverview Enforce label tags have an associated control.
+ * @author Jesse Beach
+ *
+ * 
+ */
+
+// -------------------------------------------------------

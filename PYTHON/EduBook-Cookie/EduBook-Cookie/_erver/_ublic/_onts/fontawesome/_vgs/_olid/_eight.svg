@@ -1,0 +1,25 @@
+09.9Z"
+      }
+    },
+    "free": [
+      "brands"
+    ]
+  },
+  "rockrms": {
+    "changes": [
+      "5.0.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "brands"
+    ],
+    "unicode": "f3e9",
+    "label": "Rockrms",
+    "voted": false,
+    "svg": {
+      "brands": {
+        "last_modified": 1660014461,
+        "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 496 512\"><path d=\"M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm157.4 419.5h-90l-112-131.3c-17.9-20.4-3.9-56.1 26.6-56.1h75.3l-84.6-99.3-84.3

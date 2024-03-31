@@ -1,0 +1,20 @@
+addPresentationalDependency(dep);
+							return true;
+						});
+				};
+
+				normalModuleFactory.hooks.parser
+					.for(JAVASCRIPT_MODULE_TYPE_AUTO)
+					.tap(PLUGIN_NAME, handler);
+				normalModuleFactory.hooks.parser
+					.for(JAVASCRIPT_MODULE_TYPE_DYNAMIC)
+					.tap(PLUGIN_NAME, handler);
+				normalModuleFactory.hooks.parser
+					.for(JAVASCRIPT_MODULE_TYPE_ESM)
+					.tap(PLUGIN_NAME, handler);
+			}
+		);
+	}
+}
+
+module.exports = ConstPlugin;

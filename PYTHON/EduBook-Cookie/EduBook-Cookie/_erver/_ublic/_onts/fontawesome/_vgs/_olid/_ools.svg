@@ -1,0 +1,35 @@
+ 4.688L256 144h192c8.822 0 16 7.176 16 16v32h-416V96C48 87.18 55.18 80 64 80zM448 432H64c-8.822 0-16-7.176-16-16V240h416V416C464 424.8 456.8 432 448 432z"
+      }
+    },
+    "free": [
+      "regular",
+      "solid"
+    ]
+  },
+  "folder-minus": {
+    "aliases": {
+      "unicodes": {
+        "secondary": [
+          "10f65d"
+        ]
+      }
+    },
+    "changes": [
+      "5.3.0",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid"
+    ],
+    "unicode": "f65d",
+    "label": "Folder Minus",
+    "voted": false,
+    "svg": {
+      "solid": {
+        "last_modified": 1660321823,
+        "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M448 480H64c-35.3

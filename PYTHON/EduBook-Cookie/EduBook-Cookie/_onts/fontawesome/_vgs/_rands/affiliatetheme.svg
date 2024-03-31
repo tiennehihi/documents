@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getRules = exports.isJSONType = void 0;
+const _jsonTypes = ["string", "number", "integer", "boolean", "null", "object", "array"];
+const jsonTypes = new Set(_jsonTypes);
+function isJSONType(x) {
+    return typeof x == "string" && jsonTypes.has(x);
+}
+exports.isJSONType = isJSONType;
+function getRules() {
+    const group

@@ -1,0 +1,39 @@
+hub.com/rollup/rollup/pull/2802): Observe modified output options in bundle.write (@lukastaegert)
+
+## 1.9.1
+
+_2019-04-10_
+
+### Bug Fixes
+
+- Make sure inline comments in dynamic imports are preserved (#2797)
+
+### Pull Requests
+
+- [#2797](https://github.com/rollup/rollup/pull/2797): Emit inline comments inside dynamic import (@manucorporat)
+
+## 1.9.0
+
+_2019-04-05_
+
+### Features
+
+- Add built-in support for bigint (#2789)
+
+### Pull Requests
+
+- [#2789](https://github.com/rollup/rollup/pull/2789): Ship with bigint support built-in (@danielgindi)
+- [#2791](https://github.com/rollup/rollup/pull/2791): Use shared extractAssignedNames from rollup-pluginutils (@lukastaegert)
+- [#2792](https://github.com/rollup/rollup/pull/2792): Test that rollup-plugin-commonjs works with preserveModules (@lukastaegert)
+
+## 1.8.0
+
+_2019-04-02_
+
+### Features
+
+- Support `module` as alias for `esm` and `commonjs` for `cjs` to match Node (#2783)
+
+### Pull Requests
+
+- [#2782](https://github.com/rollup/rollup/pull/2782): Inline interopDefault in co

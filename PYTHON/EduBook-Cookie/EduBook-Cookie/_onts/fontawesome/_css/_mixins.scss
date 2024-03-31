@@ -1,0 +1,48 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getSchemaRefs = exports.resolveUrl = exports.normalizeId = exports._getFullPath = exports.getFullPath = exports.inlineRef = void 0;
+const util_1 = require("./util");
+const equal = require("fast-deep-equal");
+const traverse = require("json-schema-traverse");
+// TODO refactor to use keyword definitions
+const SIMPLE_INLINED = new Set([
+    "type",
+    "format",
+    "pattern",
+    "maxLength",
+    "minLength",
+    "maxProperties",
+    "minProperties",
+    "maxItems",
+    "minItems",
+    "maximum",
+    "minimum",
+    "uniqueItems",
+    "multipleOf",
+    "required",
+    "enum",
+    "const",
+]);
+function inlineRef(schema, limit = true) {
+    if (typeof schema == "boolean")
+        return true;
+    if (limit === true)
+        return !hasRef(schema);
+    if (!limit)
+        return false;
+    return countKeys(schema) <= limit;
+}
+exports.inlineRef = inlineRef;
+const REF_KEYWORDS = new Set([
+    "$ref",
+    "$recursiveRef",
+    "$recursiveAnchor",
+    "$dynamicRef",
+    "$dynamicAnchor",
+]);
+function hasRef(schema) {
+    for (const key in schema) {
+        if (REF_KEYWORDS.has(key))
+            return true;
+        const sch = schema[key];
+        if (Array.isArray(sch) && s

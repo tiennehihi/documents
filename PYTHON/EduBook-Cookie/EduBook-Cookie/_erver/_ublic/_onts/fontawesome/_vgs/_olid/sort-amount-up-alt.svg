@@ -1,0 +1,38 @@
+ic
+        style: solid
+  label: Wand magic sparkles
+  unicode: e2ca
+  voted: false
+wand-sparkles:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f72b
+  changes:
+    - 5.4.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Wand sparkles
+  unicode: f72b
+  voted: false
+warehouse:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f494
+  changes:
+    - 5.0.7
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: s

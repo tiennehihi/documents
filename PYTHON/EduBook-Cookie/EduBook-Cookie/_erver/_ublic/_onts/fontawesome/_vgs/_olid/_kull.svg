@@ -1,0 +1,36 @@
+id
+  label: Ellipsis
+  unicode: f141
+  voted: false
+ellipsis-vertical:
+  aliases:
+    names:
+      - ellipsis-v
+    unicodes:
+      secondary:
+        - 10f142
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Ellipsis vertical
+  unicode: f142
+  voted: false
+ello:
+  changes:
+    - 5.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+    

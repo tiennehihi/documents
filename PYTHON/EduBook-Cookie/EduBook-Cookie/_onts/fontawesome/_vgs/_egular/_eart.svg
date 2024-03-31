@@ -1,0 +1,9 @@
+"use strict";
+
+// This mixin doesn't have an IDL equivalent, but since MouseEvent and KeyboardEvent implement getModifierState() the
+// same way, its implementation is shared here.
+
+class EventModifierMixinImpl {
+  // Event's constructor assumes all options correspond to IDL attributes with the same names, and sets them on `this`.
+  // That is not the case for these modifier boolean options, but since the options are set on `this` anyway we'll
+  // access them that way. The spec doesn'

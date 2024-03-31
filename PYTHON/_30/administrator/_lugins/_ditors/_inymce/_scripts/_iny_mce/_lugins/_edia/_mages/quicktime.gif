@@ -1,0 +1,10 @@
+"use strict";
+
+const selectorParser = require("postcss-selector-parser");
+const valueParser = require("postcss-value-parser");
+const { extractICSS } = require("icss-utils");
+
+const isSpacing = (node) => node.type === "combinator" && node.value === " ";
+
+function normalizeNodeArray(nodes) {
+  const arra

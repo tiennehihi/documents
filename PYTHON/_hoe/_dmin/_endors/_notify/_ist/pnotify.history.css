@@ -1,0 +1,24 @@
+/*
+  Copyright 2018 Google LLC
+
+  Use of this source code is governed by an MIT-style
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/MIT.
+*/
+
+import {assert} from 'workbox-core/_private/assert.js';
+import {logger} from 'workbox-core/_private/logger.js';
+import {
+  RouteHandler,
+  RouteMatchCallback,
+  RouteMatchCallbackOptions,
+} from 'workbox-core/types.js';
+
+import {HTTPMethod} from './utils/constants.js';
+import {Route} from './Route.js';
+
+import './_version.js';
+
+/**
+ * RegExpRoute makes it easy to create a regular expression based
+ * {@link workbox-routing.Route}.

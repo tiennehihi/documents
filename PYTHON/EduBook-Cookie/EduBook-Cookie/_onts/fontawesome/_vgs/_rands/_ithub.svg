@@ -1,0 +1,32 @@
+import { Pair } from '../nodes/Pair.js';
+import { YAMLMap } from '../nodes/YAMLMap.js';
+import { resolveProps } from './resolve-props.js';
+import { containsNewline } from './util-contains-newline.js';
+import { flowIndentCheck } from './util-flow-indent-check.js';
+import { mapIncludes } from './util-map-includes.js';
+
+const startColMsg = 'All mapping items must start at the same column';
+function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError, tag) {
+    const NodeClass = tag?.nodeClass ?? YAMLMap;
+    const map = new NodeClass(ctx.schema);
+    if (ctx.atRoot)
+        ctx.atRoot = false;
+    let offset = bm.offset;
+    let commentEnd = null;
+    for (const collItem of bm.items) {
+        const { start, key, sep, value } = collItem;
+        // key properties
+        const keyProps = resolveProps(start, {
+            indicator: 'explicit-key-ind',
+            next: key ?? sep?.[0],
+            offset,
+            onError,
+            startOnNewline: true
+        });
+        const implicitKey = !keyProps.found;
+        if (implicitKey) {
+            if (key) {
+                if (key.type === 'block-seq')
+                    onError(offset, 'BLOCK_AS_IMPLICIT_KEY', 'A block sequence may not be used as an implicit map key');
+                else if ('indent' in key && key.indent !== bm.indent)
+                    onError(offset, 'BAD_INDENT', sta

@@ -1,0 +1,67 @@
+unctionType(name) {
+        return (
+            name.length > 2 &&
+            name.charCodeAt(name.length - 2) === LEFTPARENTHESIS$1 &&
+            name.charCodeAt(name.length - 1) === RIGHTPARENTHESIS$1
+        );
+    }
+
+    function isEnumCapatible(term) {
+        return (
+            term.type === 'Keyword' ||
+            term.type === 'AtKeyword' ||
+            term.type === 'Function' ||
+            term.type === 'Type' && isFunctionType(term.name)
+        );
+    }
+
+    function buildGroupMatchGraph(combinator, terms, atLeastOneTermMatched) {
+        switch (combinator) {
+            case ' ':
+                // Juxtaposing components means that all of them must occur, in the given order.
+                //
+                // a b c
+                // =
+                // match a
+                //   then match b
+                //     then match c
+                //       then MATCH
+                //       else MISMATCH
+                //     else MISMATCH
+                //   else MISMATCH
+                var result = MATCH;
+
+                for (var i = terms.length - 1; i >= 0; i--) {
+                    var term = terms[i];
+
+                    result = createCondition(
+                        term,
+                        result,
+                        MISMATCH
+                    );
+                }
+                return result;
+
+            case '|':
+                // A bar (|) separates two or more alternatives: exactly one of them must occur.
+                //
+                // a | b | c
+                // =
+                // match a
+                //   then MATCH
+                //   else match b
+                //     then MATCH
+                //     else match c
+                //       then MATCH
+                //       else MISMATCH
+
+                var result = MISMATCH;
+                var map = null;
+
+                for (var i = terms.length - 1; i >= 0; i--) {
+                    var term = terms[i];
+
+                    // reduce sequence of keywords into a Enum
+                    if (isEnumCapatible(term)) {
+                        if (map === null && i > 0 && isEnumCapatible(terms[i - 1])) {
+     

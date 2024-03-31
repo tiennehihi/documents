@@ -1,0 +1,16 @@
+import { _ as _createForOfIteratorHelper, h as _slicedToArray, a as _typeof, b as _createClass, e as _defineProperty, c as _classCallCheck, d as defaultTagPrefix, n as defaultTags } from './PlainValue-b8036b75.js';
+import { d as YAMLMap, g as resolveMap, Y as YAMLSeq, h as resolveSeq, j as resolveString, c as stringifyString, s as strOptions, S as Scalar, n as nullOptions, a as boolOptions, i as intOptions, k as stringifyNumber, N as Node, A as Alias, P as Pair } from './resolveSeq-492ab440.js';
+import { b as binary, o as omap, p as pairs, s as set, i as intTime, f as floatTime, t as timestamp, a as warnOptionDeprecation } from './warnings-df54cb69.js';
+
+function createMap(schema, obj, ctx) {
+  var map = new YAMLMap(schema);
+
+  if (obj instanceof Map) {
+    var _iterator = _createForOfIteratorHelper(obj),
+        _step;
+
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var _step$value = _slicedToArray(_step.value, 2),
+            key = _step$value[0],
+            value

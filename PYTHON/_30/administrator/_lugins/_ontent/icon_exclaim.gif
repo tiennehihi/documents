@@ -1,0 +1,5 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{$lang_fullpage_title}</title>
+	<script language="javascript" type="text/javascript" src="../../tiny_mce_popup.js"></script>
+	<script language="javascript" type="text/javasc

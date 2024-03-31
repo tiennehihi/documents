@@ -1,0 +1,12 @@
+'use strict';
+const array = [];
+const charCodeCache = [];
+
+const leven = (left, right) => {
+	if (left === right) {
+		return 0;
+	}
+
+	const swap = left;
+
+	// Swapping the strings

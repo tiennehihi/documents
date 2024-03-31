@@ -1,0 +1,800 @@
+  /*objectFlags*/
+    void 0,
+    "implicit"
+  );
+  var unreachableNeverType = createIntrinsicType(
+    131072 /* Never */,
+    "never",
+    /*objectFlags*/
+    void 0,
+    "unreachable"
+  );
+  var nonPrimitiveType = createIntrinsicType(67108864 /* NonPrimitive */, "object");
+  var stringOrNumberType = getUnionType([stringType, numberType]);
+  var stringNumberSymbolType = getUnionType([stringType, numberType, esSymbolType]);
+  var keyofConstraintType = keyofStringsOnly ? stringType : stringNumberSymbolType;
+  var numberOrBigIntType = getUnionType([numberType, bigintType]);
+  var templateConstraintType = getUnionType([stringType, numberType, booleanType, bigintType, nullType, undefinedType]);
+  var numericStringType = getTemplateLiteralType(["", ""], [numberType]);
+  var restrictiveMapper = makeFunctionTypeMapper((t) => t.flags & 262144 /* TypeParameter */ ? getRestrictiveTypeParameter(t) : t, () => "(restrictive mapper)");
+  var permissiveMapper = makeFunctionTypeMapper((t) => t.flags & 262144 /* TypeParameter */ ? wildcardType : t, () => "(permissive mapper)");
+  var uniqueLiteralType = createIntrinsicType(
+    131072 /* Never */,
+    "never",
+    /*objectFlags*/
+    void 0,
+    "unique literal"
+  );
+  var uniqueLiteralMapper = makeFunctionTypeMapper((t) => t.flags & 262144 /* TypeParameter */ ? uniqueLiteralType : t, () => "(unique literal mapper)");
+  var outofbandVarianceMarkerHandler;
+  var reportUnreliableMapper = makeFunctionTypeMapper((t) => {
+    if (outofbandVarianceMarkerHandler && (t === markerSuperType || t === markerSubType || t === markerOtherType)) {
+      outofbandVarianceMarkerHandler(
+        /*onlyUnreliable*/
+        true
+      );
+    }
+    return t;
+  }, () => "(unmeasurable reporter)");
+  var reportUnmeasurableMapper = makeFunctionTypeMapper((t) => {
+    if (outofbandVarianceMarkerHandler && (t === markerSuperType || t === markerSubType || t === markerOtherType)) {
+      outofbandVarianceMarkerHandler(
+        /*onlyUnreliable*/
+        false
+      );
+    }
+    return t;
+  }, () => "(unreliable reporter)");
+  var emptyObjectType = createAnonymousType(
+    /*symbol*/
+    void 0,
+    emptySymbols,
+    emptyArray,
+    emptyArray,
+    emptyArray
+  );
+  var emptyJsxObjectType = createAnonymousType(
+    /*symbol*/
+    void 0,
+    emptySymbols,
+    emptyArray,
+    emptyArray,
+    emptyArray
+  );
+  emptyJsxObjectType.objectFlags |= 2048 /* JsxAttributes */;
+  var emptyTypeLiteralSymbol = createSymbol(2048 /* TypeLiteral */, "__type" /* Type */);
+  emptyTypeLiteralSymbol.members = createSymbolTable();
+  var emptyTypeLiteralType = createAnonymousType(emptyTypeLiteralSymbol, emptySymbols, emptyArray, emptyArray, emptyArray);
+  var unknownEmptyObjectType = createAnonymousType(
+    /*symbol*/
+    void 0,
+    emptySymbols,
+    emptyArray,
+    emptyArray,
+    emptyArray
+  );
+  var unknownUnionType = strictNullChecks ? getUnionType([undefinedType, nullType, unknownEmptyObjectType]) : unknownType;
+  var emptyGenericType = createAnonymousType(
+    /*symbol*/
+    void 0,
+    emptySymbols,
+    emptyArray,
+    emptyArray,
+    emptyArray
+  );
+  emptyGenericType.instantiations = /* @__PURE__ */ new Map();
+  var anyFunctionType = createAnonymousType(
+    /*symbol*/
+    void 0,
+    emptySymbols,
+    emptyArray,
+    emptyArray,
+    emptyArray
+  );
+  anyFunctionType.objectFlags |= 262144 /* NonInferrableType */;
+  var noConstraintType = createAnonymousType(
+    /*symbol*/
+    void 0,
+    emptySymbols,
+    emptyArray,
+    emptyArray,
+    emptyArray
+  );
+  var circularConstraintType = createAnonymousType(
+    /*symbol*/
+    void 0,
+    emptySymbols,
+    emptyArray,
+    emptyArray,
+    emptyArray
+  );
+  var resolvingDefaultType = createAnonymousType(
+    /*symbol*/
+    void 0,
+    emptySymbols,
+    emptyArray,
+    emptyArray,
+    emptyArray
+  );
+  var markerSuperType = createTypeParameter();
+  var markerSubType = createTypeParameter();
+  markerSubType.constraint = markerSuperType;
+  var markerOtherType = createTypeParameter();
+  var markerSuperTypeForCheck = createTypeParameter();
+  var markerSubTypeForCheck = createTypeParameter();
+  markerSubTypeForCheck.constraint = markerSuperTypeForCheck;
+  var noTypePredicate = createTypePredicate(1 /* Identifier */, "<<unresolved>>", 0, anyType);
+  var anySignature = createSignature(
+    /*declaration*/
+    void 0,
+    /*typeParameters*/
+    void 0,
+    /*thisParameter*/
+    void 0,
+    emptyArray,
+    anyType,
+    /*resolvedTypePredicate*/
+    void 0,
+    0,
+    0 /* None */
+  );
+  var unknownSignature = createSignature(
+    /*declaration*/
+    void 0,
+    /*typeParameters*/
+    void 0,
+    /*thisParameter*/
+    void 0,
+    emptyArray,
+    errorType,
+    /*resolvedTypePredicate*/
+    void 0,
+    0,
+    0 /* None */
+  );
+  var resolvingSignature = createSignature(
+    /*declaration*/
+    void 0,
+    /*typeParameters*/
+    void 0,
+    /*thisParameter*/
+    void 0,
+    emptyArray,
+    anyType,
+    /*resolvedTypePredicate*/
+    void 0,
+    0,
+    0 /* None */
+  );
+  var silentNeverSignature = createSignature(
+    /*declaration*/
+    void 0,
+    /*typeParameters*/
+    void 0,
+    /*thisParameter*/
+    void 0,
+    emptyArray,
+    silentNeverType,
+    /*resolvedTypePredicate*/
+    void 0,
+    0,
+    0 /* None */
+  );
+  var enumNumberIndexInfo = createIndexInfo(
+    numberType,
+    stringType,
+    /*isReadonly*/
+    true
+  );
+  var iterationTypesCache = /* @__PURE__ */ new Map();
+  var noIterationTypes = {
+    get yieldType() {
+      return Debug.fail("Not supported");
+    },
+    get returnType() {
+      return Debug.fail("Not supported");
+    },
+    get nextType() {
+      return Debug.fail("Not supported");
+    }
+  };
+  var anyIterationTypes = createIterationTypes(anyType, anyType, anyType);
+  var anyIterationTypesExceptNext = createIterationTypes(anyType, anyType, unknownType);
+  var defaultIterationTypes = createIterationTypes(neverType, anyType, undefinedType);
+  var asyncIterationTypesResolver = {
+    iterableCacheKey: "iterationTypesOfAsyncIterable",
+    iteratorCacheKey: "iterationTypesOfAsyncIterator",
+    iteratorSymbolName: "asyncIterator",
+    getGlobalIteratorType: getGlobalAsyncIteratorType,
+    getGlobalIterableType: getGlobalAsyncIterableType,
+    getGlobalIterableIteratorType: getGlobalAsyncIterableIteratorType,
+    getGlobalGeneratorType: getGlobalAsyncGeneratorType,
+    resolveIterationType: (type, errorNode) => getAwaitedType(type, errorNode, Diagnostics.Type_of_await_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member),
+    mustHaveANextMethodDiagnostic: Diagnostics.An_async_iterator_must_have_a_next_method,
+    mustBeAMethodDiagnostic: Diagnostics.The_0_property_of_an_async_iterator_must_be_a_method,
+    mustHaveAValueDiagnostic: Diagnostics.The_type_returned_by_the_0_method_of_an_async_iterator_must_be_a_promise_for_a_type_with_a_value_property
+  };
+  var syncIterationTypesResolver = {
+    iterableCacheKey: "iterationTypesOfIterable",
+    iteratorCacheKey: "iterationTypesOfIterator",
+    iteratorSymbolName: "iterator",
+    getGlobalIteratorType,
+    getGlobalIterableType,
+    getGlobalIterableIteratorType,
+    getGlobalGeneratorType,
+    resolveIterationType: (type, _errorNode) => type,
+    mustHaveANextMethodDiagnostic: Diagnostics.An_iterator_must_have_a_next_method,
+    mustBeAMethodDiagnostic: Diagnostics.The_0_property_of_an_iterator_must_be_a_method,
+    mustHaveAValueDiagnostic: Diagnostics.The_type_returned_by_the_0_method_of_an_iterator_must_have_a_value_property
+  };
+  var amalgamatedDuplicates;
+  var reverseMappedCache = /* @__PURE__ */ new Map();
+  var homomorphicMappedTypeInferenceStack = [];
+  var ambientModulesCache;
+  var patternAmbientModules;
+  var patternAmbientModuleAugmentations;
+  var globalObjectType;
+  var globalFunctionType;
+  var globalCallableFunctionType;
+  var globalNewableFunctionType;
+  var globalArrayType;
+  var globalReadonlyArrayType;
+  var globalStringType;
+  var globalNumberType;
+  var globalBooleanType;
+  var globalRegExpType;
+  var globalThisType;
+  var anyArrayType;
+  var autoArrayType;
+  var anyReadonlyArrayType;
+  var deferredGlobalNonNullableTypeAlias;
+  var deferredGlobalESSymbolConstructorSymbol;
+  var deferredGlobalESSymbolConstructorTypeSymbol;
+  var deferredGlobalESSymbolType;
+  var deferredGlobalTypedPropertyDescriptorType;
+  var deferredGlobalPromiseType;
+  var deferredGlobalPromiseLikeType;
+  var deferredGlobalPromiseConstructorSymbol;
+  var deferredGlobalPromiseConstructorLikeType;
+  var deferredGlobalIterableType;
+  var deferredGlobalIteratorType;
+  var deferredGlobalIterableIteratorType;
+  var deferredGlobalGeneratorType;
+  var deferredGlobalIteratorYieldResultType;
+  var deferredGlobalIteratorReturnResultType;
+  var deferredGlobalAsyncIterableType;
+  var deferredGlobalAsyncIteratorType;
+  var deferredGlobalAsyncIterableIteratorType;
+  var deferredGlobalAsyncGeneratorType;
+  var deferredGlobalTemplateStringsArrayType;
+  var deferredGlobalImportMetaType;
+  var deferredGlobalImportMetaExpressionType;
+  var deferredGlobalImportCallOptionsType;
+  var deferredGlobalImportAttributesType;
+  var deferredGlobalDisposableType;
+  var deferredGlobalAsyncDisposableType;
+  var deferredGlobalExtractSymbol;
+  var deferredGlobalOmitSymbol;
+  var deferredGlobalAwaitedSymbol;
+  var deferredGlobalBigIntType;
+  var deferredGlobalNaNSymbol;
+  var deferredGlobalRecordSymbol;
+  var deferredGlobalClassDecoratorContextType;
+  var deferredGlobalClassMethodDecoratorContextType;
+  var deferredGlobalClassGetterDecoratorContextType;
+  var deferredGlobalClassSetterDecoratorContextType;
+  var deferredGlobalClassAccessorDecoratorContextType;
+  var deferredGlobalClassAccessorDecoratorTargetType;
+  var deferredGlobalClassAccessorDecoratorResultType;
+  var deferredGlobalClassFieldDecoratorContextType;
+  var allPotentiallyUnusedIdentifiers = /* @__PURE__ */ new Map();
+  var flowLoopStart = 0;
+  var flowLoopCount = 0;
+  var sharedFlowCount = 0;
+  var flowAnalysisDisabled = false;
+  var flowInvocationCount = 0;
+  var lastFlowNode;
+  var lastFlowNodeReachable;
+  var flowTypeCache;
+  var contextualTypeNodes = [];
+  var contextualTypes = [];
+  var contextualIsCache = [];
+  var contextualTypeCount = 0;
+  var inferenceContextNodes = [];
+  var inferenceContexts = [];
+  var inferenceContextCount = 0;
+  var emptyStringType = getStringLiteralType("");
+  var zeroType = getNumberLiteralType(0);
+  var zeroBigIntType = getBigIntLiteralType({ negative: false, base10Value: "0" });
+  var resolutionTargets = [];
+  var resolutionResults = [];
+  var resolutionPropertyNames = [];
+  var resolutionStart = 0;
+  var inVarianceComputation = false;
+  var suggestionCount = 0;
+  var maximumSuggestionCount = 10;
+  var mergedSymbols = [];
+  var symbolLinks = [];
+  var nodeLinks = [];
+  var flowLoopCaches = [];
+  var flowLoopNodes = [];
+  var flowLoopKeys = [];
+  var flowLoopTypes = [];
+  var sharedFlowNodes = [];
+  var sharedFlowTypes = [];
+  var flowNodeReachable = [];
+  var flowNodePostSuper = [];
+  var potentialThisCollisions = [];
+  var potentialNewTargetCollisions = [];
+  var potentialWeakMapSetCollisions = [];
+  var potentialReflectCollisions = [];
+  var potentialUnusedRenamedBindingElementsInTypes = [];
+  var awaitedTypeStack = [];
+  var diagnostics = createDiagnosticCollection();
+  var suggestionDiagnostics = createDiagnosticCollection();
+  var typeofType = createTypeofType();
+  var _jsxNamespace;
+  var _jsxFactoryEntity;
+  var subtypeRelation = /* @__PURE__ */ new Map();
+  var strictSubtypeRelation = /* @__PURE__ */ new Map();
+  var assignableRelation = /* @__PURE__ */ new Map();
+  var comparableRelation = /* @__PURE__ */ new Map();
+  var identityRelation = /* @__PURE__ */ new Map();
+  var enumRelation = /* @__PURE__ */ new Map();
+  var builtinGlobals = createSymbolTable();
+  builtinGlobals.set(undefinedSymbol.escapedName, undefinedSymbol);
+  var suggestedExtensions = [
+    [".mts", ".mjs"],
+    [".ts", ".js"],
+    [".cts", ".cjs"],
+    [".mjs", ".mjs"],
+    [".js", ".js"],
+    [".cjs", ".cjs"],
+    [".tsx", compilerOptions.jsx === 1 /* Preserve */ ? ".jsx" : ".js"],
+    [".jsx", ".jsx"],
+    [".json", ".json"]
+  ];
+  initializeTypeChecker();
+  return checker;
+  function getCachedType(key) {
+    return key ? cachedTypes.get(key) : void 0;
+  }
+  function setCachedType(key, type) {
+    if (key)
+      cachedTypes.set(key, type);
+    return type;
+  }
+  function getJsxNamespace(location) {
+    if (location) {
+      const file = getSourceFileOfNode(location);
+      if (file) {
+        if (isJsxOpeningFragment(location)) {
+          if (file.localJsxFragmentNamespace) {
+            return file.localJsxFragmentNamespace;
+          }
+          const jsxFragmentPragma = file.pragmas.get("jsxfrag");
+          if (jsxFragmentPragma) {
+            const chosenPragma = isArray(jsxFragmentPragma) ? jsxFragmentPragma[0] : jsxFragmentPragma;
+            file.localJsxFragmentFactory = parseIsolatedEntityName(chosenPragma.arguments.factory, languageVersion);
+            visitNode(file.localJsxFragmentFactory, markAsSynthetic, isEntityName);
+            if (file.localJsxFragmentFactory) {
+              return file.localJsxFragmentNamespace = getFirstIdentifier(file.localJsxFragmentFactory).escapedText;
+            }
+          }
+          const entity = getJsxFragmentFactoryEntity(location);
+          if (entity) {
+            file.localJsxFragmentFactory = entity;
+            return file.localJsxFragmentNamespace = getFirstIdentifier(entity).escapedText;
+          }
+        } else {
+          const localJsxNamespace = getLocalJsxNamespace(file);
+          if (localJsxNamespace) {
+            return file.localJsxNamespace = localJsxNamespace;
+          }
+        }
+      }
+    }
+    if (!_jsxNamespace) {
+      _jsxNamespace = "React";
+      if (compilerOptions.jsxFactory) {
+        _jsxFactoryEntity = parseIsolatedEntityName(compilerOptions.jsxFactory, languageVersion);
+        visitNode(_jsxFactoryEntity, markAsSynthetic);
+        if (_jsxFactoryEntity) {
+          _jsxNamespace = getFirstIdentifier(_jsxFactoryEntity).escapedText;
+        }
+      } else if (compilerOptions.reactNamespace) {
+        _jsxNamespace = escapeLeadingUnderscores(compilerOptions.reactNamespace);
+      }
+    }
+    if (!_jsxFactoryEntity) {
+      _jsxFactoryEntity = factory.createQualifiedName(factory.createIdentifier(unescapeLeadingUnderscores(_jsxNamespace)), "createElement");
+    }
+    return _jsxNamespace;
+  }
+  function getLocalJsxNamespace(file) {
+    if (file.localJsxNamespace) {
+      return file.localJsxNamespace;
+    }
+    const jsxPragma = file.pragmas.get("jsx");
+    if (jsxPragma) {
+      const chosenPragma = isArray(jsxPragma) ? jsxPragma[0] : jsxPragma;
+      file.localJsxFactory = parseIsolatedEntityName(chosenPragma.arguments.factory, languageVersion);
+      visitNode(file.localJsxFactory, markAsSynthetic, isEntityName);
+      if (file.localJsxFactory) {
+        return file.localJsxNamespace = getFirstIdentifier(file.localJsxFactory).escapedText;
+      }
+    }
+  }
+  function markAsSynthetic(node) {
+    setTextRangePosEnd(node, -1, -1);
+    return visitEachChild(
+      node,
+      markAsSynthetic,
+      /*context*/
+      void 0
+    );
+  }
+  function getEmitResolver(sourceFile, cancellationToken2) {
+    getDiagnostics2(sourceFile, cancellationToken2);
+    return emitResolver;
+  }
+  function lookupOrIssueError(location, message, ...args) {
+    const diagnostic = location ? createDiagnosticForNode(location, message, ...args) : createCompilerDiagnostic(message, ...args);
+    const existing = diagnostics.lookup(diagnostic);
+    if (existing) {
+      return existing;
+    } else {
+      diagnostics.add(diagnostic);
+      return diagnostic;
+    }
+  }
+  function errorSkippedOn(key, location, message, ...args) {
+    const diagnostic = error2(location, message, ...args);
+    diagnostic.skippedOn = key;
+    return diagnostic;
+  }
+  function createError(location, message, ...args) {
+    return location ? createDiagnosticForNode(location, message, ...args) : createCompilerDiagnostic(message, ...args);
+  }
+  function error2(location, message, ...args) {
+    const diagnostic = createError(location, message, ...args);
+    diagnostics.add(diagnostic);
+    return diagnostic;
+  }
+  function addErrorOrSuggestion(isError, diagnostic) {
+    if (isError) {
+      diagnostics.add(diagnostic);
+    } else {
+      suggestionDiagnostics.add({ ...diagnostic, category: 2 /* Suggestion */ });
+    }
+  }
+  function errorOrSuggestion(isError, location, message, ...args) {
+    if (location.pos < 0 || location.end < 0) {
+      if (!isError) {
+        return;
+      }
+      const file = getSourceFileOfNode(location);
+      addErrorOrSuggestion(isError, "message" in message ? createFileDiagnostic(file, 0, 0, message, ...args) : createDiagnosticForFileFromMessageChain(file, message));
+      return;
+    }
+    addErrorOrSuggestion(isError, "message" in message ? createDiagnosticForNode(location, message, ...args) : createDiagnosticForNodeFromMessageChain(getSourceFileOfNode(location), location, message));
+  }
+  function errorAndMaybeSuggestAwait(location, maybeMissingAwait, message, ...args) {
+    const diagnostic = error2(location, message, ...args);
+    if (maybeMissingAwait) {
+      const related = createDiagnosticForNode(location, Diagnostics.Did_you_forget_to_use_await);
+      addRelatedInfo(diagnostic, related);
+    }
+    return diagnostic;
+  }
+  function addDeprecatedSuggestionWorker(declarations, diagnostic) {
+    const deprecatedTag = Array.isArray(declarations) ? forEach(declarations, getJSDocDeprecatedTag) : getJSDocDeprecatedTag(declarations);
+    if (deprecatedTag) {
+      addRelatedInfo(
+        diagnostic,
+        createDiagnosticForNode(deprecatedTag, Diagnostics.The_declaration_was_marked_as_deprecated_here)
+      );
+    }
+    suggestionDiagnostics.add(diagnostic);
+    return diagnostic;
+  }
+  function isDeprecatedSymbol(symbol) {
+    const parentSymbol = getParentOfSymbol(symbol);
+    if (parentSymbol && length(symbol.declarations) > 1) {
+      return parentSymbol.flags & 64 /* Interface */ ? some(symbol.declarations, isDeprecatedDeclaration2) : every(symbol.declarations, isDeprecatedDeclaration2);
+    }
+    return !!symbol.valueDeclaration && isDeprecatedDeclaration2(symbol.valueDeclaration) || length(symbol.declarations) && every(symbol.declarations, isDeprecatedDeclaration2);
+  }
+  function isDeprecatedDeclaration2(declaration) {
+    return !!(getCombinedNodeFlagsCached(declaration) & 536870912 /* Deprecated */);
+  }
+  function addDeprecatedSuggestion(location, declarations, deprecatedEntity) {
+    const diagnostic = createDiagnosticForNode(location, Diagnostics._0_is_deprecated, deprecatedEntity);
+    return addDeprecatedSuggestionWorker(declarations, diagnostic);
+  }
+  function addDeprecatedSuggestionWithSignature(location, declaration, deprecatedEntity, signatureString) {
+    const diagnostic = deprecatedEntity ? createDiagnosticForNode(location, Diagnostics.The_signature_0_of_1_is_deprecated, signatureString, deprecatedEntity) : createDiagnosticForNode(location, Diagnostics._0_is_deprecated, signatureString);
+    return addDeprecatedSuggestionWorker(declaration, diagnostic);
+  }
+  function createSymbol(flags, name, checkFlags) {
+    symbolCount++;
+    const symbol = new Symbol47(flags | 33554432 /* Transient */, name);
+    symbol.links = new SymbolLinks();
+    symbol.links.checkFlags = checkFlags || 0 /* None */;
+    return symbol;
+  }
+  function createParameter2(name, type) {
+    const symbol = createSymbol(1 /* FunctionScopedVariable */, name);
+    symbol.links.type = type;
+    return symbol;
+  }
+  function createProperty(name, type) {
+    const symbol = createSymbol(4 /* Property */, name);
+    symbol.links.type = type;
+    return symbol;
+  }
+  function getExcludedSymbolFlags(flags) {
+    let result = 0;
+    if (flags & 2 /* BlockScopedVariable */)
+      result |= 111551 /* BlockScopedVariableExcludes */;
+    if (flags & 1 /* FunctionScopedVariable */)
+      result |= 111550 /* FunctionScopedVariableExcludes */;
+    if (flags & 4 /* Property */)
+      result |= 0 /* PropertyExcludes */;
+    if (flags & 8 /* EnumMember */)
+      result |= 900095 /* EnumMemberExcludes */;
+    if (flags & 16 /* Function */)
+      result |= 110991 /* FunctionExcludes */;
+    if (flags & 32 /* Class */)
+      result |= 899503 /* ClassExcludes */;
+    if (flags & 64 /* Interface */)
+      result |= 788872 /* InterfaceExcludes */;
+    if (flags & 256 /* RegularEnum */)
+      result |= 899327 /* RegularEnumExcludes */;
+    if (flags & 128 /* ConstEnum */)
+      result |= 899967 /* ConstEnumExcludes */;
+    if (flags & 512 /* ValueModule */)
+      result |= 110735 /* ValueModuleExcludes */;
+    if (flags & 8192 /* Method */)
+      result |= 103359 /* MethodExcludes */;
+    if (flags & 32768 /* GetAccessor */)
+      result |= 46015 /* GetAccessorExcludes */;
+    if (flags & 65536 /* SetAccessor */)
+      result |= 78783 /* SetAccessorExcludes */;
+    if (flags & 262144 /* TypeParameter */)
+      result |= 526824 /* TypeParameterExcludes */;
+    if (flags & 524288 /* TypeAlias */)
+      result |= 788968 /* TypeAliasExcludes */;
+    if (flags & 2097152 /* Alias */)
+      result |= 2097152 /* AliasExcludes */;
+    return result;
+  }
+  function recordMergedSymbol(target, source) {
+    if (!source.mergeId) {
+      source.mergeId = nextMergeId;
+      nextMergeId++;
+    }
+    mergedSymbols[source.mergeId] = target;
+  }
+  function cloneSymbol(symbol) {
+    const result = createSymbol(symbol.flags, symbol.escapedName);
+    result.declarations = symbol.declarations ? symbol.declarations.slice() : [];
+    result.parent = symbol.parent;
+    if (symbol.valueDeclaration)
+      result.valueDeclaration = symbol.valueDeclaration;
+    if (symbol.constEnumOnlyModule)
+      result.constEnumOnlyModule = true;
+    if (symbol.members)
+      result.members = new Map(symbol.members);
+    if (symbol.exports)
+      result.exports = new Map(symbol.exports);
+    recordMergedSymbol(result, symbol);
+    return result;
+  }
+  function mergeSymbol(target, source, unidirectional = false) {
+    if (!(target.flags & getExcludedSymbolFlags(source.flags)) || (source.flags | target.flags) & 67108864 /* Assignment */) {
+      if (source === target) {
+        return target;
+      }
+      if (!(target.flags & 33554432 /* Transient */)) {
+        const resolvedTarget = resolveSymbol(target);
+        if (resolvedTarget === unknownSymbol) {
+          return source;
+        }
+        target = cloneSymbol(resolvedTarget);
+      }
+      if (source.flags & 512 /* ValueModule */ && target.flags & 512 /* ValueModule */ && target.constEnumOnlyModule && !source.constEnumOnlyModule) {
+        target.constEnumOnlyModule = false;
+      }
+      target.flags |= source.flags;
+      if (source.valueDeclaration) {
+        setValueDeclaration(target, source.valueDeclaration);
+      }
+      addRange(target.declarations, source.declarations);
+      if (source.members) {
+        if (!target.members)
+          target.members = createSymbolTable();
+        mergeSymbolTable(target.members, source.members, unidirectional);
+      }
+      if (source.exports) {
+        if (!target.exports)
+          target.exports = createSymbolTable();
+        mergeSymbolTable(target.exports, source.exports, unidirectional);
+      }
+      if (!unidirectional) {
+        recordMergedSymbol(target, source);
+      }
+    } else if (target.flags & 1024 /* NamespaceModule */) {
+      if (target !== globalThisSymbol) {
+        error2(
+          source.declarations && getNameOfDeclaration(source.declarations[0]),
+          Diagnostics.Cannot_augment_module_0_with_value_exports_because_it_resolves_to_a_non_module_entity,
+          symbolToString(target)
+        );
+      }
+    } else {
+      const isEitherEnum = !!(target.flags & 384 /* Enum */ || source.flags & 384 /* Enum */);
+      const isEitherBlockScoped = !!(target.flags & 2 /* BlockScopedVariable */ || source.flags & 2 /* BlockScopedVariable */);
+      const message = isEitherEnum ? Diagnostics.Enum_declarations_can_only_merge_with_namespace_or_other_enum_declarations : isEitherBlockScoped ? Diagnostics.Cannot_redeclare_block_scoped_variable_0 : Diagnostics.Duplicate_identifier_0;
+      const sourceSymbolFile = source.declarations && getSourceFileOfNode(source.declarations[0]);
+      const targetSymbolFile = target.declarations && getSourceFileOfNode(target.declarations[0]);
+      const isSourcePlainJs = isPlainJsFile(sourceSymbolFile, compilerOptions.checkJs);
+      const isTargetPlainJs = isPlainJsFile(targetSymbolFile, compilerOptions.checkJs);
+      const symbolName2 = symbolToString(source);
+      if (sourceSymbolFile && targetSymbolFile && amalgamatedDuplicates && !isEitherEnum && sourceSymbolFile !== targetSymbolFile) {
+        const firstFile = comparePaths(sourceSymbolFile.path, targetSymbolFile.path) === -1 /* LessThan */ ? sourceSymbolFile : targetSymbolFile;
+        const secondFile = firstFile === sourceSymbolFile ? targetSymbolFile : sourceSymbolFile;
+        const filesDuplicates = getOrUpdate(amalgamatedDuplicates, `${firstFile.path}|${secondFile.path}`, () => ({ firstFile, secondFile, conflictingSymbols: /* @__PURE__ */ new Map() }));
+        const conflictingSymbolInfo = getOrUpdate(filesDuplicates.conflictingSymbols, symbolName2, () => ({ isBlockScoped: isEitherBlockScoped, firstFileLocations: [], secondFileLocations: [] }));
+        if (!isSourcePlainJs)
+          addDuplicateLocations(conflictingSymbolInfo.firstFileLocations, source);
+        if (!isTargetPlainJs)
+          addDuplicateLocations(conflictingSymbolInfo.secondFileLocations, target);
+      } else {
+        if (!isSourcePlainJs)
+          addDuplicateDeclarationErrorsForSymbols(source, message, symbolName2, target);
+        if (!isTargetPlainJs)
+          addDuplicateDeclarationErrorsForSymbols(target, message, symbolName2, source);
+      }
+    }
+    return target;
+    function addDuplicateLocations(locs, symbol) {
+      if (symbol.declarations) {
+        for (const decl of symbol.declarations) {
+          pushIfUnique(locs, decl);
+        }
+      }
+    }
+  }
+  function addDuplicateDeclarationErrorsForSymbols(target, message, symbolName2, source) {
+    forEach(target.declarations, (node) => {
+      addDuplicateDeclarationError(node, message, symbolName2, source.declarations);
+    });
+  }
+  function addDuplicateDeclarationError(node, message, symbolName2, relatedNodes) {
+    const errorNode = (getExpandoInitializer(
+      node,
+      /*isPrototypeAssignment*/
+      false
+    ) ? getNameOfExpando(node) : getNameOfDeclaration(node)) || node;
+    const err = lookupOrIssueError(errorNode, message, symbolName2);
+    for (const relatedNode of relatedNodes || emptyArray) {
+      const adjustedNode = (getExpandoInitializer(
+        relatedNode,
+        /*isPrototypeAssignment*/
+        false
+      ) ? getNameOfExpando(relatedNode) : getNameOfDeclaration(relatedNode)) || relatedNode;
+      if (adjustedNode === errorNode)
+        continue;
+      err.relatedInformation = err.relatedInformation || [];
+      const leadingMessage = createDiagnosticForNode(adjustedNode, Diagnostics._0_was_also_declared_here, symbolName2);
+      const followOnMessage = createDiagnosticForNode(adjustedNode, Diagnostics.and_here);
+      if (length(err.relatedInformation) >= 5 || some(err.relatedInformation, (r) => compareDiagnostics(r, followOnMessage) === 0 /* EqualTo */ || compareDiagnostics(r, leadingMessage) === 0 /* EqualTo */))
+        continue;
+      addRelatedInfo(err, !length(err.relatedInformation) ? leadingMessage : followOnMessage);
+    }
+  }
+  function combineSymbolTables(first2, second) {
+    if (!(first2 == null ? void 0 : first2.size))
+      return second;
+    if (!(second == null ? void 0 : second.size))
+      return first2;
+    const combined = createSymbolTable();
+    mergeSymbolTable(combined, first2);
+    mergeSymbolTable(combined, second);
+    return combined;
+  }
+  function mergeSymbolTable(target, source, unidirectional = false) {
+    source.forEach((sourceSymbol, id) => {
+      const targetSymbol = target.get(id);
+      target.set(id, targetSymbol ? mergeSymbol(targetSymbol, sourceSymbol, unidirectional) : getMergedSymbol(sourceSymbol));
+    });
+  }
+  function mergeModuleAugmentation(moduleName) {
+    var _a, _b, _c;
+    const moduleAugmentation = moduleName.parent;
+    if (((_a = moduleAugmentation.symbol.declarations) == null ? void 0 : _a[0]) !== moduleAugmentation) {
+      Debug.assert(moduleAugmentation.symbol.declarations.length > 1);
+      return;
+    }
+    if (isGlobalScopeAugmentation(moduleAugmentation)) {
+      mergeSymbolTable(globals, moduleAugmentation.symbol.exports);
+    } else {
+      const moduleNotFoundError = !(moduleName.parent.parent.flags & 33554432 /* Ambient */) ? Diagnostics.Invalid_module_name_in_augmentation_module_0_cannot_be_found : void 0;
+      let mainModule = resolveExternalModuleNameWorker(
+        moduleName,
+        moduleName,
+        moduleNotFoundError,
+        /*isForAugmentation*/
+        true
+      );
+      if (!mainModule) {
+        return;
+      }
+      mainModule = resolveExternalModuleSymbol(mainModule);
+      if (mainModule.flags & 1920 /* Namespace */) {
+        if (some(patternAmbientModules, (module2) => mainModule === module2.symbol)) {
+          const merged = mergeSymbol(
+            moduleAugmentation.symbol,
+            mainModule,
+            /*unidirectional*/
+            true
+          );
+          if (!patternAmbientModuleAugmentations) {
+            patternAmbientModuleAugmentations = /* @__PURE__ */ new Map();
+          }
+          patternAmbientModuleAugmentations.set(moduleName.text, merged);
+        } else {
+          if (((_b = mainModule.exports) == null ? void 0 : _b.get("__export" /* ExportStar */)) && ((_c = moduleAugmentation.symbol.exports) == null ? void 0 : _c.size)) {
+            const resolvedExports = getResolvedMembersOrExportsOfSymbol(mainModule, "resolvedExports" /* resolvedExports */);
+            for (const [key, value] of arrayFrom(moduleAugmentation.symbol.exports.entries())) {
+              if (resolvedExports.has(key) && !mainModule.exports.has(key)) {
+                mergeSymbol(resolvedExports.get(key), value);
+              }
+            }
+          }
+          mergeSymbol(mainModule, moduleAugmentation.symbol);
+        }
+      } else {
+        error2(moduleName, Diagnostics.Cannot_augment_module_0_because_it_resolves_to_a_non_module_entity, moduleName.text);
+      }
+    }
+  }
+  function addToSymbolTable(target, source, message) {
+    source.forEach((sourceSymbol, id) => {
+      const targetSymbol = target.get(id);
+      if (targetSymbol) {
+        forEach(targetSymbol.declarations, addDeclarationDiagnostic(unescapeLeadingUnderscores(id), message));
+      } else {
+        target.set(id, sourceSymbol);
+      }
+    });
+    function addDeclarationDiagnostic(id, message2) {
+      return (declaration) => diagnostics.add(createDiagnosticForNode(declaration, message2, id));
+    }
+  }
+  function getSymbolLinks(symbol) {
+    if (symbol.flags & 33554432 /* Transient */)
+      return symbol.links;
+    const id = getSymbolId(symbol);
+    return symbolLinks[id] ?? (symbolLinks[id] = new SymbolLinks());
+  }
+  function getNodeLinks(node) {
+    const nodeId = getNodeId(node);
+    return nodeLinks[nodeId] || (nodeLinks[nodeId] = new NodeLinks());
+  }
+  function isGlobalSourceFile(node) {
+    return node.kind === 312 /* SourceFile */ && !isExternalOrCommonJsModule(node);
+  }
+  function getSymbol2(symbols, name, meaning) {
+    if (meaning) {
+      const symbol = getMergedSymbol(symbols.get(name));
+      if (symbol) {
+        Debug.assert((getCheckFlags(symbol) & 1 /* Instantiated */) === 0, "Should never get an instantiated symbol here.");
+        if (symbol.flags & meaning) {
+          return symbol;
+        }
+        if (symbol.flags & 2097152 /* Alias */) {
+          const targetFlags = getSymbolFlags(symbol);
+          if (targetFlags & meaning) {
+           

@@ -1,0 +1,2 @@
+defined_as_an_accessor_in_class_1_but_is_overridden_here_in_2_as_an_instance_property: diag(2610, 1 /* Error */, "_0_is_defined_as_an_accessor_in_class_1_but_is_overridden_here_in_2_as_an_instance_property_2610", "'{0}' is defined as an accessor in class '{1}', but is overridden here in '{2}' as an instance property."),
+  _0_is_defined_as_a_property_in_class_1_but_is_overridden_here_in_2_as_an_acces

@@ -1,0 +1,61 @@
+import type Ajv from "../../core"
+import type {SchemaObject} from "../../types"
+import {jtdForms, JTDForm, SchemaObjectMap} from "./types"
+import {SchemaEnv, getCompilingSchema} from ".."
+import {_, str, and, or, nil, not, CodeGen, Code, Name, SafeExpr} from "../codegen"
+import MissingRefError from "../ref_error"
+import N from "../names"
+import {hasPropFunc} from "../../vocabularies/code"
+import {hasRef} from "../../vocabularies/jtd/ref"
+import {intRange, IntType} from "../../vocabularies/jtd/type"
+import {parseJson, parseJsonNumber, parseJsonString} from "../../runtime/parseJson"
+import {useFunc} from "../util"
+import validTimestamp from "../../runtime/timestamp"
+
+type GenParse = (cxt: ParseCxt) => void
+
+const genParse: {[F in JTDForm]: GenParse} = {
+  elements: parseElements,
+  values: parseValues,
+  discriminator: parseDiscriminator,
+  properties: parseProperties,
+  optionalProperties: parseProperties,
+  enum: parseEnum,
+  type: parseType,
+  ref: parseRef,
+}
+
+interface ParseCxt {
+  readonly gen: CodeGen
+  readonly self: Ajv // current Ajv instance
+  readonly schemaEnv: SchemaEnv
+  readonly definitions: SchemaObjectMap
+  schema: SchemaObject
+  data: Code
+  parseName: Name
+  char: Name
+}
+
+export default function compileParser(
+  this: Ajv,
+  sch: SchemaEnv,
+  definitions: SchemaObjectMap
+): SchemaEnv {
+  const _sch = getCompilingSchema.call(this, sch)
+  if (_sch) return _sch
+  const {es5, lines} = this.opts.code
+  const {ownProperties} = this.opts
+  const gen = new CodeGen(this.scope, {es5, lines, ownProperties})
+  const parseName = gen.scopeName("parse")
+  const cxt: ParseCxt = {
+    self: this,
+    gen,
+    schema: sch.schema as SchemaObject,
+    schemaEnv: sch,
+    definitions,
+    data: N.data,
+    parseName,
+    char: gen.name("c"),
+  }
+
+  let sourceC

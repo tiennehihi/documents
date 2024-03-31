@@ -1,0 +1,30 @@
+     ]
+    }
+  },
+  "gem": {
+    "aliases": {
+      "unicodes": {
+        "composite": [
+          "1f48e"
+        ],
+        "secondary": [
+          "10f3a5"
+        ]
+      }
+    },
+    "changes": [
+      "5.0.0",
+      "5.10.1",
+      "6.0.0-beta1",
+      "6.2.0",
+      "6.2.1"
+    ],
+    "ligatures": [],
+    "unicode": "f3a5",
+    "label": "Gem",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1667828915,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M116.7 33.8c4.5-6.1 11.7-9.8 19.3-9.8H376c7

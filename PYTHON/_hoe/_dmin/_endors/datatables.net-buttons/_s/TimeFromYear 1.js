@@ -1,0 +1,1 @@
+raint('type', ['number', {\n        step: this.$element.attr('step'),\n        base: this.$element.attr('min') || this.$element.attr('value')\n      }], undefined, true);\n    // Regular other HTML5 supported types\n    } else if (/^(email|url|range)$/i.test(ty

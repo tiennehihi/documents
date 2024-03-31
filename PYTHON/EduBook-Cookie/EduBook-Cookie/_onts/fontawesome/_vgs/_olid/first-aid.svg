@@ -1,0 +1,15 @@
+/**
+ * @fileoverview Rule to flag for-in loops without if statements inside
+ * @author Nicholas C. Zakas
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Rule Definition
+//------------------------------------------------------------------------------
+
+/** @type {import('../shared/types').Rule} */
+module.exports = {
+    meta: {
+        type: "suggestio

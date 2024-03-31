@@ -1,0 +1,1 @@
+{"version":3,"file":"ReferenceTracker.d.ts","sourceRoot":"","sources":["../../../src/ast-utils/eslint-utils/ReferenceTracker.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,KAAK,QAAQ,MAAM,iBAAiB,CAAC;AACjD,OAAO,KAAK,EAAE,QAAQ,EAAE,MAAM,iBAAiB,CAAC;AAEhD,QAAA,MAAM,oBAAoB,EAAE,OAAO,MAA0C,CAAC;AAC9E,QAAA,MAAM,oBAAoB,EAAE,OAAO,MAA0C,CAAC;AAC9E,QAAA,MAAM,yBAAyB,EAAE,OAAO,MACA,CAAC;AACzC,

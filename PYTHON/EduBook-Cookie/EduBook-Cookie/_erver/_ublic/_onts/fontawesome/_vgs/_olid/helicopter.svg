@@ -1,0 +1,19 @@
+.@{fa-css-prefix}.@{fa-css-prefix}-glass:before { content: @fa-var-martini-glass-empty; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-envelope-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-css-prefix}.@{fa-css-prefix}-envelope-o:before { content: @fa-var-envelope; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-star-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-css-prefix}.@{fa-css-prefix}-star-o:before { content: @fa-var-star; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-remove:before { content: @fa-var-xmark; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-close:before { content: @fa-var-xmark; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-gear

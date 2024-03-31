@@ -1,0 +1,51 @@
+t: "\f6e3"; }
+
+.fa-hand-peace::before {
+  content: "\f25b"; }
+
+.fa-rotate::before {
+  content: "\f2f1"; }
+
+.fa-sync-alt::before {
+  content: "\f2f1"; }
+
+.fa-spinner::before {
+  content: "\f110"; }
+
+.fa-robot::before {
+  content: "\f544"; }
+
+.fa-peace::before {
+  content: "\f67c"; }
+
+.fa-gears::before {
+  content: "\f085"; }
+
+.fa-cogs::before {
+  content: "\f085"; }
+
+.fa-warehouse::before {
+  content: "\f494"; }
+
+.fa-arrow-up-right-dots::before {
+  content: "\e4b7"; }
+
+.fa-splotch::before {
+  content: "\f5bc"; }
+
+.fa-face-grin-hearts::before {
+  content: "\f584"; }
+
+.fa-grin-hearts::before {
+  content: "\f584"; }
+
+.fa-dice-four::before {
+  content: "\f524"; }
+
+.fa-sim-card::before {
+  content: "\f7c4"; }
+
+.fa-transgender::before {
+  content: "\f225"; }
+
+.fa-transgender-a

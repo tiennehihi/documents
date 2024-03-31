@@ -1,0 +1,6 @@
+Promise<void> => { return; }
+// Message: Must not annotate undefined return type.
+
+// Options: ["always",{"annotateUndefined":"never"}]
+async (): Promise<undefined> => { return; }
+// Message: Mus

@@ -1,0 +1,37 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ValueScope = exports.ValueScopeName = exports.Scope = exports.varKinds = exports.UsedValueState = void 0;
+const code_1 = require("./code");
+class ValueError extends Error {
+    constructor(name) {
+        super(`CodeGen: "code" for ${name} not defined`);
+        this.value = name.value;
+    }
+}
+var UsedValueState;
+(function (UsedValueState) {
+    UsedValueState[UsedValueState["Started"] = 0] = "Started";
+    UsedValueState[UsedValueState["Completed"] = 1] = "Completed";
+})(UsedValueState = exports.UsedValueState || (exports.UsedValueState = {}));
+exports.varKinds = {
+    const: new code_1.Name("const"),
+    let: new code_1.Name("let"),
+    var: new code_1.Name("var"),
+};
+class Scope {
+    constructor({ prefixes, parent } = {}) {
+        this._names = {};
+        this._prefixes = prefixes;
+        this._parent = parent;
+    }
+    toName(nameOrPrefix) {
+        return nameOrPrefix instanceof code_1.Name ? nameOrPrefix : this.name(nameOrPrefix);
+    }
+    name(prefix) {
+        return new code_1.Name(this._newName(prefix));
+    }
+    _newName(prefix) {
+        const ng = this._names[prefix] || this._nameGroup(prefix);
+        return `${prefix}${ng.index++}`;
+    }
+    _nameGroup(prefix) 

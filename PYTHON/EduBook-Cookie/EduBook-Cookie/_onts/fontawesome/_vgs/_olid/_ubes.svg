@@ -1,0 +1,23 @@
+"use strict";
+
+var _utils = require("./utils.js");
+var _core = require("./core.js");
+var _is = require("../validators/is.js");
+const defineType = (0, _utils.defineAliasedType)("TypeScript");
+const bool = (0, _utils.assertValueType)("boolean");
+const tSFunctionTypeAnnotationCommon = () => ({
+  returnType: {
+    validate: (0, _utils.assertNodeType)("TSTypeAnnotation", "Noop"),
+    optional: true
+  },
+  typeParameters: {
+    validate: (0, _utils.assertNodeType)("TSTypeParameterDeclaration", "Noop"),
+    optional: true
+  }
+});
+defineType("TSParameterProperty", {
+  aliases: ["LVal"],
+  visitor: ["parameter"],
+  fields: {
+    accessibility: {
+      validate: (0, _utils.assertOneOf)("p

@@ -1,0 +1,33 @@
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Hand holding droplet
+  unicode: f4c1
+  voted: false
+hand-holding-hand:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Hand Holding-hand
+  unicode: e4f7
+  voted: false
+hand-holding-heart:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f4be
+  changes:
+    - 5.0.9
+    - 6.0.0-beta1
+    - 6.2.0
+ 

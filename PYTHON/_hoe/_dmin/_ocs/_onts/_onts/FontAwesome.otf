@@ -1,0 +1,1440 @@
+= tn) {
+            p.openElements.generateImpliedEndTagsWithExclusion(tn);
+            p.openElements.popUntilElementPopped(element);
+            break;
+        }
+
+        if (p._isSpecialElement(element)) {
+            break;
+        }
+    }
+}
+
+//OPTIMIZATION: Integer comparisons are low-cost, so we can use very fast tag name length filters here.
+//It's faster than using dictionary.
+function endTagInBody(p, token) {
+    const tn = token.tagName;
+
+    switch (tn.length) {
+        case 1:
+            if (tn === $.A || tn === $.B || tn === $.I || tn === $.S || tn === $.U) {
+                callAdoptionAgency(p, token);
+            } else if (tn === $.P) {
+                pEndTagInBody(p, token);
+            } else {
+                genericEndTagInBody(p, token);
+            }
+
+            break;
+
+        case 2:
+            if (tn === $.DL || tn === $.UL || tn === $.OL) {
+                addressEndTagInBody(p, token);
+            } else if (tn === $.LI) {
+                liEndTagInBody(p, token);
+            } else if (tn === $.DD || tn === $.DT) {
+                ddEndTagInBody(p, token);
+            } else if (tn === $.H1 || tn === $.H2 || tn === $.H3 || tn === $.H4 || tn === $.H5 || tn === $.H6) {
+                numberedHeaderEndTagInBody(p, token);
+            } else if (tn === $.BR) {
+                brEndTagInBody(p, token);
+            } else if (tn === $.EM || tn === $.TT) {
+                callAdoptionAgency(p, token);
+            } else {
+                genericEndTagInBody(p, token);
+            }
+
+            break;
+
+        case 3:
+            if (tn === $.BIG) {
+                callAdoptionAgency(p, token);
+            } else if (tn === $.DIR || tn === $.DIV || tn === $.NAV || tn === $.PRE) {
+                addressEndTagInBody(p, token);
+            } else {
+                genericEndTagInBody(p, token);
+            }
+
+            break;
+
+        case 4:
+            if (tn === $.BODY) {
+                bodyEndTagInBody(p, token);
+            } else if (tn === $.HTML) {
+                htmlEndTagInBody(p, token);
+            } else if (tn === $.FORM) {
+                formEndTagInBody(p, token);
+            } else if (tn === $.CODE || tn === $.FONT || tn === $.NOBR) {
+                callAdoptionAgency(p, token);
+            } else if (tn === $.MAIN || tn === $.MENU) {
+                addressEndTagInBody(p, token);
+            } else {
+                genericEndTagInBody(p, token);
+            }
+
+            break;
+
+        case 5:
+            if (tn === $.ASIDE) {
+                addressEndTagInBody(p, token);
+            } else if (tn === $.SMALL) {
+                callAdoptionAgency(p, token);
+            } else {
+                genericEndTagInBody(p, token);
+            }
+
+            break;
+
+        case 6:
+            if (
+                tn === $.CENTER ||
+                tn === $.FIGURE ||
+                tn === $.FOOTER ||
+                tn === $.HEADER ||
+                tn === $.HGROUP ||
+                tn === $.DIALOG
+            ) {
+                addressEndTagInBody(p, token);
+            } else if (tn === $.APPLET || tn === $.OBJECT) {
+                appletEndTagInBody(p, token);
+            } else if (tn === $.STRIKE || tn === $.STRONG) {
+                callAdoptionAgency(p, token);
+            } else {
+                genericEndTagInBody(p, token);
+            }
+
+            break;
+
+        case 7:
+            if (
+                tn === $.ADDRESS ||
+                tn === $.ARTICLE ||
+                tn === $.DETAILS ||
+                tn === $.SECTION ||
+                tn === $.SUMMARY ||
+                tn === $.LISTING
+            ) {
+                addressEndTagInBody(p, token);
+            } else if (tn === $.MARQUEE) {
+                appletEndTagInBody(p, token);
+            } else {
+                genericEndTagInBody(p, token);
+            }
+
+            break;
+
+        case 8:
+            if (tn === $.FIELDSET) {
+                addressEndTagInBody(p, token);
+            } else if (tn === $.TEMPLATE) {
+                endTagInHead(p, token);
+            } else {
+                genericEndTagInBody(p, token);
+            }
+
+            break;
+
+        case 10:
+            if (tn === $.BLOCKQUOTE || tn === $.FIGCAPTION) {
+                addressEndTagInBody(p, token);
+            } else {
+                genericEndTagInBody(p, token);
+            }
+
+            break;
+
+        default:
+            genericEndTagInBody(p, token);
+    }
+}
+
+function eofInBody(p, token) {
+    if (p.tmplInsertionModeStackTop > -1) {
+        eofInTemplate(p, token);
+    } else {
+        p.stopped = true;
+    }
+}
+
+// The "text" insertion mode
+//------------------------------------------------------------------
+function endTagInText(p, token) {
+    if (token.tagName === $.SCRIPT) {
+        p.pendingScript = p.openElements.current;
+    }
+
+    p.openElements.pop();
+    p.insertionMode = p.originalInsertionMode;
+}
+
+function eofInText(p, token) {
+    p._err(ERR.eofInElementThatCanContainOnlyText);
+    p.openElements.pop();
+    p.insertionMode = p.originalInsertionMode;
+    p._processToken(token);
+}
+
+// The "in table" insertion mode
+//------------------------------------------------------------------
+function characterInTable(p, token) {
+    const curTn = p.openElements.currentTagName;
+
+    if (curTn === $.TABLE || curTn === $.TBODY || curTn === $.TFOOT || curTn === $.THEAD || curTn === $.TR) {
+        p.pendingCharacterTokens = [];
+        p.hasNonWhitespacePendingCharacterToken = false;
+        p.originalInsertionMode = p.insertionMode;
+        p.insertionMode = IN_TABLE_TEXT_MODE;
+        p._processToken(token);
+    } else {
+        tokenInTable(p, token);
+    }
+}
+
+function captionStartTagInTable(p, token) {
+    p.openElements.clearBackToTableContext();
+    p.activeFormattingElements.insertMarker();
+    p._insertElement(token, NS.HTML);
+    p.insertionMode = IN_CAPTION_MODE;
+}
+
+function colgroupStartTagInTable(p, token) {
+    p.openElements.clearBackToTableContext();
+    p._insertElement(token, NS.HTML);
+    p.insertionMode = IN_COLUMN_GROUP_MODE;
+}
+
+function colStartTagInTable(p, token) {
+    p.openElements.clearBackToTableContext();
+    p._insertFakeElement($.COLGROUP);
+    p.insertionMode = IN_COLUMN_GROUP_MODE;
+    p._processToken(token);
+}
+
+function tbodyStartTagInTable(p, token) {
+    p.openElements.clearBackToTableContext();
+    p._insertElement(token, NS.HTML);
+    p.insertionMode = IN_TABLE_BODY_MODE;
+}
+
+function tdStartTagInTable(p, token) {
+    p.openElements.clearBackToTableContext();
+    p._insertFakeElement($.TBODY);
+    p.insertionMode = IN_TABLE_BODY_MODE;
+    p._processToken(token);
+}
+
+function tableStartTagInTable(p, token) {
+    if (p.openElements.hasInTableScope($.TABLE)) {
+        p.openElements.popUntilTagNamePopped($.TABLE);
+        p._resetInsertionMode();
+        p._processToken(token);
+    }
+}
+
+function inputStartTagInTable(p, token) {
+    const inputType = Tokenizer.getTokenAttr(token, ATTRS.TYPE);
+
+    if (inputType && inputType.toLowerCase() === HIDDEN_INPUT_TYPE) {
+        p._appendElement(token, NS.HTML);
+    } else {
+        tokenInTable(p, token);
+    }
+
+    token.ackSelfClosing = true;
+}
+
+function formStartTagInTable(p, token) {
+    if (!p.formElement && p.openElements.tmplCount === 0) {
+        p._insertElement(token, NS.HTML);
+        p.formElement = p.openElements.current;
+        p.openElements.pop();
+    }
+}
+
+function startTagInTable(p, token) {
+    const tn = token.tagName;
+
+    switch (tn.length) {
+        case 2:
+            if (tn === $.TD || tn === $.TH || tn === $.TR) {
+                tdStartTagInTable(p, token);
+            } else {
+                tokenInTable(p, token);
+            }
+
+            break;
+
+        case 3:
+            if (tn === $.COL) {
+                colStartTagInTable(p, token);
+            } else {
+                tokenInTable(p, token);
+            }
+
+            break;
+
+        case 4:
+            if (tn === $.FORM) {
+                formStartTagInTable(p, token);
+            } else {
+                tokenInTable(p, token);
+            }
+
+            break;
+
+        case 5:
+            if (tn === $.TABLE) {
+                tableStartTagInTable(p, token);
+            } else if (tn === $.STYLE) {
+                startTagInHead(p, token);
+            } else if (tn === $.TBODY || tn === $.TFOOT || tn === $.THEAD) {
+                tbodyStartTagInTable(p, token);
+            } else if (tn === $.INPUT) {
+                inputStartTagInTable(p, token);
+            } else {
+                tokenInTable(p, token);
+            }
+
+            break;
+
+        case 6:
+            if (tn === $.SCRIPT) {
+                startTagInHead(p, token);
+            } else {
+                tokenInTable(p, token);
+            }
+
+            break;
+
+        case 7:
+            if (tn === $.CAPTION) {
+                captionStartTagInTable(p, token);
+            } else {
+                tokenInTable(p, token);
+            }
+
+            break;
+
+        case 8:
+            if (tn === $.COLGROUP) {
+                colgroupStartTagInTable(p, token);
+            } else if (tn === $.TEMPLATE) {
+                startTagInHead(p, token);
+            } else {
+                tokenInTable(p, token);
+            }
+
+            break;
+
+        default:
+            tokenInTable(p, token);
+    }
+}
+
+function endTagInTable(p, token) {
+    const tn = token.tagName;
+
+    if (tn === $.TABLE) {
+        if (p.openElements.hasInTableScope($.TABLE)) {
+            p.openElements.popUntilTagNamePopped($.TABLE);
+            p._resetInsertionMode();
+        }
+    } else if (tn === $.TEMPLATE) {
+        endTagInHead(p, token);
+    } else if (
+        tn !== $.BODY &&
+        tn !== $.CAPTION &&
+        tn !== $.COL &&
+        tn !== $.COLGROUP &&
+        tn !== $.HTML &&
+        tn !== $.TBODY &&
+        tn !== $.TD &&
+        tn !== $.TFOOT &&
+        tn !== $.TH &&
+        tn !== $.THEAD &&
+        tn !== $.TR
+    ) {
+        tokenInTable(p, token);
+    }
+}
+
+function tokenInTable(p, token) {
+    const savedFosterParentingState = p.fosterParentingEnabled;
+
+    p.fosterParentingEnabled = true;
+    p._processTokenInBodyMode(token);
+    p.fosterParentingEnabled = savedFosterParentingState;
+}
+
+// The "in table text" insertion mode
+//------------------------------------------------------------------
+function whitespaceCharacterInTableText(p, token) {
+    p.pendingCharacterTokens.push(token);
+}
+
+function characterInTableText(p, token) {
+    p.pendingCharacterTokens.push(token);
+    p.hasNonWhitespacePendingCharacterToken = true;
+}
+
+function tokenInTableText(p, token) {
+    let i = 0;
+
+    if (p.hasNonWhitespacePendingCharacterToken) {
+        for (; i < p.pendingCharacterTokens.length; i++) {
+            tokenInTable(p, p.pendingCharacterTokens[i]);
+        }
+    } else {
+        for (; i < p.pendingCharacterTokens.length; i++) {
+            p._insertCharacters(p.pendingCharacterTokens[i]);
+        }
+    }
+
+    p.insertionMode = p.originalInsertionMode;
+    p._processToken(token);
+}
+
+// The "in caption" insertion mode
+//------------------------------------------------------------------
+function startTagInCaption(p, token) {
+    const tn = token.tagName;
+
+    if (
+        tn === $.CAPTION ||
+        tn === $.COL ||
+        tn === $.COLGROUP ||
+        tn === $.TBODY ||
+        tn === $.TD ||
+        tn === $.TFOOT ||
+        tn === $.TH ||
+        tn === $.THEAD ||
+        tn === $.TR
+    ) {
+        if (p.openElements.hasInTableScope($.CAPTION)) {
+            p.openElements.generateImpliedEndTags();
+            p.openElements.popUntilTagNamePopped($.CAPTION);
+            p.activeFormattingElements.clearToLastMarker();
+            p.insertionMode = IN_TABLE_MODE;
+            p._processToken(token);
+        }
+    } else {
+        startTagInBody(p, token);
+    }
+}
+
+function endTagInCaption(p, token) {
+    const tn = token.tagName;
+
+    if (tn === $.CAPTION || tn === $.TABLE) {
+        if (p.openElements.hasInTableScope($.CAPTION)) {
+            p.openElements.generateImpliedEndTags();
+            p.openElements.popUntilTagNamePopped($.CAPTION);
+            p.activeFormattingElements.clearToLastMarker();
+            p.insertionMode = IN_TABLE_MODE;
+
+            if (tn === $.TABLE) {
+                p._processToken(token);
+            }
+        }
+    } else if (
+        tn !== $.BODY &&
+        tn !== $.COL &&
+        tn !== $.COLGROUP &&
+        tn !== $.HTML &&
+        tn !== $.TBODY &&
+        tn !== $.TD &&
+        tn !== $.TFOOT &&
+        tn !== $.TH &&
+        tn !== $.THEAD &&
+        tn !== $.TR
+    ) {
+        endTagInBody(p, token);
+    }
+}
+
+// The "in column group" insertion mode
+//------------------------------------------------------------------
+function startTagInColumnGroup(p, token) {
+    const tn = token.tagName;
+
+    if (tn === $.HTML) {
+        startTagInBody(p, token);
+    } else if (tn === $.COL) {
+        p._appendElement(token, NS.HTML);
+        token.ackSelfClosing = true;
+    } else if (tn === $.TEMPLATE) {
+        startTagInHead(p, token);
+    } else {
+        tokenInColumnGroup(p, token);
+    }
+}
+
+function endTagInColumnGroup(p, token) {
+    const tn = token.tagName;
+
+    if (tn === $.COLGROUP) {
+        if (p.openElements.currentTagName === $.COLGROUP) {
+            p.openElements.pop();
+            p.insertionMode = IN_TABLE_MODE;
+        }
+    } else if (tn === $.TEMPLATE) {
+        endTagInHead(p, token);
+    } else if (tn !== $.COL) {
+        tokenInColumnGroup(p, token);
+    }
+}
+
+function tokenInColumnGroup(p, token) {
+    if (p.openElements.currentTagName === $.COLGROUP) {
+        p.openElements.pop();
+        p.insertionMode = IN_TABLE_MODE;
+        p._processToken(token);
+    }
+}
+
+// The "in table body" insertion mode
+//------------------------------------------------------------------
+function startTagInTableBody(p, token) {
+    const tn = token.tagName;
+
+    if (tn === $.TR) {
+        p.openElements.clearBackToTableBodyContext();
+        p._insertElement(token, NS.HTML);
+        p.insertionMode = IN_ROW_MODE;
+    } else if (tn === $.TH || tn === $.TD) {
+        p.openElements.clearBackToTableBodyContext();
+        p._insertFakeElement($.TR);
+        p.insertionMode = IN_ROW_MODE;
+        p._processToken(token);
+    } else if (
+        tn === $.CAPTION ||
+        tn === $.COL ||
+        tn === $.COLGROUP ||
+        tn === $.TBODY ||
+        tn === $.TFOOT ||
+        tn === $.THEAD
+    ) {
+        if (p.openElements.hasTableBodyContextInTableScope()) {
+            p.openElements.clearBackToTableBodyContext();
+            p.openElements.pop();
+            p.insertionMode = IN_TABLE_MODE;
+            p._processToken(token);
+        }
+    } else {
+        startTagInTable(p, token);
+    }
+}
+
+function endTagInTableBody(p, token) {
+    const tn = token.tagName;
+
+    if (tn === $.TBODY || tn === $.TFOOT || tn === $.THEAD) {
+        if (p.openElements.hasInTableScope(tn)) {
+            p.openElements.clearBackToTableBodyContext();
+            p.openElements.pop();
+            p.insertionMode = IN_TABLE_MODE;
+        }
+    } else if (tn === $.TABLE) {
+        if (p.openElements.hasTableBodyContextInTableScope()) {
+            p.openElements.clearBackToTableBodyContext();
+            p.openElements.pop();
+            p.insertionMode = IN_TABLE_MODE;
+            p._processToken(token);
+        }
+    } else if (
+        (tn !== $.BODY && tn !== $.CAPTION && tn !== $.COL && tn !== $.COLGROUP) ||
+        (tn !== $.HTML && tn !== $.TD && tn !== $.TH && tn !== $.TR)
+    ) {
+        endTagInTable(p, token);
+    }
+}
+
+// The "in row" insertion mode
+//------------------------------------------------------------------
+function startTagInRow(p, token) {
+    const tn = token.tagName;
+
+    if (tn === $.TH || tn === $.TD) {
+        p.openElements.clearBackToTableRowContext();
+        p._insertElement(token, NS.HTML);
+        p.insertionMode = IN_CELL_MODE;
+        p.activeFormattingElements.insertMarker();
+    } else if (
+        tn === $.CAPTION ||
+        tn === $.COL ||
+        tn === $.COLGROUP ||
+        tn === $.TBODY ||
+        tn === $.TFOOT ||
+        tn === $.THEAD ||
+        tn === $.TR
+    ) {
+        if (p.openElements.hasInTableScope($.TR)) {
+            p.openElements.clearBackToTableRowContext();
+            p.openElements.pop();
+            p.insertionMode = IN_TABLE_BODY_MODE;
+            p._processToken(token);'use strict';
+
+var _jestMatchersObject = require('./jestMatchersObject');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      Õ{¥;¯©PtÄâBİÂßó)fQd¶,HEP¤õ¢@:Ys«²‰SËš€”CëÑé†p/½VÕYób†¡½RÜ7G°‘âö*®T"¡µü5…©~Ë}—l¦†)ú¬pñ¥	*·TDÈ/À,^["Pì-ˆS:6Á‡À…àkc+U8Éq$ß]¨Ğ®z°‘ÂÁCI)rH%›%ÙõÀ«³·¾-LÚdªFÍà×Ãs7AÀä’p#<\×½áÖx·^ß+µÀµ“—ç'¶q#1Ç'<ˆäp¤<úH<±©&?òüáÛØõd¾ÆËKØIXË*7¬«œ¸°¤Ûr!îvúˆ&|r”ğ>ß‘¸ß:cn‰?¡+œÉScf9ZJYû§"şÑBç“™XÃ±öÓŞEhŒ8ó¸> ˜ÊÎuÙ{ìo„ÃW
+§~*é3p3u–ş‚Ç’¯–NpCrAjÛÔ2
+Õ¹ü†êÈŞü>é6ş„ûƒ,éz8Õ•EAšx­XíšaAœ-ÅœÎõÑÎ;–Øùæk½ yUÚE„s{$K6Şs33€ó:ÿÌÍí<xğé¹{´sk¯ïà¤ˆ•D~Óë=6…·C!úÄ1'F]Lq Œ¢¤¢ßùÓ¿ü÷@\éxp¿ş/ú×ÿdÃLI‡)—“Ú­vN_üÛºgÙË`2ÜàSm¯ÄK€–~í¸¹,®¡ç;xÕá.ø>Ñÿ…Ñó½ï4×é5êN`f¥‡K‘ár[ĞYQ¾GÅ§Éh+©¡í|½À÷ĞÒ$ñ …/èe®§HH÷óU¼‘ff•\,”7†V»ÉÜÄQ3¾×;hÒi›ËØN¤/ÆõÄ—|ìyqÃavï†«ŠÂÊ"ã¯ümåp‘Ã+¢oÖ6«  ¦'„®œ~V©–y/nÇ_p‡Ç(š¿Š`Ä+QÆd3n3Æ_Jõò¥l"Í8$Ö€‚AÌ:I×ÃöH™*@5§œär7çÂn5ÖloÈ äg©ÛàÍã‘¸<¡è»ğÚV3\Ø:ë†í9)¯gíµÚab·OÿS¸Õô$Ñ»¿bOh@=x!LÔ<#e[Ë
+İ5¥ñ×;ofûEŞ(»İİiçãÍôÍ¸ÈÓw{trâ9&¦«ŠtÄÑ"7üŸ¦L24‰ÕºÃÿÓf~9ém»a¹`!]^¾uªŸ€6¢d÷f‹\ö¬ßPˆi›Ä0Mí¨ä ¿Yu1á^§lõµıü_·„£9oFoZubÂccçÇ›¬c:S_Í(ë¡|jŠâ†³G­òeo5¹”®ê,´s›eV,8%ºÀ6±Ñ^=eñ7¾;cJ“ÿä±^-€Îİš{^Z@¤»Â	¦±9Ş¨	½(®ÃëbÒsªf;Û
+}|ópĞC‰7L$ÍLªfabâÍvm°¬—‹[vÁ&á€Nvõ|ô²6ü?ë5Å.Ù/ÅÚDlEŸÎ0·±`\²KÉ6!Dä,ZWxÜ¡?ˆÌ—±æAtñ.ƒ–– 1äœ·±Qv©İZòzf½JÕ_ô•Ğÿ +ê^CÑÆtªÇòğ”y“ÀÛ¿5&²˜Ç ä’”«0yp_œ¥HY¸¢î£©pÙK¢&ÚÃ×~]¢òŸe­F«¨1t>)P7ªË8VU‡İß&²¬oC<`%´vÉbæEl¹9\^İJ,ş7RDì±w6¹l%ôÌìâ•¶®˜opöPK    y´jTÓÖ/û     !   PYTHON/shoe/PHPMailer/SECURITY.mdµYmoÛ8şŞ_ÁÃ.Ğ°¿ÄvRàpÛMÛÛ-š½ Éö^‚EM‹c‹kŠÔ‘”ß¯¿R’åÔÛÉİ‡Åº’HÎË3Ï<Ã|Çn «¬ô;¦—8fAq/õŠyÃ®º¾âR}ñâZwÀ„t™2øƒësÍZé\…Ke›Ji°|!•ô-M¥ó¹5Õ*gw·R€’KÿÒ±Ì+¤æD³ke¹óPüv’{_ºW§§¾^‘f¦8mìÑQhŸÏ\jÿu¬´rƒª]úâEk;›¦gé¸UŸd&,aüÀŞîÇ=Ë¸Æ ¸Jy†ŸTÚÛÊ‘‘™À@¡É¸RøäD.™«²<¾’¿ÿ2úVêÚºÜ8fzN»Ì”¸É|iY\»^Ê~^†çß—Ü{°ÚÂïç¬ä–à!8;ßp%º÷Z´Ïôæt¦Ş¾,óòåœĞF–íïÓŒŒ çm@^½ú¾ŞÊØy¯"C«VÊ,¸bt%Ï 	“Ã8-+yitãúO›÷™ôl+•Â°4/0d¥…%XĞ¸C…E%•OğU{.3Ñe‡‡…Sv…ˆYñ=ÖÍŞ$ô‚OË*´ƒ“E©poñšé:´Rö2úêîòÓÛd4“ñt0Şƒm‹ToDª¥óéÊlN7¶§„‘S
+õúı³øóÁúm^ëc ï>ÉµåÚ³4*g—9¯r®;A *o^mä9ÏÖ°v—ŞïşÓcÉÙ]N@Kl:Öl·iûø´×`:DeƒpGçÜWÁ]çäd¡0"Lá‹(æ!öcF *®WŸy„uÎæ¹ø¾â+ âËÜˆŠ.F¨–Ü9ŒQ¥—	Dˆ`Kk
+J&¾Öeå ¨şĞàú³_¹d´Û>2Âd.-df355€N*‡/¼ê<„[q*Í)	-O–ÆÜ»ïá«±UŒGbåaZ¢¡\9Ã8E-(1Ôñ
+vËQ.¨0pûèF ÆVÜ‹İÊÒÇ/iY2&ÈÅ
+¾c‹&!€¼Í¥{£Õñ²TD¦ŞÔôèâaÈFm =Ôõ™ß•’*±^yÕÄˆı]ja¶.}ñ°²ŠºìhO<~A Ó+²×BİĞNñ ò'Ôî ÕÇúö´“íÂ×ÁM÷>ø
+XBZd4µ«D¬áÈœ|c¤p´¢Fkíö²mWéµ6[á»Íe 4Aœ^.0i[L5¾-0õõ1Òé—Èâ¸ê3¹;ˆ%‹\
+È Ì@öÊ4r³P*Ej¢M4ùVğß¥~Iñ	æl2şö†¡RÌ{ôR³72Äçgí'On!ËµQfµc—&í³^ìWx(hl¢T1‘wš†|œ\à· ‘2LÏC@ˆnŠ±°¢^DG×ìĞĞPt`x/FSfÔëù%ûpÇxÓuq£;*¬{ÊKÜ=È™¬Ú;¶’>¯Z/:¿ğ9¢üF0˜ññdp¾\§|ÁGC1²ÉÅdM¦p–M—½ã¹ ÙGÓ§ç²ŞàA.ßq+İ:—ì“;®³RÓ;Æ¢©Ï µ"o–J>é6j‚m–C¶v!v¿~ü€,”C!jÊ 5„ Æº¼÷îšÊ0o*˜çÊ#U3p/CV«HG&ÃÚ
+Í/cÙ'·»æa£öÑé°Ò%a`Î¶9DB	MºiA=Í¹¯‰“ó—ÅMÕDı¦æ@e€$ËÛ/c¿o¦"ÿw`íˆ‚„L)u$b¾ÁE5~?¾»<Ø˜‚²_nKÈäRfĞšsªĞµ¼íJfJR$Dje¦R”'e¶ÁË™Í;ò¸k|ìŒo¨‡œ"‚æag9Ò„’ª™öG€§£És 6x Ø·Š[FıŸ"v‰ÿÀ h‰ãˆBe%û4¤ÓÌI:JG³àdİØp¹ş’-bwMÆ…&ƒ
+”[tjŞ²Â 9éuaÓÂ:¸Ô}‘êAn «Hö5âú€Ú1¤xQ'øãåÛ£án˜îÉán6Àpß °»PîÜâT¦`¿éZsWT€ZÛ¦$u&	¶±-†9á¬ÌuyB‘Ià¾TFúĞz
+ƒ¡–È§°;ª… £ĞİUâïFdı@w‡ğ4%FïhìèŞd¨kœß)S@ ­0!q·OØ!œn 5.û[Nûf;”ÅFCº¶ß€Q Ï;©»¯`ï+LÓhŠÔ†‘œõ°D74¤²ÜÜºG…G4íªÖÄœ	×o“9K†ÃÉ3Fƒfƒ)ÔÄtÌç8œ¤˜%7oEq$hü®‹¿£‡÷şFÒ­e1@+’HAâ•
+ºÎÙ¼İºæ† {d`#:B“R yåU(¹J£ë.|äÁFfÒ+ª¢±›si#©3UQ
+ß§Jº Œa?ô“03èRk	B‚/r_Ï©!FˆÍ-o¤7ÍİÍUƒÀ2¤Î!¹:ÍÎÄ‹æS; ÆÀ™KA'•®\„ZıæäšÈb“\ =47t#”7RÄE×œëš]²× çc9»³ıcà:êÂ•ëŠÛ»x ØšB¤;·">wQ:RZ/ ¥~Ğƒ·úéöêCsÕ`*›µSÛ3»\ì…h8‚Sç*­/pZA¬v]¤\3¢¦ÓN‹LÙkBƒ¦Ö8û¡&8ù½r)¹Æ
+£ı>¯À®qó>›“3ˆÃŠ~#Ì¥^ã/ğY¹<ôf‚ò§É‘¤ñ2Œ®X’ºÇŸ8ëŸ8İKj$ááµ“Ü=®ÿ$:Hxƒ=¨@Úc£óˆ…iïHOl2>M†ƒÁÙÓ{z³AñÇÜ
+P>Q®éØmwyÃ·H[Å”j·–!V\åa”vA‘s±‘ÎX`÷’<y»Sò1Ø\¢ø²äĞÌäZ“„jM~b)Í}¡êÁ½¤çM•VŠıXmJä~òÃ¿kïÁö‘áùÑt<&ãñ331ÿ2ñ¿MÄxcOıVD»ù³i#:ùZD'ÉùÙìú)®ïQ÷¸¹º½f—?¼ëHHšSJ°8	­ÎíBzKŒã‚ã+ºÛÑ$òã_·€¯øî[®Î“Étxñd×êõûÇ`¥iŠ‹ŠZ `”¶Q¸QrA.wu5]ÚsH¿v/öê%Û™*xUÉÍ›pì£h™j±àëVÒÙû3İM—{/Î·>Y„é4ìA'UåÊÒE×¢6‰ùÆÎode„cÅ,,‘_AÙ(Ì£ÒãúÀ@èN—å8€ıbXA‹ßS(Î†)N=×J:Êœ …¶|×s"ÅY†›Oàê‹nÙß¿Ô­WÃd<;›}Õ«¯z×Ö6ÊRº>s\ã<àà«—»8óßìo…ç5À[´'A…i(è;é¨e‘Á1–—¥c'xì¥¢Ñ†Itòõm…B¹õà’”Ö˜Ğª[ÖZÒŞ!xÒšınÁ;(d²¯úN\ƒ–%@í 9»==¶q}¯•mƒY¸Ù{ò†õú^€{³ç4™ÌÆO7²^€a:KGÇ®@tÿºğæy¨Ê„q0I†çƒ§C´^ÿ……ö¼¯°ûãÇãVP·f¥HD­TÅôÿæO4ÓĞŸ"s³i|)ğ.j¹Ø PtFÙ§³d<Nîi\OşPK    y´jT”Â–¥         PYTHON/shoe/PHPMailer/VERSION3Ó3Ó3  PK
+     «rÃT               PYTHON/shoe/PHPMailer/language/PK    y´jTs)_\  0  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-af.php•”İnÔ0…ï÷)æi¡RÛû‚"ÊÚBÅßª¢Ùx’%™±l'”Wâ5x1&ÉfÛm³ råØÉç3Çgüì…_ûÅâøà`pZ®%ÂÕ»«KäšÔ(e‹%Aa¯'¨°É¤p&eÍq)Ø÷5&VB8*X8qG`ë©Ç¾ô˜W=bKµÙãÅâQÿ~úşâìSvqúáí÷%¶iM’8ÇDËk˜ç°ü|ùåê°Ğ6@e	”ÔQà‚ÉôüĞàúÉ£åÓ‡Ô\E(OÙZcú'Õª‡aÚà+–ıT‡	3Ñ”a“Oä–×©ıG¶C{iÔøô3k(Fói$mh¯T]¬Ğ×\–ˆÔDå<Bru,åíßâ£¬¨"qdU:óLÊ˜%ÜPŞî8?Î7î´œ:¥¡ŒyD’Á‘—×³ˆú÷/¨ú±úH=É]Ì ºè£½ÿËÚdE@wOÜkƒtZ—ƒIß,èEh8Öm5c‰	-«»Q½[©×X´REÇ!«û"ÀÒaÍ.CçÂû†ó+©v\Ò(k^O34ÖÈØz¯aŒ¤ıãÒ¶I@­Êµ²WŒÚ±£1_¡QJHÌ1
+URg…íB‡V÷Æ?ë!‹n1»C œ=[·Ç#ÙíŸsÙîaMé¯‡¹”‡­0ziµ§¾lŞ»Ìšä³éæ¸8ÉÛÜ=ãñ“”£½
+AÃ˜‰³"g˜mÅ^%Æ•uC¤{××9A31Ø—Us5FjĞÂL
+Ãpo?Ğbd•Ì
+ˆ[¿úCæ´
+ÄC}*ı˜F§ÿ PK    y´jTY<  è  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-ar.php•U[OA~ï¯8&UàÁETˆ!j†¨o†l†İi;Ú½dw úXØ–¥ÿÂ4¤— µ"šòKÎüÏÌ²ôÂ”h:;g9ßwÎw.]{Õ¢Riei©K°³=áÂÎ›m&ê<†:ªû¬Ê¡B×Uˆy…Œ2„Í ZIdÌ‚¤Î¤¨„1x¼"!Åz/5æzÄÜ/âÕXÙ¾¬‘Ã«}fXü0‘¬Â`-7=}òx½JŸ<–İĞAN+¥Ò²ñvkó½³µñîõ§²†á.“¼¼Åç9”ñÿ`>lÜUP)vAµUS©à ;ôĞÆ!`W¥êXeté/—ŸİepÃ à®tjßB†;]}'š+ıØ3†2UÓxX¹<&™„Òa®Ë#É½ò®‹@(à>±GÑ§y"MÓw¦šš¬Üä7ÇçIBEÉño8T¯òÈGxiÎ>¨!ğÚŠ¸¡'‚ê”*E´‘mü	xMÇtddËTc¬X_¹»?SÂk¾rª¥ùì@ºQ|IRŞ½HË•á•ÑN¥Z;úkÜF<˜†œ®‹)‡¼A™%#x® Ç¡ïTôhxå]º)ê‰Öğ’òÏÔ‰¶´(ún‘HS—Œ±ˆ€F‹†dvF¬âfFÜà…îTj Ó=*]‡ËvğVÃ</]G¯]O‹fštB!JJCØšO¥àÊ/§”Û‘é¦Œş«]`äc…çöt}³eÌ%ûQÆù QD`Ğ[äÜÄ3Xq¬gÈšn‡Âã–tÉû{3"şOj*½©¯nòÂs¥7u¨RkP1wE$h&3}4¿7rcêâ÷ü:0ıÓÎGı—J'­Œİ[it¨úhR&vÍQî®Û„}‰q¼ É—‘S,İI6„dVù«üÍÃGóı´¼ŒÇqkŒ­ùMmó€Å‚íÑZHøÜÏÂŸš1]Úú±£2 †kpìO¿"şAÏ¢õ(yˆ0p|‘$·BO†ì7ìO‰’á™Ê4AüPK    y´jTó@åPÂ  Õ  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-az.php”»nÛ0†w?Å
+xO[4)’¦’"½ KG"-3æE!)ÃòKdöä±k½dò&9€ßª‡ŠíØ‰œ5 À$¥ïüüÏåÍ»¬—µZ½½ìÁñˆÛÅ5j—//PHnA¢NsL9tiy–wiÓ8Õ©®Ş¢v½0ºÆã]¡…tîø(Ã¤kj½‹¹ïÑGJØk”(i³Ój½
+/:?ı>ûÙ¯qíE‚·¯`õ{íoß/a¸{tÕôÎ„ó	äÕ$·.‘,?h¿~NLŒÖ<ñQÏ8ÿ"±^:nÜ
+½Ã™Or©ğb0ôiã#LyÎÚWÍ1~[.Æš7‹qœKàLHµ"nds•ù"RÜ92õ»d¿'@xiy§Ùb\Ã!®y£fšN:}­h_xaÅ¾*g$¥ ‰Ğ7Lâ|Âª©Ux´!Oò­D­h÷·ÊB±t²à^ØZÍ PnµyÎµ¯¶@°éC¶3d¹}a2®7kÄFê%–¿ª)ã—eY£¢n(böDÖYyçüÒp™)y‰×‰ èvİ4Úy¤rß®ö ´tsİw¢ºîOL‡²šêGİÍÔJÁ"dÌn8JÔ“r6JË™&I
+ÔÀ÷U„áÅ&¨º‰ëòvy–ûPßDƒıÕ÷}á1¢®•Òıƒ7ı`µ{£ÄÌš`¼Aâı­&v[0Šu¿Ğw°-OD&hŠ¸­Ü=ïÆãù«I5eØ§xåŒlÓ”Eú7²äu°:©¦;óº³HõóªßjDÓOá†ŠF‚òY´š\—X]áÿ¦TåÖ»¥ì	ô/ÊhÆÔj?§'a†…"¥»ÃMn—³ƒT×ĞNÃDñ\;at¤„sk	º:åIøPK    y´jT¨J}Q­  Ñ  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-ba.php”ÏnÛ0Æïy
+(°ôŞu[;,è
+´E°î6kÑü‡$ÙØò}¾ÈNí{²ë4^œb99²ù#E~O?ÛµÍfp_Œg«o«kÔ9¨ós‚Lş€£Lƒ%ç•ökÙW´aÈŒE™ftK ïC„YLËˆØR»SlÂZ–®Ö—Â¨1×OpJñäL¿œ¤‹ÔÔŸ$âx6{	ç—WËïÉÕùÍÅÏydb ù¿0¿½ş±‚GÏ%À5ŞT!X§lq1ÿ°OK3¥!YŞ¤é‚ 6yóô@à­)ä¾àå¡ûĞ“kÉ™z2‰Â€	›`š’¤æw“IVF¾L5°öM¬zİ¢¤c=	¥Ú†ßIMŞKŸ{à Eåÿ`Ö¸¦$Ê­Ãò4‡S£4ç¯ˆsCÖlXj‡ÒiLî0“NÀ$æ¥Íh"[Ìnëô¦uÏ±yŒÔ}3M‹Êëºåıüî0MzäCc#N:g¥ú±Ä»´}	­q¯´òPu2è$‹²V»¼½yŞŠ“ŠN#Œ-)™äè}- #¢x³÷:5Ó¹œÜÉj¼e<”‹·¹h”Šş#•fPœ56V×¤¾E"¨Ò7Ò œ5\¦Ú0V,öYL3[¬´JP)·3La.ûêº²¬çóB<«½Hµe÷iºŞº[,±|cEì½³„ı«ŞÙaZıÖ™V+š¨ïk·Õ¢V	îE«µøHqÓWÔÙ³F“No¯sŞ·T¤¾Ì+†Wº4õËr¢éú:ØdXQ¯ãÃ·XßY@£)/"É9ãFÕzÊ=MÅ¶è4Ş‹“<ı³,Ç®1`m
+‰h@n÷Pë0ôæß :´H±U%µö~ÛÅN…*’C¥—6Ã2úPK    y´jTY0ßÜ?  ‚  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-be.php•UËnÓ@İç+fd¨Úf_
+´H µ¨vUdö$Å[IDwmR¤²«–_%QD7¿0óGÜÇiÒØ*¥ò<|Î¹ç>¼û"¬†…Bqc£€6ĞKâá¨Î)fèøõñ¦‰‡Y¥+•a¹ƒ"R†M Vñ(¯"aÆ=,hÀP9ˆKÊ”QAÁ¹Ğ¸{!vjbjvq]Tá…}Ô8f.Àá?õi½†v)+{œˆ0
+¶Cï9¼P,i€ı7‡ïìÃı·¯N,A˜ Ä*¡ôï²äÙ“Õ–c9’=ôşèÃñ’Ó¥MÕ•}õUÆª©ÚêV#ÙS—ğÜİ¶®’9cÄv5àâ_Èb9cu%iªu®šp+†ß­êÍ‚­,:r94ïm©s9PgòÖüÔL).Øf°±ãP×*­•24xZÁHueSu·bÕ1Ñw2iˆŠSÛ'œCöŠ9j¼;9HlÙ×ÜÀ<±æÈÆdNàRV¹‡›c^Ë±£¨HEé Gm°âNİ$IkBÊFš[µvP&Ã'âÔ—êa‰!M	Pµ~l²~•MÌF?ÛÒM`LçÜ*=ÀåòyàqK/AôÀşgzk`ƒ0«´V2˜!G:qFpŠšƒ¾]ÖíæfIª³¤z¬Ú]oªsó˜Ü ×ã¤3²XN,Ê¸ÀĞË¸ª<)·	Çiõ_€C±™û†|PúøÉv6G{Ôµ±ëFÆ¯pôµv9NÓ™S•›HÆ™ñ-BWÍD«ìÍÖ„ã©A]’J[”öŞŸš²5â‘Á„©°ÜDÿ­$Ó#ßÌU3x=ƒ(
+ m+ÔÓ­PôhqÄ˜axÕŸÓD8íÁù¥ºÌ!ŒˆCC
+Ã—/ÙòZA™«NN”ª›í7§¶:<2Xµõ¦†»zÊæƒêä°ø"´Óqİ*ËÂïşË@A¢(ˆ–bÉ³/¢#Š?Âààäá÷èúoŸxü)ï´-3‘)‡f$~ÖŸÆ´:f·ÛôÔ1’ŠÅŒá+ã4`¶O9Ÿ§
+D¤'hvb ş PK    y´jT,_ÿA  ”  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-bg.phpUËn1İç+¼@
+T¢İ—-RˆUÀE#3ãL¬f<£±µ»¤åÙM,BE|À4$MHšäì?âÚóÈ$™> ‘’Û÷œsŸŞxÔ‚Rime¥„VĞ“FİÅ!Åí=ÛÛÅ´NBTÇÌm`— *¼®£TaQøh›¹uÊkH„˜ñ:Ôg¨ê‡È!UÊ¨ M‚`_hØÍ Ûû"C5«¸!j`°K÷k°ˆ^úœ4Ñ†GqıĞİßt=X]µ}ïœ^+•îhë­ç;Û¯¬­—Oß–µ=a‚ÚXr¥Ÿ‡¨üz÷Í’¿UKöÔg9”Ñ:’ßeÉK9‘ú¡+#¤Úğ¤áy¢Úê¶:p¾%HNµ©ìÂuó­–,«°}Æˆ-¬šÏÅÿ«h'æSõ!VLì`-æÛ6	qÊ•kˆJá;PGšy“F±«8x$…4ÄÄ¡åÎ!ƒ1EB#ÏÔ‰ì&²5z3Ñè‘	øy®¾È^~¯SF²«“BFfûeîŒ,c„ğRß$JGf¬‡@ÓÇZFDo‚»1W'yĞ¢œ¢)81ÒòçP3Tİ&şœ—+¨ê@#”– MÍRïAè9ºÒËÆ¿b;S¨Ñ-+ÈàøDgù&æĞ÷¬ªîOgÑ™39Òı0«ŸHv{[wK_FT“…HoËQR[-Œ±q11e\`häù>¾!7ã¸5àÿcœ{ğšy,‡fáTo"3BŠ)›¸N;N˜K^B™µ›ó¶X¿gfšéEŞ?ÔÍXÑ`è¾	LÜ |(s3%kÄ^À¬Ÿ
+e¡ß¤)’ıSµ âÎãÒè¦İË¦[$;iò4“æ5»ID´97s)©cõ)Mk¡¦Ø4 0ˆù\ñ,Ï!S¦·¨¤‹´ÿVMœºlyz˜}II_ö)ÈiËÎu„{"°Òi?ó4óSãMºj’£wï­^‰FÂĞç„¦hsÏx©Û‹›úæ~Ãƒ“…‹èê»/í!#| Ûj¤ÿ€Vö÷bÿ.µo&«„A§>³<Êy–
+-äØMã@£ø ª•^ğ/PK    y´jT&§±L¥  Â  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-ca.php…”½nÛ0Çw?Å”dˆ÷4ı0£	¤A›­0„³x’‰R¤À£ÜdëktËÖèÚÍoÒ'éQòW:ñd‘w?ÿ÷?~hfÍ`0<:Àœa@ƒn/n¯Qò _U‹A)Ÿ'à©”Åà`l+£yÁ£eƒA;¥ó ¨ÔV='ı¡,¾GÄšÚ­bf’p9—óNĞFwPëÂ;­Òpşù
+W¿—Øá`ğ&æ.¯Æ_ò«ÑÍ§oYÌ&t²	¬~ï {/Ø¯×w·'pã€ÿıü5Ch\Õ¬>ÉgoŸCg-!ŸI/B‰`Ğ “ŸkµŒJâ•¨›[r,
+j©l’ÀŸ£¼uĞGÅ¯$ê&<ä51‹¶=iE3RK+Œ*ÛA´'‹G˜¶:¤a¶pJÛjÃYÁÎd½Å
+½ø#H–;SÕ*<$çŠöIGVœj}ú4!ú¬ˆ9›ì!Äm¥Eu0Ò]ô÷º}æ²Û¨-Å•¤úôİM½ö¯’½«ó2ºYí”y…|(n¨Åkñ?*OrQOæ§ÖÑ‚0×—hdrÒ|m9 Xõ©½#×Ó…'1`kbÎâÑãQ¡lm×¶8uÇéSæh´ÊQ)¿%¸œ2’…Åoì¢Zòa»§ñu7Ø»¹mç{{	ú­èèŞ„ÜÆm)Lã%
+úÚßY.c(vßÔd¸»:>+WŞˆá´•¹ó:)€4F7ZÂOš¹3’cÃë†ò6“_í#ëÊ>Ÿ«Íñá}ÓÀuhòå3³U¡¤_àò\ Ó•	g}ØÁáñ^Å3³Irhç	K4—[ãT¦Šiç‰Üõ¥¨$Úƒ¿ş/¦\:şp˜xBd@X;›ÇÇk­],tµËñPK    y´jT	=‚é  N  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-ch.php}”[OAÇßû)æÁ¤Êë“!õJH£$`ˆú`bšÍ°;m'¶³›i·/„p©D.ÅHTLÚLSZ°Æİéî“_ÁÙ]¶PºKŸºsæÿ;ÿ9çÌÜ¹¯gõXLŠ!0–ÅQ¦MMBœCÈA’)Àiñ™ J‹E¦$Éä0Íf@Bsa€´f ¥1ÁqæBèPy	3¨Ş*,°¬LàÂsLÀ,czB’fff†GnÎÜVˆ4Ó2Ò=±[ŠÅ®¹êÑñ‰äybôñÃqWÃ
+d(Áï.ˆ?|6œõv­öïdÛnı4Û§Îá²]+[_Ù¿ş–æã·ŠFR˜œÕ(‹&€Ù\±_Ú=¾zàÌf›ï´"˜*dP&“¡¢ !5
+cò:_©
+²U©	¬UÙòy’4@DyÍÉyD©(©O;#Núk`ZSç€·-Ì"Š¦b’9—z¾sØıtĞ=Ùì~.‹º…Šg‘Rè+w ö«Â¿ÙûË	¦uÈ+¥ñTˆÖ®vœ­*ß\0ÛˆôBÓ‰§.{÷d½nŞ['¥«‰†–—ÓîPª¦–œİ/İí×VeÍ)•­ºµ[ræ«‚u¶âÍ’Ùz+Ğ¡Æ„2(´>ÏlU÷º«õ¼HÎ7ùÑFdË1)ÂVe¨ªÆ…ê	Ğ¸g‘ğÂç½;çM!-èºføc(ä€Ïç‹%§´È—~ôêR|ú¶¬ã†ğË×k|¹1åº¡±ŠBŠVç³ßæ•wæŸöÂ‘U_3›%³yøzÃìì›­–H…\“~#rHÁ:öõkàºƒ^ã¼í†Hp¹U!5¦8Co…‡÷# iš‘ˆ’ç™.È¹¿Àİ˜¹~ø±á+(ÈÍÓç# PdÅë‹®2R„†ÓâšPtéƒDŒ€€0 ]¹‚İQ44Ë¡X#rSÚ« %ƒ8‹xˆÿPK    y´jT´Çé“Ğ    4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-cs.php•¿nÛ0Æw?ÅÜfHv·E¤AS 	Œ¶S‹@ Å³E["	ò$Ôz‚.}€ “ÇF†Îd¿W’ÿ&rZ/–HŞÇßŞ¼³‰ítN:pg%Æ	ô/úWB¥è z”‹Â_{àpÈƒdà\Rå '´O)£ahH*­H<OùŞŠx*t:/Âûé§ËóÏÑåéõÇï]‘S‚šT,»7°ş½…îY2ørõµßƒÓœÂ¢RÄÓD¤â¸ûú)-6ZcLQb<¦]cZ"hQT³RxkÆ¨«9“ëüï
+t˜µn!‰HŠD£%”İ›–->ğ*Ğ8˜¦ìòVù½‡™¥i”¡÷¬VƒZáúÓ“ººZÜ¥JËÅ´¢c#•mã×k,u5Ë2©~KÃ'ÖÕ¼­ç{—°…½¬ãğ{OíÑÁ*µ$ŞwoZ¢Ëjî'‚‚üD¹…	x“ŒËŸ‹z·£ó&¸áÂ" i5Ò…Å/Âƒç:“EÃàMù8ãjæy4Wó˜m!¤C/ÀHôÕœm)Â˜ıƒ¾¾]ÍÚ7PÚ“`×î;{+I1¥Â°7š•±Ì8Ÿ 3s=‰ñ¸[ˆTÉHHévä®¹–óã„V9÷à¹øP$¨ÉM7şVÍJ-23êé9ÿü›·_t+Îa²ºMÔ¥åskkj‹1ĞL®«ÔÉ“µ•[å	>U[ä¹Êù‰½(¸ˆA¤œ‘Yşää¤Î×Ò›¼Ñ.oœ:ÆìÀ-8Œ•U¨Éï™èQh³Òt‹^>ğ¡ÆìXX‰³¸kÇ«‘~ZàÛİBIR±œ=[â>#­{ä6k¦Ô}ï¬™yùjÕc2Ğ9ãö’Ùd²ÓATv!œ®nü²nÌ\…¢Ğ?¹íe‹;ş¸„zOÚä‡Ú›Ù+££Ly¿Ñj•kïL¹œUóåí¦%üPK    y´jT`$W°  ¨  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-da.php}•ÏNÛ@ÆïyŠ9Tr‹T¸SÚ‚
+´´¤B¤=U‘µñÅëYkwmÈñÜób]Ç$›(’ãıóÛog¾™œ|­—õdrtp08¤Ün~ÜL…ÒhA*Q äüzsô.¨Ğa¥·‚œ^‚ÜX˜+R^µ<ïó´YÏÔ8*¿ä?Í’`†á¼'w•;U÷‹CY~	ËnñŞ* H>x$N29ø%Â½±%,V0U¥@3oÊÖÀ‰¢Üœºş}ãïÑdò.È8»º¾¸M¯Ï~ÿ—!H^eÂc2‡şó’ÙôÏäx§áÚŠ RN¯˜)Ñ&Ÿ^£2C„™O—ÆùQÔ¥±EµCğJCœrh[´HP6Œ Å‡€©-z?r”^¤d|*²k2™¿>êœÁBcÛ7K™:ˆÄªö«´Bç8[nƒœ¢d½A1ç¿‘üä+,–ƒ ÊŒTTl=èo‰$=Äø‘S	ƒŒÌš½„ôŒ_Û‰¼U¥ÆaBplŒsÉ|ŒÀ	(ÖÑİôÆÔH»ˆ¹TzçàúqAø&Ïš*ÍCÈ².×Oºàø„{¹ğ´BZV!æ«íH°9/ØÂûÌ‹J••¡D÷ıUp™¢1™¢–çe*d’Ì·‰”ÅJKUÀFâ°®*–{´©kêÚØÎ§¼º)hÂ5_?£GYƒBjkZ%q@Èû‰{TìGœ•á‘‚©€á^á ×b¦jÅÕïöR²_EÛ¼ôèİŒŒ\İ©‚^—@$óZs~pwåë´ï&[e½®oİÌûQ!·£ÃQZkìŠÒµÑ
+«wÔá‹n¶ã÷ØğcDtÈ'5š9ÿ„~7ÃŸ›yÊMÕ=G*Z«U]w¬øÏ‡¡ğPK    y´jTÎµÚƒÈ  ^  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-de.php”KnÛ0†÷>Å,
+dï6hÄy I4M-–†!‰†”Óø<=CWŞùbJ–_¡ƒh#H$¿ş3ÿ|ùZçõ`pzt4€#¸Bª„†‡ë‡{¡J$(…Î‘!Hş¡äŸÎÀXg¥²98Ú–Â)£A‚¥ÒÊ©¯;ÏüV‹¤ğˆ5•ÿŸü÷èænü#¾}¿ú‰Æå¨J„ÃhısÑãıÏ‡ãKÌùìF«mRÍR£3¼’¡Mò’Ãè“èó[vb´ÆÄÅ¹±îö-os*ğŒ4U:õæMíÆk>9’uX–b¥Â‰X‹$ÁÚaMB±.øš^R~i•äD1ç|+cU»×¸Bkùt{eot.J,<”ˆ†èÄ¤Jg›ó=äIO±­ ·&í´Bñ“f§H=c% 4\í/v¾:ıı+—‹œP‡¹¾ÉZÕ¬İfŸAô«ÉHIÉ¹†·
+ª½ê¿65êİ”Ï jr·ü{ºÜ—ÿ¤ÔùdªXúæN÷¿P[¼ÑÔú7‰”øŠØª£†¦+màßõ…§·U¿ltÑ°èÒïˆ­›Ğ·ÓªÍNÂôoKc‘¶YE“ÜG[©r?,¥SÙŞy±Aéuİ÷OıAŞAl/ÀôÉ„1áóU;cZÚ¦®uäóĞ-Á‹¢t¥R£7óráæaÏÕdf*Å€:çÊ±ØN¹ËY©Šgú›[hÇÇ¸ªåò¯Î6åá&ªV¬˜İi¡7óBmûjCË?ÒFVeú­ñ}œ.LQñ˜ó»ğ Emåê¸Ÿ¦›t—H3¤è–‹D†¢I0¹™Ùa†³›	RbÊ^·¸×;·<Øàyµ¼R‹7ÍYJÃä”i¹HŠî×¡©ç‹ËF‹+eíZÉ>Eoğ1½ r›ÉùPK    y´jT›–15l  ÷  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-el.phpU]kA}Ï¯˜!Zlû^õ!Z¡•b}“°Œ»“ti²»ÌN‚¾µMÒRhAğQAÓ–Xcš/òîü%ïıhÒlB;3›sÎ½÷Ü;OŸ{A.·¾²’c+ìµbŸílîls·"$«p¯\ãeÁJ¸Ü`R”pSù¬à•+n¸Ç”ä^XáÊõ=Vò%sDÉõ\åÖÃsE/nïDŠŠ»ë¹ÜZ¿|³Uxgm½|ûúC×Ôğ”ks%òE–ü±üîöû¿ô1´a#èl0ø
+uÆĞÁõt˜>€¾nè&Lğm‚[=İÀçˆ=œÂE™ÖòOæ¹mßó„­¬=?TÓÜ÷änès\ş…nÌ	1£¯n"h&«Ã·<_YÜ¶E „“/.aıLÄÏ·.`œlŒ®®¡O;´è˜ĞÉ u´3¹E5PŸ­ªC¬MÄs#Ñ„V©V·ğú_ú”å®>D¦®>Ñg0¢Sü:›Á³}ÇõÊ·à)ÃWT;Ö§QšX!şpõ•/«\m°L´OÂ®Íc
+m¶qÜ0L‚gÔ;Dw´à&ÚBé¦JC¸ÔGÙ¤äzSœ0Ì—“êÌË#:0Äİ0,Æ-*É¡Iá-—ùğ¦©"²)# ûf¡à[T"Ú 9}–(ÓM}f0hS™°l×"5“”{ë”~Õ*Q';w“ò‚„mä?%‘[Îá†DQV"NâÂÅ”oƒĞØ—Ù*\/T»zvX,ôr2Œ¹K5Ï¦‘°–_ç×±¸ãÈ©ò'ıĞ—NFÓê`*Tï1ƒ^fìsšÖèf­—†:#¥j¦¦a-|M
+”Â¢£U·ÒÄöî
+ş!{“X2C¤_w‘âÏ´Šãsju2ÖƒŞ-„gm´K?wøY"V«”àŒøSP×ĞLiRØnàâÔgœOÆ»“ñô­Ï9Î/}”!`yMº‹fCè–½ùé6×®QMàš8õñâQVU`%×ĞmÌÆÏ¦ªMD:¹ÇuÃv…¬¹¶DHéË|qÙˆÁGÇ,h¶ô:—.ÿˆÃ+w.ÏùVœĞí²Gd*—ÉÄéÃ`îæ†Qlß?ÔQº™&o}=ãzPÂ±™­ª†i]PC!9añ‰øPK    y´jTyûh‚    4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-eo.php”ÏNÛ@ÆïyŠ9TŠÄ¡ÜÓV-‡ZBq©5ñN’‰íÙÕş±ZŞ Ôà%*x¯Î:	`p ¾Ùëıí7ß|;?»¥ö÷öF°ÓàÈ£DgGg'È5y¨Q	s}€§¹~Ô?¦²¨9,!ê†Pcd+0·ÍY8rK ë1c¿8,«Œx ê×ıÑè]~?øz<=/NŒ1Å%Iä#¯`û|‚ñÔ£·Ê†@¾åÚÂ÷“‹³¿&€÷·1oYXh°©*)px?şğ’^Z*c±´!ş'½²BUDcë‡Å·Î1±,Kr‘Ìøê­s„înRˆ¸İœ»Sãâ¯¢¡ÔÌ5t¾ *Ä¬«xw“EJ…ÃúHJkX„-æ”´`U¯uë<]«³vƒŸT¦^—¶c”»ß>Õ©QçD‹ši†A9VS!Œ¯z ƒš}g¼±ÉÛÚÿ
+Ë:’§¤¾óÖ$wQ“ÜdªªÃ]Do›b3k©ûF‚€ÆSØtTÔÓØKÇ0’E­‰íg<#Ih­ÒS\7a¤*y#sGâXZ¬ÙhŒâ£"Ï)n4ªyİO»*mº‹Ùå6$ç¬_W›Lq½éÀ,RÉ çmË†”\²Öb M¹cmk£”û[H’´Ü’Z+jø­`äëŸìXcz]yínÕ+=jÎŞßÄhSmWPéé×€òF6%ğB^Ş”şqi*Ï³÷$4ÑÛÉó(Y	Yß“óÖTé@ä½õ=5¯U>„iÑ3Îôšz6/×+]“G‹õ|İİ<eógOÏvÍMH`+EÃ!<ø§gœtS	H×ÍÚ°PK    y´jTy´Ò8™  ¼  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-es.php•ÏN1ÆïyŠ9T
+pwJ[ 	*½UÑj°gÓ]Ûòx£ò8<@O<B^¬3»,ùÃ¦47¯g~ósü%Îãhtxp0‚¸‹èÏáöÛí5ºŠTègÎJYA¢R>æ ~VidNè¹Âì‚‡2$°T:ï²[È~VèIDóK¯Ôö+6y.	×˜3Üå&ÙG8®e1ávq2«%vbBıYÂG£š~zyuñ½¸:½ùús¬ òÙÌ4Bÿûã‹”„|wıãö.ëØİW¯á¥$¤Éøã[ 	Ş“ÉÅ<pş 		°¦´pö%hn1cáC.ĞŠ™ìx:@?Ç| Ô ´aTÇüXÔÄ,Âv Vi(Å ­¨ &Ïø@@œ—O°@³ü†ŞëülÅêgÁ¶š·|öe¹v0Îâ‚~“i6ÒƒVÂÑƒÆ`&¨ÓZ‘˜ÇÓİ¶Ô*ÉÌİ"üƒ"ùuÒšè–à´Ï_£ß'—€Şc§P¥ÚnÕy…{¼ìfÇ‘.¬KdŒÇ°š¨vêF™+¬*LÁŸá<gÓnZ|S“H<Øx„.Ú8Ô#*„²ñ]×tì&ÃüVÎhmZÓ{³[~á´W/Wè\ ¤ã)'.–OØ!Qİ{ëznb©³½à¡ÛR§wŞä ÛbøÁ:c
+2^4Pç9İÄ¤Ù*o7bûÀ­$CE[Rgç‡Ï’µq¼Ñİ­A½
+¼ê0÷@~§Ÿ’áßNÙŠ-µ—.Õ»Fƒë‹ş™Z'éZœu;{ûmËçÉNéiãéğHl½fÃ¥,09{L[åM|ˆúB–¢QBı#>e×Ã!ÁÒÂ¢vÌ¯"i]İöPî¥óĞ!şPK    y´jTıvMó½  Ğ  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-et.php”ÛN1†ïó#T)-já@Uh© Š(êM…VÃz²²k¯ìñª}Ÿ¼w½Ë‹uì d¡å"(¶ç›?ÿŞ}l§í`p¸¿?€}q–ÑÂøËø¹&5Ú*bE0Ñ¯G` event. Any data that is received
+         * and buffered in the socket will not be sent to the child.
+         *
+         * The optional `callback` is a function that is invoked after the message is
+         * sent but before the child may have received it. The function is called with a
+         * single argument: `null` on success, or an `Error` object on failure.
+         *
+         * If no `callback` function is provided and the message cannot be sent, an`'error'` event will be emitted by the `ChildProcess` object. This can
+         * happen, for instance, when the child process has already exited.
+         *
+         * `subprocess.send()` will return `false` if the channel has closed or when the
+         * backlog of unsent messages exceeds a threshold that makes it unwise to send
+         * more. Otherwise, the method returns `true`. The `callback` function can be
+         * used to implement flow control.
+         *
+         * #### Example: sending a server object
+         *
+         * The `sendHandle` argument can be used, for instance, to pass the handle of
+         * a TCP server object to the child process as illustrated in the example below:
+         *
+         * ```js
+         * const subprocess = require('node:child_process').fork('subprocess.js');
+         *
+         * // Open up the server object and send the handle.
+         * const server = require('node:net').createServer();
+         * server.on('connection', (socket) => {
+         *   socket.end('handled by parent');
+         * });
+         * server.listen(1337, () => {
+         *   subprocess.send('server', server);
+         * });
+         * ```
+         *
+         * The child would then receive the server object as:
+         *
+         * ```js
+         * process.on('message', (m, server) => {
+         *   if (m === 'server') {
+         *     server.on('connection', (socket) => {
+         *       socket.end('handled by child');
+         *     });
+         *   }
+         * });
+         * ```
+         *
+         * Once the server is now shared between the parent and child, some connections
+         * can be handled by the parent and some by the child.
+         *
+         * While the example above uses a server created using the `node:net` module,`node:dgram` module servers use exactly the same workflow with the exceptions of
+         * listening on a `'message'` event instead of `'connection'` and using`server.bind()` instead of `server.listen()`. This is, however, only
+         * supported on Unix platforms.
+         *
+         * #### Example: sending a socket object
+         *
+         * Similarly, the `sendHandler` argument can be used to pass the handle of a
+         * socket to the child process. The example below spawns two children that each
+         * handle connections with "normal" or "special" priority:
+         *
+         * ```js
+         * const { fork } = require('node:child_process');
+         * const normal = fork('subprocess.js', ['normal']);
+         * const special = fork('subprocess.js', ['special']);
+         *
+         * // Open up the server and send sockets to child. Use pauseOnConnect to prevent
+         * // the sockets from being read before they are sent to the child process.
+         * const server = require('node:net').createServer({ pauseOnConnect: true });
+         * server.on('connection', (socket) => {
+         *
+         *   // If this is special priority...
+         *   if (socket.remoteAddress === '74.125.127.100') {
+         *     special.send('socket', socket);
+         *     return;
+         *   }
+         *   // This is normal priority.
+         *   normal.send('socket', socket);
+         * });
+         * server.listen(1337);
+         * ```
+         *
+         * The `subprocess.js` would receive the socket handle as the second argument
+         * passed to the event callback function:
+         *
+         * ```js
+         * process.on('message', (m, socket) => {
+         *   if (m === 'socket') {
+         *     if (socket) {
+         *       // Check that the client socket exists.
+         *       // It is possible for the socket to be closed between the time it is
+         *       // sent and the time it is received in the child process.
+         *       socket.end(`Request handled with ${process.argv[2]} priority`);
+         *     }
+         *   }
+         * });
+         * ```
+         *
+         * Do not use `.maxConnections` on a socket that has been passed to a subprocess.
+         * The parent cannot track when the socket is destroyed.
+         *
+         * Any `'message'` handlers in the subprocess should verify that `socket` exists,
+         * as the connection may have been closed during the time it takes to send the
+         * connection to the child.
+         * @since v0.5.9
+         * @param options The `options` argument, if present, is an object used to parameterize the sending of certain types of handles. `options` supports the following properties:
+         */
+        send(message: Serializable, callback?: (error: Error | null) => void): boolean;
+        send(message: Serializable, sendHandle?: SendHandle, callback?: (error: Error | null) => void): boolean;
+        send(
+            message: Serializable,
+            sendHandle?: SendHandle,
+            options?: MessageOptions,
+            callback?: (error: Error | null) => void,
+        ): boolean;
+        /**
+         * Closes the IPC channel between parent and child, allowing the child to exit
+         * gracefully once there are no other connections keeping it alive. After calling
+         * this method the `subprocess.connected` and `process.connected` properties in
+         * both the parent and child (respectively) will be set to `false`, and it will be
+         * no longer possible to pass messages between the processes.
+         *
+         * The `'disconnect'` event will be emitted when there are no messages in the
+         * process of being received. This will most often be triggered immediately after
+         * calling `subprocess.disconnect()`.
+         *
+         * When the child process is a Node.js instance (e.g. spawned using {@link fork}), the `process.disconnect()` method can be invoked
+         * within the child process to close the IPC channel as well.
+         * @since v0.7.2
+         */
+        disconnect(): void;
+        /**
+         * By default, the parent will wait for the detached child to exit. To prevent the
+         * parent from waiting for a given `subprocess` to exit, use the`subprocess.unref()` method. Doing so will cause the parent's event loop to not
+         * include the child in its reference count, allowing the parent to exit
+         * independently of the child, unless there is an established IPC channel between
+         * the child and the parent.
+         *
+         * ```js
+         * const { spawn } = require('node:child_process');
+         *
+         * const subprocess = spawn(process.argv[0], ['child_program.js'], {
+         *   detached: true,
+         *   stdio: 'ignore',
+         * });
+         *
+         * subprocess.unref();
+         * ```
+         * @since v0.7.10
+         */
+        unref(): void;
+        /**
+         * Calling `subprocess.ref()` after making a call to `subprocess.unref()` will
+         * restore the removed reference count for the child process, forcing the parent
+         * to wait for the child to exit before exiting itself.
+         *
+         * ```js
+         * const { spawn } = require('node:child_process');
+         *
+         * const subprocess = spawn(process.argv[0], ['child_program.js'], {
+         *   detached: true,
+         *   stdio: 'ignore',
+         * });
+         *
+         * subprocess.unref();
+         * subprocess.ref();
+         * ```
+         * @since v0.7.10
+         */
+        ref(): void;
+        /**
+         * events.EventEmitter
+         * 1. close
+         * 2. disconnect
+         * 3. error
+         * 4. exit
+         * 5. message
+         * 6. spawn
+         */
+        addListener(event: string, listener: (...args: any[]) => void): this;
+        addListener(event: "close", listener: (code: number | null, signal: NodeJS.Signals | null) => void): this;
+        addListener(event: "disconnect", listener: () => void): this;
+        addListener(event: "error", listener: (err: Error) => void): this;
+        addListener(event: "exit", listener: (code: number | null, signal: NodeJS.Signals | null) => void): this;
+        addListener(event: "message", listener: (message: Serializable, sendHandle: SendHandle) => void): this;
+        addListener(event: "spawn", listener: () => void): this;
+        emit(event: string | symbol, ...args: any[]): boolean;
+        emit(event: "close", code: number | null, signal: NodeJS.Signals | null): boolean;
+        emit(event: "disconnect"): boolean;
+        emit(event: "error", err: Error): boolean;
+        emit(event: "exit", code: number | null, signal: NodeJS.Signals | null): boolean;
+        emit(event: "message", message: Serializable, sendHandle: SendHandle): boolean;
+        emit(event: "spawn", listener: () => void): boolean;
+        on(event: string, listener: (...args: any[]) => void): this;
+        on(event: "close", listener: (code: number | null, signal: NodeJS.Signals | null) => void): this;
+        on(event: "disconnect", listener: () => void): this;
+        on(event: "error", listener: (err: Error) => void): this;
+        on(event: "exit", listener: (code: number | null, signal: NodeJS.Signals | null) => void): this;
+        on(event: "message", listener: (message: Serializable, sendHandle: SendHandle) => void): this;
+        on(event: "spawn", listener: () => void): this;
+        once(event: string, listener: (...args: any[]) => void): this;
+        once(event: "close", listener: (code: number | null, signal: NodeJS.Signals | null) => void): this;
+        once(event: "disconnect", listener: () => void): this;
+        once(event: "error", listener: (err: Error) => void): this;
+        once(event: "exit", listener: (code: number | null, signal: NodeJS.Signals | null) => void): this;
+        once(event: "message", listener: (message: Serializable, sendHandle: SendHandle) => void): this;
+        once(event: "spawn", listener: () => void): this;
+        prependListener(event: string, listener: (...args: any[]) => void): this;
+        prependListener(event: "close", listener: (code: number | null, signal: NodeJS.Signals | null) => void): this;
+        prependListener(event: "disconnect", listener: () => void): this;
+        prependListener(event: "error", listener: (err: Error) => void): this;
+        prependListener(event: "exit", listener: (code: number | null, signal: NodeJS.Signals | null) => void): this;
+        prependListener(event: "message", listener: (message: Serializable, sendHandle: SendHandle) => void): this;
+        prependListener(event: "spawn", listener: () => void): this;
+        prependOnceListener(event: string, listener: (...args: any[]) => void): this;
+        prependOnceListener(
+            event: "close",
+            listener: (code: number | null, signal: NodeJS.Signals | null) => void,
+        ): this;
+        prependOnceListener(event: "disconnect", listener: () => void): this;
+        prependOnceListener(event: "error", listener: (err: Error) => void): this;
+        prependOnceListener(
+            event: "exit",
+            listener: (code: number | null, signal: NodeJS.Signals | null) => void,
+        ): this;
+        prependOnceListener(event: "message", listener: (message: Serializable, sendHandle: SendHandle) => void): this;
+        prependOnceListener(event: "spawn", listener: () => void): this;
+    }
+    // return this object when stdio option is undefined or not specified
+    interface ChildProcessWithoutNullStreams extends ChildProcess {
+        stdin: Writable;
+        stdout: Readable;
+        stderr: Readable;
+        readonly stdio: [
+            Writable,
+            Readable,
+            Readable,
+            // stderr
+            Readable | Writable | null | undefined,
+            // extra, no modification
+            Readable | Writable | null | undefined, // extra, no modification
+        ];
+    }
+    // return this object when stdio option is a tuple of 3
+    interface ChildProcessByStdio<I extends null | Writable, O extends null | Readable, E extends null | Readable>
+        extends ChildProcess
+    {
+        stdin: I;
+        stdout: O;
+        stderr: E;
+        readonly stdio: [
+            I,
+            O,
+            E,
+            Readable | Writable | null | undefined,
+            // extra, no modification
+            Readable | Writable | null | undefined, // extra, no modification
+        ];
+    }
+    interface MessageOptions {
+        keepOpen?: boolean | undefined;
+    }
+    type IOType = "overlapped" | "pipe" | "ignore" | "inherit";
+    type StdioOptions = IOType | Array<IOType | "ipc" | Stream | number | null | undefined>;
+    type SerializationType = "json" | "advanced";
+    interface MessagingOptions extends Abortable {
+        /**
+         * Specify the kind of serialization used for sending messages between processes.
+         * @default 'json'
+         */
+        serialization?: SerializationType | undefined;
+        /**
+         * The signal value to be used when the spawned process will be killed by the abort signal.
+         * @default 'SIGTERM'
+         */
+        killSignal?: NodeJS.Signals | number | undefined;
+        /**
+         * In milliseconds the maximum amount of time the process is allowed to run.
+         */
+        timeout?: number | undefined;
+    }
+    interface ProcessEnvOptions {
+        uid?: number | undefined;
+        gid?: number | undefined;
+        cwd?: string | URL | undefined;
+        env?: NodeJS.ProcessEnv | undefined;
+    }
+    interface CommonOptions extends ProcessEnvOptions {
+        /**
+         * @default false
+         */
+        windowsHide?: boolean | undefined;
+        /**
+         * @default 0
+         */
+        timeout?: number | undefined;
+    }
+    interface CommonSpawnOptions extends CommonOptions, MessagingOptions, Abortable {
+        argv0?: string | undefined;
+        /**
+         * Can be set to 'pipe', 'inherit', 'overlapped', or 'ignore', or an array of these strings.
+         * If passed as an array, the first element is used for `stdin`, the second for
+         * `stdout`, and the third for `stderr`. A fourth element can be used to
+         * specify the `stdio` behavior beyond the standard streams. See
+         * {@link ChildProcess.stdio} for more information.
+         *
+         * @default 'pipe'
+         */
+        stdio?: StdioOptions | undefined;
+        shell?: boolean | string | undefined;
+        windowsVerbatimArguments?: boolean | undefined;
+    }
+    interface SpawnOptions extends CommonSpawnOptions {
+        detached?: boolean | undefined;
+    }
+    interface SpawnOptionsWithoutStdio extends SpawnOptions {
+        stdio?: StdioPipeNamed | StdioPipe[] | undefined;
+    }
+    type StdioNull = "inherit" | "ignore" | Stream;
+    type StdioPipeNamed = "pipe" | "overlapped";
+    type StdioPipe = undefined | null | StdioPipeNamed;
+    interface SpawnOptionsWithStdioTuple<
+        Stdin extends StdioNull | StdioPipe,
+        Stdout extends StdioNull | StdioPipe,
+        Stderr extends StdioNull | StdioPipe,
+    > extends SpawnOptions {
+        stdio: [Stdin, Stdout, Stderr];
+    }
+    /**
+     * The `child_process.spawn()` method spawns a new process using the given`command`, with command-line arguments in `args`. If omitted, `args` defaults
+     * to an empty array.
+     *
+     * **If the `shell` option is enabled, do not pass unsanitized user input to this**
+     * **function. Any input containing shell metacharacters may be used to trigger**
+     * **arbitrary command execution.**
+     *
+     * A third argument may be used to specify additional options, with these defaults:
+     *
+     * ```js
+     * const defaults = {
+     *   cwd: undefined,
+     *   env: process.env,
+     * };
+     * ```
+     *
+     * Use `cwd` to specify the working directory from which the process is spawned.
+     * If not given, the default is to inherit the current working directory. If given,
+     * but the path does not exist, the child process emits an `ENOENT` error
+     * and exits immediately. `ENOENT` is also emitted when the command
+     * does'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.default = void 0;
+
+var _utils = require('./utils');
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+const testCaseReportHandler = (testPath, sendMessageToJest) => event => {
+  switch (event.name) {
+    case 'test_done': {
+      const testResult = (0, _utils.makeSingleTestResult)(event.test);
+      const testCaseResult = (0, _utils.parseSingleTestResult)(testResult);
+      sendMessageToJest('test-case-result', [testPath, testCaseResult]);
+      break;
+    }
+  }
+};
+
+var _default = testCaseReportHandler;
+exports.default = _default;
+                                                                                                                                                                                                                                              ƒÃRÙn,2ñ†Ò:ĞX2l:„ÚxÎ"í]«ŠEô^›§Ux.ßÃÒX‚·ŒªyÇé#£ú/1y1™<‹.Ÿ¯.ÿÉ¯.¾~üoØŠqzÃÏŸ0ıvııöÒ>‡-#ƒĞ_‡gÓ7û¸Y¨ª‡\‚ßbõ8±„@…Z~Ft´,XÒèæª3J +í.äÛ¡5£“eC(¬s¡i#a†ÎsFÊà¦Fè¬uÛ ŠùÌ³€x£´säÌ#ÊÁ¢ãeS¨d6SZçË|JÛÆëËùáäŠ™&‚áÍ)×ª¸ù¶„+Cayÿk•Ä•#l%#Ş–”rÃ÷Yö2{uö$Ê³ìUöúyÌó^K$ÌçÖóÁ²-¤ÈôW™tÕF¾’Et%kÅ*'Ë¹*
+lõônŸzt…+;©Ä(›–ò½—íY+Şû>åŒÏ±î5b5J ÂjCÕÆy ÜĞ±† B£êF	K,ÂN„/CŠ¤„ıuˆ ­á¥\ºß¯ƒÂe¿#…,ïñÑˆ ¶IÊ¨÷Ó»İœ\[Ò(Åa‹•ùËÒé#4Û"í©ì}ïæ7°õ·Œ>H Î6yÇ‰~â§ØB¶®R¦U™Tã¼Ò"ÊX·Õ<§ŠÇ³Ù/Cê£ÆÊ@EÔU
+0Í:%“.–"v²¯sQ¦ÛÊfê†
+k-3$EvÇ¼{EÎÛŞ+µ“RMï½ˆSãQ˜hIÆ£{˜ŞíÃ†½ßÄ³§ã]Ä¸w“†R«mk]/Wñ†~î­Ó¼ª}ªc q¡¶ÎvFãHb/4VM,¦4;üúùë'	erV«S¤m[a…İÂ9,Lk$~§ËÜtÚšïáÑü ã}æMEû3"ÑeG¦SÏum¸Íã ÙSSz0âÎos\îïBQê:]#AÉcŞÄçó(ªê›ô1üÛp¹àÑ×7Q4²ø?Û‡´xältÎºm§uaDŠİ±ôuÊ5“äñIQ´SĞŞëµÖ¥›b’¢Ê¤åP‚~6ıPK    y´jTŸëS ç    4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-pl.php•TMoÓ@½çWÌ)´Bå^@|h‰ ‰ª¬w’Llï¬v×1ö±¢êo¨øÜPoMş³vS’ÔES¼k¿yïÍÌ{üÔÎì`ğp û0âœüFoGGŠrt+3-Õa"‡àp"‡áµ™¶o§ŒÏU 60a'd(ĞAîCÄ|fUšEˆT9}8Ü‹ÏÏß½ı1yÿüøÍ×¡*ÃM TÀú÷†/V§Ë3Ÿ>á˜
+^]Ö5hWJ7´<‡²"tM07„†ÔÁğÑí*)ƒiHfìÃ?Váx‘6µ”ğ´¼€ªz,Âë"
+½…´
+*1•¦hêáI_¡WÊ _hJ­Në¨ª//öÂbaCè½xÚA^Ã~!¥Y8ÿsôl)ˆı &eMfúçû5ˆènŒHoÙ_ıCÆZ7AÎ³«ŸÕ!ô"~Ã´ÜêÛâÚÉÒ•éŒéU?H²Ö.ï7¢eNe Å¡å…-åØœ²ò/(lÑOî¦Â¡b×¶ôoH‹dgVïğ9V•¹FJ;ôp¬´ªÒºó^:jªH¯N¹ªûáÉHdà·ç}‡hUW2jy“Òdéœ B÷÷àS, W¿¤EfBÓÒ©TÆ<º
+]ßÉ,TN:QZ»“w+ú®`µ¨”Àñİ¡é‘şA‰İÿh—µ]Æ>&*ÇÕ¥¬ëHbéºFnJöê,Úœi·Ï—Ö²ëÖ/.I»¹
+
+¬[­õê4£M­‘'„ÇâD9%™ÿ~?¦d%k‚ß“[a²e¯ÍòË³m¯¨ß+OSs{Y7ªˆU–|İ­é†’;àŠ`“uş¡-p‘-¼ìnîïA£2^}OîÊrÅº‘`½#ğZ\tİÓ]3ú>](Gj,këq'”7ÓC¶¥Š9Ÿ—ch
+Öõ„2É&9i
+i‚Áù]ÙĞxb“äı“×±ÒvÁqãt­¾æ7PK    y´jTŠ¶kÏ×  a  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-pt.phpUËnÔ@¼ïWôi“H„{(Šx(ä†"«×Ó¶;xf¬™ñ
+ò7CÄ¯ğÑcÇûHf±Úƒ=ªêªñá›¦j&“{{Øƒ™u¡-[ò;§­³¡Ù…Ù»Ù9rMj4e‹%A!¯à¨Á`áÔ”5û
+‚CãklÖ¢‚^È|ˆGæ_"ÄµÅ6T²áƒ5¨pNpxóğtTÙ eİ~nõkYúb2y·¿?;ı˜_¼ı<›ÉÎ1ĞôÆß+˜:gAYøt~5;€‹î‡•ºë}÷kAµk¾E‚2€t÷²núò)Qn¡<d•õá‰j.OnÁÊº~k’UaÀÌØaSHM¯“¬—*ë£ô¨…ñ†8Ä$*é&|Ë4y/İPA“‰£Œzåò¡»ƒŞ2¦áLn›r…4ÂÈx1Ê*–ğ¢bE9+<€$ÒWÊÛFH	Y‡ÅèÒPÑ¦½jŞO¯ÿ…9)±³s^;ûLI†YGt›“ÄÇ!¨uŒÓÜñ?9«³"FD=*ş2·ÎQìqu…^ÚäŒTOİ½<Fx*[6¼ø@Ú­M>MÄÆço¦g‹J’çœÅÆ­Fˆ»ïFŞÅxP´fhq×4ÑBB 2TÊ­µdˆÌ‚Qô3dªVækPTµ«#Š‹Æ)Áìît‹ˆº¿búôø¶iä~ëÕJ¦ÀDêî'ø6Î¢J'¿qVRJ‰Ò¯HÇr$sr5^Cµ’´z­dI{ïşÀ%Jûä§HR:ÉHÃÒ7¿á‚§±_×Å.ÿˆ+:Å¶i‘<—æit—L(ïÙlK™×¡ÉÆ«qUªlÂÉ0³³ûPÃşV6·QÅò°´yO¦Y cœK<==ºF¾MÃV2¾ DŒîNl»œ$I­É4GMÊUSú™ÈC}.Ãp½ıPK    y´jT"©´  Ÿ
+  7   PYTHON/shoe/PHPMailer/language/phpmailer.lang-pt_br.php•VÍnÛF¾û)æP@­ã*z0àº­ÇuØ‰P½1â¨iÉ]fXÛocä´@NEŸ€/Ö2r$›²îì~ßÎÎÏ·Üÿ¹^Ô[[O···`{¼â’ÑÂÄù˜ŠD`òrr†\’‡m‘° ˜Ëp<ÍÅÛ¢ä°€èÑ†#;sçÁĞœ-Gnd>ê5æb±ÂÚY1Å… &˜J/Éz~—NĞçŒ°_«ù w6zW
+ä/šsWgş§UôiÊ1ÀIâ
+}ûì—j9èŞEgF
+Š\ƒMTrMpX6Š©û!êÈPpé
+ŠJ\½ügìà9Y2%ûs5Ì–ã¨bœU\û1‚#GåBĞE?‘¯ãnm}¥±:|uzükvzøúä÷‘2‘œc¤Ñ–Ï0:öŞIØáüìíd^·ï$‚¡v!´*A =ÒG?Üe¥¢¸Ì¤$Vh{æó„ĞJiœ¦Ú¿çÑ là!U pĞÄéĞSHeDTAE!HÒm€Ü‰‡UÍÃXÒí±³pÁ~ª$×j#Û° S@+{Ÿ½ìÈ©v¥„àêöƒúÑÅ	É.²¡¡n¯@	ä c©¼UÊ3ÌßœƒKpÊ6]ìèÆ„%_QÑu—‡Ü7~¶ûDîŸ¿C“¢´”ÇláBüÂTäN‘rLtâoØ8ß­ÌŒÁˆ™u1Ã<§:’M7zÆ	şÄQ?É¨ªãeö)+=Ñ'²3²j« %ÀA¬Ía[|†-±GbŸKiõÉ‘|É	”K®÷cG”§µ
+^2D«_Œ~•”u`g³ŠC¸ñN£ÓÍ(ŸÕ]ˆÑ0‰ªZŞFÓ‡üA]&És€ş]âÆíÁFNW“]e\KÛá>´ÉÌóÃ[HCesÕRsËí7A
+K„ÏFÒ’¨(R÷9Çr!¥^ó±E#ÖÅeCúÅ¹v+Â<Ù•Ææn¤åL&MëWÂ¬á°Ò¿Ô~èbBß*ƒ7íµ,w{pYßû£éŠ£®"m\™ï®!Èq&Ü¨:{Cz/¥+ySG7–G{uGÔòºêîÄ®ÑCªEGûN4ôS}‹ô†¤³hÜ` kïDPh Ğ¿¹¼ıGb"JÊVni¹¡&¹v+².¨ŠKçF¶ÛkÏÃì^ººf	GX+¼;b´V€k´aàÂŞ´ñpßhŸ‹„ûêªXgKyşì¥^eâõ3_Ó9âÒøCwº÷¨ı×pÑ]…V´û_H÷£éğiK¢Îdt±^X¯ú<Jïı'qFÃò[a‘Ã—xgä"çòVÃ¿c¹ Ç5èg"xn•ş€rô?‡^ÛÔÓr€ íµ,è¶øPK    y´jTŠ  	  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-ro.phpVMo7½ëWÌ¡€ ']7èÁ€›¢5§	`§F’öR‹19Z±å’?;×üŠ 'ÿ¬Ii»²×› :IäğñÍ¼7C=ıÍ­İbqxp°€xc{4
+\¼¼8G¥ÉƒFÓ%ìVüó<­x1Z85VaÑ£	£²VÖƒ¤•2*ªïÇŒú»Cñ_†Pyõp±ø!ÿ>yuvú¦=;yıÇ?KLqM&*‘–—°ûü
+ËSoÑ¼=wq')æ¨ÇyB@ Û	c³üå>äUêº›–sáUÈ¿É•("r
+Ÿ?€,$B$À‰¸[µà¼½ÒÔş ùZp–I‚L‚óDÖ'G™MOÿ%Í•¸`’>1=çiCF
+Âñ¨Ç\2mƒºı¤Jnùª÷(¸z˜—¬»ıT)ö\¶¥l¯Û5¡d	¤2Ài5\ì1Ê9Š?ß)“®! ß.bB­Ş¼Íò6Of~ÔüÔ<9zT‚š'ÍÏ&ë(¬1\vmCœ‘æ™ÍQEÆäùÊ¤Ëæ¼N#¶ÆÆ… I./§ğŸsÑ5áÄg"Ôx^„¥ŞÅ›–5	Ø,Å°çY§¤«ÔÕÓÇ°\èn”ñUŞÉ¼8ßdl‰…=†IkÙ3ôäu‚°sRBH}m)¡Èí(3îÀÜAYÓö*„&Ÿ)¸Ø¶Äà4µÜÓ¥â!,/¤VfYÏ•ºı¨ÈÏ€ZGf9–r8=¾DRk%éÛ¯ñ¶oWyœd¯Œ¯ùk(![¥'¾äGgÏ°Ï€
+iÔ2x¸ìO Œú"ÁMT{±8\Š)2Kà&Ì[¹ÏØÍ4ğ†÷eËMìGåfà“¼PZ’vĞÅ”%>‹?W§Áòr¬\ŸóÎıÌ!ÕH5êÇ¤“à¿[,±›ÁZ/w+°ù:ÀÀn ˜?Û—7¢Lƒœ³¾>ukÈ!¤¼ûÀHá)»aCMTü§«¤ø8Ïbä¤®ŒGAš%åolõMıE¾âş„rŠËöœxwjMrÓv.N#¨ÎÜŸ@Å7€}Š{oS™º½)ªü¬y3ÜG×
++é^Ÿ>³rË|ö\K×ûÒ¾2ü Ïµ¬Ï Ì}ajšÅªoËÿ%,¾ó%)’"ƒİéàç¼¨·Ôfè÷Öô¬<f6è²m ;¾;ŞÄÃløõ„ÒXTúPK    y´jT;×ë¬  Ç  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-ru.php…UÍnÛF¾ë)öP@­Q'è­pÖF‘ş Ia$½±¥VÒ"Ò’ WJr³¤´N!ÃF^ósÈĞª™Èú¡^aöú$J	eQ”5Úoæû¾î6ÃJåöÎNEìˆ8ÖÒˆ£ŸîKİR‘hIÓèÈ†uüº'"UÇ Ä]Óhé¸)l$MÜ’VFÔƒHÔT]muW	üİRÒƒPú)Å‡¬•ÛÄ‡-õT=ß7;mù8èŠ}‰ùõVÔù¶xú‡ ¶XÀC<iêVKìë¯¾6Û'AP_¿]©|F`‡?ß»ûÀ»wøËª”@«}iUõX¬şîˆ*¼r/`—0D<¼ÿëÑ€¬‚F®¡½‡ÄıŸã[Õo6AüÀå[¯‰e~d©p¸B€Ôõ]Ï]X@†	Lİ¹;…1†Ïò&|k×õğì	Œèé¥EÔ¤•	¬'}_…VÕªÇÿS¡Ïaî†æÁ‚»ŞD`eü ¦M£Ğâ
+á%¤ÌØCÖæpõÜÖ3g0"ø=Qšø©ò;kú¬%áí÷0Ãç;Lœ	ÔeÈŒMas•#Í¸§+7(G!+39q\=Ş@q}"%£êQœ`"ÜsLyªlKI)ƒP™bÂ<åÛü&7Î\¼µf÷×Ê7A}‡ÜÒ
+{r´½:U­¤™Ü(,ï5ùÊ09	Ş&æğäÔ]”#h[‰“³>8ÛEÁÁÔ–¼ì ;œÃ„&Ç‹6Vûù¥Î
+£ «kÊ“µZT‡°^3BBÀ5'O¾DP‡l­>ù;5F^º¡È=s¡q·Ø>›k<…dÕ|i=mŞW<Mq'ƒ('¬Gü{ò7çq§´ØŠ×¢8«qâ2®8şËñ¸³Ò¥‘òu¨qUÅk²~z‡L±—;[×–UøÏfpã	Ì¶b;´Ï¼6J ÕY‡¥´!÷ğ#C²ÿ„”FÒrueK×ÊD}IëBš»—È.Y‰[ühUTêŒÀ?ÑdĞVå½lÈ¼mËÄºa6·×ÃKåè­Œ·¤jÛĞ[mırİLÅ<¥¹s¦Ğ£®·¹Òiy•âŠ¢ Z«ú&Îf¾-te¤åo¸³buóEU6ÓKÉf~´œjÆÔÛ%îz«ø‚‘S¼Ÿò«eàÎ·­{«L¬ãµu„ªxÃf~Á¯&liøÙÇ‰Ğ qêÿ PK    y´jT@‚ÿ0!  u  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-sk.php•Án7†ïzŠ9PkzŒë&1;.«BíSƒ`A“#‰Úİ!Ar• —>„=äàSn”£÷Êp×+[Î*‰n»œıøóç?£ãçvfƒ'8€ËÂÔ"‡ñùøBè‚¦•˜"LøñNøe0pJÓBû'È"hC01N4é k^‰ùÂ
+™'Ä–Ú¼U˜ñZÎDWšrÇeóÒÃ‹iÉÅ‡Ò”ÏÖ1°‚¿\¡e×ple)HçOÛ­2ü”ö;ùóÍéßÙ›“Ñë·ÃD@
+ZŠ€ÃwĞış€áåÅÕN3î^Î×¸6•NtWRãáğ÷¯yÒ¡ÙÌø°Ÿ7ÂkS(ÍæÅ@BÕZ,ÅæğÖÌ‘4‚7Ğ|áÑÕèLÙ»›AddB&¤DPßõìö*®‚ J{j°NÏEˆúpXÚ°ÈJô¯¦EİáÆ.®–Š²noù±^ôJB’FišŞŞ1F¸¤¸*òøQq¤ø”GĞ‹øeµs÷WàÔ‹ÜûÕH¹l,ñş!$Ùo¯k½ V3WHqıŠ±HåŒW:sïˆ¬É„Ú8ÍwhÂçÿâMØÄ	ßh6IÁWâÊóÛjo%GN9dô—ÃYwk=‰~¬&Ï›½æGÎu25m8$µ LmbjœÃ¤¢|_¶5Õ¢Ğ*J¹Ö6t£·<‡ù×WúŞ¢SÛp¹Å6ÈÿpğH”VtÀÏŸvy‹ïóvÛğ¼ãü¦lFSÓa¾²Ö¸¶Å³=åòB³dà»f¢5ŠËRºãº×DË‹Za‰•çÌ ,…J“@ğ(Ø¼g•Šªín·­§g,ŞÌ±”Uï&¥¶I•ß	Ù£¹p’P‹-ÊÔéÌ¾ó{-ñzJ_·wB·C’çË¬¾éï=—íË`³nPŞëëÔ½lW~ş–Å‚'¿9ÜÁt)D6bÚáYõË¨…Óâš{Üã£ŒŒ°™Ì†3÷SšE<2ø¯kùhm“—Ho÷Í0Î±×†²R{¿5¬±)®Yš3ËÍ*Ş8ìfÄPK    y´jT…°÷Û  
+  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-sl.php…VKnãFİûµ Àãád…ÇIì Îññ ›@ Jd‰*‘ìjt7	[gÈÜ!¾ˆWÖ½RM},Y”í…%±«_W½zõš§?Ù‰=8øtxx ‡pWIK†àö÷Û+äŠThŠ‚±ş<Gc}.LQ±Ÿ@ph|…ÅÀXä4fÃ[]ôÌbVb±Ú=Å&LtÃŸÕdàK3D§²‰4ÎŠZC“Lê7£åŠ-ÌÿƒSëdJYğgãøÈ'·®pş7NÿS§£
+ggâpFõ2òÓÁÁ71¡ó?./şJ/Ï¯ûg÷’	œa ÁV?ÀàîêË-´Xâ	œ·!F•˜ñÁ04ŞR…Éàû]ÈQS©r¼·€¼Fhqş(‘ĞÌ*~şÊ™@k+nqyØ”¬=˜”VÚ™ÑoóÇRriÑ x+İS=ÿ%Ğz+æOØ
+Hn¶Ú‘#°ÊJl\5Ø¡p5E3¥nbG †j)"¢†Õ22âtÍÀ<OïÓ	a®h»ì5™‰M´ãc@åÎ1W˜İÜV—lšû£î«Á¼p˜ÇEYr0Ãºí8ù6ù|ü¡‹>N>'ß}è¥7cTéD“|£cÏ¬`»*WU>C•¨ïŠ†B5—jJõºÒ{V‰©‘b–‘”†}çİ§ô.µ¨Öáó×H·î-©•jÒš¼×1Y .Q/>Æ6#/}Vz¸Víx±Yâ½Æ3™älŠ¨µèÈÊÌ  c¤bß©&Ü‹rOY³5+”Kî•ø÷Aè¤x“Öìı:#…¸ÒsKœJ¤FÅ¯JrÚ¶&zOÇ¸÷ƒáv=JE¹öO,êçJ†ôX2;ÓxÅî¨îæ…¿ä¤NÇÑÌò×Q«BRq ½:êzÔ¢Äö0ÅFõ©¦²í<[™é”e¬ó0Ó¦îFÆ)µı2`ÓjxêÜºêöË
+FñSGE]_¸Xå¯#cÖeíËqÖÂÃ]Bô0®©èÖQŞÙJQ)â›pâ£×º‡Áp—_…ô/³‹ï$¶ãHk~Œº»µº¹÷UÆƒ¯°XŠÜÙ¨œĞÛ½«ZÎ©§·N<×r¤µïìĞãô
+.ä«‰ôß,2¶¬äø-!îX‘®P¼5Öp^Öı4Ü_²çÂ¬çõÕ½Õå%³÷Ğ´ÙS›f’Ó6Ğ*Iu |gcJ÷Ûmû%©¾£°Ñ÷:Út>~o -î‰¦6'«]^zKîÜ~eåR'{ás
+
+üjpo%w2Š:ç72#çÄ†½o'°‡©ãH}ÍÓÀ—õ\U'³D+|ùí­‹¯_Õ”Û¥ÕıPK    y´jTŸ„òh  ı  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-sr.php­UÁnÓ@½ç+ö€©‡¥@{@€DQE¹¡ÊÚÚ›t!^[ö6‚[Óè	…
+!şÀ„˜Z	I/pŸı#fÖqê¤N‰ïz=ïÍÌ›çÕ;ánX«]]Zª±%¶%¢ÉÛ¼¿¹ÁeKD¬ÅUs7kàr…E¢›:`wU³%ã]¦#®â×2P¬DÌ©¤–mÁğ¹¦ k!wŸSˆiT»Ë÷ô.¾ oa)LA³Ïà·zf¯?`=ÈÌ	[åÏD;~Ğ–îZÓÇHËnàß.Û­à×úã
+ı|ÃV}²p¯]¿1ûÚÕZí
+qZğğîcçáú£{OëH(-]®E}›¿[¬¾µñd“Á7"e` É
+C®]s€$GxÍÌ!d´o^ãı1$Fö&exªgxnÉrıæET7PJ¸ÚÙbıgÔ3[’N¯‡x	ËÇìa¼KñxÏ^Çğ£’Æ¸’†Ç5wT îº"ÔÂË¹,¦ı<İ£cº¸‹g2óÊ;¡Ò@V‰%üP¿t|Ç(g‚_P	}óC[³oº0 (‹‘À)	¦:¶rOªæyØiìOZâ§H,Á®l™ÙÏK¹Â*C¾îŞŒ$J!óòZ©~Ã"ŸĞ"Cˆò>Â§y…+è>|5İjš1[û8®oÿH^ì9Àòœ@ı<1&õæ¨ ªtÅëQ'*``°0£(ğ½7—*j^Q¨ÎaYÎvMKÍ	iŠMt‘Ú§•²®f	W†Ç:áòG0šg‘–9¤ÿÂAªXs4–Y_¹¬·¸XÅŒ¬ËdŒ¼‹™Cìõ¹Ë˜îr5X›·¤çpÏ‹Jb"°ÏÓi*•À&y E1;&™éL&­gQ®~u¾uwë ñ^Qn!K¹¥5$WšÅ-F}Á,‡z·'.¦R‡÷ZÏ¥hù˜aÄ¯öbmËF¦[¢=µ'$“`Â¯¸q,›ê¢{XÈwçJ)b­ë[£ÍÇñØVlÄ¾ÂîÏÅ8éÌ´õyLEATß¾$Ÿ‹0ÚÜæ‘ä;è±˜ûZ-29un“/İCD&½âéYUı*Ä"g/´P±”ãË8¶«ğø>	šÄ|şÅ[‘jáò¿PK    y´jTp=/-ä    9   PYTHON/shoe/PHPMailer/language/phpmailer.lang-sr_latn.php¥•MoÓ@†ïù{@ŠÔC€‡R •¨
+R[E”Š¬‰=q&¶wW»ëäTNåÈSÿAU„øè©¹;ÿˆYç£	qÊœ¬½~fvæ7{/ôP·ZwvZbGœ¡éHÑ}Õ=ÊÑˆdZBŠbÀË]apÀ7‡2ÍÉ…3 m”eD‚’äÈ£àç.@÷5ÄY@,©õ](İ_¨>W?«oÕéÇêªú]}­®¦ç¢úÄ·®§ç|ıUİT×Õ÷é±#ôå)ŞO&ubU<_…P®&—á$o»½{E1_Ä?Yía«õ ätğúøğMt|pzô®@(Åà°İ‹Ï3Ñ>;yÛ©ÁÉe»‚÷…mÊ ¦I#¥Õ˜C§ıt“+)1vÑPYwW+cò gAÔ-F+ATcDR¹âµÃ¤İÛ$á¬gK¡=Ü^ ¤F&Ú}ˆ
+´–[8ã-˜˜ÉŒgÊç¦ŒA6sd¬’ébÁ9E­ÆXTï0áè»¢ñãr­-KD(L¡Ò’Ï!hìÍä’5($Lúe3-º.”µíŞv×ÇºR—W9ŒéÒ(Wi›<å¼2w´l[vÜïh¦%Yåm´Òæ©XŞŠ·4Ü´«’TÍ1ŸEËØ®EÚC.cà,ş;Ië€çd}š6‹¬2ƒ²äª„ùƒRf<Ue§é!§$‚$1+½cd7èp~n­‚+AGœ"Y–¥—0¯Ks¢EmLõğØR³¢gÓÃTNiœp­5ß,qmØflÈìeíŠA”(ú`xTYÎò©'° 7û†¥TnNM`ÍÚ^Ï)SEø1¿evlát´0¡»n×UûÇ©±hŒ2í^sz+¼-¥÷`ú<<ÿ²Æ5Œ'&˜_‚øœòaÍE/Pæ#òå6×`§¶¤dTµËZÖÆ“°Cí[ü·A,Á¹õüPK    y´jTckF÷…  J  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-sv.php•ÁRÛ0†ïyŠ=tÆ-3$w
+-L–Z¦pëd<‹µv„eÉ#Éiéó„C_ /àëJN&†!7I»Ÿ~ïş«ì¬gõh4ÙÙÁ\ı&!İ.¿\^ TdA¡.,r^î¥œ7½]¨é-j§ĞK£!7åRK/ç|îô°Æ¬ˆjÜÅÆÏ8á«™¡†s©uûÏÂşmX*^’ßÈ¿8v2½	¹Ggç'?Óó£ïŸ%!›´—zJ¦°ş@ruq}	9©=øÖhA µ'àğíÈâ8y¿Ë_˜ùtfœ¿¹ñ^*!b—És²ƒlSm|ŠYFµ'‘L·ØÇ«s‹‚\¼'à&“- Uµ¿K+r«ÚÁVÀ‹nnŒ¸ƒ6$ˆtf„ÔÅ&uÿ£lÚC ]îg…~(kz¥_3•©l—‡óƒbAœK¦½ü3]†öŞ—¦r¾+1G¿€15é¾HN¥Új[»¬k/Ğ¬©Ò<XT<uÚ.Õ-Î×H wÉ²xh6Üƒ¥—Å0Ujç‘Í×wê“RÅ¡áÖíÖìÁ¼Ñe˜©ñ0pJŠE”L72WB 7¬§¶f.¤7Pµ÷.œ]Tål¨Œ÷X G¯äuøAqUœğèw×Ôµ±á™İ8ß.ÅÆà[K™¬%«ëõ¢7/›~<h{E'œ,ô¶ï#™OÈò™‹øÁäÊ×éúØ[ËúÔ¼}ÇesNİeeãñ³$²ÖØ’5©{JÕ1G+ñ†mïèÉSõÈNİ3ı¤BÍyœÈráJ!t„çøô‡ŸJÇŞKÃ‡<”‹ù×<Ší¢(€nãXí"üİñPK    y´jTÌ¹ |  ¹  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-tl.php…”ÁnÛ0†ïy
+x+°ôŞu[sèÖmmQlzƒµY°E	’œ.o?J±“:u›\KÔçŸü)uµ›ÍNONfp÷¨°µ
+î®înP·ÒC‹¤:TVüz^®x1Z¸$ÕêPCôH¡Å¨-ÁÊzr¥IG½–Àûq™pá°jg‡î×±‹5Ÿ[¯‘$üìBÔü¼G‚s©…MËéB>5¯¬ùÂOg³w	´øq}ù»¼^Ü~ÿ[$¤¨+Œ²XÂğûÅŸ›û;¸ôŞú3¸Ò$4tm´5Ò¼øô’VY"YÅ²¶!§5ØX’MD9 ›ŒX’%V•tQŠb9^´puş
+¡æ:(…n’+‹›ÒÈ¸Ê[fÏ}Àd";i¸¦éŸ‘°–“ª¬Ğ¤ö€²M•Q&3†À3˜Äü“U7²aŒa/²P|Âi@ê¶\¡Šå$àãv7‹IÑop¬“ôœ’9ßxçĞÆÇ®	HÇŞšr•ZXHK¦…Ît¡#+Ø/@!|Ö¸á·G­ì4QS`g£7î¸ZÚtm/m^IHV²XuT¥8Ÿ†¯±Õ¢ìµËø†h3·HÂ¹×X.n¦õš|s‡Î9ë·]ÜW`»»ïÛĞ¥vRóv­…œ÷‹9,‹“66cU–”²n°ÖtÈ˜¾÷\{Ä·®‰—•všçDy8qıŒÂ±›;ğ1?ƒVôòš7…¼rØDWÓg/±/nÙï¾ÿ°2%SF‰ğ¢S¥_³OôHNkäAüÈ—)Èƒy8ä”ÊÓ›òc3dìË8¯M‹È‰¸4:„]å˜}Ëâ‰gN&íÂ2å?PK    y´jT	I sÚ  ì  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-tr.php…”ÏNÛ@ÆïyŠ9TJ‹T¸ÓVJU¡ Uª*dMìI²õzÖÚ]£&/Ğ7àê#×æÒ7;ïÕÙ„$˜Ô‡•¼~;ûÍ7óö}>Ê;½ìÀUaSåFpyzyJ“<,pH0ß}°4Io ÇCvz‹ì4zeÆBBÅÊ«Y÷zcœÄŠ:ŸÅÂä@OWwŠ¡ºnÎ@†ïõTg8iNŸÓ(#GÄZ™ºÔEsñ`ŒN1ÅÍé‹auÏğ	-¦Å¬”•½NçEæğãYïKtvøùäG7ì%ö*FOİkX~ï ûõüêNÑ£«§ûpá[d€Õ‡&õt·ûæ)/6ÌûhdœßÆ›ÿ¹‚‹¸¡ò*äíğDNGl|„qL¹§¤{İ
+ÿFVAŠıB%Jg2´ò(Ëı8ÊÈ9ÉÓ‚õÀ;'‡?ë)ƒªîV—
+úfV¶B86¢üp}~	9RZqFcbHC¼x(5Ixá>´¢~Q\läa‰ª~£®§³Ò×S»Ò¨;È¹îõäØ¸1äA³Rv]¶0LNÜ$¬k¥¿MW<´&‹¡
+’GA‘VÖË&–œÔ	Á°úË	ÙŒÄ³åÉrÛ¤­Øyox.Ú­eJ^çbF”:åÔ©±áŒ–ŠŞæ6Å7¨Ua’Ø†˜>¡à
+§&+ö<ôgÄÌæÅ?÷­+òÜØ…q…³:V÷¾ºÏGÈB‘fâ<¥¢H&ÑÚÖØrknTB-±õDÇ	ô•…à˜¸>ŠúsÁ3¥i¨I+ŞR¬r%}Ám$íI¡5“·¸M‹ÑAd•ÿq„SC~Z5áŠúO6ÁpFË{Z™Ï£e»YG¹Œñaåå«fŞ›nÚ}JÖ»ØºhXÛãºA«°/õãèQ<&é#³2jÑJ»[RB	‚õt=ı\ğÄN2åÜJÁù`/	.tÑDüPK    y´jTbªø•  ê  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-uk.phpUËnIİû+jä!"a$#¡$@Å¢V¥»l—bW·ªËŞa›,"RdV>Á±ì±ó°óU4÷ŞvûËˆ,b§:uÎ½çÜs{çaRI
+…»¶Á^i.•äŠíÿ½ÿ”ËªĞ¬ÊU¹ÎË‚•àÏm¦E	MÌ©rU¦f4Wi•+VŠ5‹D	 Œ<„İMxx„3T:åuSÿÔµl°çõ¨Ñ`;Ÿ»‰N·”0[uş€şµ$ßŠˆ6ØŸ±–)^	+BÅlçvùÁV’L/İ-n!ßŞã'OöıõºˆŒBr#Š,ÿ¹ÏŠö»Øk;²WöÒvÙ‹§/÷·™½Y:´]Ûs-;qïàhh»î_×q_·Š÷V‰ÂX)š §æwˆÆvÀlÏöôÌµÜ©kºÏ@ï:¶ÿ¦èÎàÁµì({Ğ·º¹éšv åôğ·k{K‰¸áŠMÀÃP$FDÅƒ_–5Ø±ëLkº¡f/àä3¶¾À0g*Œ#©Êæßì 4ëØ>1Ş%|é»¶í!¢n3/ä[Ö—<Z‚¼”ÿ ìàLP¸O5ÊX®‰¸ü8Í$Iš|à	Š· à×ÎtwïøÂ^ı8N„Z„õéÙ	vá¾2×$[D?Z;™—hu›ã¬)GÇµ „¡‹|} ³éîÃ×TÑÍIĞ}z;&»~©RÃ!TË™Zçäµ¤>óúAŞ±½¤8}b5¨õÛŞAKt|,#ğ(Ò¾!ÓÀè»SD]×Äbï t8î xÌ€Ê°¹s†SÓ×fé6ç½£Ë×¢©¿ÎæïxË©Ñ*£l¥õ$‰u.(‡mÒîp134l1ª³pÈs22™LöÒiÊDÂúJ—üü‚3†°?ÛzeYq²¯àÊíÄÈxT€«½5i­%¦ÔÀ^^˜ªljõ€YØ3nÿHóªŒVŒÎFÊß$ó)<°Cj~ötq§4ÃÜßïÖŠù:_9©,«ÕıæQ>sÔŞP×ì‡´f’ ?Ìô€ç«?·i¸ºöññøx„Ö±^ª{•gqMĞ¹–ü¶[*~~©ù–2ù•S²ÅÜµçht„ùËN‡0dj±½îu`„Je¬‚šLÓ™Èüà‡î#¼Ë'j:®IøcwF ÿPK    y´jTÜdscŞ    4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-vi.php•ÏoÓ0Çïı+Ş©0¡ö>l°
+Û4±iTEãÆÖ’+vªí¼B\èiš‚iš¸014$DsàjÿGşl÷ÇÒ.è¡umçó¾~ïûœ¥§’ËZ­¹°PƒØL#‰˜bpGı¿˜¹"{§ÀÖË­"B–@H0HIÀ cş.BÂ:fRÇĞÂ ŠƒNªh#tâ|Ö(´è20ëºa#-KB÷-c‚u³$ÕÜ<±»¶¹²ÚÚn<|µı–hŒšP½ÜH|¦]|b67kµ{öá•µõÖo}eóÅÛº}œ¡”hVoÃøóêëEv,`{cgk^óü—9˜æEvù)uÃŸ´Qti‚#£Úã±Òÿ‰Ü7‰Ó€EÖå§‡@Íô7·³2„O4ñ0Ö¡”IÍüz»"Äj‘ı€Ğ#…ıa¸Aïú²ÈÎ¨Ğ?—€æç+c°HêCÏTV™¤ù£#é4¿²’Oø)•¤±/0(ea„ØÈÏ€çWd¬ËåtĞ+²È¡’uÀh:U£9ÃŠ ·çÅÉA«aÖ†.wJÕÛó`GÆ–©)…Ém¨æ[à|^,–i¥zìgêÙ—ô­Iykx¿Ş®`»¬ç˜÷Ù…Õ,Jãöi³—Îíç¦\bËÂó¯Ñ¬ùõe£Ü%¡ğ=âûI)©<øXôOÅH‹ˆ¸±bŞÇ ZgäúÛ9\¥RÆÉĞâgj’G^ÒsËÚ&Ò±ÙfÆ•Rew…Ï*¤>3J$/úgFpj-îš$¿Ğ®QÎµ-Ø‰N96îgqW/%Œ
+)Ì=£¦*9Ó¯¡ß¯Î–Şî²²CGr"ÒÒ_\7'ˆòÕ-²OCÉsI,IâdJÏ„TºŞìÖJ5]’²gZJ±™tº=¹p²B×]<.ú¿éÌdèÌ·ç^LîäÍfÅÍ¢*£	¥&‰4ÑZã­8Ä?PK    y´jTëî:ÿ  …  4   PYTHON/shoe/PHPMailer/language/phpmailer.lang-zh.php}”MOAÇïıs0iÂAîˆŠQ"0r3d3îNÛÑíÌº3­x+¡°PE„RSÚù0îì¶'¿‚³»hiÛËvŸÿoşÏËÌàC#jı}}ĞÆM¨a):xÅ1B#¡1ˆud’HFË×`¢°r
+†IDÇ,
+¸		Ó¡«aj…1‘¸ò;w72 úFnP½(Œó¨èøı„Á ÿòwU{psUq¹ï(±#H×)òBnÄô·,%n6Ò=œTé[¨Ebró&¹?¸ãúyôltø¥2úèÅÓ×AWŒÇ*ä(8š¿û øjl<Çõƒ½µg½*fsbï§Yû›œŞ»R)!HåJ”2Ş5“µK™Fò»s¶!REà}µÊU{»Yƒ*„rª*28Ò‚=Èö—œH¯93õÒœ½ºŞ…‰bÿ¨Äc²M>ï’ÙøtbUOÅìQøíLWœıJG=Q©†IäZÚÔÛ[ÎvÎ9Ë;»µĞQ;‰ÔxK½›Z?±}VÏ.È„:‰İ¡ô
+ÁXp¢“øè«H¯Ú+v6ÕAD‚íŞ=Y{«VçEf»7Ñ¤1%ìºÖnj½ÖHN‰­¢ø–¼âvB`Â8”“Ø:ˆ×sçv¦,–k"}Ø¥§˜$ 5jšy£<!6wd+›Uq´tÙ_Ï‘›`F&µpY»é’4Û¹i1ï{cÈâ†AM%Ü*/Ú+Çvú—œ9™®u‘…];uêw1j˜45ÔÉèÅlc'e§—¬?›õ¹’(.[å¤HÎÛ+§Ò´U©ø¾»pM¤bËóÌZšqë XÕœUngöìÃr{Ú]²_T§xîîøˆÎõc1n(Í;âÚİ•7ÿ>ğ.˜®rdšÔlñĞ”[µŠ½µ(Öó½,$ ‰á9ûµİP~ûëù#QØ°S«¹Eù¿^ø,'®Ûæˆ0L‰ÃŒ]UÆ­ÇTÅÍ"ŸuNfÀps™GùPK    y´jTg{.ºé  x  7   PYTHON/shoe/PHPMailer/language/phpmailer.lang-zh_cn.php}”ÑOÓ@Çß÷WÜƒÉä]QGQ0Dx3¤9ÛÛvq½ÖŞmÂÛ@Í†aâÆ AJDÛŠË6à±½nOü^Ûm°®/m¯÷ûô{¿ß÷÷{¤Gõ@`td$ FÀVõc¤€ÇQLE`úéôÄ1d€$‘8Œ ¯÷€Âb‘i`‚Db˜F3 ¡1È°F@X3€‚Â˜`†ˆïÌá‡t(¿†‘ª»
+ã,*bøÍ[„Á˜wy·»²¦>ìİµ ÅIŒ©Î/„ÂÚ¼*8·6Í"EY qÆpˆµŸ;›F;ÎÿÇŸMN¼&ÇŸ?ytÂaX†ç@çz ‚3S³Ó •Ûl–ËW-{³nç­'Íßûÿ’KÁû·Q²F’™Õ(†â…]~šo^~åŸö­t¸_Íjo×|È
+dP"“ ,#]+87˜œ¯ğLÉ¬fš{G<[ğ"Ug’Š(5ñ`m`k©dÖÏøñw¾2«5û—Ÿ&DdMÁ$Òî øö¡ımßn¬Û»‹BÔÀày$Çû~ì&‡/ÿlW|‚º™ 487 ¸YºlJşúÙ0„¦#ÒğnØZñåÏV#9œhhªvœ­Üee×ZÉEk»bí$¯¹ƒ˜P…ûØÍ¨•:nVŞÙ¹Ÿ¢`’€1¬HPQŒôtU¸ş½j¬Ø¹?Öñª(¶]:ñ¤ñ²sØ|ÚŞzï#Pu×5"ëºfxNôèæeÑ*íñô_û¨Üv`®ÌW}”ê†–À
+¤ôòC«XçÙUóâK3ujUÖÌjÒ¬òÜ™H¿Y«yz}¸’±EGÓ¾jÜn•~ÚĞÂP!·î0{§‚_°Êt©3º’Ú‚øvÆúX´6Úã`Ø|qIÈ04£OÉM’•ª‰Óø¨I@ÃWÂüİ˜QŞ¹°ÏK<½ŞJeÄƒ•İh¥²¾MÌ¡X#’Š)½N`™Õ=q~P´v
+`¢³ÍÃüPK
+     «rÃT               PYTHON/shoe/PHPMailer/src/PK    y´jT2õ‚¹¡  Ø  '   PYTHON/shoe/PHPMailer/src/Exception.php…“[OÛ0Çßó)¦I´ÕH
+‚‡ªk@…õ¥éÒäº§‰!±#_(İÆwŸ”ª”Ió‹íã¿ÇçâÎ÷2+=/hµ<hA4ˆÆ„å(¡ÿB±ÔLp 9QÊßÂ”ÊYÏısgsæB„zdZ—ê[¤LgfáSQ;äŞ
+’÷|İ0=0(¥xDªß¨ÄèL[![Codecov](https://img.shields.io/codecov/c/github/ehmicky/human-signals.svg?label=tested&logo=codecov)](https://codecov.io/gh/ehmicky/human-signals)
+[![Travis](https://img.shields.io/badge/cross-platform-4cc61e.svg?logo=travis)](https://travis-ci.org/ehmicky/human-signals)
+[![Node](https://img.shields.io/node/v/human-signals.svg?logo=node.js)](https://www.npmjs.com/package/human-signals)
+[![Gitter](https://img.shields.io/gitter/room/ehmicky/human-signals.svg?logo=gitter)](https://gitter.im/ehmicky/human-signals)
+[![Twitter](https://img.shields.io/badge/%E2%80%8B-twitter-4cc61e.svg?logo=twitter)](https://twitter.com/intent/follow?screen_name=ehmicky)
+[![Medium](https://img.shields.io/badge/%E2%80%8B-medium-4cc61e.svg?logo=medium)](https://medium.com/@ehmicky)
+
+Human-friendly process signals.
+
+This is a map of known process signals with some information about each signal.
+
+Unlike
+[`os.constants.signals`](https://nodejs.org/api/os.html#os_signal_constants)
+this includes:
+
+- human-friendly [descriptions](#description)
+- [default actions](#action), including whether they [can be prevented](#forced)
+- whether the signal is [supported](#supported) by the current OS
+
+# Example
+
+```js
+const { signalsByName, signalsByNumber } = require('human-signals')
+
+console.log(signalsByName.SIGINT)
+// {
+//   name: 'SIGINT',
+//   number: 2,
+//   description: 'User interruption with CTRL-C',
+//   supported: true,
+//   action: 'terminate',
+//   forced: false,
+//   standard: 'ansi'
+// }
+
+console.log(signalsByNumber[8])
+// {
+//   name: 'SIGFPE',
+//   number: 8,
+//   description: 'Floating point arithmetic error',
+//   supported: true,
+//   action: 'core',
+//   forced: false,
+//   standard: 'ansi'
+// }
+```
+
+# Install
+
+```bash
+npm install human-signals
+```
+
+# Usage
+
+## signalsByName
+
+_Type_: `object`
+
+Object whose keys are signal [names](#name) and values are
+[signal objects](#signal).
+
+## signalsByNumber
+
+_Type_: `object`
+
+Object whose keys are signal [numbers](#number) and values are
+[signal objects](#signal).
+
+## signal
+
+_Type_: `object`
+
+Signal object with the following properties.
+
+### name
+
+_Type_: `string`
+
+Standard name of the signal, for example `'SIGINT'`.
+
+### number
+
+_Type_: `number`
+
+Code number of the signal, for example `2`. While most `number` are
+cross-platform, some are different between different OS.
+
+### description
+
+_Type_: `string`
+
+Human-friendly description for the signal, for example
+`'User interruption with CTRL-C'`.
+
+### supported
+
+_Type_: `boolean`
+
+Whether the current OS can handle this signal in Node.js using
+[`process.on(name, handler)`](https://nodejs.org/api/process.html#process_signal_events).
+
+The list of supported signals
+[is OS-specific](https://github.com/ehmicky/cross-platform-node-guide/blob/master/docs/6_networking_ipc/signals.md#cross-platform-signals).
+
+### action
+
+_Type_: `string`\
+_Enum_: `'terminate'`, `'core'`, `'ignore'`, `'pause'`, `'unpause'`
+
+What is the default action for this signal when it is not handled.
+
+### forced
+
+_Type_: `boolean`
+
+Whether the signal's default action cannot be prevented. This is `true` for
+`SIGTERM`, `SIGKILL` and `SIGSTOP`.
+
+### standard
+
+_Type_: `string`\
+_Enum_: `'ansi'`, `'posix'`, `'bsd'`, `'systemv'`, `'other'`
+
+Which standard defined that signal.
+
+# Support
+
+If you found a bug or would like a new feature, _don't hesitate_ to
+[submit an issue on GitHub](../../issues).
+
+For other questions, feel free to
+[chat with us on Gitter](https://gitter.im/ehmicky/human-signals).
+
+Everyone is welcome regardless of personal background. We enforce a
+[Code of conduct](CODE_OF_CONDUCT.md) in order to promote a positive and
+inclusive environment.
+
+# Contributing
+
+This project was made with â¤ï¸. The simplest way to give back is by starring and
+sharing it online.
+
+If the documentation is unclear or has a typo, please click on the page's `Edit`
+button (pencil icon) and suggest a correction.
+
+If you would like to help us fix a bug or add a new feature, please check our
+[guidelines](CONTRIBUTING.md). Pull requests are welcome!
+
+Thanks go to our wonderful contributors:
+
+<!-- ALL-CONTRIBUTORS-LIST:START -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://twitter.com/ehmicky"><img src="https://avatars2.githubusercontent.com/u/8136211?v=4" width="100px;" alt=""/><br /><sub><b>ehmicky</b></sub></a><br /><a href="https://github.com/ehmicky/human-signals/commits?author=ehmicky" title="Code">ğŸ’»</a> <a href="#design-ehmicky" title="Design">ğŸ¨</a> <a href="#ideas-ehmicky" title="Ideas, Planning, & Feedback">ğŸ¤”</a> <a href="https://github.com/ehmicky/human-signals/commits?author=ehmicky" title="Documentation">ğŸ“–</a></td>
+    <td align="center"><a href="http://www.electrovir.com"><img src="https://avatars0.githubusercontent.com/u/1205860?v=4" width="100px;" alt=""/><br /><sub><b>electrovir</b></sub></a><br /><a href="https://github.com/ehmicky/human-signals/commits?author=electrovir" title="Code">ğŸ’»</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+      :¶Ûƒ_*öÿ¸×¼lW~«D1©‡GU`œĞ›JX9¢}:S@HyUIGÕéÉWì,nÿLÛÓÓ§"P{ZûÂ©Vâ:g8}Ûo÷KM\`GÎ’PşaNúYÙ’â5?£ÿ¬Â§Ø±X©Bé2¬²IB­şE…ï$[Ø)bUÃ~ş;k“²°ë+mq†¡ôäE.”¾¨¿ª¿DcçäÀ¯ğÍšaØ\º.…™Òv^ñÔCŞÿíx×ˆ÷vwìœípï4áœ!Àİ^ú¸ÔúHá%1µÚ}¤Lg¼`ÎS—D+Œ5%mÈulK
+‹`}8rÛ;Ô0‚,¤§0£/¹˜™SB½å%ft$<9]c_N§‚¦ˆ¡3%ÆT*¸7'>Xe%¨€Í×Ö…NÙ/©ŒS™bXv(ê³ºMTÏëâGøƒg!§Ç'oğÃãü‡G»õ¡¯(ğRİbs¼zO¢	ĞÛ¶å¼şşÖûnCüéËW'9p'¯»°”ÂÏ¢Ô¾Ë¼ØÛ\*ñĞ4 ÒâkcsíYß}ôñĞë-;>)é+ oŒØö„m\3»Òvx*ívÌræ”“zæê¸C²wøÕWƒ~Ê.ıcàh‰|¡½XN@#>Qw¥Ö"
+ƒËFÌv„û®„ú2ÔŠ™û–ÒÕtÃm’TáN«e ®R©fØ²à<ƒ2WÑ÷x±¯¿Ñ áJ”ÎÉB,˜ƒ±ûÊğH%79…èÄ£>œ2úc†«¤Ér6
+èf-ø&ß7ÊÖdVyqsÉãô:¤SÜß²“ú+WbñG"8Y4° Î±‘SĞÌ .Œ)×K?(‡z6aŠ8ë2—³Q¢İã‰+„G_äk-lƒbô>BH}®õâç•ú«î›2(%H™>fºs˜ëBjÁdS@kû®ŠU‰ì¹{ØÑøbÆ¶fdKj:ggÔ6-m‚ËRµÖHú—ßJ²`âl²ï.Hm¹+ÃFÎœûòN—aotÊT÷ƒymkĞ¼¬]TY÷êC§WetôRe?_5¯GÇÕ4p¦ …›{pŸÑ¾¢¬(÷Çèî ¨¬Ïˆ)q~N^v ×!ıŠX¨[öcu'I)ğxÊ½âEÚPÖCPh´‰Ë!#o¢`S€#úz+MÖ'l!ÃÃÄá‹gÏ€ğƒÒFlkày†g_ÖOê/êÇ{%Ú‘Sâ-îÛ:·ÔbQ3â„ĞY 5iu6ìáÚ†î¨ôÚPèTİØ æÉØKè@ƒÓÈÂÇÂœäªôpM_)VÀˆ;“2EqmC‡2Ï*ÃëV«=V,ZO
+TbP¡;ç=ä&n¬6°~Ğ6Ceå¼Ùé^ÚŸA	&t‡pÊ#œ@ AfˆcaÍ×}îÊY»Ûü\alK%Ij›@À/	é 	9ğúJÊÊDttä ¸o5–QB¾%öD‘Cx–ò ãfœÄâ(Mr+Hr>ìGÿqåÏ‹—¯³¡9w|N¸g¡p2¡EÙ”—'èq½«Qçüs¡Sú:Ü“ì _L’N,få‹ÜîÉ}@^ßnGmL™µß__ŸŸ²r£KÉZİN»7:uG*iU¦KémıŸÑcfuQà«C[W½^»…8ê”55³œX$:Õu%åLºWŸº°uº87©Áwµ¬‘i°änºUCT¬
+^à¸0}ê«1ÙŸPƒCíÒ¶/ÔãÀlˆÕ-]½ïØğæê†]]şÈëšÔ"Ä-±Ä„¾ë–Œ®›ÄÎ#áW.M $Ü’…a‘ŒQ7?Lâo¶™NbµÄ›VÛ¼rÆšeBŒr>ÄîµĞfIld4ê2”)‡÷«¬˜Zç-wö,Ò©C¸ˆ“Ğ&În¼@ŞàæÆ‡šu±6lö;Õtº8—R¯÷Ks}ó+ ×X¹º5²i¸"€&€-¾D-™¥ÂÓ;¾€ª€§Nì2¶½»8O‘Üìô§ÜÜÜà…c÷ÚîµÉ;¬å%!ùöáS`[eO‰ÏûÎ›äx»¯Ş¤jœ2qğæÿŞä¤¹Ç¯Í#‹ÄÛ—ğ×&-Lwœõ‡ƒÚ–kØÂÎDŒ=•ÌæPAÁ¶¹!¥RQN97©©B}„B±d‹U_Ç/º$sÇ¬ò[4Ç¤h—Ú¥ú3]Ú?¿‚€_­NŠ…
+·ò¦‚\‘İÚ­QQ‰ÉT	˜Opí™û÷-:S[KIaXèØ|ä—cE;#Æõ[N°¢š2Dßôåº?E¨h£Tş%‚ÙJCşO…ÄÂD-+×-–© ¬™)[Ø<-µ¬Ö¹ TF%PfÖäJ?†‰Wyü^ÆÀ^& S**Š®‚¹–…Ÿ¹ZfÍnSß»¦ú,MBya•[H&1ëI•mï¿lÍ/e‚­aÃ‚.S˜Ñí¸pƒS¿¡•»IBnÖ—£u•à‹ËË·œ²Ï}ÅÂ#Tûªş¬ş,c%"òM“/xjÆÿUlHêfT¹‡FÅ|fWlm2ÂŸÙ`©]'Ãhº.:R&M$*©Dsë˜]’ 0ÑÏ)„PL¼¹ğ`–¨˜U)v–Ìy¸(ÂúRŞÊˆn#`Äw<–ÈpœŞ»Ûb`Œ§v[|ÜO"¥ÍT~!.¨÷xĞn]¶íOúöK;!„›{í 4°ñ¢íp^µ\ohçç¶ÈCÛ=,?€/U¡‰lÛ4¸T‹³u.ñŞ ,ºÚ»ƒ‹ƒÇéà€M:>ö‡rW_¯İ]7³u$ˆ9-½Yfï÷c¾Ìè¥¢tâw©ˆ‰:šÇ<c®édjË¹[±²Û‰ºÂ”"k!»TÑPn¢#ØÓ'VØåIãu%×«¯<F%'d‡:-­Ò3Î©oÏíUMØƒPk¼„“h±Ÿ’|üu½q¼ËO‘ÚİØHänn”ç—Jmí:ÔÉÄ¶Ï+Uf?»ATùm¿Îé+Pƒ+¸$*Z‚Ã!ú^Î¢ÛsÇiÇå…m9ç`P~+ğ‡PÂ°)<wWófCÒÍ·¨9¶t%Ú¶`×O¸wËš!¥¼ĞÉ±¿•P¯ÏÖr68@´p­´Ó“F’Í³†AeD\°›±O0±&Ögxv Ş3H‡m\hK/Tòp…%UV¾œnä¨µBaRÓïïñêcy# B®NF»ƒ=u“q¯‚©ÙI­‡Ù–4cO!}ä^v"¹ì;Mï	Ëˆîjpğ¼<Ï»Ï¤`ÈdcÌd×çì©v—níµrŸĞÒí§ìµNøy9ÕªÙk3Ÿ¨©ëŒ£½¼Gïò}%ASy–h±æPò¢#İ1áH»^y*ìí,àÚØg¹/™ô÷Ügi¶'vÍ[D¶ŒÖû¹æ€¨˜ÛçpÍeXé´3ÖğÕ5ªx‰ÈØŸ"6ğ×#Dæ¦s:¶µÃ RşÓ“ŸÄ²™á&:ÙÂ{«i‘2Y·5M:Tå[f¿ätÏ>×‰ ^2DwÌ.ˆ¬eÑX¸Òë~q:Id`j2G©ëE'×Ù×öÚJ¼óşpnü±Ùíœ5Gíq›®ÑCª€ 1F[ÙëX)Ã²³/Ç[4ív˜=l‘éÓ›´k]a ¦•†äzf}û,ûié¶HUVnàî(>âÈnWŒªP¢ĞTºm­êÃk£JR÷¦<Ïû‹äyŞƒäMş2“‡IŒE¬jFı5BÈmTfÚf¸–‹Õ:^ ğ¼½;;¡$¾Ğö\fŠëUE#Vib_Û@]ú•ç•~5ñ¼½gú×¹õ/°3û#‰»iâ6ß|	Z©Úoi0Ä\æ'TCü¥^Ä±¨ug{Ë÷tKÙqwÁpÃª*Ş0¬ı%‰ÕÙum;ò^«ËÓÎYïo_íï
+ç¶£¦CBÛ?`İvm”¿kİvú»VÅ±ì.ße¹Ãˆç)ëÁå%Ú¨ÅÎ_ì”Ö¢ñ¶¸Û!/ÿKÉÜÕCIaËWÌ’ Kß˜{·Âè‡ÿl­bÆ=.pV´ıÙDşjÅÒ—±)¿±aj’…¿*ôyœ¢ÆGX<ãğGºãÒa5<s2Éıó÷P4~®ÿûpeÒ‘;”YÿƒNİ¨S ÈVÒÚ:»\‹³‡y4¼ø “îw4ÈÒ¹ë]è&äP–œ…cd6&.åíäbCá›å“¯‰³X—©\[‹m\j;<h5YkÎexpôí:‘ ä¯h‰ôNTæo0«ÍN!c{ÙâñİÂÓ¡ä¯ßX4óX-Án°5mn“ş?{OÛÖ6®ì÷ş
+AÙÚn“˜ĞhXH)„³¹‡Ò^B·»—dS“ğÙÄfc³”-œß~5£‘,Û²	¥çí9›§”`ëe4¤yS*—v­µR*8ş Ìî»»©,ñx{­íÀ¿bôÂª?WLŒÚÌTˆ(±:çíM„vø±sØë¾;€~V«e“›`Q\ú‚äº¥Æ	^ƒf’ ¼ôz°„1ßŒœ@tß;z÷~ø¶Óëmÿ¥cæ%½×ĞÕ”S\ô+Lÿ7€Bt> Í{€†#à‡Äq]p|Ì´%»„Øüñ½9ì##Øl›§_\9hlÌv÷÷4C‹ôô%¦Wºÿ\xækÉV¿&ßHcã¥ıĞ‚Úµa€;Üd‹ıY?\,B¸¸Mğ(ğD&¬2“Eæ		
+CŠ—¨õƒPŠz¦.÷>bğVfÆt¸·“"¥¶e@²"”@íÃÛ=ÿk“ìwÒ`%‡ïs0½œ
+h&~x–œkªXòM·Ç£7üØt6şÑ¢B—GS¬ÁÎe6»¼(Jáñ—€ê÷$âS\ÛÙêKáDYcp ~¼Ş\¿i‚ˆføvû'İ’caõùü£G]Ÿ;ÌWÑó^àä!yõjİ
+t:{@âBµÀ1,î˜8ô
+‹‚tYÉ*k«|†¼,Öá}jT¹¶Ïµu1lì_,'ÄÆ&›É6.]´84|‚Ğßo’ó;LßËÎnk«ÕE
+§ƒ—pKÍl=áÂxå«İm„&Ú6İ6Éâ”€w8É^íì®T!êñÊàÃÏ6Še67u8­CŸÈúV¦=€wôZªÎ­úæºïƒÑ¯ “ÖMÖtÓ:97W‰G¹³Ö>6àEÛ|?
+Ã2k4	,‡§Ö&“ ÖbÆ%st·Eu˜ŸŸ¤2Ì©¤G£ë¢Ij{Ğì'ob#¿8(Í–§8Ğ~I~6a,öNı!˜šÖ…ãÇ©Ÿë²ƒíIÕØe‘•Ë.Z4°Ò‡şCÊÙf‚C[$O©VF/˜bá“ÔuÙ©ñUv)xÀ¶wœ€"0T¹ğg§ ?>×d#ä.‰Ëw9%‹@*W˜®œ:ŠªJIÍPOü®**Ct1Æˆ"UåImÍ¶Çã€näÛ;Æz¨š`K„¡²+˜„e‰é*Ğ”Ê ÍàÁ—ÿ¥-äm4ØšKM‚X“}¨ñÜıŠzZˆ‚ò[Ö”£¿Gü´<8ûu‰*Ã‚0ù‰mMOHGõ‡²a¾à°fWÄ*V¤sôd",Ê×Æ-˜Kö®fDÕLUÓ™Ábd¨ó_8ydp›_¥>2+Ûêù! HTMXÎFUiÄ8,=ÎƒXƒ)lf–¥å”6²ØÉ„j±/T@D=º],¯zaé¨ª­(H˜«*MPZ`¦0ËÕ08øßÜLonn*²ÍO8é°7Ùk¨YMüwROvm1K‹á/Ff÷†#]„@e4qˆb°e7|£ëÜ¨pëÊñ*\¶Ke7vs4
+*i4óĞë«.=Ğ…khÖ²NšáÅÊLø4»?W˜æ%ÄÚ6]ZFÙàWî`>]rP<Œğ
+EMÂ~jóÿ=¿-ç©N ØÌ/º1Şå”éµ°·n›:Ñ®4œç–Y4ç¡(¶RßÒ·ñhn˜·‘©ƒBõ\p*¥qÎÎÄ™Ah(†q.ÿ„-áE¡†5vl)?«F®ÀN~´Ğ×èíŒ’½}nçGDÌÇ>:g†¶‹ÀÄ>ÓÀoeŞ2Dê.z$l×1^´Xğ)æóAç¾½hv%‰" b™vÓ×DÚúG"g>÷^lR†! ÒMĞïLğ>uy!´ÇN‚D(øé.õIıÊ—]C±Õá™q%Ñ>èú }¡dàÇv¡ÃåêŸAÆ©İ¶Ücz¹@–˜^§f¬!41²mÏüŞúp´W_·
+ïøÙtœcP¶27Ò`49¤‘	†	“"®jğ‡~µŒå`pl3@ÀMæNùğ9„„3‚Ï¦`¡a[?×§õ1û¡´bË€°Å~²hF“ëÍ‚)	ûq”Jr^;µKêwC°E2¸9ß¯F7Q|®Z×nğ¹£B‚± Ãa„‹µª·†§ı¤ø¬¢iºSä?Å§Fl‡‹yfSÜŒ{~gÂY;²RÄ?€)ù¸˜ ±&\ø*/§DRÖ±ÆMQ”(Ù€rqmI²iû=ß	lµX¹wã6§Öî"~Šnı_†(S¸µ„©ıÜÇ­{t-Ì²Ä]@uw,o±ø]°@£÷‚EÅ»«Y®\P²"ƒÍÒKËÆ£YáÉO÷p~ÙL±5ÎúU1§„ ïr6Íi¡Ğš¨ ªq¯ømìÿï¿
+õ¿Í÷ß½™‹Å]@>~«KÇÚüV‰}~ãG~Ç]”f,Õ¢¥%*eŠ'G“yÓ’)ÊfcÖ‘’Ï
+i2bti^ï5’OÊŠyØ_¯É>DÎ(Æ à0å]WoGšrÊÖÜ¨
+ÍÓG(çŞÍ:!$m‡²°›¬±\kÎÓ±³óçtˆéØÙùv31İ&Şü9r*Ş|Ë¹8ùšÉ@ë·ú7âUhUø>%døí¦Ebø¾sê˜%×Œï‹0şÂH%†`/ì?òÀŸ@É·dû#$ÒÒ>oléAøÊ•
+â“¨ÉJÊd®[EK“@¹A€b†ß0vù™HÀØR(çcÄŸ0@Ÿ]ÁÄ"¬oã’_è'dyÚĞE%Éêw~ïõ}D?Vä@ó„ä"|(`|ŞÈèâÇøpüóNÌ†Ø‡¤ÕÇçÂ¢Y°¾–§ÕÀ_ê¢ñŸ¹ ŠrPó²@\WDn)dmÒ™şÖruâû;ä:Ø…³Á\·‡Q‘P&±`š¶ÉÏ©xœ¡"7Òzm9%ç[¨”?¿ºîvRÃ7 äi ›1É®„HëĞ)æJ9-Š#¬ïbf;-ö]l¯ÿÄ„ÀæÓ¶hš†¸I8#& ø˜ªd^ää@J»• •ƒ¹°”†WÕ$ÖåÊ~Æ-[û¡È¼ºå[“dVZ¦…è‹R—n²c3ÒZ®K´m°Y'¦uå#-ã G:¤"‡=iXd£›PsîÅ}*Ç68'3BŸ=C:,Ü¤ ét+BSZ¾œÒ–á‚öšşç NôU@€ä¼SSŒ±’âÇ²½SJ7íî¨hº„uşåmæ‰¸÷Í= dÔåĞÊÍ	v)ÈsR¢F^İ)æ$LÀ6’÷ZÄeé¶êÔM"m:«Î -É1Œó3¸IlòúÂÔÉDkíÏí›ıÛoßwíÚÆ³1®ÁT-'*pr¥¢.î^»ã<c—’* Vº?şWï‚8ƒr;Ê»åJxØ”ıy ùçMå<»¿yãäü*‰Ğà6vµ‰f]«¶Ñ/Øåíñ ÏU¥*ù1¶l‚e±2ç><Ï‘¡rä´Q†œ}]
+±î]›÷âœ·ë÷üŒ(ÂT§—}¹ı€‡…`ÜÜÃ)éáŞÎúÊJ=N®'˜ÁhêÕÓè¶%Q1hÿSY¶8âˆÄŠ;Ã÷Tvk‘’ÿå|‡]¹S]xÁ,.†Ú¦ŞÅpv:â /`0œÌ0ÚXªµwßn¿Gƒä0ºŒÔ¿N5{ é³ñ¨y)cN ©ÖÀhuæ£ÏªÑœH‹Â±:ó¯£éeÃ_ºpÄr½³?¾4İcâ¹ÓÙIì^ù'.œù]Z¬Â¶²GŞ3ec1SĞái9#¢€ImËi’ƒ¸ÌÇ;7`.Á¸•±´€KìW—ĞÊİOùZÅ¨cŸ2w&f@ø%‚.W$¶¢tâJu„´%bjé`[¨¥°–åe-“;øÒ>ÃÑeóO(`$Ã°J	¶¨Ürİ2¢2ƒÂ*ı;H,„³±¸Y¾84\XVnçp]&73ü'õwàMˆĞ½ND¿KØ,Àdyâ.øb2g˜®(_”Øfi¾"ú `¢1;×=ç¡Èƒğb…ë²›è#føXŞÏGÛ?Õ;‡‡ï´¥QKüÍO«Şu¢©o“;‰>³È{X#×®Á£äâëº»°ü‘“{ÁÛ”±…õğØØL)c2ë€á’kñç1•‚!ô“Ò¤=¶0¸z{’îpÑäTà%çÒ×Hh’«‚™5¹¸‚Xógâ» e–öKFŸ¶õöÍpg»×~xÿ¾sX+Š÷¦^2:·-÷—Í~»ñ´ßŞ\rcM¶^ß’ã.NTÕdÁg	2êï(^1=bÄ{ŞÖPZ çéYÿËKŞSQ3‚pá‚„ˆõË/ÖêDÂ0
+rô×1^|<âË'.m¨ˆ!ÅLE¢C¸pm®,›Vb”ïÇnşpÊ©ãœâ%ï[m¾JêŞfUE/£¥ıZ0XŒyeÏ·ÔÚ&@b§VŞ	ÕÀ~æåCææwJÈªm$´MIä•ÑdÜ  0ŸUÛªI‚¶‡pü9$ş9hb¥20¤|¶mÜMÈ7K›»ï-å÷x.gåQ¶²´•‡¨«óh‚xÏJ™ø½ïÒ_E±,Cµ–U«.i"½ò*ƒ²U&¿U—üˆ3ŠÀâŞ)˜¾×¸SÉ²µ$‘dXÜ–Ôöˆ†ËĞÕFº6ö^G]°/ÿvÛ«ëÊÀà06Šİas‚ó3HiesÅş\½C•(aßiÙv[ö-w\¦‘RéF[A]÷ß_™Ö£y[£»¯İM™q­‹rİC¼gã$Ä—3ôú§«¹Ê¹©æBLÊ÷ÒuÍç¡o-²ªı—!.ìoÁËöŞ‚'E^™0Œ- {€@|9 J¨H=fT^”¼zâp†šø@dm$˜„Ë“û‡tSÀ»$ÜÁ æ¨4ØáıŒÖ:5Ûlnş/2-î:JŠaC´3ö‘¢
+ŒA8„YËv/…æ-2/on˜m/ÜKÑuÌJëlÛà¦u÷	HUy ^¨â›i2Ëæ¿Õ&B Ì'µl˜Şˆeƒk"K‰bA>y"‚óÊ	æQeüíÏŒ}jC(HË‹üóŠ˜21K6©ËægGşè<¤™	eZIdòétoÂšp8Ã¿d¤–+¸ˆ|Šã\à+,4Ñ’ww3€ÄZê,éÙ¨ Ù`®M¢3€Æâ2‘ª`ğ•ŒôÌOöõ }vµ­c&˜_ÂÅÉ—r¢Ğ•/ÆPO ÈèÆTA'aŒpL‰Ó ;zn+ ¦OCxœøq"Kgƒulh.øT¬bèÒÿvp€(İ€¬^Kó’¾ß9ì°-¶ŞXÎ·"‰&cQ&+ÀÏ>¿e!ù©’óƒ%ëÕÀ‡ñe
+©ÙY IXOD¢	ğsz‰)"ñza!6-áÕ…º˜ Ä¼]²¸¡5éÿÎüÏŸ˜Øàë1|ÔTCf>Ã€	¤ûñåô¤aÌ…Ñ¨¦”Mö©¹CPò:›s>U‡¶@ëòZOQÓ²båÅOuB6H^ë1Z5·NEB©lk?)y©KıEi8ª‰pE°2m7øX*Swª•9¢”0ıt#>Fc•,Oc;*°6[’“¢PÀrzF Şóè–×â”jù¾ïˆ$4zÂ~’oOÅFSØÕ·–ü‰'Š„9©$’(ôV¯³óá°{ôsc*BâîüØ©¯,¯4ëÏW—Ÿ—;´g€"gö˜’NäßšÃäL¼r•Œ¢}t‡>.Q=©_¦GÒ±U!Šà²Iü…X`‰ÍÌğ
+<Sµ•'FC™™^¦d¤ø®Ò£¾’„W5°o«ÅGşWé)üf§¤ØºÉeıiá{ªºp¢ÏH ø€³R´ûı(ª#íğ„KÁuEŒ0X\ÆÁÔ#¨9 ã†ée7LÍêÉOÍ¨!-Ï_,áMâ–©Qşo%»IdÙ‰[|~}ò©¤0XÀÆÃK5W¿`¯¦Æ·O&Ş¹ÃSotD'Óó—5ƒ±ÚÆxkÖ"(Ø´³¨¸4;³Êš/§şŒs£ı]‚¹Á!*+}RœcŞk÷ıï/øÚH ?‚¨Ú|µÒh®ò#A£YÖ ¯´ªU²NƒYœ4àÌôúŞµ¼f«5°Lµ¢DF‰ç“û”ıÖ?oğ÷*š	q"å×Z04cx$ìÄ‡¬²Çweyù•Û\á¿]Ü+êRİwCÊ£Ypv0h‚3½æ2{ËiÙó'ìğ2>O¢ĞToÏçïOg¾O	.š™?€ùqCjo5ØÌ^êÃÊ¤T‰øJv,”Ô¦¥P™x	EˆÓd™…’x›t±Ûv{Ën7Å6ÿÒï÷Yıïƒ›ã_ø¨é8_V^¾¬İ:s]å%_;k˜;´±ü§¾õ?/ïòŸm§}ÜOØÀyvÃâ×§¹WÏœ¶c÷EÍ•ŠN úçåfÿ·ÎŞğŸşÓ©÷­§õşqÀß¬ín`üù2ıi·Ÿ;óÚîó/Ïà‹sƒÿ·+z;^x?ë»õW›í_ê¯İ,å°,<.…CQ1ºgÑ¡™è7à»ıán:¯q’šÎ±Wÿc¹şª>ø²ú§®‰5èñ  ’%Ê‡•ƒL»+oÿ%ŸÿåZseõö¦l·[¼rêù:ùÒ¬½€ò[üé*/¿v[ÚçöÕj<•u[ıÁÀù²Bí´•åÚê­Ónñ¿Öœ6ÎÙ–Şy¦ìËÛÖü]¶8EãøÖEó[…ùhZĞgÛ^yy¼\9¸Yá¿^¡úM}Y©åq“—hc9hPüŠ·üüÖqúÄì’Ä»YO©ü†e8i¤š—sïûGšD€ÎÂÚ:Mw´”•‡ŸóÆ6k—é$ştØ¸â7ï«3LùØ¯#K‡#¯_·¡ÃM¡¼úÇ°L ıíúÿñ	k,<^úî‰Xû|å?}¹¹…Õÿ:-Â—Z+ı«> Rm–SƒV‘ST»ÕoÜÕT¦†ótÉıF¤é„æÏCLÏ[ÚÙ×xäÓÃùoQÒräO&±2òã˜Ùİ®é`üÁIrW¤Fñ\ìˆÄO*t1&¾J‚•üƒ7'»ø„‰Ì1+.~‚›nª°,•?¡áÈæD:nÑ|êd ‚»ƒÃ„À‘}Ô<—È¬ÜÙ,¹*šêÃa½xB¯Y(2=R‚s¥&+Õº#JÆ8@Êj
+×n~ºfÛ½nW<»Á?,„KåÅex'ÒdmJôÒÂ½0iIß6+„å/‚íÄ ~•àB›”I²û @¬pB#†–êW‚‰¨)ó³qêÕK§J&Wgº]^u‚X]¯ù½·á7ô$ ø:JÈá½o‚Ôg%549i;ióI¤ğ5ƒ©Êngû³FJh@¦)±qa¿ÒºRµÎ †SşTP$¨&90qRƒ<™NÇh÷ê ¢h.VAHcRÊ¥ñ	ıôşk|ˆ@K–55$ôyÓlZecˆdQ;/¥É¯5×ı‘_´N¯Áçİ¹Šk½ÆhÌ5‘vH8È>\±µÑ)PsB!X íWş­Y¥Š$J*Ùl™z,…7ƒ‚NÎP=IX0ù à…šªİÉµš=<Wğ
+çQFH1iïPdr¯©èO±4ùºÆrÈ3é™\—ølJÔ‚ÀqÒ)(kp¸L1,Ş#¨oÆŸÑ¦Pem¶ySëHÖag åæË°#Ä2˜öN¢K‘Aˆ¼ê$oÅ$¼_3>¥N§d//
+­ÍÌˆHrQiAÓ=8Úrn°Í·øÃîöŒ¡÷bÕ2âW7ÂK“ )6§¼?mïâÂ÷f)˜k³Åë’ª¼Éô=¯Ü¨Xb¾´@G³ÛÙÛş°Änèï½Î°w´û|xøa¿ÓSw~èìüuø¦»Ûe7¥-ÂG/1Ø~:úÕÊp¸}ĞëußlïŞ‘{UiÆ»±‚‚„	Û3¹²¼ü¼j"÷@˜ƒ‚“HP]4A,™[ß%wµcßoåTiYc}3œ¥cœz/ÍJêS¤u8¶ˆõ`¨MÀ—•ÎÁ©ù2ôË=0Ïœ—k­¡‘¶±ñlwJO†¨ fÒå¢q8PIÑç‰äzŠ/ñ«œ8p\³%qph<ÄmX 0
+)¡Mõ|ÁlĞr¡Á™¥©³H‰î'x"’ië¡ÔF9añÌ®MÎ†ÄÇùjèa-ÓTš…ÿ¬Ô†A¶Å‰hT»@ñ›*
+¦0ED‰éµTö<ËºËâãó¨¾uæK½¸í<Ì”Úûj‹ƒ+à¬—u"ÔdÈ¡§JRPóš£†ÂéM„·Z<#=d‘f$bOÂÑÆîCÎÊ€ÅùÛÚdëËüC*§@¦åx×ãÇÉİ2ı^®°;r]L—1…mì÷vêxœÀ|WËJçªyáX³ò@™œÖßÇ GWÙzòÊÉj¿c§éˆœ»ìößÂùNSÀ¯¯àˆ `òÖDh\ÑùÄ?óF×.éò³ğî)µÒ±X ®ón¿D˜š9C˜÷k<’Ğ=Â;x;BÚÛÈHSA™²
+È
+*)™üL! %¬!%ğ·ùwßÃ«æZJ:½j–7Ô\~^4|SÁ2Ñ²ˆ#bøy(Ah5­|*z-¥V^B¹ç;;cè†Ó2‘•Sc8¬?ntş’™ÒGi[×f¶˜OôˆJd8ğ—¿¹8ixw}CçÿÙ{Òî¶$¿ëWtm@Æ<|ÄN,Yv8¶œhÆ¶´’<yY‰‘ „1	Ğè#ïoß®ªîFŸ )Û³“÷Â÷l‘@wõ]]wUq`cJu¤ßÅ„¸çÉò2iùÃÎøƒ¿€”$ø>âÕÙía•ïÃÃ«RZæSÂ°ø	8¸r¤eŞf7™ñh<v]À³‡nb²!Ô÷§Ş¦“D3–Ì™‘ãÎé¶ÍKÛW0ìÛaâz9o9M—óãÃè+ï_ğ³`€.Ao6Œh¨;BQÄ@rÒø×÷Î¥\C
+aV‘©2×a	ZÓËğ¦\¿çaëÜM³¾îšq@®kµ+?F·Á¥½…=³ç'õy¨¯´!ğÆTäµƒ\'ÃÔ8ÃJµG„^RM¡¾Bx<ÎY¦à¸×+Ã­ÀĞµ"û$«÷nÈõÃ¼¿xõüôàhp|:€2æåàôàïûµx¬ZpAğxÛi	nÆ)Ø6ÈxµhôÊ1„¹H†ö.A±´`öĞpµ2LË ã4€2ûÑ6«†\bík¡y#wÇ5‘<&xy‰Ğİ¯ª|“x"Ê™èöÄÉÅE ;¹Ó.¸”½uš‘jßÍã×I!¤y(*—¥H˜{c,ã¬˜&K%‚iûúY“&P¦½ÂÈdûÏÜ­Q½CZ”—Sä3pô“½å³‘Ä´çGfnµË×JkÏíênãHŒ~ŠTeí¦j½=£e‡œ;Íù2,P˜Z^I«¸²:î „Ü‰ê#yNœ‰ÌÙ‚k ÇQa'gvów‚D
+ÒÍ*y=úQ€sğ/eõÈÍÎ¦q{ª¸NÈÚŠ(°¹¡4®®šH‚+Z‰À™®CúÆI·
+Ÿ´³­%g[³-o?#qlW¹¼»Óå™8ÀeÎšĞ	„]Eváéß^À¢Š<aÎŞ0¸ª$¨>
+§è7ßøJ“ùi¾ô–oy*ˆL‹Âî×­&¹ÑpUFM*½Vq„öe29ŠË«á@jy©_»n{«ş‰÷â¦]6š¼Nç’Â¶8Uê®X M¹ùónÊNSGª|ÚÇÚ¹!Ì,§"™Ñ/'G-§0²µDßÃY"“y¢ş‚ÖŞ-}®-HµGÌ l#ëEx:—+$Éˆ†S÷$1$‘ıŒÂfÎ 7Òbşå$ªJªİ(`¡\M"É÷*ÍôguyeÓ–Ê¾é’D2«JE³(ğ&ğ–9âz	
+çlñ}ªÚ»¡. y­yÁOmlíÑ}ÚÈ‚feğÙ†™{AÊ"[(Ş#ÁHæ%IËd õÒËAøÇ¨ÕºŞ0Yuø¾Ôl~ÜSÁY	€öd6.-*7(	ş–$‹Á\=ö„Ïy˜%…úİG`áV¶‚]¼¦´e
+_±Vß6
+NIYªÀš‰8ÀR*O¨ /—ñ¼Ñ€JV¨· üÃ©&r¼K ‚HÌ­W¸¨rs:Vw-›øO%ğ…VmTØ“"‰–V°)'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.default = void 0;
+
+function path() {
+  const data = _interopRequireWildcard(require('path'));
+
+  path = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function util() {
+  const data = _interopRequireWildcard(require('util'));
+
+  util = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _exit() {
+  const data = _interopRequireDefault(require('exit'));
+
+  _exit = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _jestUtil() {
+  const data = require('jest-util');
+
+  _jestUtil = function () {
+    return data;
+  };
+
+  return data;
+}
+
+var _BaseReporter = _interopRequireDefault(require('./BaseReporter'));
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {default: obj};
+}
+
+function _getRequireWildcardCache(nodeInterop) {
+  if (typeof WeakMap !== 'function') return null;
+  var cacheBabelInterop = new WeakMap();
+  var cacheNodeInterop = new WeakMap();
+  return (_getRequireWildcardCache = function (nodeInterop) {
+    return nodeInterop ? cacheNodeInterop : cacheBabelInterop;
+  })(nodeInterop);
+}
+
+function _interopRequireWildcard(obj, nodeInterop) {
+  if (!nodeInterop && obj && obj.__esModule) {
+    return obj;
+  }
+  if (obj === null || (typeof obj !== 'object' && typeof obj !== 'function')) {
+    return {default: obj};
+  }
+  var cache = _getRequireWildcardCache(nodeInterop);
+  if (cache && cache.has(obj)) {
+    return cache.get(obj);
+  }
+  var newObj = {};
+  var hasPropertyDescriptor =
+    Object.defineProperty && Object.getOwnPropertyDescriptor;
+  for (var key in obj) {
+    if (key !== 'default' && Object.prototype.hasOwnProperty.call(obj, key)) {
+      var desc = hasPropertyDescriptor
+        ? Object.getOwnPropertyDescriptor(obj, key)
+        : null;
+      if (desc && (desc.get || desc.set)) {
+        Object.defineProperty(newObj, key, desc);
+      } else {
+        newObj[key] = obj[key];
+      }
+    }
+  }
+  newObj.default = obj;
+  if (cache) {
+    cache.set(obj, newObj);
+  }
+  return newObj;
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+
+const isDarwin = process.platform === 'darwin';
+const icon = path().resolve(__dirname, '../assets/jest_logo.png');
+
+class NotifyReporter extends _BaseReporter.default {
+  constructor(globalConfig, startRun, context) {
+    super();
+
+    _defineProperty(this, '_notifier', loadNotifier());
+
+    _defineProperty(this, '_startRun', void 0);
+
+    _defineProperty(this, '_globalConfig', void 0);
+
+    _defineProperty(this, '_context', void 0);
+
+    this._globalConfig = globalConfig;
+    this._startRun = startRun;
+    this._context = context;
+  }
+
+  onRunComplete(contexts, result) {
+    const success =
+      result.numFailedTests === 0 && result.numRuntimeErrorTestSuites === 0;
+    const firstContext = contexts.values().next();
+    const hasteFS =
+      firstContext && firstContext.value && firstContext.value.hasteFS;
+    let packageName;
+
+    if (hasteFS != null) {
+      // assuming root package.json is the first one
+      const [filePath] = hasteFS.matchFiles('package.json');
+      packageName =
+        filePath != null
+          ? hasteFS.getModuleName(filePath)
+          : this._globalConfig.rootDir;
+    } else {
+      packageName = this._globalConfig.rootDir;
+    }
+
+    packageName = packageName != null ? `${packageName} - ` : '';
+    const notifyMode = this._globalConfig.notifyMode;
+    const statusChanged =
+      this._context.previousSuccess !== success || this._context.firstRun;
+    const testsHaveRun = result.numTotalTests !== 0;
+
+    if (
+      testsHaveRun &&
+      success &&
+      (notifyMode === 'always' ||
+        notifyMode === 'success' ||
+        notifyMode === 'success-change' ||
+        (notifyMode === 'change' && statusCh

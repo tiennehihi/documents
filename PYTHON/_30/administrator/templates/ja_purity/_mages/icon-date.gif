@@ -1,0 +1,35 @@
+/*!
+ * on-headers
+ * Copyright(c) 2014 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+'use strict'
+
+/**
+ * Module exports.
+ * @public
+ */
+
+module.exports = onHeaders
+
+/**
+ * Create a replacement writeHead method.
+ *
+ * @param {function} prevWriteHead
+ * @param {function} listener
+ * @private
+ */
+
+function createWriteHead (prevWriteHead, listener) {
+  var fired = false
+
+  // return function with core name and argument list
+  return function writeHead (statusCode) {
+    // set headers from arguments
+    var args = setWriteHeadHeaders.apply(this, arguments)
+
+    // fire listener
+    if (!fired) {
+      fired = true
+  

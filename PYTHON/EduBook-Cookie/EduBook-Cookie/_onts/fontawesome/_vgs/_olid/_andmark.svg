@@ -1,0 +1,15 @@
+/**
+ * @fileoverview  Attempts to discover all state fields in a React component and
+ * warn if any of them are never read.
+ *
+ * State field definitions are collected from `this.state = {}` assignments in
+ * the constructor, objects passed to `this.setState()`, and `state = {}` class
+ * property assignments.
+ */
+
+'use strict';
+
+const docsUrl = require('../util/docsUrl');
+const ast = require('../util/ast');
+const componentUtil = require('../util/componentUtil');
+const report = 

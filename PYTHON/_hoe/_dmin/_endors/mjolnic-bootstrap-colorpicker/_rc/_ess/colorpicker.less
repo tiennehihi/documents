@@ -1,0 +1,102 @@
+Directory, state);
+}
+function readPackageJsonTSConfigField(jsonContent, baseDirectory, state) {
+  return readPackageJsonPathField(jsonContent, "tsconfig", baseDirectory, state);
+}
+function readPackageJsonMainField(jsonContent, baseDirectory, state) {
+  return readPackageJsonPathField(jsonContent, "main", baseDirectory, state);
+}
+function readPackageJsonTypesVersionsField(jsonContent, state) {
+  const typesVersions = readPackageJsonField(jsonContent, "typesVersions", "object", state);
+  if (typesVersions === void 0)
+    return;
+  if (state.traceEnabled) {
+    trace(state.host, Diagnostics.package_json_has_a_typesVersions_field_with_version_specific_path_mappings);
+  }
+  return typesVersions;
+}
+function readPackageJsonTypesVersionPaths(jsonContent, state) {
+  const typesVersions = readPackageJsonTypesVersionsField(jsonContent, state);
+  if (typesVersions === void 0)
+    return;
+  if (state.traceEnabled) {
+    for (const key in typesVersions) {
+      if (hasProperty(typesVersions, key) && !VersionRange.tryParse(key)) {
+        trace(state.host, Diagnostics.package_json_has_a_typesVersions_entry_0_that_is_not_a_valid_semver_range, key);
+      }
+    }
+  }
+  const result = getPackageJsonTypesVersionsPaths(typesVersions);
+  if (!result) {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.package_json_does_not_have_a_typesVersions_entry_that_matches_version_0, versionMajorMinor);
+    }
+    return;
+  }
+  const { version: bestVersionKey, paths: bestVersionPaths } = result;
+  if (typeof bestVersionPaths !== "object") {
+    if (state.traceEnabled) {
+      trace(state.host, Diagnostics.Expected_type_of_0_field_in_package_json_to_be_1_got_2, `typesVersions['${bestVersionKey}']`, "object", typeof bestVersionPaths);
+    }
+    return;
+  }
+  return result;
+}
+var typeScriptVersion;
+function getPackageJsonTypesVersionsPaths(typesVersions) {
+  if (!typeScriptVersion)
+    typeScriptVersion = new Version(version);
+  for (const key in typesVersions) {
+    if (!hasProperty(typesVersions, key))
+      continue;
+    const keyRange = VersionRange.tryParse(key);
+    if (keyRange === void 0) {
+      continue;
+    }
+    if (keyRange.test(typeScriptVersion)) {
+      return { version: key, paths: typesVersions[key] };
+    }
+  }
+}
+function getEffectiveTypeRoots(options, host) {
+  if (options.typeRoots) {
+    return options.typeRoots;
+  }
+  let currentDirectory;
+  if (options.configFilePath) {
+    currentDirectory = getDirectoryPath(options.configFilePath);
+  } else if (host.getCurrentDirectory) {
+    currentDirectory = host.getCurrentDirectory();
+  }
+  if (currentDirectory !== void 0) {
+    return getDefaultTypeRoots(currentDirectory);
+  }
+}
+function getDefaultTypeRoots(currentDirectory) {
+  let typeRoots;
+  forEachAncestorDirectory(normalizePath(currentDirectory), (directory) => {
+    const atTypes = combinePaths(directory, nodeModulesAtTypes);
+    (typeRoots ?? (typeRoots = [])).push(atTypes);
+  });
+  return typeRoots;
+}
+var nodeModulesAtTypes = combinePaths("node_modules", "@types");
+function arePathsEqual(path1, path2, host) {
+  const useCaseSensitiveFileNames2 = typeof host.useCaseSensitiveFileNames === "function" ? host.useCaseSensitiveFileNames() : host.useCaseSensitiveFileNames;
+  return comparePaths(path1, path2, !useCaseSensitiveFileNames2) === 0 /* EqualTo */;
+}
+function getOriginalAndResolvedFileName(fileName, host, traceEnabled) {
+  const resolvedFileName = realPath(fileName, host, traceEnabled);
+  const pathsAreEqual = arePathsEqual(fileName, resolvedFileName, host);
+  return {
+    // If the fileName and realpath are differing only in casing prefer fileName so that we can issue correct errors for casing under forceConsistentCasingInFileNames
+    resolvedFileName: pathsAreEqual ? fileName : resolvedFileName,
+    originalPath: pathsAreEqual ? void 0 : fileName
+  };
+}
+function getCandidateFromTypeRoot(typeRoot, typeReferenceDirectiveName, moduleResolutionState) {
+  const nameForLookup = endsWith(typeRoot, "/node_modules/@types") || endsWith(typeRoot, "/node_modules/@types/") ? mangleScopedPackageNameWithTrace(typeReferenceDirectiveName, moduleResolutionState) : typeReferenceDirectiveName;
+  return combinePaths(typeRoot, nameForLookup);
+}
+function resolveTypeReferenceDirective(typeReferenceDirectiveName, containingFile, options, host, redirectedReference, cache, resolutionMode) {
+  Debug.assert(typeof typeReferenceDirectiveName === "string", "Non-string value passed to `ts.resolveTypeReferenceDirective`, lik

@@ -1,0 +1,10 @@
+'use strict';
+
+var GetIntrinsic = require('get-intrinsic');
+
+var $species = GetIntrinsic('%Symbol.species%', true);
+var $TypeError = require('es-errors/type');
+
+var ArrayCreate = require('./ArrayCreate');
+var Get = require('./Get');
+va

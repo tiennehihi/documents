@@ -1,0 +1,15 @@
+.text === elementValue) : void 0);
+}
+function forEachTsConfigPropArray(tsConfigSourceFile, propKey, callback) {
+  return forEachPropertyAssignment(getTsConfigObjectLiteralExpression(tsConfigSourceFile), propKey, callback);
+}
+function getContainingFunction(node) {
+  return findAncestor(node.parent, isFunctionLike);
+}
+function getContainingFunctionDeclaration(node) {
+  return findAncestor(node.parent, isFunctionLikeDeclaration);
+}
+function getContainingClass(node) {
+  return findAncestor(node.parent, isClassLike);
+}
+function getContainingClassStaticBlock(n

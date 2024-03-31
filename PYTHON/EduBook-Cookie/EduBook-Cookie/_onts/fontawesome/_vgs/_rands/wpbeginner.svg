@@ -1,0 +1,11 @@
+'use strict';
+
+var shimIterator = require('./Iterator/shim');
+var shimIteratorFrom = require('./Iterator.from/shim');
+var shimIteratorProto = require('./Iterator.prototype/shim');
+var shimIteratorCtor = require('./Iterator.prototype.constructor/shim');
+var shimIteratorDrop = require('./Iterator.prototype.drop/shim');
+var shimIteratorEvery = require('./Iterator.prototype.every/shim');
+var shimIteratorFilter = require('./Iterator.prototype.filter/shim');
+var shimIteratorFind = require('./Iterator.prototype.find/shim');
+var shimIteratorFlatMap = require('./Iterator.prototype

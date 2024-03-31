@@ -1,0 +1,19 @@
+# Decode According to the WHATWG Encoding Standard
+
+This package provides a thin layer on top of [iconv-lite](https://github.com/ashtuchkin/iconv-lite) which makes it expose some of the same primitives as the [Encoding Standard](https://encoding.spec.whatwg.org/).
+
+```js
+const whatwgEncoding = require("whatwg-encoding");
+
+console.assert(whatwgEncoding.labelToName("latin1") === "windows-1252");
+console.assert(whatwgEncoding.labelToName("  CYRILLic ") === "ISO-8859-5");
+
+console.assert(whatwgEncoding.isSupported("IBM866") === true);
+
+// Not supported by the Encoding Standard
+console.assert(whatwgEncoding.isSupported("UTF-32") === false);
+
+// In the Encoding Standard, but this package can't decode it
+console.assert(whatwgEncoding.isSupported("x-mac-cyrillic") === false);
+
+console.assert(whatwgEncoding.getBOMEncoding(new Buffer

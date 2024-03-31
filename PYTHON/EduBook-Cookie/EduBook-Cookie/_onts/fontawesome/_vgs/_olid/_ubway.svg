@@ -1,0 +1,6 @@
+jectTypeIndexer;
+declare function assertObjectTypeProperty(node: object | null | undefined, opts?: object | null): asserts node is ObjectTypeProperty;
+declare function assertObjectTypeSpreadProperty(node: object | null | undefined, opts?: object | null): asserts node is ObjectTypeSpreadProperty;
+declare function assertOpaqueType(node: object | null | undefined, opts?: object | null): asserts node is OpaqueType;
+declare function assertQualifiedTypeIdentifier(node: object | null | undefined, opts?: object | null): asserts node is QualifiedTypeIdentifier;
+declare function assertStringLiteralTypeAnnotation(node: object | null | undefined, opts?: object | null): asserts node is StringLiteralTypeA

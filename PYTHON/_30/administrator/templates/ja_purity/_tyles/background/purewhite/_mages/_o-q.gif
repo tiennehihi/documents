@@ -1,0 +1,7 @@
+'use strict';
+
+var acorn = require('acorn');
+var walk = require('acorn-walk');
+
+function isScope(node) {
+  return node.type === 'FunctionEx

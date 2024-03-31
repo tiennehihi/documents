@@ -1,0 +1,40 @@
+  const propName = this.tokens.identifierName();
+        this.processPropName(propName);
+        this.tokens.appendCode(": true");
+      } else if (this.tokens.matches1(tt.braceL)) {
+        // This is prop spread, like <div {...getProps()}>, which we can pass
+        // through fairly directly as an object spread.
+        this.tokens.replaceToken("");
+        this.rootTransformer.processBalancedCode();
+        this.tokens.replaceToken("");
+      } else {
+        break;
+      }
+      this.tokens.appendCode(",");
+    }
+    return keyCode;
+  }
+
+  processPropName(propName) {
+    if (propName.includes("-")) {
+      this.tokens.replaceToken(`'${propName}'`);
+    } else {
+      this.tokens.copyToken();
+    }
+  }
+
+  processPropValue() {
+    if (this.tokens.matches1(tt.braceL)) {
+      this.tokens.replaceToken("");
+      this.rootTransformer.processBalancedCode();
+      this.tokens.replaceToken("");
+    } else if (this.tokens.matches1(tt.jsxTagStart)) {
+      this.processJSXTag();
+    } else {
+      this.processStringPropValue();
+    }
+  }
+
+  processStringPropValue() {
+    const token = this.tokens.currentToken();
+    const valueCode =

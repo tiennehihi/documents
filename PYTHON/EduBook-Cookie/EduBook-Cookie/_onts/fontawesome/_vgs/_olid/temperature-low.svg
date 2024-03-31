@@ -1,0 +1,4 @@
+aceSpecifier | ImportSpecifier | ExportNamespaceSpecifier | ExportDefaultSpecifier;
+type Accessor = ClassAccessorProperty;
+type Private = ClassPrivateProperty | ClassPrivateMethod | PrivateName;
+type Flow = AnyTypeAnnotation | ArrayTypeAnnotation | BooleanTypeAnnotation | BooleanLiteralTypeAnnotation | NullLiteralTypeAnnotation | ClassImplements | DeclareClass | DeclareFunction | DeclareInterface | DeclareModule | DeclareModuleExports | DeclareTypeAlias | DeclareOpaqueType | DeclareVariable | DeclareExportDeclaration | DeclareExportAllDeclaration | DeclaredPredicate | ExistsTypeAnnotation | FunctionTypeAnnotation | FunctionTypeParam | GenericTy

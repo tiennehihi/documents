@@ -1,0 +1,19 @@
+const importPattern = /^:import\(("[^"]*"|'[^']*'|[^"']+)\)$/;
+const balancedQuotes = /^("[^"]*"|'[^']*'|[^"']+)$/;
+
+const getDeclsObject = (rule) => {
+  const object = {};
+
+  rule.walkDecls((decl) => {
+    const before = decl.raws.before ? decl.raws.before.trim() : "";
+
+    object[before + decl.prop] = decl.value;
+  });
+
+  return object;
+};
+/**
+ *
+ * @param {string} css
+ * @param {boolean} removeRules
+ * @param

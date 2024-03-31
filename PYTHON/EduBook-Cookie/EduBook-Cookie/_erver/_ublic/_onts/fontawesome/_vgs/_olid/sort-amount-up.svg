@@ -1,0 +1,41 @@
+   pro:
+      - family: classic
+        style: brands
+  label: Yelp
+  unicode: f1e9
+  voted: false
+yen-sign:
+  aliases:
+    names:
+      - cny
+      - jpy
+      - rmb
+      - yen
+    unicodes:
+      composite:
+        - a5
+      secondary:
+        - 10f157
+  changes:
+    - 3.2.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Yen Sign
+  unicode: f157
+  voted: false
+yin-yang:
+  aliases:
+    unicodes:
+      composite:
+        - 262f
+      secondary:
+        

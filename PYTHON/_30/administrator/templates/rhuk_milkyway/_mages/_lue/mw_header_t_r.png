@@ -1,0 +1,35 @@
+// ==================================================================================================
+// JSON Schema Draft 04
+// ==================================================================================================
+
+/**
+ * @see https://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.1
+ */
+export type JSONSchema4TypeName =
+    | "string" //
+    | "number"
+    | "integer"
+    | "boolean"
+    | "object"
+    | "array"
+    | "null"
+    | "any";
+
+/**
+ * @see https://tools.ietf.org/html/draft-zyp-json-schema-04#section-3.5
+ */
+export type JSONSchema4Type =
+    | string //
+    | number
+    | boolean
+    | JSONSchema4Object
+    | JSONSchema4Array
+    | null;
+
+// Workaround for infinite type recursion
+export interface JSONSchema4Object {
+    [key: string]: JSONSchema4Type;
+}
+
+// Workaround for infinite type recursion
+// https://github

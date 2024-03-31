@@ -1,0 +1,18 @@
+import { Doc } from './';
+
+// https://github.com/prettier/prettier/blob/main/src/document/index.js
+
+export namespace builders {
+    type DocCommand =
+        | Align
+        | BreakParent
+        | Concat
+        | Cursor
+        | Fill
+        | Group
+        | IfBreak
+        | Indent
+        | IndentIfBreak
+        | Label
+        | Line
+       

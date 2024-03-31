@@ -1,0 +1,43 @@
+abel: GG Currency Circle
+  unicode: f261
+  voted: false
+ghost:
+  aliases:
+    unicodes:
+      composite:
+        - 1f47b
+      secondary:
+        - 10f6e2
+  changes:
+    - 5.4.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Ghost
+  unicode: f6e2
+  voted: false
+gift:
+  aliases:
+    unicodes:
+      composite:
+        - 1f381
+      secondary:
+        - 10f06b
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.0.9
+    - 5.6.0
+    - 6.0.0-beta1
+    - 6.0.0-beta3
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style:

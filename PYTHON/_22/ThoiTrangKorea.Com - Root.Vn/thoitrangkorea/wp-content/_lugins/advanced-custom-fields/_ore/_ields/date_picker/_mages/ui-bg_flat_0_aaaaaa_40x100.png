@@ -1,0 +1,6 @@
+          _state.request.body = data;
+        }
+      } else {
+        // poorly implemented IE case
+        if(typeof(data.xml) !== 'undefined') {
+          _state.request.body = 

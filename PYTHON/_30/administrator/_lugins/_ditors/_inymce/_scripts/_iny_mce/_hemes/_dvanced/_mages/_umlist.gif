@@ -1,0 +1,4 @@
+sually_overlaps_default = visuallyOverlaps;
+    var isXHTMLGlobal;
+    var nodeIndex2 = 0;
+    var VirtualNode 

@@ -1,0 +1,4 @@
+{
+	"name": "is-wsl",
+	"version": "2.2.0",
+	"description": "Check if the process is running inside Windows Subsy

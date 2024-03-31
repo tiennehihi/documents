@@ -1,0 +1,6 @@
+nv = getAttributeNameValue(node, at);
+              if (atnv) {
+                if (data2.attributes[atnv]) {
+                  data2.attributes[atnv]++;
+                } else {
+               

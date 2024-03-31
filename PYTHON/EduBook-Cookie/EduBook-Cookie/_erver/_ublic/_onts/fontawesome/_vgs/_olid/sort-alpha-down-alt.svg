@@ -1,0 +1,41 @@
+6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: regular
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+      - family: classic
+        style: regular
+  label: Square caret up
+  unicode: f151
+  voted: false
+square-check:
+  aliases:
+    names:
+      - check-square
+    unicodes:
+      composite:
+        - '2611'
+        - '2705'
+        - f046
+      secondary:
+        - 10f14a
+  changes:
+    - 3.1.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: regular
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+    

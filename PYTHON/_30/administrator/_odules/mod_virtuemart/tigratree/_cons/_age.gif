@@ -1,0 +1,11 @@
+declare namespace locatePath {
+	interface Options {
+		/**
+		Current working directory.
+
+		@default process.cwd()
+		*/
+		readonly cwd?: string;
+
+		/**
+		Type of path to m

@@ -1,0 +1,5 @@
+ tokenIsIdentifierOrKeyword(token()) && !scanner.hasPrecedingLineBreak();
+  }
+  function nextTokenIsClassKeywordOnSameLine() {
+    nextToken();
+    return token() === 86 /* ClassKeyword */ && !scanner.h

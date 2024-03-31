@@ -1,0 +1,282 @@
+
+/*! js-yaml 4.1.0 https://github.com/nodeca/js-yaml @license MIT */
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.jsyaml = {}));
+}(this, (function (exports) { 'use strict';
+
+  function isNothing(subject) {
+    return (typeof subject === 'undefined') || (subject === null);
+  }
+
+
+  function isObject(subject) {
+    return (typeof subject === 'object') && (subject !== null);
+  }
+
+
+  function toArray(sequence) {
+    if (Array.isArray(sequence)) return sequence;
+    else if (isNothing(sequence)) return [];
+
+    return [ sequence ];
+  }
+
+
+  function extend(target, source) {
+    var index, length, key, sourceKeys;
+
+    if (source) {
+      sourceKeys = Object.keys(source);
+
+      for (index = 0, length = sourceKeys.length; index < length; index += 1) {
+        key = sourceKeys[index];
+        target[key] = source[key];
+      }
+    }
+
+    return target;
+  }
+
+
+  function repeat(string, count) {
+    var result = '', cycle;
+
+    for (cycle = 0; cycle < count; cycle += 1) {
+      result += string;
+    }
+
+    return result;
+  }
+
+
+  function isNegativeZero(number) {
+    return (number === 0) && (Number.NEGATIVE_INFINITY === 1 / number);
+  }
+
+
+  var isNothing_1      = isNothing;
+  var isObject_1       = isObject;
+  var toArray_1        = toArray;
+  var repeat_1         = repeat;
+  var isNegativeZero_1 = isNegativeZero;
+  var extend_1         = extend;
+
+  var common = {
+  	isNothing: isNothing_1,
+  	isObject: isObject_1,
+  	toArray: toArray_1,
+  	repeat: repeat_1,
+  	isNegativeZero: isNegativeZero_1,
+  	extend: extend_1
+  };
+
+  // YAML error class. http://stackoverflow.com/questions/8458984
+
+
+  function formatError(exception, compact) {
+    var where = '', message = exception.reason || '(unknown reason)';
+
+    if (!exception.mark) return message;
+
+    if (exception.mark.name) {
+      where += 'in "' + exception.mark.name + '" ';
+    }
+
+    where += '(' + (exception.mark.line + 1) + ':' + (exception.mark.column + 1) + ')';
+
+    if (!compact && exception.mark.snippet) {
+      where += '\n\n' + exception.mark.snippet;
+    }
+
+    return message + ' ' + where;
+  }
+
+
+  function YAMLException$1(reason, mark) {
+    // Super constructor
+    Error.call(this);
+
+    this.name = 'YAMLException';
+    this.reason = reason;
+    this.mark = mark;
+    this.message = formatError(this, false);
+
+    // Include stack trace in error object
+    if (Error.captureStackTrace) {
+      // Chrome and NodeJS
+      Error.captureStackTrace(this, this.constructor);
+    } else {
+      // FF, IE 10+ and Safari 6+. Fallback for others
+      this.stack = (new Error()).stack || '';
+    }
+  }
+
+
+  // Inherit from Error
+  YAMLException$1.prototype = Object.create(Error.prototype);
+  YAMLException$1.prototype.constructor = YAMLException$1;
+
+
+  YAMLException$1.prototype.toString = function toString(compact) {
+    return this.name + ': ' + formatError(this, compact);
+  };
+
+
+  var exception = YAMLException$1;
+
+  // get snippet for a single line, respecting maxLength
+  function getLine(buffer, lineStart, lineEnd, position, maxLineLength) {
+    var head = '';
+    var tail = '';
+    var maxHalfLength = Math.floor(maxLineLength / 2) - 1;
+
+    if (position - lineStart > maxHalfLength) {
+      head = ' ... ';
+      lineStart = position - maxHalfLength + head.length;
+    }
+
+    if (lineEnd - position > maxHalfLength) {
+      tail = ' ...';
+      lineEnd = position + maxHalfLength - tail.length;
+    }
+
+    return {
+      str: head + buffer.slice(lineStart, lineEnd).replace(/\t/g, '→') + tail,
+      pos: position - lineStart + head.length // relative position
+    };
+  }
+
+
+  function padStart(string, max) {
+    return common.repeat(' ', max - string.length) + string;
+  }
+
+
+  function makeSnippet(mark, options) {
+    options = Object.create(options || null);
+
+    if (!mark.buffer) return null;
+
+    if (!options.maxLength) options.maxLength = 79;
+    if (typeof options.indent      !== 'number') options.indent      = 1;
+    if (typeof options.linesBefore !== 'number') options.linesBefore = 3;
+    if (typeof options.linesAfter  !== 'number') options.linesAfter  = 2;
+
+    var re = /\r?\n|\r|\0/g;
+    var lineStarts = [ 0 ];
+    var lineEnds = [];
+    var match;
+    var foundLineNo = -1;
+
+    while ((match = re.exec(mark.buffer))) {
+      lineEnds.push(match.index);
+      lineStarts.push(match.index + match[0].length);
+
+      if (mark.position <= match.index && foundLineNo < 0) {
+        foundLineNo = lineStarts.length - 2;
+      }
+    }
+
+    if (foundLineNo < 0) foundLineNo = lineStarts.length - 1;
+
+    var result = '', i, line;
+    var lineNoLength = Math.min(mark.line + options.linesAfter, lineEnds.length).toString().length;
+    var maxLineLength = options.maxLength - (options.indent + lineNoLength + 3);
+
+    for (i = 1; i <= options.linesBefore; i++) {
+      if (foundLineNo - i < 0) break;
+      line = getLine(
+        mark.buffer,
+        lineStarts[foundLineNo - i],
+        lineEnds[foundLineNo - i],
+        mark.position - (lineStarts[foundLineNo] - lineStarts[foundLineNo - i]),
+        maxLineLength
+      );
+      result = common.repeat(' ', options.indent) + padStart((mark.line - i + 1).toString(), lineNoLength) +
+        ' | ' + line.str + '\n' + result;
+    }
+
+    line = getLine(mark.buffer, lineStarts[foundLineNo], lineEnds[foundLineNo], mark.position, maxLineLength);
+    result += common.repeat(' ', options.indent) + padStart((mark.line + 1).toString(), lineNoLength) +
+      ' | ' + line.str + '\n';
+    result += common.repeat('-', options.indent + lineNoLength + 3 + line.pos) + '^' + '\n';
+
+    for (i = 1; i <= options.linesAfter; i++) {
+      if (foundLineNo + i >= lineEnds.length) break;
+      line = getLine(
+        mark.buffer,
+        lineStarts[foundLineNo + i],
+        lineEnds[foundLineNo + i],
+        mark.position - (lineStarts[foundLineNo] - lineStarts[foundLineNo + i]),
+        maxLineLength
+      );
+      result += common.repeat(' ', options.indent) + padStart((mark.line + i + 1).toString(), lineNoLength) +
+        ' | ' + line.str + '\n';
+    }
+
+    return result.replace(/\n$/, '');
+  }
+
+
+  var snippet = makeSnippet;
+
+  var TYPE_CONSTRUCTOR_OPTIONS = [
+    'kind',
+    'multi',
+    'resolve',
+    'construct',
+    'instanceOf',
+    'predicate',
+    'represent',
+    'representName',
+    'defaultStyle',
+    'styleAliases'
+  ];
+
+  var YAML_NODE_KINDS = [
+    'scalar',
+    'sequence',
+    'mapping'
+  ];
+
+  function compileStyleAliases(map) {
+    var result = {};
+
+    if (map !== null) {
+      Object.keys(map).forEach(function (style) {
+        map[style].forEach(function (alias) {
+          result[String(alias)] = style;
+        });
+      });
+    }
+
+    return result;
+  }
+
+  function Type$1(tag, options) {
+    options = options || {};
+
+    Object.keys(options).forEach(function (name) {
+      if (TYPE_CONSTRUCTOR_OPTIONS.indexOf(name) === -1) {
+        throw new exception('Unknown option "' + name + '" is met in definition of "' + tag + '" YAML type.');
+      }
+    });
+
+    // TODO: Add tag format check.
+    this.options       = options; // keep original options in case user wants to extend this type later
+    this.tag           = tag;
+    this.kind          = options['kind']          || null;
+    this.resolve       = options['resolve']       || function () { return true; };
+    this.construct     = options['construct']     || function (data) { return data; };
+    this.instanceOf    = options['instanceOf']    || null;
+    this.predicate     = options['predicate']     || null;
+    this.represent     = options['represent']     || null;
+    this.representName = options['representName'] || null;
+    this.defaultStyle  = options['defaultStyle']  || null;
+    this.multi         = options['multi']         || false;
+    this.styleAliases  = compileStyleAliases(options['styleAliases'] || null);
+
+    if (YAML_NODE_KINDS.indexOf(this.kind) === -1) {
+      throw new exception('Unknown kind "' + this.kind + '" is specified for "' + tag + '" YAML 

@@ -1,0 +1,18 @@
+'use strict';
+const valueParser = require('postcss-value-parser');
+const mappings = require('./lib/map');
+
+/**
+ * @param {unknown} item
+ * @param {number} index
+ * @return {boolean}
+ */
+function evenValues(item, index) {
+  return index % 2 === 0;
+}
+
+const repeatKeywords = new Set(mappings.values());
+
+/**
+ * @param {valueParser.Node} node
+ * @return {boolea

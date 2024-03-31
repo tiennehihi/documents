@@ -1,0 +1,38 @@
+[
+      "solid"
+    ]
+  },
+  "question": {
+    "aliases": {
+      "unicodes": {
+        "composite": [
+          "2753",
+          "2754",
+          "f128"
+        ],
+        "primary": [
+          "f128"
+        ],
+        "secondary": [
+          "103f",
+          "10f128"
+        ]
+      }
+    },
+    "changes": [
+      "3.1.0",
+      "5.0.0",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid"
+    ],
+    "unicode": "3f",
+    "label": "Question",
+    "voted": false,
+    "svg

@@ -1,0 +1,14 @@
+  case "constructor":
+            tag = parseSimpleTag(start2, factory2.createJSDocClassTag, tagName, margin, indentText);
+            break;
+          case "public":
+            tag = parseSimpleTag(start2, factory2.createJSDocPublicTag, tagName, margin, indentText);
+            break;
+          case "private":
+            tag = parseSimpleTag(start2, factory2.createJSDocPrivateTag, tagName, margin, indentText);
+            break;
+          case "protected":
+            tag = parseSimpleTag(start2, factory2.createJSDocProtectedTag, tagName, margin, indentText);
+            break;
+          case "readonly":
+            tag = parseSimpleTag(start2, factory2.createJSDocReadonlyTag, tagName

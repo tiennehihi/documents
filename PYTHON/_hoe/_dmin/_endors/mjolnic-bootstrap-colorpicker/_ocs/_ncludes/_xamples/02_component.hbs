@@ -1,0 +1,11 @@
+ookAhead(nextTokenIsOpenParenOrLessThanOrDot);
+      default:
+        return isIdentifier2();
+    }
+  }
+  function isStartOfExpression() {
+    if (isStartOfLeftHandSideExpression()) {
+      return true;
+    }
+    switch (token()) {
+      case 40 /* PlusToke

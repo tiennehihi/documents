@@ -1,0 +1,6 @@
+aration> | null): node is TSImportEqualsDeclaration;
+declare function isTSExternalModuleReference(node: Node | null | undefined, opts?: Opts<TSExternalModuleReference> | null): node is TSExternalModuleReference;
+declare function isTSNonNullExpression(node: Node | null | undefined, opts?: Opts<TSNonNullExpression> | null): node is TSNonNullExpression;
+declare function isTSExportAssignment(node: Node | null | undefined, opts?: Opts<TSExportAssignment> | null): node is TSExportAssignment;
+declare function isTSNamespaceExportDeclaration(node: Node | null | undefined, opts?: Opts<TSNamespaceExportDeclaration> | null): node is TSNamespaceExportDeclaration;
+declare function isTSTypeAnnotation(node: Node | null | undefined, opts?: Opts<TSTyp

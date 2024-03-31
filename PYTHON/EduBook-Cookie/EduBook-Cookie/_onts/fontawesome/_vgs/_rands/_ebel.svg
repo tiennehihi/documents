@@ -1,0 +1,23 @@
+declare var ajv: {
+  (options?: ajv.Options): ajv.Ajv;
+  new(options?: ajv.Options): ajv.Ajv;
+  ValidationError: typeof AjvErrors.ValidationError;
+  MissingRefError: typeof AjvErrors.MissingRefError;
+  $dataMetaSchema: object;
+}
+
+declare namespace AjvErrors {
+  class ValidationError extends Error {
+    constructor(errors: Array<ajv.ErrorObject>);
+
+    message: string;
+    errors: Array<ajv.ErrorObject>;
+    ajv: true;
+    validation: true;
+  }
+
+  class MissingRefError extends Error {
+    constructor(baseId: string, ref: string, message?: string);
+    static message: (baseId: string, ref: string) => string;
+
+    message: str

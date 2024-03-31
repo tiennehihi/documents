@@ -1,0 +1,10 @@
+- Nếu host bị lỗi khi chạy code, hãy thử 1 trong các cách sau:
+
++ Truy cập bộ quản lý tệp > cài đặt > hiển thị tệp tin ẩn > Lưu lại . Tiến hành kiểm tra lại file .htaccess và chỉnh sửa cho chính xác!
+
++ Truy cập select PHP version > Chọn bản PHP phù hợp với code!
+
+
+- Vui lòng không thực hiện login sai để tránh bị tường lửa chặn IP khiến cho bạn không truy cập host được!
+
+Cảm ơn bạn đã sử dụng dịch vụ!

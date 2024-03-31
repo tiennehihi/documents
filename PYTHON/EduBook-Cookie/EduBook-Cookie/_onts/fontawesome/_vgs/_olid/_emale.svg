@@ -1,0 +1,8 @@
+import TemplateTag from '../TemplateTag';
+import stripIndentTransformer from '../stripIndentTransformer';
+import trimResultTransformer from '../trimResultTransformer';
+
+var stripIndents = new TemplateTag(stripIndentTransformer('all'), trimResultTransformer);
+
+export default stripIndents;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9zdHJpcEluZGVudHMvc3RyaXBJbmRlb

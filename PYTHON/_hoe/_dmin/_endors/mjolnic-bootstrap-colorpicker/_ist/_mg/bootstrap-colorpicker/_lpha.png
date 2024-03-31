@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const equal = require("fast-deep-equal");
+const SCALAR_TYPES = ["number", "integer", "string", "boolean", "null"];
+function getDef() {
+    return {
+        keyword: "uniqueItemProperties",
+        type: "array",
+        schemaType: "array",
+        compile(keys, parentSchema) {
+            const scalar = getScalarKeys(keys, parentSchema);
+            return (data) => {
+                if (data.length <= 1)
+ 

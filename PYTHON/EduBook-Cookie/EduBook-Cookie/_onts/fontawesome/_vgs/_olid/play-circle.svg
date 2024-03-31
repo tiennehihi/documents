@@ -1,0 +1,10 @@
+'use strict';
+
+var GetIntrinsic = require('get-intrinsic');
+
+var $SyntaxError = require('es-errors/syntax');
+var $TypeError = require('es-errors/type');
+var $Promise = GetIntrinsic('%Promise%', true);
+
+var Call = require('./Call');
+var CompletionRecord = re

@@ -1,0 +1,26 @@
+"regular"
+        }
+      ]
+    }
+  },
+  "g": {
+    "aliases": {
+      "unicodes": {
+        "composite": [
+          "67"
+        ]
+      }
+    },
+    "changes": [
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "47",
+    "label": "G",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321824,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" 

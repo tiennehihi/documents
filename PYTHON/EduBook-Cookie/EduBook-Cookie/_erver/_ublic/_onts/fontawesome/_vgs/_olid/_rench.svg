@@ -1,0 +1,27 @@
+        "snapchat-ghost"
+      ],
+      "unicodes": {
+        "composite": [
+          "f2ac"
+        ]
+      }
+    },
+    "changes": [
+      "4.6.0",
+      "5.0.0",
+      "6.0.0-beta1"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "brands"
+    ],
+    "unicode": "f2ab",
+    "label": "Snapchat",
+    "voted": false,
+    "svg": {
+      "brands": {
+        "last_modified": 1660014463,
+        "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M496.926,366

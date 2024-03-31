@@ -1,0 +1,9 @@
+import type {FuncKeywordDefinition, SchemaCxt} from "ajv"
+
+const sequences: Record<string, number | undefined> = {}
+
+export type DynamicDefaultFunc = (args?: Record<string, any>) => () => any
+
+const DEFAULTS: Record<string, DynamicDefaultFunc | undefined> = {
+  timestamp: () => () => Date.now(),
+  datetime: () => () => new Date().toISOString(

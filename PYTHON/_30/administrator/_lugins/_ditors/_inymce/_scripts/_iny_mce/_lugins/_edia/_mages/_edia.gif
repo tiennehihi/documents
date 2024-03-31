@@ -1,0 +1,13 @@
+const topologicalSort = require("./topologicalSort");
+
+const matchImports = /^(.+?)\s+from\s+(?:"([^"]+)"|'([^']+)'|(global))$/;
+const icssImport = /^:import\((?:"([^"]+)"|'([^']+)')\)/;
+
+const VISITED_MARKER = 1;
+
+/**
+ * :import('G') {}
+ *
+ * Rule
+ *   composes: ... from 'A'
+ * 

@@ -1,0 +1,30 @@
+/**
+ * @license React
+ * react-dom-server.browser.development.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+'use strict';
+
+if (process.env.NODE_ENV !== "production") {
+  (function() {
+'use strict';
+
+var React = require('react');
+
+var ReactVersion = '18.2.0';
+
+var ReactSharedInternals = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+
+// by calls to these methods by a Babel plugin.
+//
+// In PROD (or in packages without access to React internals),
+// they are left as they are instead.
+
+function warn(format) {
+  {
+   

@@ -1,0 +1,11 @@
+{
+	"name": "@csstools/postcss-font-format-keywords",
+	"description": "Use unquoted format on @font-face CSS definitions.",
+	"version": "1.0.1",
+	"author": "Jonathan Neal <jonathantneal@hotmail.com>",
+	"license": "CC0-1.0",
+	"funding": {
+		"type": "opencollective",
+		"url": "https://opencollective.com/csstools"
+	},
+	"engines": {

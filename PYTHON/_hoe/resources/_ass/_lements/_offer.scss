@@ -1,0 +1,11 @@
+ssociated with each
+     * other when the `Worker` is created. While the `MessagePort` object on the parent
+     * side is not directly exposed, its functionalities are exposed through `worker.postMessage()` and the `worker.on('message')` event
+     * on the `Worker` object for the parent thread.
+     *
+     * To create custom messaging channels (which is encouraged over using the default
+     * global channel because it facilitates separation of concerns), users can create
+     * a `MessageChannel` object on either thread and pass one of the`MessagePort`s on that `MessageChannel` to the other thread through a
+     * pre-existing channel, such as the global one.
+     *
+     * See `port.

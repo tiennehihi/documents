@@ -1,0 +1,1 @@
+a promise.\n  // A validation that immediately fails will interrupt the validations.\n  whenValid: function ({group, force} = {}) {\n    this._refreshFields();\n\n    var promises = this._withoutReactualizingFormOptions(() => {\n      return $.map

@@ -1,0 +1,69 @@
+tation-lock": {
+      "pass": "Pantaila maneiagarria da eta ez dago orientazio-blokeorik",
+      "fail": "CSSak orientazioa blokeatzen du, eta pantaila ezin da orientatu.",
+      "incomplete": "Ezin da zehaztu CSS orientazio-blokeorik dagoen"
+    },
+    "meta-viewport-large": {
+      "pass": "<meta> etiketak ez du zum esanguratsurik eragozten gailu mugikorretan",
+      "fail": "<meta> etiketak gailu mugikorretan mugatzen du zooma"
+    },
+    "meta-viewport": {
+      "pass": "<meta> etiketak ez du zoom eragozten gailu mugikorretan",
+      "fail": "${data} < meta> etiketan, gailu mugikorretan zoom-a eragozten du"
+    },
+    "header-present": {
+      "pass": "Orriak 'header' bat dauka",
+      "fail": "Orriak ez dauka 'header' bat"
+    },
+    "heading-order": {
+      "pass": "Goiburuen hurrenkera zuzena da",
+      "fail": "Goiburuen hurrenkera ez da zuzena"
+    },
+    "internal-link-present": {
+      "pass": "Aurkitutako jauzi esteka ('skip') baliozkoa da",
+      "fail": "Ez dira aurkitu jauzi esteka ('skip') baliozkorik"
+    },
+    "landmark": {
+      "pass": "Orrialdeak herrialde bat du erreferentzia-puntu",
+      "fail": "Orrialdeak ez du herrialde erreferentzia-punturik"
+    },
+    "meta-refresh": {
+      "pass": "<meta> etiketak ez du orria freskatzen",
+      "fail": "<meta> etiketak orria freskatzen du"
+    },
+    "p-as-heading": {
+      "pass": "<p> elementuak ez dira goiburu gisa diseinatus",
+      "fail": "Goiburuko elementuak erabili beharko lirateke <p> estiloko elementuak erabili beharrean"
+    },
+    "region": {
+      "pass": "Orriaren eduki guztia erreferentzia-puntuetan sartuta dago.",
+      "fail": "Erreferentzia-puntuetan sartu gabeko edukia du orriak"
+    },
+    "skip-link": {
+      "pass": "Badago jauziko loturaren helmuga ('skip')",
+      "incomplete": "Jauzi-loturaren ('skip') helmuga agerian geratu beharko litzateke aktibazioan ",
+      "fail": "Ez dago helmugarik jauziko estekarako ('skip')"
+    },
+    "unique-frame-title": {
+      "pass": "Elementuaren title atributua bakarra da",
+      "fail": "Elementuaren title atributua ez da bakarra"
+    },
+    "duplicate-id-active": {
+      "pass": "Dokumentuak ez dauka id atributu bera partekatzen duen elementu aktiborik",
+      "fail": "Dokumentuak elementu aktiboak ditu, id atributu berarekin: ${data}"
+    },
+    "duplicate-id-aria": {
+      "pass": "Dokumentuak ez dauka id atributu bera partekatzen duen Aari edo etiketekin lotutako elementurik",
+      "fail": "Dokumentuak hainbat elementu ditu, id atributu bereko aria batekin lotuta: ${data}"
+    },
+    "duplicate-id": {
+      "pass": "Dokumentuak ez dauka id atributu bera partekatzen duen elementu estatikorik",
+      "fail": "Dokumentuak hainbat elementu estatiko ditu, id atributu berarekin"
+    },
+    "aria-label": {
+      "pass": "aria-label atributua existitzen da eta ez dago hutsik",
+      "fail": "aria-label atributua ez da existitzen edo hutsik dago"
+    },
+    "aria-labelledby": {
+      "pass": "aria-labelledby atributua existitzen da eta pantaila-irakurgailuetarako ikus daitezkeen elementuei egiten die erreferentzia",
+      "fail": "aria-labelledby atributua ez da existitzen, existitzen ez diren elementuei egiten die erreferentzia edo el

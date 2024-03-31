@@ -1,0 +1,66 @@
+"use strict";
+module.exports = function(Promise,
+                          PromiseArray,
+                          apiRejection,
+                          tryConvertToPromise,
+                          INTERNAL,
+                          debug) {
+var util = require("./util");
+var tryCatch = util.tryCatch;
+var errorObj = util.errorObj;
+var async = Promise._async;
+
+function MappingPromiseArray(promises, fn, limit, _filter) {
+    this.constructor$(promises);
+    this._promise._captureStackTrace();
+    var context = Promise._getContext();
+    this._callback = util.contextBind(context, fn);
+    this._preservedValues = _filter === INTERNAL
+        ? new Array(this.length())
+        : null;
+    this._limit = limit;
+    this._inFlight = 0;
+    this._queue = [];
+    async.invoke(this._asyncInit, this, undefined);
+    if (util.isArray(promises)) {
+        for (var i = 0; i < promises.length; ++i) {
+            var maybePromise = promises[i];
+            if (maybePromise instanceof Promise) {
+                maybePromise.suppressUnhandledRejections();
+            }
+        }
+    }
+}
+util.inherits(MappingPromiseArray, PromiseArray);
+
+MappingPromiseArray.prototype._asyncInit = function() {
+    this._init$(undefined, -2);
+};
+
+MappingPromiseArray.prototype._init = function () {};
+
+MappingPromiseArray.prototype._promiseFulfilled = function (value, index) {
+    var values = this._values;
+    var length = this.length();
+    var preservedValues = this._preservedValues;
+    var limit = this._limit;
+
+    if (index < 0) {
+        index = (index * -1) - 1;
+        values[index] = value;
+        if (limit >= 1) {
+            this._inFlight--;
+            this._drainQueue();
+            if (this._isResolved()) return true;
+        }
+    } else {
+        if (limit >= 1 && this._inFlight >= limit) {
+            values[index] = value;
+            this._queue.push(index);
+            return false;
+        }
+        if (preservedValues !== null) preservedValues[index] = value;
+
+        var promise = this._promise;
+        var callback = this._callback;
+        var rec

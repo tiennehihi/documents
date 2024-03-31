@@ -1,0 +1,33 @@
+odeJS.ArrayBufferView[];
+    }
+    export namespace readv {
+        function __promisify__(
+            fd: number,
+            buffers: readonly NodeJS.ArrayBufferView[],
+            position?: number,
+        ): Promise<ReadVResult>;
+    }
+    /**
+     * For detailed information, see the documentation of the asynchronous version of
+     * this API: {@link readv}.
+     * @since v13.13.0, v12.17.0
+     * @param [position='null']
+     * @return The number of bytes read.
+     */
+    export function readvSync(fd: number, buffers: readonly NodeJS.ArrayBufferView[], position?: number): number;
+
+    export interface OpenAsBlobOptions {
+        /**
+         * An optional mime type for the blob.
+         *
+         * @default 'undefined'
+         */
+        type?: string | undefined;
+    }
+
+    /**
+     * Returns a `Blob` whose data is backed by the given file.
+     *
+     * The file must not be modified after the `Blob` is created. Any modifications
+     * will cause reading the `Blob` data to fail with a `DOMException` error.
+     * Synchronous stat operations on the file when the `Bl

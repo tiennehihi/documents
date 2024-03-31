@@ -1,0 +1,16 @@
+ttedExpression */);
+    node.expression = expression;
+    node.original = original;
+    node.transformFlags |= propagateChildFlags(node.expression) | 1 /* ContainsTypeScript */;
+    setTextRange(node, original);
+    return node;
+  }
+  function updatePartiallyEmittedExpression(node, expression) {
+    return node.expression !== expression ? update(createPartiallyEmittedExpression(expression, node.original), node) : node;
+  }
+  function flattenCommaElements(node) {
+    if (nodeIsSynthesized(node) && !isParseTreeNode(node) && !node.original && !node.emitNode && !node.id) {
+      if (isCommaListExpression(node)) {
+        return node.elements;
+      }
+     

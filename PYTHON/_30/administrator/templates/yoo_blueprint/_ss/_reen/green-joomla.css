@@ -1,0 +1,11 @@
+'use strict';
+const os = require('os');
+const tty = require('tty');
+const hasFlag = require('has-flag');
+
+const {env} = process;
+
+let forceColor;
+if (hasFlag('no-color') ||
+	hasFlag('no-colors') ||
+	has

@@ -1,0 +1,27 @@
+nts: ?Array<Comment>,
+  async: boolean,
+  defaults: Array<?Expression>,
+  expression: boolean,
+  generator: boolean,
+  params: Array<Pattern>,
+  rest: ?Identifier,
+  returnType: ?TypeAnnotation,
+  typeParameters: ?TypeParameterDeclaration,
+} | {
+  type: 'AssignmentExpression',
+  _AssignmentExpression?: void,
+  left: Pattern,
+  operator: AssignmentOperator,
+  right: Expression,
+  end: number,
+  innerComments: ?Array<Comment>,
+  leadingComments: ?Array<Comment>,
+  loc: {
+    end: {column: number, line: number},
+    start: {column: number, line: number},
+  },
+  start: number,
+  trailingComments: ?Array<Comment>,
+} | {
+  type: 'AssignmentPattern',
+  _AssignmentPattern?: vo

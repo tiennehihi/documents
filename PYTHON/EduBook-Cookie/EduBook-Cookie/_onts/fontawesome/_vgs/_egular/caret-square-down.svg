@@ -1,0 +1,11 @@
+'use strict';
+
+// TODO, semver-major: delete this
+
+var $TypeError = require('es-errors/type');
+var $SyntaxError = require('es-errors/syntax');
+
+var isMatchRecord = require('./records/match-record');
+var isPropertyDescriptor = require('./records/property-descriptor');
+var isIteratorRecord = require('./records/iterator-record');
+var isPromiseCapabilityRecord = require('./records/promise-ca

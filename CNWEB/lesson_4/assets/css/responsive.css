@@ -1,0 +1,11 @@
+@media (max-width: 740px) {
+    .center {
+        text-align: center;
+    }
+    .row .box,
+    .row .box-purple,
+    .row .box-yellow {
+        width: 100% !important;
+        margin: 0 32px;
+    }
+}

@@ -1,0 +1,12 @@
+;
+            if (predicate.call(thisArg, value, i, list)) {
+              return value;
+            }
+          }
+          return void 0;
+        }
+      });
+    }
+    if (!Array.prototype.findIndex) {
+      Object.defineProperty(Array.prototype, 'findIndex', {
+        value: functio

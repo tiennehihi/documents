@@ -1,0 +1,1 @@
+true === this.validationResult || 'none' === this.options.focus)\n      return null;\n\n    for (var i = 0; i < this.fields.length; i++) {\n      var field = this.fields[i];\n      if (true !== field.validationResult && field.validationResult.leng

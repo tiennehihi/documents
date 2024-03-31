@@ -1,0 +1,17 @@
+var List = require('../common/List');
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function isValidNumber(value) {
+    // Number.isInteger(value) && value >= 0
+    return (
+        typeof value === 'number' &&
+        isFinite(value) &&
+        Math.floor(value) === value &&
+        value >= 0
+    );
+}
+
+function isValidLocation(loc) {
+    return (
+        Boolean(loc) &&
+        isValidNumbe

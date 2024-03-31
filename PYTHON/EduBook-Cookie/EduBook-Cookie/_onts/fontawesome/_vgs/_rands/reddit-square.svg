@@ -1,0 +1,38 @@
+/**
+ * @fileoverview Flag shouldComponentUpdate when extending PureComponent
+ */
+
+'use strict';
+
+const astUtil = require('../util/ast');
+const componentUtil = require('../util/componentUtil');
+const docsUrl = require('../util/docsUrl');
+const report = require('../util/report');
+
+// ------------------------------------------------------------------------------
+// Rule Definition
+// ------------------------------------------------------------------------------
+
+const messages = {
+  noShouldCompUpdate: '{{component}} does not need shouldComponentUpdate when extending React.PureComponent.',
+};
+
+module.exports = {
+  meta: {
+    docs: {
+      description: 'Disallow usage of shouldComponentUpdate when extending React.PureComponent',
+      category: 'Possible Errors',
+      recommended: false,
+      url: docsUrl('no-redundant-should-component-update'),
+    },
+
+    messages,
+
+    schema: [],
+  },
+
+  create(context) {
+    /**
+     * Checks for shouldComponentUpdate property
+     * @param {ASTNode} node The AST node being checked.
+ 

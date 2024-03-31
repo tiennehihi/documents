@@ -1,0 +1,10 @@
+Constraints";
+  ContextFlags3[ContextFlags3["Completions"] = 4] = "Completions";
+  ContextFlags3[ContextFlags3["SkipBindingPatterns"] = 8] = "SkipBindingPatterns";
+  return ContextFlags3;
+})(ContextFlags || {});
+var NodeBuilderFlags = /* @__PURE__ */ ((NodeBuilderFlags2) => {
+  NodeBuilderFlags2[NodeBuilderFlags2["None"] = 0] = "None";
+  NodeBuilderFlags2[NodeBuilderFlags2["NoTruncation"] = 1] = "NoTruncation";
+  NodeBuilderFlags2[NodeBuilderFlags2["WriteArrayAsGenericType"] = 2] = "WriteArrayAsGenericType";
+  NodeBuilderFlags2[NodeBuilderFlags2["GenerateNamesForShadowedTypeParams"] = 4] = "GenerateName

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="./style.css">
+        <link rel="icon" href="" type="image/x-icon">
+        <title>Document</title>
+    </head>
+    <body>
+        <div class="main">
+
+            <form action="" method="POST" class="form" id="register-form">
+                <h3 class="heading">Thành viên đăng ký</h3>
+                <p class="desc">Cùng nhau học lập trình miễn phí tại F8 ❤️</p>
+            
+                <div class="spacer"></div>
+            
+                <div class="form-group">
+                    <label for="fullname" class="form-label">Tên đầy đủ</label>
+                    <input id="fullname" name="fullname" type="text" rules="required" placeholder="VD: Vũ Đức Tiến" class="form-control">
+                    <span class="form-message"></span>
+                </div>
+            
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input id="email" name="email" type="text" rules="required|email" placeholder="VD: email@domain.com" class="form-control">
+                    <span class="form-message"></span>
+                </div>
+            
+                <div class="form-group">
+                    <label for="password" class="form-label">Mật khẩu</label>
+                    <input id="password" name="password" type="password" rules="required|min:6" placeholder="Nhập mật khẩu" class="form-control">
+                    <span class="form-message"></span>
+                </div>
+            
+                <button class="form-submit">Đăng ký</button>
+            </form>
+          
+          </div>
+    </body>
+    <script src="./validator_2.js"></script>
+    <script src="./script.js"></script>
+    <script>
+        var form = new Validator('#register-form')
+        form.onSubmit = function(formData) {
+            console.log(formData);
+            // Tạo một đối tượng XMLHttpRequest
+            var xhr = new XMLHttpRequest();
+
+            // Đặt phương thức và URL của yêu cầu
+            xhr.open('GET', 'data.php', true);
+
+            // Xử lý sự kiện khi yêu cầu hoàn thành
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // Lấy nội dung từ phản hồi
+                    var fileContent = xhr.responseText;
+
+                    // Hiển thị nội dung trên trang
+                    var contentElement = document.getElementById('content');
+                    contentElement.innerText = fileContent;
+                }
+            };
+
+            // Gửi yêu cầu
+            xhr.send();
+        }
+    </script>
+    <!-- <script>
+        var form = new Validator('#register-form');
+        form.onSubmit = function(formData) {
+            // Chuyển đổi đối tượng formData thành mảng các cặp khóa-giá trị
+            var entries = Object.entries(formData);
+
+            // Tạo chuỗi dữ liệu cần ghi vào tệp tin
+            var fileContent = '';
+            entries.forEach(function(entry) {
+            var key = entry[0];
+            var value = entry[1];
+            fileContent += key + ': ' + value + '\n';
+            });
+
+            // Tạo đường dẫn tới tệp tin "data.txt"
+            var fileURL = 'data.txt';
+
+            // Ghi thông tin vào tệp tin
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileContent));
+            element.setAttribute('download', fileURL);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        };
+    </script> -->
+    <!-- <script>
+        var form = new Validator('#register-form');
+        form.onSubmit = function(formData) {
+            // Chuyển đổi đối tượng formData thành mảng các cặp khóa-giá trị
+            var entries = Object.entries(formData);
+
+            // Đọc nội dung hiện có của file "data.txt" (nếu có)
+            var fileContent = '';
+            var fileReader = new FileReader();
+            fileReader.onload = function(e) {
+            fileContent = e.target.result;
+
+            // Thêm các giá trị mới vào fileContent
+            entries.forEach(function(entry) {
+                var key = entry[0];
+                var value = entry[1];
+                fileContent += key + ': ' + value + '\n';
+            });
+
+            // Tạo đường dẫn tới tệp tin "data.txt"
+            var fileURL = 'data.txt';
+
+            // Ghi thông tin vào tệp tin
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileContent));
+            element.setAttribute('download', fileURL);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            };
+
+            // Đọc nội dung hiện có của file "data.txt" bằng cách tạo một đối tượng FileReader
+            fileReader.readAsText(new Blob([fileContent]));
+        };
+    </script> -->
+</html>

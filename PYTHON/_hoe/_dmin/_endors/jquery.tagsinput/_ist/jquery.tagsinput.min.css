@@ -1,0 +1,20 @@
+import { Directives } from '../doc/directives.js';
+import { Document } from '../doc/Document.js';
+import { YAMLWarning, YAMLParseError } from '../errors.js';
+import { isCollection, isPair } from '../nodes/identity.js';
+import { composeDoc } from './compose-doc.js';
+import { resolveEnd } from './resolve-end.js';
+
+function getErrorPos(src) {
+    if (typeof src === 'number')
+        return [src, src + 1];
+    if (Array.isArray(src))
+        return src.length === 2 ? src : [src[0], src[1]];
+    const { offset, source } = src;
+    return [offset, offset + (typeof source === 'string' ? source.length : 1)];
+}
+function parsePrelude(prelude) {
+    let comment = '';
+    let atComment = false;
+    let afterEmptyLine = false;
+    for (let i = 0; i < prelude.length; ++i) {

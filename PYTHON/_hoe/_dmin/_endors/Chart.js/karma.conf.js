@@ -1,0 +1,12 @@
+t",
+    "es.string.includes",
+    "es.string.is-well-formed",
+    "es.string.iterator",
+    "es.string.match",
+    "es.string.match-all",
+    "es.string.pad-end",
+    "es.string.pad-start",
+    "es.string.raw",
+    "es.string.repeat",
+    "es.string.replace",
+ 

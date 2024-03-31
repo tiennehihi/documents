@@ -1,0 +1,22 @@
+// @ts-check
+"use strict";
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+Object.defineProperty(exports, "build", {
+    enumerable: true,
+    get: function() {
+        return build;
+    }
+});
+const _fs = /*#__PURE__*/ _interop_require_default(require("fs"));
+const _path = /*#__PURE__*/ _interop_require_default(require("path"));
+const _resolveConfigPath = require("../../util/resolveConfigPath.js");
+const _plugin = require("./plugin.js");
+function _interop_require_default(obj) {
+    return obj && obj.__esModule ? obj : {
+        default: obj
+    };
+}
+async function build(args) {
+    let inp

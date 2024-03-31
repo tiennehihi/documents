@@ -1,0 +1,54 @@
+/*
+  Copyright 2018 Google LLC
+
+  Use of this source code is governed by an MIT-style
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/MIT.
+*/
+
+import '../../_version.js';
+
+interface LoggableObject {
+  [key: string]: string | number;
+}
+interface MessageMap {
+  [messageID: string]: (param: LoggableObject) => string;
+}
+
+export const messages: MessageMap = {
+  'invalid-value': ({paramName, validValueDescription, value}) => {
+    if (!paramName || !validValueDescription) {
+      throw new Error(`Unexpected input to 'invalid-value' error.`);
+    }
+    return (
+      `The '${paramName}' parameter was given a value with an ` +
+      `unexpected value. ${validValueDescription} Received a value of ` +
+      `${JSON.stringify(value)}.`
+    );
+  },
+
+  'not-an-array': ({moduleName, className, funcName, paramName}) => {
+    if (!moduleName || !className || !funcName || !paramName) {
+      throw new Error(`Unexpected input to 'not-an-array' error.`);
+    }
+    return (
+      `The parameter '${paramName}' passed into ` +
+      `'${moduleName}.${className}.${funcName}()' must be an array.`
+    );
+  },
+
+  'incorrect-type': ({
+    expectedType,
+    paramName,
+    moduleName,
+    className,
+    funcName,
+  }) => {
+    if (!expectedType || !paramName || !moduleName || !funcName) {
+      throw new Error(`Unexpected input to 'incorrect-type' error.`);
+    }
+    const classNameStr = className ? `${className}.` : '';
+    return (
+      `The parameter '${paramName}' passed into ` +
+      `'${moduleName}.${classNameStr}` +
+      `${funcName}()' must

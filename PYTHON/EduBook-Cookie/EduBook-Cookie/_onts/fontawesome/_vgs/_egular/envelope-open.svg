@@ -1,0 +1,41 @@
+computeColumnWidths(height);
+    computeLanes(root, 0);
+    return renderGraph();
+    function isFlowSwitchClause(f) {
+      return !!(f.flags & 128 /* SwitchClause */);
+    }
+    function hasAntecedents(f) {
+      return !!(f.flags & 12 /* Label */) && !!f.antecedents;
+    }
+    function hasAntecedent(f) {
+      return !!(f.flags & hasAntecedentFlags);
+    }
+    function hasNode(f) {
+      return !!(f.flags & hasNodeFlags);
+    }
+    function getChildren(node) {
+      const children = [];
+      for (const edge of node.edges) {
+        if (edge.source === node) {
+          children.push(edge.target);
+        }
+      }
+      return children;
+    }
+    function getParents(node) {
+      const parents = [];
+      for (const edge of node.edges) {
+        if (edge.target === node) {
+          parents.push(edge.source);
+        }
+      }
+      return parents;
+    }
+    function buildGraphNode(flowNode2, seen) {
+      const id = getDebugFlowNodeId(flowNode2);
+      let graphNode = links[id];
+      if (graphNode && seen.has(flowNode2)) {
+        graphNode.circular = true;
+        graphNode = {
+          id: -1,
+          flowNode: flo

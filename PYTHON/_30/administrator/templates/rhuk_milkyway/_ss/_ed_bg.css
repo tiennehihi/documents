@@ -1,0 +1,22 @@
+declare namespace ESTree {
+    interface FlowTypeAnnotation extends Node {}
+
+    interface FlowBaseTypeAnnotation extends FlowTypeAnnotation {}
+
+    interface FlowLiteralTypeAnnotation extends FlowTypeAnnotation, Literal {}
+
+    interface FlowDeclaration extends Declaration {}
+
+    interface AnyTypeAnnotation extends FlowBaseTypeAnnotation {}
+
+    interface ArrayTypeAnnotation extends FlowTypeAnnotation {
+        elementType: FlowTypeAnnotation;
+    }
+
+    interface BooleanLiteralTypeAnnotation extends FlowLiteralTypeAnnotation {}
+
+    interface BooleanTypeAnnotation extends FlowBaseTypeAnnotation {}
+
+    interface ClassImplements extends Node {
+        id: Identifier;
+        typeParameters?: TypeParameterInsta

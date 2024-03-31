@@ -1,0 +1,61 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+const { SyncHook, AsyncSeriesHook } = require("tapable");
+const { makeWebpackError } = require("../HookWebpackError");
+const WebpackError = require("../WebpackError");
+const ArrayQueue = require("./ArrayQueue");
+
+const QUEUED_STATE = 0;
+const PROCESSING_STATE = 1;
+const DONE_STATE = 2;
+
+let inHandleResult = 0;
+
+/**
+ * @template T
+ * @callback Callback
+ * @param {(WebpackError | null)=} err
+ * @param {T=} result
+ */
+
+/**
+ * @template T
+ * @template K
+ * @template R
+ */
+class AsyncQueueEntry {
+	/**
+	 * @param {T} item the item
+	 * @param {Callback<R>} callback the callback
+	 */
+	constructor(item, callback) {
+		this.item = item;
+		/** @type {typeof QUEUED_STATE | typeof PROCESSING_STATE | typeof DONE_STATE} */
+		this.state = QUEUED_STATE;
+		this.callback = callback;
+		/** @type {Callback<R>[] | undefined} */
+		this.callbacks = undefined;
+		this.result = undefined;
+		/** @type {WebpackError | undefined} */
+		this.error = undefined;
+	}
+}
+
+/**
+ * @template T
+ * @template K
+ * @template R
+ */
+class AsyncQueue {
+	/**
+	 * @param {Object} options options object
+	 * @param {string=} options.name name of the queue
+	 * @param {number=} options.parallelism how many items should be processed at once
+	 * @param {AsyncQueue<any, any, any>=} options.parent parent queue, which will have priority over this queue and with shared parallelism
+	 * @param {function(T): K=} options.getKey extract key from item
+	 * @param {function(T, Callback<R>): void} options.processor asy

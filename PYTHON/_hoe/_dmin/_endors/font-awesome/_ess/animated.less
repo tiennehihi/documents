@@ -1,0 +1,31 @@
+gs
+    } = ctx.doc.schema;
+    const resolved = resolveScalar(str, tags, tags.scalarFallback).value;
+    if (typeof resolved !== 'string') return doubleQuotedString(value, ctx);
+  }
+
+  const body = implicitKey ? str : foldFlowLines(str, indent, FOLD_FLOW, getFoldOptions(ctx));
+
+  if (comment && !inFlow && (body.indexOf('\n') !== -1 || comment.indexOf('\n') !== -1)) {
+    if (onComment) onComment();
+    return addCommentBefore(body, indent, comment);
+  }
+
+  return body;
+}
+
+function stringifyString(item, ctx, onComment, onChompKeep) {
+  const {
+    defaultType
+  } = strOptions;
+  const {
+    implicitKey,
+    inFlow
+  } = ctx;
+  let {
+    type,
+    value
+  } = item;
+
+  if (typeof value !== 'string') {
+    v

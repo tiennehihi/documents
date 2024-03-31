@@ -1,0 +1,39 @@
+/3219): Also recover from plugin errors during the initial build (@lukastaegert)
+
+## 1.26.3
+
+_2019-11-02_
+
+### Bug Fixes
+
+- Work around an incompatibility with rollup-plugin-dts (#3211)
+
+### Pull Requests
+
+- [#3211](https://github.com/rollup/rollup/pull/3211): Do no fail if the source attribute is `undefined` in an unused named export (@lukastaegert)
+
+## 1.26.2
+
+_2019-10-31_
+
+### Bug Fixes
+
+- Do not create invalid code when using `treeshake: false` and star re-exports (#3209)
+
+### Pull Requests
+
+- [#3209](https://github.com/rollup/rollup/pull/3209): Also remove export-all declarations when not tree-shaking (@lukastaegert)
+
+## 1.26.1
+
+_2019-10-31_
+
+### Bug Fixes
+
+- Prevent an issue where outputs would overwrite files emitted by other outputs (#3201)
+- Do not throw an error if the config file does not have a .js extension (#3204)
+
+### Pull Requests
+
+- [#3201](https://github.com/rollup/rollup/pull/3201): Make the CLI run generate/output in serial (@marijnh)
+- [#3204](https://github.com/rollup/rollup/pull/3204): support all config file ext

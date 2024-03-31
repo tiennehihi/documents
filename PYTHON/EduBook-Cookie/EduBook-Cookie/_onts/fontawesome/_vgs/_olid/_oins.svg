@@ -1,0 +1,33 @@
+# import/no-named-export
+
+<!-- end auto-generated rule header -->
+
+Prohibit named exports. Mostly an inverse of [`no-default-export`].
+
+[`no-default-export`]: ./no-default-export.md
+
+## Rule Details
+
+The following patterns are considered warnings:
+
+```javascript
+// bad1.js
+
+// There is only a single module export and it's a named export.
+export const foo = 'foo';
+```
+
+```javascript
+// bad2.js
+
+// There is more than one named export in the module.
+export const foo = 'foo';
+export const bar = 'bar';
+```
+
+```javascript
+// bad3.js
+
+// There is more than one named export in the module.
+const foo = 'foo';
+cons

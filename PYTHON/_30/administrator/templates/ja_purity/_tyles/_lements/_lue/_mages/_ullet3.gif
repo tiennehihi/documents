@@ -1,0 +1,5 @@
+re zero.
+    for (; rd[i] === 0; i--) rd.pop();
+
+    // Zero?
+    if

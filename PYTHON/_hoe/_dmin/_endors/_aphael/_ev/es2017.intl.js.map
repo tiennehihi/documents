@@ -1,0 +1,1 @@
+lse {\n            if (my.type === 'boolean') {\n              throw new Error(\n                `Flag ${token.rawName} does not take a value, received '${token.value}'`\n              )\n            }\n            if (my.type === 'string') 

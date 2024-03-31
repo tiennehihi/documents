@@ -1,0 +1,16 @@
+64"; }
+
+.fa-dice-five::before {
+  content: "\f523"; }
+
+.fa-square-rss::before {
+  content: "\f143"; }
+
+.fa-rss-square::before {
+  content: "\f143"; }
+
+.fa-land-mine-on::before {
+  content: "\e51b"; }
+
+.fa-i-cursor::before {
+  content: "\f24

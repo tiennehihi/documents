@@ -1,0 +1,26 @@
+urceMapRanges) {
+    destEmitNode.tokenSourceMapRanges = mergeTokenSourceMapRanges(tokenSourceMapRanges, destEmitNode.tokenSourceMapRanges);
+  }
+  if (constantValue !== void 0) {
+    destEmitNode.constantValue = constantValue;
+  }
+  if (helpers) {
+    for (const helper of helpers) {
+      destEmitNode.helpers = appendIfUnique(destEmitNode.helpers, helper);
+    }
+  }
+  if (startsOnNewLine !== void 0) {
+    destEmitNode.startsOnNewLine = startsOnNewLine;
+  }
+  if (snippetElement !== void 0) {
+    destEmitNode.snippetElement = snippetElement;
+  }
+  if (classThis) {
+    destEmitNode.classThis = classThis;
+  }
+  if (assignedName) {
+    destEmitNode.assignedName = assignedName;
+  }
+  return destEmitNode;
+}
+fu

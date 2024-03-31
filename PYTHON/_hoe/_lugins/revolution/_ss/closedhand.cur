@@ -1,0 +1,14 @@
+/**
+ * @fileoverview Main API Class
+ * @author Kai Cataldo
+ * @author Toru Nagashima
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const path = require("path");
+const fs = r

@@ -1,0 +1,4 @@
+import type { CasApi, CasGetOptions } from '../cas/types';
+import type { CrudApi, CrudResourceInfo } from '../crud/types';
+export interface CrudCasOptions {
+    hash: (blo

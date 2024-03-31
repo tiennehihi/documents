@@ -1,0 +1,23 @@
+import { Composer } from './compose/composer.js';
+import { Document } from './doc/Document.js';
+import { prettifyError, YAMLParseError } from './errors.js';
+import { warn } from './log.js';
+import { LineCounter } from './parse/line-counter.js';
+import { Parser } from './parse/parser.js';
+
+function parseOptions(options) {
+    const prettyErrors = options.prettyErrors !== false;
+    const lineCounter = options.lineCounter || (prettyErrors && new LineCounter()) || null;
+    return { lineCounter, prettyErrors };
+}
+/**
+ * Parse the input as a stream of YAML documents.
+ *
+ * Documents should be separated from each other by `...` or `---` marker lines.
+ *
+ * @returns If an empty `docs` array is returned, it will be of type
+ *   EmptyStream and contain additional stream information. In
+ *   TypeScript, you should use `'empty' in docs` as a type guard for it.
+ */
+function parseAllDocuments(source, options = {}) {
+    const { line

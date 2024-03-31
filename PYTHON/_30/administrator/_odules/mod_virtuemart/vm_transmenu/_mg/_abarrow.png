@@ -1,0 +1,3 @@
+range-set  ::= range ( logical-or range ) *
+logical-or ::= ( ' ' ) * '||' ( ' ' ) *
+range      ::= hyphen | simple ( ' ' si

@@ -1,0 +1,19 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = series;
+
+var _parallel2 = require('./internal/parallel.js');
+
+var _parallel3 = _interopRequireDefault(_parallel2);
+
+var _eachOfSeries = require('./eachOfSeries.js');
+
+var _eachOfSeries2 = _interopRequireDefault(_eachOfSeries);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Run the functions in the `tasks` collection in series,

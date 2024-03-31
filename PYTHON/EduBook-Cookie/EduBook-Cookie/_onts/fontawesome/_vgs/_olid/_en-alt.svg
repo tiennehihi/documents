@@ -1,0 +1,21 @@
+face TypeParameter extends BaseNode {
+  type: "TypeParameter";
+  bound: TypeAnnotation | null;
+  default: FlowType | null;
+  variance: Variance | null;
+  name: string;
+}
+
+export interface TypeParameterDeclaration extends BaseNode {
+  type: "TypeParameterDeclaration";
+  params: Array<TypeParameter>;
+}
+
+export interface TypeParameterInstantiation extends BaseNode {
+  type: "TypeParameterInstantiation";
+  params: Array<FlowType>;
+}
+
+export interface UnionTypeAnnotation extends BaseNode {
+  type: "UnionTypeAnnotation";
+  ty

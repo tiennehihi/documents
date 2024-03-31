@@ -1,0 +1,66 @@
+'use strict';
+
+const stringify = require('./lib/stringify');
+const compile = require('./lib/compile');
+const expand = require('./lib/expand');
+const parse = require('./lib/parse');
+
+/**
+ * Expand the given pattern or create a regex-compatible string.
+ *
+ * ```js
+ * const braces = require('braces');
+ * console.log(braces('{a,b,c}', { compile: true })); //=> ['(a|b|c)']
+ * console.log(braces('{a,b,c}')); //=> ['a', 'b', 'c']
+ * ```
+ * @param {String} `str`
+ * @param {Object} `options`
+ * @return {String}
+ * @api public
+ */
+
+const braces = (input, options = {}) => {
+  let output = [];
+
+  if (Array.isArray(input)) {
+    for (let pattern of input) {
+      let result = braces.create(pattern, options);
+      if (Array.isArray(result)) {
+        output.push(...result);
+      } else {
+        output.push(result);
+      }
+    }
+  } else {
+    output = [].concat(braces.create(input, options));
+  }
+
+  if (options && options.expand === true && options.nodupes === true) {
+    output = [...new Set(output)];
+  }
+  return output;
+};
+
+/**
+ * Parse the given `str` with the given `options`.
+ *
+ * ```js
+ * // braces.parse(pattern, [, options]);
+ * const ast = braces.parse('a/{b,c}/d');
+ * console.log(ast);
+ * ```
+ * @param {String} pattern Brace pattern to parse
+ * @param {Object} options
+ * @return {Object} Returns an AST
+ * @api public
+ */
+
+braces.parse = (input, options = {}) => parse(input, options);
+
+/**
+ * Creates a braces string from an AST, or an AST node.
+ *
+ * ```js
+ * const braces = require('braces');
+ * let ast = braces.parse('foo/{a,b}/bar');
+ * console.log(stringify(ast

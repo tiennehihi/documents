@@ -1,0 +1,1 @@
+{"version":3,"file":"timestamp.js","sourceRoot":"","sources":["../../lib/runtime/timestamp.ts"],"names":[],"mappings":";;AAAA,MAAM,YAAY,GAAG,OAAO,CAAA;AAC5B,MAAM,IAAI,GAAG,4BAA4B,CAAA;AACz

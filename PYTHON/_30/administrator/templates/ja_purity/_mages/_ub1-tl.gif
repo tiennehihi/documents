@@ -1,0 +1,17 @@
+{
+  "name": "@leichtgewicht/ip-codec",
+  "version": "2.0.4",
+  "description": "Small package to encode or decode IP addresses from buffers to strings.",
+  "main": "index.cjs",
+  "types": "types",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.cjs"
+    }
+  },
+  "scripts": {
+    "lint": "standard && dtslint --localTs node_modules/typescript/lib types",
+    "test": "npm run lint && npm run unit",
+    "unit": "fresh-tape test.mjs",
+    "c

@@ -1,0 +1,1 @@
+elf.push(item)}));else if(arguments.length>0)for(var i=0,l=arguments.length;i<l;i++)self.push(arguments[i]);return self}function insert(self,node,value){var inserted=n

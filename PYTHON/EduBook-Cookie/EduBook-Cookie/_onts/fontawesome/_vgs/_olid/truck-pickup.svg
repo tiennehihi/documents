@@ -1,0 +1,20 @@
+lassContextObject(contextIn) : createESDecorateClassElementContextObject(contextIn);
+  }
+  function createESDecorateHelper(ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
+    context.requestEmitHelper(esDecorateHelper);
+    return factory2.createCallExpression(
+      getUnscopedHelperName("__esDecorate"),
+      /*typeArguments*/
+      void 0,
+      [
+        ctor ?? factory2.createNull(),
+        descriptorIn ?? factory2.createNull(),
+        decorators,
+        createESDecorateContextObject(contextIn),
+        initializers,
+        extraInitializers
+      ]
+    );
+  }
+  function createRunInitializersHelper(thisArg, initializers, value) {
+    context.requestEmitHelper(runInitializ

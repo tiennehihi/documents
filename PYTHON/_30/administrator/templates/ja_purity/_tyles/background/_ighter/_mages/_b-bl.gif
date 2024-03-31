@@ -1,0 +1,11 @@
+'use strict';
+
+var KEYWORDS = require('./keywords');
+
+module.exports = defineKeywords;
+
+
+/**
+ * Defines one or several keywords in ajv instance
+ * @param  {Ajv} ajv validator instance
+ * @pa

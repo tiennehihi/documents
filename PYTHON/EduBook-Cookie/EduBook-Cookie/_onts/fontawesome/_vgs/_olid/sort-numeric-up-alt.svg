@@ -1,0 +1,32 @@
+"use strict";Object.defineProperty(exports, "__esModule", {value: true});
+var _keywords = require('./keywords');
+var _types = require('./types');
+
+ class Scope {
+  
+  
+  
+
+  constructor(startTokenIndex, endTokenIndex, isFunctionScope) {
+    this.startTokenIndex = startTokenIndex;
+    this.endTokenIndex = endTokenIndex;
+    this.isFunctionScope = isFunctionScope;
+  }
+} exports.Scope = Scope;
+
+ class StateSnapshot {
+  constructor(
+     potentialArrowAt,
+     noAnonFunctionType,
+     inDisallowConditionalTypesContext,
+     tokensLength,
+     scopesLength,
+     pos,
+     type,
+     contextualKeyword,
+     start,
+     end,
+     isType,
+     scopeDepth,
+     error,
+  ) {;this.potentialArrowAt = potenti

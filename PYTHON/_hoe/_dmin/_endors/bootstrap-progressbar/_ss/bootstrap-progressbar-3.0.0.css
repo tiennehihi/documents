@@ -1,0 +1,209 @@
+TA_SECTION_STATE;
+            } else {
+                this._err(ERR.cdataInHtmlContent);
+                this._createCommentToken();
+                this.currentToken.data = '[CDATA[';
+                this.state = BOGUS_COMMENT_STATE;
+            }
+        }
+
+        //NOTE: sequence lookup can be abrupted by hibernation. In that case lookup
+        //results are no longer valid and we will need to start over.
+        else if (!this._ensureHibernation()) {
+            this._err(ERR.incorrectlyOpenedComment);
+            this._createCommentToken();
+            this._reconsumeInState(BOGUS_COMMENT_STATE);
+        }
+    }
+
+    // Comment start state
+    //------------------------------------------------------------------
+    [COMMENT_START_STATE](cp) {
+        if (cp === $.HYPHEN_MINUS) {
+            this.state = COMMENT_START_DASH_STATE;
+        } else if (cp === $.GREATER_THAN_SIGN) {
+            this._err(ERR.abruptClosingOfEmptyComment);
+            this.state = DATA_STATE;
+            this._emitCurrentToken();
+        } else {
+            this._reconsumeInState(COMMENT_STATE);
+        }
+    }
+
+    // Comment start dash state
+    //------------------------------------------------------------------
+    [COMMENT_START_DASH_STATE](cp) {
+        if (cp === $.HYPHEN_MINUS) {
+            this.state = COMMENT_END_STATE;
+        } else if (cp === $.GREATER_THAN_SIGN) {
+            this._err(ERR.abruptClosingOfEmptyComment);
+            this.state = DATA_STATE;
+            this._emitCurrentToken();
+        } else if (cp === $.EOF) {
+            this._err(ERR.eofInComment);
+            this._emitCurrentToken();
+            this._emitEOFToken();
+        } else {
+            this.currentToken.data += '-';
+            this._reconsumeInState(COMMENT_STATE);
+        }
+    }
+
+    // Comment state
+    //------------------------------------------------------------------
+    [COMMENT_STATE](cp) {
+        if (cp === $.HYPHEN_MINUS) {
+            this.state = COMMENT_END_DASH_STATE;
+        } else if (cp === $.LESS_THAN_SIGN) {
+            this.currentToken.data += '<';
+            this.state = COMMENT_LESS_THAN_SIGN_STATE;
+        } else if (cp === $.NULL) {
+            this._err(ERR.unexpectedNullCharacter);
+            this.currentToken.data += unicode.REPLACEMENT_CHARACTER;
+        } else if (cp === $.EOF) {
+            this._err(ERR.eofInComment);
+            this._emitCurrentToken();
+            this._emitEOFToken();
+        } else {
+            this.currentToken.data += toChar(cp);
+        }
+    }
+
+    // Comment less-than sign state
+    //------------------------------------------------------------------
+    [COMMENT_LESS_THAN_SIGN_STATE](cp) {
+        if (cp === $.EXCLAMATION_MARK) {
+            this.currentToken.data += '!';
+            this.state = COMMENT_LESS_THAN_SIGN_BANG_STATE;
+        } else if (cp === $.LESS_THAN_SIGN) {
+            this.currentToken.data += '!';
+        } else {
+            this._reconsumeInState(COMMENT_STATE);
+        }
+    }
+
+    // Comment less-than sign bang state
+    //------------------------------------------------------------------
+    [COMMENT_LESS_THAN_SIGN_BANG_STATE](cp) {
+        if (cp === $.HYPHEN_MINUS) {
+            this.state = COMMENT_LESS_THAN_SIGN_BANG_DASH_STATE;
+        } else {
+            this._reconsumeInState(COMMENT_STATE);
+        }
+    }
+
+    // Comment less-than sign bang dash state
+    //------------------------------------------------------------------
+    [COMMENT_LESS_THAN_SIGN_BANG_DASH_STATE](cp) {
+        if (cp === $.HYPHEN_MINUS) {
+            this.state = COMMENT_LESS_THAN_SIGN_BANG_DASH_DASH_STATE;
+        } else {
+            this._reconsumeInState(COMMENT_END_DASH_STATE);
+        }
+    }
+
+    // Comment less-than sign bang dash dash state
+    //------------------------------------------------------------------
+    [COMMENT_LESS_THAN_SIGN_BANG_DASH_DASH_STATE](cp) {
+        if (cp !== $.GREATER_THAN_SIGN && cp !== $.EOF) {
+            this._err(ERR.nestedComment);
+        }
+
+        this._reconsumeInState(COMMENT_END_STATE);
+    }
+
+    // Comment end dash state
+    //------------------------------------------------------------------
+    [COMMENT_END_DASH_STATE](cp) {
+        if (cp === $.HYPHEN_MINUS) {
+            this.state = COMMENT_END_STATE;
+        } else if (cp === $.EOF) {
+            this._err(ERR.eofInComment);
+            this._emitCurrentToken();
+            this._emitEOFToken();
+        } else {
+            this.currentToken.data += '-';
+            this._reconsumeInState(COMMENT_STATE);
+        }
+    }
+
+    // Comment end state
+    //------------------------------------------------------------------
+    [COMMENT_END_STATE](cp) {
+        if (cp === $.GREATER_THAN_SIGN) {
+            this.state = DATA_STATE;
+            this._emitCurrentToken();
+        } else if (cp === $.EXCLAMATION_MARK) {
+            this.state = COMMENT_END_BANG_STATE;
+        } else if (cp === $.HYPHEN_MINUS) {
+            this.currentToken.data += '-';
+        } else if (cp === $.EOF) {
+            this._err(ERR.eofInComment);
+            this._emitCurrentToken();
+            this._emitEOFToken();
+        } else {
+            this.currentToken.data += '--';
+            this._reconsumeInState(COMMENT_STATE);
+        }
+    }
+
+    // Comment end bang state
+    //------------------------------------------------------------------
+    [COMMENT_END_BANG_STATE](cp) {
+        if (cp === $.HYPHEN_MINUS) {
+            this.currentToken.data += '--!';
+            this.state = COMMENT_END_DASH_STATE;
+        } else if (cp === $.GREATER_THAN_SIGN) {
+            this._err(ERR.incorrectlyClosedComment);
+            this.state = DATA_STATE;
+            this._emitCurrentToken();
+        } else if (cp === $.EOF) {
+            this._err(ERR.eofInComment);
+            this._emitCurrentToken();
+            this._emitEOFToken();
+        } else {
+            this.currentToken.data += '--!';
+            this._reconsumeInState(COMMENT_STATE);
+        }
+    }
+
+    // DOCTYPE state
+    //------------------------------------------------------------------
+    [DOCTYPE_STATE](cp) {
+        if (isWhitespace(cp)) {
+            this.state = BEFORE_DOCTYPE_NAME_STATE;
+        } else if (cp === $.GREATER_THAN_SIGN) {
+            this._reconsumeInState(BEFORE_DOCTYPE_NAME_STATE);
+        } else if (cp === $.EOF) {
+            this._err(ERR.eofInDoctype);
+            this._createDoctypeToken(null);
+            this.currentToken.forceQuirks = true;
+            this._emitCurrentToken();
+            this._emitEOFToken();
+        } else {
+            this._err(ERR.missingWhitespaceBeforeDoctypeName);
+            this._reconsumeInState(BEFORE_DOCTYPE_NAME_STATE);
+        }
+    }
+
+    // Before DOCTYPE name state
+    //------------------------------------------------------------------
+    [BEFORE_DOCTYPE_NAME_STATE](cp) {
+        if (isWhitespace(cp)) {
+            return;
+        }
+
+        if (isAsciiUpper(cp)) {
+            this._createDoctypeToken(toAsciiLowerChar(cp));
+            this.state = DOCTYPE_NAME_STATE;
+        } else if (cp === $.NULL) {
+            this._err(ERR.unexpectedNullCharacter);
+            this._createDoctypeToken(unicode.REPLACEMENT_CHARACTER);
+            this.state = DOCTYPE_NAME_STATE;
+        } else if (cp === $.GREATER_THAN_SIGN) {
+            this._err(ERR.missingDoctypeName);
+            this._createDoctypeToken(null);
+            this.currentToken.forceQuirks = true;
+            this._emitCurrentToken();
+            this.state = DATA_STATE;
+        } else if (cp === $.EOF

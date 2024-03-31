@@ -1,0 +1,1271 @@
+ficient color contrast of ${data.contrastRatio} (Minimum contrast is ${data.requiredContrastRatio}:1, link background color: ${data.nodeBackgroundColor}, surrounding background color: ${data.parentBackgroundColor})"
+      },
+      "incomplete": {
+        "default": "Element's foreground contrast ratio could not be determined",
+        "bgContrast": "Element's background contrast ratio could not be determined",
+        "bgImage": "Element's contrast ratio could not be determined due to a background image",
+        "bgGradient": "Element's contrast ratio could not be determined due to a background gradient",
+        "imgNode": "Element's contrast ratio could not be determined because element contains an image node",
+        "bgOverlap": "Element's contrast ratio could not be determined because of element overlap"
+      }
+    },
+    "autocomplete-appropriate": {
+      "pass": "the autocomplete value is on an appropriate element",
+      "fail": "the autocomplete value is inappropriate for this type of input"
+    },
+    "autocomplete-valid": {
+      "pass": "the autocomplete attribute is correctly formatted",
+      "fail": "the autocomplete attribute is incorrectly formatted"
+    },
+    "accesskeys": {
+      "pass": "Accesskey attribute value is unique",
+      "fail": "Document has multiple elements with the same accesskey"
+    },
+    "focusable-content": {
+      "pass": "Element contains focusable elements",
+      "fail": "Element should have focusable content"
+    },
+    "focusable-disabled": {
+      "pass": "No focusable elements contained within element",
+      "incomplete": "Check if the focusable elements immediately move the focus indicator",
+      "fail": "Focusable content should be disabled or be removed from the DOM"
+    },
+    "focusable-element": {
+      "pass": "Element is focusable",
+      "fail": "Element should be focusable"
+    },
+    "focusable-modal-open": {
+      "pass": "No focusable elements while a modal is open",
+      "incomplete": "Check that focusable elements are not tabbable in the current state"
+    },
+    "focusable-no-name": {
+      "pass": "Element is not in tab order or has accessible text",
+      "fail": "Element is in tab order and does not have accessible text",
+      "incomplete": "Unable to determine if element has an accessible name"
+    },
+    "focusable-not-tabbable": {
+      "pass": "No focusable elements contained within element",
+      "incomplete": "Check if the focusable elements immediately move the focus indicator",
+      "fail": "Focusable content should have tabindex='-1' or be removed from the DOM"
+    },
+    "frame-focusable-content": {
+      "pass": "Element does not have focusable descendants",
+      "fail": "Element has focusable descendants",
+      "incomplete": "Could not determine if element has descendants"
+    },
+    "landmark-is-top-level": {
+      "pass": "The ${data.role} landmark is at the top level.",
+      "fail": "The ${data.role} landmark is contained in another landmark."
+    },
+    "no-focusable-content": {
+      "pass": "Element does not have focusable descendants",
+      "fail": {
+        "default": "Element has focusable descendants",
+        "notHidden": "Using a negative tabindex on an element inside an interactive control does not prevent assistive technologies from focusing the element (even with 'aria-hidden=true')"
+      },
+      "incomplete": "Could not determine if element has descendants"
+    },
+    "page-has-heading-one": {
+      "pass": "Page has at least one level-one heading",
+      "fail": "Page must have a level-one heading"
+    },
+    "page-has-main": {
+      "pass": "Document has at least one main landmark",
+      "fail": "Document does not have a main landmark"
+    },
+    "page-no-duplicate-banner": {
+      "pass": "Document does not have more than one banner landmark",
+      "fail": "Document has more than one banner landmark"
+    },
+    "page-no-duplicate-contentinfo": {
+      "pass": "Document does not have more than one contentinfo landmark",
+      "fail": "Document has more than one contentinfo landmark"
+    },
+    "page-no-duplicate-main": {
+      "pass": "Document does not have more than one main landmark",
+      "fail": "Document has more than one main landmark"
+    },
+    "tabindex": {
+      "pass": "Element does not have a tabindex greater than 0",
+      "fail": "Element has a tabindex greater than 0"
+    },
+    "alt-space-value": {
+      "pass": "Element has a valid alt attribute value",
+      "fail": "Element has an alt attribute containing only a space character, which is not ignored by all screen readers"
+    },
+    "duplicate-img-label": {
+      "pass": "Element does not duplicate existing text in <img> alt text",
+      "fail": "Element contains <img> element with alt text that duplicates existing text"
+    },
+    "explicit-label": {
+      "pass": "Form element has an explicit <label>",
+      "fail": "Form element does not have an explicit <label>",
+      "incomplete": "Unable to determine if form element has an explicit <label>"
+    },
+    "help-same-as-label": {
+      "pass": "Help text (title or aria-describedby) does not duplicate label text",
+      "fail": "Help text (title or aria-describedby) text is the same as the label text"
+    },
+    "hidden-explicit-label": {
+      "pass": "Form element has a visible explicit <label>",
+      "fail": "Form element has explicit <label> that is hidden",
+      "incomplete": "Unable to determine if form element has explicit <label> that is hidden"
+    },
+    "implicit-label": {
+      "pass": "Form element has an implicit (wrapped) <label>",
+      "fail": "Form element does not have an implicit (wrapped) <label>",
+      "incomplete": "Unable to determine if form element has an implicit (wrapped} <label>"
+    },
+    "label-content-name-mismatch": {
+      "pass": "Element contains visible text as part of it's accessible name",
+      "fail": "Text inside the element is not included in the accessible name"
+    },
+    "multiple-label": {
+      "pass": "Form field does not have multiple label elements",
+      "incomplete": "Multiple label elements is not widely supported in assistive technologies. Ensure the first label contains all necessary information."
+    },
+    "title-only": {
+      "pass": "Form element does not solely use title attribute for its label",
+      "fail": "Only title used to generate label for form element"
+    },
+    "landmark-is-unique": {
+      "pass": "Landmarks must have a unique role or role/label/title (i.e. accessible name) combination",
+      "fail": "The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+    },
+    "has-lang": {
+      "pass": "The <html> element has a lang attribute",
+      "fail": {
+        "noXHTML": "The xml:lang attribute is not valid on HTML pages, use the lang attribute.",
+        "noLang": "The <html> element does not have a lang attribute"
+      }
+    },
+    "valid-lang": {
+      "pass": "Value of lang attribute is included in the list of valid languages",
+      "fail": "Value of lang attribute not included in the list of valid languages"
+    },
+    "xml-lang-mismatch": {
+      "pass": "Lang and xml:lang attributes have the same base language",
+      "fail": "Lang and xml:lang attributes do not have the same base language"
+    },
+    "dlitem": {
+      "pass": "Description list item has a <dl> parent element",
+      "fail": "Description list item does not have a <dl> parent element"
+    },
+    "listitem": {
+      "pass": "List item has a <ul>, <ol> or role=\"list\" parent element",
+      "fail": {
+        "default": "List item does not have a <ul>, <ol> parent element",
+        "roleNotValid": "List item does not have a <ul>, <ol> parent element without a role, or a role=\"list\""
+      }
+    },
+    "only-dlitems": {
+      "pass": "dl element only has direct children that are allowed inside; <dt>, <dd>, or <div> elements",
+      "fail": "dl element has direct children that are not allowed: ${data.values}"
+    },
+    "only-listitems": {
+      "pass": "List element only has direct children that are allowed inside <li> elements",
+      "fail": "List element has direct children that are not allowed: ${data.values}"
+    },
+    "structured-dlitems": {
+      "pass": "When not empty, element has both <dt> and <dd> elements",
+      "fail": "When not empty, element does not have at least one <dt> element followed by at least one <dd> element"
+    },
+    "caption": {
+      "pass": "The multimedia element has a captions track",
+      "incomplete": "Check that captions is available for the element"
+    },
+    "frame-tested": {
+      "pass": "The iframe was tested with axe-core",
+      "fail": "The iframe could not be tested with axe-core",
+      "incomplete": "The iframe still has to be tested with axe-core"
+    },
+    "no-autoplay-audio": {
+      "pass": "<video> or <audio> does not output audio for more than allowed duration or has controls mechanism",
+      "fail": "<video> or <audio> outputs audio for more than allowed duration and does not have a controls mechanism",
+      "incomplete": "Check that the <video> or <audio> does not output audio for more than allowed duration or provides a controls mechanism"
+    },
+    "css-orientation-lock": {
+      "pass": "Display is operable, and orientation lock does not exist",
+      "fail": "CSS Orientation lock is applied, and makes display inoperable",
+      "incomplete": "CSS Orientation lock cannot be determined"
+    },
+    "meta-viewport-large": {
+      "pass": "<meta> tag does not prevent significant zooming on mobile devices",
+      "fail": "<meta> tag limits zooming on mobile devices"
+    },
+    "meta-viewport": {
+      "pass": "<meta> tag does not disable zooming on mobile devices",
+      "fail": "${data} on <meta> tag disables zooming on mobile devices"
+    },
+    "target-offset": {
+      "pass": "Target has sufficient offset from its closest neighbor (${data.closestOffset}px should be at least ${data.minOffset}px)",
+      "fail": "Target has insufficient offset from its closest neighbor (${data.closestOffset}px should be at least ${data.minOffset}px)",
+      "incomplete": {
+        "default": "Element with negative tabindex has insufficient offset from its closest neighbor (${data.closestOffset}px should be at least ${data.minOffset}px). Is this a target?",
+        "nonTabbableNeighbor": "Target has insufficient offset from a neighbor with negative tabindex (${data.closestOffset}px should be at least ${data.minOffset}px). Is the neighbor a target?"
+      }
+    },
+    "target-size": {
+      "pass": {
+        "default": "Control has sufficient size (${data.width}px by ${data.height}px, should be at least ${data.minSize}px by ${data.minSize}px)",
+        "obscured": "Control is ignored because it is fully obscured and thus not clickable"
+      },
+      "fail": {
+        "default": "Target has insufficient size (${data.width}px by ${data.height}px, should be at least ${data.minSize}px by ${data.minSize}px)",
+        "partiallyObscured": "Target has insufficient size because it is partially obscured (smallest space is ${data.width}px by ${data.height}px, should be at least ${data.minSize}px by ${data.minSize}px)"
+      },
+      "incomplete": {
+        "default": "Element with negative tabindex has insufficient size (${data.width}px by ${data.height}px, should be at least ${data.minSize}px by ${data.minSize}px). Is this a target?",
+        "contentOverflow": "Element size could not be accurately determined due to overflow content",
+        "partiallyObscured": "Element with negative tabindex has insufficient size because it is partially obscured (smallest space is ${data.width}px by ${data.height}px, should be at least ${data.minSize}px by ${data.minSize}px). Is this a target?",
+        "partiallyObscuredNonTabbable": "Target has insufficient size because it is partially obscured by a neighbor with negative tabindex (smallest space is ${data.width}px by ${data.height}px, should be at least ${data.minSize}px by ${data.minSize}px). Is the neighbor a target?"
+      }
+    },
+    "header-present": {
+      "pass": "Page has a heading",
+      "fail": "Page does not have a heading"
+    },
+    "heading-order": {
+      "pass": "Heading order valid",
+      "fail": "Heading order invalid",
+      "incomplete": "Unable to determine previous heading"
+    },
+    "identical-links-same-purpose": {
+      "pass": "There are no other links with the same name, that go to a different URL",
+      "incomplete": "Check that links have the same purpose, or are intentionally ambiguous."
+    },
+    "internal-link-present": {
+      "pass": "Valid skip link found",
+      "fail": "No valid skip link found"
+    },
+    "landmark": {
+      "pass": "Page has a landmark region",
+      "fail": "Page does not have a landmark region"
+    },
+    "meta-refresh-no-exceptions": {
+      "pass": "<meta> tag does not immediately refresh the page",
+      "fail": "<meta> tag forces timed refresh of page"
+    },
+    "meta-refresh": {
+      "pass": "<meta> tag does not immediately refresh the page",
+      "fail": "<meta> tag forces timed refresh of page (less than 20 hours)"
+    },
+    "p-as-heading": {
+      "pass": "<p> elements are not styled as headings",
+      "fail": "Heading elements should be used instead of styled <p> elements",
+      "incomplete": "Unable to determine if <p> elements are styled as headings"
+    },
+    "region": {
+      "pass": "All page content is contained by landmarks",
+      "fail": "Some page content is not contained by landmarks"
+    },
+    "skip-link": {
+      "pass": "Skip link target exists",
+      "incomplete": "Skip link target should become visible on activation",
+      "fail": "No skip link target"
+    },
+    "unique-frame-title": {
+      "pass": "Element's title attribute is unique",
+      "fail": "Element's title attribute is not unique"
+    },
+    "duplicate-id-active": {
+      "pass": "Document has no active elements that share the same id attribute",
+      "fail": "Document has active elements with the same id attribute: ${data}"
+    },
+    "duplicate-id-aria": {
+      "pass": "Document has no elements referenced with ARIA or labels that share the same id attribute",
+      "fail": "Document has multiple elements referenced with ARIA with the same id attribute: ${data}"
+    },
+    "duplicate-id": {
+      "pass": "Document has no static elements that share the same id attribute",
+      "fail": "Document has multiple static elements with the same id attribute: ${data}"
+    },
+    "aria-label": {
+      "pass": "aria-label attribute exists and is not empty",
+      "fail": "aria-label attribute does not exist or is empty"
+    },
+    "aria-labelledby": {
+      "pass": "aria-labelledby attribute exists and references elements that are visible to screen readers",
+      "fail": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",
+      "incomplete": "ensure aria-labelledby references an existing element"
+    },
+    "avoid-inline-spacing": {
+      "pass": "No inline styles with '!important' that affect text spacing has been specified",
+      "fail": {
+        "singular": "Remove '!important' from inline style ${data.values}, as overriding this is not supported by most browsers",
+        "plural": "Remove '!important' from inline styles ${data.values}, as overriding this is not supported by most browsers"
+      }
+    },
+    "button-has-visible-text": {
+      "pass": "Element has inner text that is visible to screen readers",
+      "fail": "Element does not have inner text that is visible to screen readers",
+      "incomplete": "Unable to determine if element has children"
+    },
+    "doc-has-title": {
+      "pass": "Document has a non-empty <title> element",
+      "fail": "Document does not have a non-empty <title> element"
+    },
+    "exists": {
+      "pass": "Element does not exist",
+      "incomplete": "Element exists"
+    },
+    "has-alt": {
+      "pass": "Element has an alt attribute",
+      "fail": "Element does not have an alt attribute"
+    },
+    "has-visible-text": {
+      "pass": "Element has text that is visible to screen readers",
+      "fail": "Element does not have text that is visible to screen readers",
+      "incomplete": "Unable to determine if element has children"
+    },
+    "important-letter-spacing": {
+      "pass": "Letter-   }
+      });
+    }
+  }
+
+  /**
+   * @private
+   * @returns {void}
+   */
+  setupWatchFiles() {
+    const { watchFiles } = this.options;
+
+    if (/** @type {WatchFiles[]} */ (watchFiles).length > 0) {
+      /** @type {WatchFiles[]} */
+      (watchFiles).forEach((item) => {
+        this.watchFiles(item.paths, item.options);
+      });
+    }
+  }
+
+  /**
+   * @private
+   * @returns {void}
+   */
+  setupMiddlewares() {
+    /**
+     * @type {Array<Middleware>}
+     */
+    let middlewares = [];
+
+    // compress is placed last and uses unshift so that it will be the first middleware used
+    if (this.options.compress) {
+      const compression = require("compression");
+
+      middlewares.push({ name: "compression", middleware: compression() });
+    }
+
+    if (typeof this.options.onBeforeSetupMiddleware === "function") {
+      this.options.onBeforeSetupMiddleware(this);
+    }
+
+    if (typeof this.options.headers !== "undefined") {
+      middlewares.push({
+        name: "set-headers",
+        path: "*",
+        middleware: this.setHeaders.bind(this),
+      });
+    }
+
+    middlewares.push({
+      name: "webpack-dev-middleware",
+      middleware:
+        /** @type {import("webpack-dev-middleware").Middleware<Request, Response>}*/
+        (this.middleware),
+    });
+
+    if (this.options.proxy) {
+      const { createProxyMiddleware } = require("http-proxy-middleware");
+
+      /**
+       * @param {ProxyConfigArrayItem} proxyConfig
+       * @returns {RequestHandler | undefined}
+       */
+      const getProxyMiddleware = (proxyConfig) => {
+        // It is possible to use the `bypass` method without a `target` or `router`.
+        // However, the proxy middleware has no use in this case, and will fail to instantiate.
+        if (proxyConfig.target) {
+          const context = proxyConfig.context || proxyConfig.path;
+
+          return createProxyMiddleware(
+            /** @type {string} */ (context),
+            proxyConfig
+          );
+        }
+
+        if (proxyConfig.router) {
+          return createProxyMiddleware(proxyConfig);
+        }
+      };
+
+      /**
+       * Assume a proxy configuration specified as:
+       * proxy: [
+       *   {
+       *     context: "value",
+       *     ...options,
+       *   },
+       *   // or:
+       *   function() {
+       *     return {
+       *       context: "context",
+       *       ...options,
+       *     };
+       *   }
+       * ]
+       */
+      /** @type {ProxyConfigArray} */
+      (this.options.proxy).forEach((proxyConfigOrCallback) => {
+        /**
+         * @type {RequestHandler}
+         */
+        let proxyMiddleware;
+
+        let proxyConfig =
+          typeof proxyConfigOrCallback === "function"
+            ? proxyConfigOrCallback()
+            : proxyConfigOrCallback;
+
+        proxyMiddleware =
+          /** @type {RequestHandler} */
+          (getProxyMiddleware(proxyConfig));
+
+        if (proxyConfig.ws) {
+          this.webSocketProxies.push(proxyMiddleware);
+        }
+
+        /**
+         * @param {Request} req
+         * @param {Response} res
+         * @param {NextFunction} next
+         * @returns {Promise<void>}
+         */
+        const handler = async (req, res, next) => {
+          if (typeof proxyConfigOrCallback === "function") {
+            const newProxyConfig = proxyConfigOrCallback(req, res, next);
+
+            if (newProxyConfig !== proxyConfig) {
+              proxyConfig = newProxyConfig;
+              proxyMiddleware =
+                /** @type {RequestHandler} */
+                (getProxyMiddleware(proxyConfig));
+            }
+          }
+
+          // - Check if we have a bypass function defined
+          // - In case the bypass function is defined we'll retrieve the
+          // bypassUrl from it otherwise bypassUrl would be null
+          // TODO remove in the next major in favor `context` and `router` options
+          const isByPassFuncDefined = typeof proxyConfig.bypass === "function";
+          const bypassUrl = isByPassFuncDefined
+            ? await /** @type {ByPass} */ (proxyConfig.bypass)(
+                req,
+                res,
+                proxyConfig
+              )
+            : null;
+
+          if (typeof bypassUrl === "boolean") {
+            // skip the proxy
+            // @ts-ignore
+            req.url = null;
+            next();
+          } else if (typeof bypassUrl === "string") {
+            // byPass to that url
+            req.url = bypassUrl;
+            next();
+          } else if (proxyMiddleware) {
+            return proxyMiddleware(req, res, next);
+          } else {
+            next();
+          }
+        };
+
+        middlewares.push({
+          name: "http-proxy-middleware",
+          middleware: handler,
+        });
+        // Also forward error requests to the proxy so it can handle them.
+        middlewares.push({
+          name: "http-proxy-middleware-error-handler",
+          middleware:
+            /**
+             * @param {Error} error
+             * @param {Request} req
+             * @param {Response} res
+             * @param {NextFunction} next
+             * @returns {any}
+             */
+            (error, req, res, next) => handler(req, res, next),
+        });
+      });
+
+      middlewares.push({
+        name: "webpack-dev-middleware",
+        middleware:
+          /** @type {import("webpack-dev-middleware").Middleware<Request, Response>}*/
+          (this.middleware),
+      });
+    }
+
+    if (/** @type {NormalizedStatic[]} */ (this.options.static).length > 0) {
+      /** @type {NormalizedStatic[]} */
+      (this.options.static).forEach((staticOption) => {
+        staticOption.publicPath.forEach((publicPath) => {
+          middlewares.push({
+            name: "express-static",
+            path: publicPath,
+            middleware: getExpress().static(
+              staticOption.directory,
+              staticOption.staticOptions
+            ),
+          });
+        });
+      });
+    }
+
+    if (this.options.historyApiFallback) {
+      const connectHistoryApiFallback = require("connect-history-api-fallback");
+      const { historyApiFallback } = this.options;
+
+      if (
+        typeof (
+          /** @type {ConnectHistoryApiFallbackOptions} */
+          (historyApiFallback).logger
+        ) === "undefined" &&
+        !(
+          /** @type {ConnectHistoryApiFallbackOptions} */
+          (historyApiFallback).verbose
+        )
+      ) {
+        // @ts-ignore
+        historyApiFallback.logger = this.logger.log.bind(
+          this.logger,
+          "[connect-history-api-fallback]"
+        );
+      }
+
+      // Fall back to /index.html if nothing else matches.
+      middlewares.push({
+        name: "connect-history-api-fallback",
+        middleware: connectHistoryApiFallback(
+          /** @type {ConnectHistoryApiFallbackOptions} */
+          (historyApiFallback)
+        ),
+      });
+
+      // include our middleware to ensure
+      // it is able to handle '/index.html' request after redirect
+      middlewares.push({
+        name: "webpack-dev-middleware",
+        middleware:
+          /** @type {import("webpack-dev-middleware").Middleware<Request, Response>}*/
+          (this.middleware),
+      });
+
+      if (/** @type {NormalizedStatic[]} */ (this.options.static).length > 0) {
+        /** @type {NormalizedStatic[]} */
+        (this.options.static).forEach((staticOption) => {
+          staticOption.publicPath.forEach((publicPath) => {
+            middlewares.push({
+              name: "express-static",
+              path: publicPath,
+              middleware: getExpress().static(
+                staticOption.directory,
+                staticOption.staticOptions
+              ),
+            });
+          });
+        });
+      }
+    }
+
+    if (/** @type {NormalizedStatic[]} */ (this.options.static).length > 0) {
+      const serveIndex = require("serve-index");
+
+      /** @type {NormalizedStatic[]} */
+      (this.options.static).forEach((staticOption) => {
+        staticOption.publicPath.forEach((publicPath) => {
+          if (staticOption.serveIndex) {
+            middlewares.push({
+              name: "serve-index",
+              path: publicPath,
+              /**
+               * @param {Request} req
+               * @param {Response} res
+               * @param {NextFunction} next
+               * @returns {void}
+               */
+              middleware: (req, res, next) => {
+                // serve-index doesn't fallthrough non-get/head request to next middleware
+                if (req.method !== "GET" && req.method !== "HEAD") {
+                  return next();
+                }
+
+                serveIndex(
+                  staticOption.directory,
+                  /** @type {ServeIndexOptions} */
+                  (staticOption.serveIndex)
+                )(req, res, next);
+              },
+            });
+          }
+        });
+      });
+    }
+
+    if (this.options.magicHtml) {
+      middlewares.push({
+        name: "serve-magic-html",
+        middleware: this.serveMagicHtml.bind(this),
+      });
+    }
+
+    // Register this middleware always as the last one so that it's only used as a
+    // fallback when no other middleware responses.
+    middlewares.push({
+      name: "options-middleware",
+      path: "*",
+      /**
+       * @param {Request} req
+       * @param {Response} res
+       * @param {NextFunction} next
+       * @returns {void}
+       */
+      middleware: (req, res, next) => {
+        if (req.method === "OPTIONS") {
+          res.statusCode = 204;
+          res.setHeader("Content-Length", "0");
+          res.end();
+          return;
+        }
+        next();
+      },
+    });
+
+    if (typeof this.options.setupMiddlewares === "function") {
+      middlewares = this.options.setupMiddlewares(middlewares, this);
+    }
+
+    middlewares.forEach((middleware) => {
+      if (typeof middleware === "function") {
+        /** @type {import("express").Application} */
+        (this.app).use(middleware);
+      } else if (typeof middleware.path !== "undefined") {
+        /** @type {import("express").Application} */
+        (this.app).use(middleware.path, middleware.middleware);
+      } else {
+        /** @type {import("express").Application} */
+        (this.app).use(middleware.middleware);
+      }
+    });
+
+    if (typeof this.options.onAfterSetupMiddleware === "function") {
+      this.options.onAfterSetupMiddleware(this);
+    }
+  }
+
+  /**
+   * @private
+   * @returns {void}
+   */
+  createServer() {
+    const { type, options } = /** @type {ServerConfiguration} */ (
+      this.options.server
+    );
+
+    /** @type {import("http").Server | undefined | null} */
+    // eslint-disable-next-line import/no-dynamic-require
+    this.server = require(/** @type {string} */ (type)).createServer(
+      options,
+      this.app
+    );
+
+    /** @type {import("http").Server} */
+    (this.server).on(
+      "connection",
+      /**
+       * @param {Socket} socket
+       */
+      (socket) => {
+        // Add socket to list
+        this.sockets.push(socket);
+
+        socket.once("close", () => {
+          // Remove socket from list
+          this.sockets.splice(this.sockets.indexOf(socket), 1);
+        });
+      }
+    );
+
+    /** @type {import("http").Server} */
+    (this.server).on(
+      "error",
+      /**
+       * @param {Error} error
+       */
+      (error) => {
+        throw error;
+      }
+    );
+  }
+
+  /**
+   * @private
+   * @returns {void}
+   */
+  // TODO: remove `--web-socket-server` in favor of `--web-socket-server-type`
+  createWebSocketServer() {
+    /** @type {WebSocketServerImplementation | undefined | null} */
+    this.webSocketServer = new /** @type {any} */ (this.getServerTransport())(
+      this
+    );
+    /** @type {WebSocketServerImplementation} */
+    (this.webSocketServer).implementation.on(
+      "connection",
+      /**
+       * @param {ClientConnection} client
+       * @param {IncomingMessage} request
+       */
+      (client, request) => {
+        /** @type {{ [key: string]: string | undefined } | undefined} */
+        const headers =
+          // eslint-disable-next-line no-nested-ternary
+          typeof request !== "undefined"
+            ? /** @type {{ [key: string]: string | undefined }} */
+              (request.headers)
+            : typeof (
+                /** @type {import("sockjs").Connection} */ (client).headers
+              ) !== "undefined"
+            ? /** @type {import("sockjs").Connection} */ (client).headers
+            : // eslint-disable-next-line no-undefined
+              undefined;
+
+        if (!headers) {
+          this.logger.warn(
+            'webSocketServer implementation must pass headers for the "connection" event'
+          );
+        }
+
+        if (
+          !headers ||
+          !this.checkHeader(headers, "host") ||
+          !this.checkHeader(headers, "origin")
+        ) {
+          this.sendMessage([client], "error", "Invalid Host/Origin header");
+
+          // With https enabled, the sendMessage above is encrypted asynchronously so not yet sent
+          // Terminate would prevent it sending, so use close to allow it to be sent
+          client.close();
+
+          return;
+        }
+
+        if (this.options.hot === true || this.options.hot === "only") {
+          this.sendMessage([client], "hot");
+        }
+
+        if (this.options.liveReload) {
+          this.sendMessage([client], "liveReload");
+        }
+
+        if (
+          this.options.client &&
+          /** @type {ClientConfiguration} */
+          (this.options.client).progress
+        ) {
+          this.sendMessage(
+            [client],
+            "progress",
+            /** @type {ClientConfiguration} */
+            (this.options.client).progress
+          );
+        }
+
+        if (
+          this.options.client &&
+          /** @type {ClientConfiguration} */ (this.options.client).reconnect
+        ) {
+          this.sendMessage(
+            [client],
+            "reconnect",
+            /** @type {ClientConfiguration} */
+            (this.options.client).reconnect
+          );
+        }
+
+        if (
+          this.options.client &&
+          /** @type {ClientConfiguration} */
+          (this.options.client).overlay
+        ) {
+          const overlayConfig = /** @type {ClientConfiguration} */ (
+            this.options.client
+          ).overlay;
+
+          this.sendMessage(
+            [client],
+            "overlay",
+            typeof overlayConfig === "object"
+              ? {
+                  ...overlayConfig,
+                  errors:
+                    overlayConfig.errors &&
+                    encodeOverlaySettings(overlayConfig.errors),
+                  warnings:
+                    overlayConfig.warnings &&
+                    encodeOverlaySettings(overlayConfig.warnings),
+                  runtimeErrors:
+                    overlayConfig.runtimeErrors &&
+                    encodeOverlaySettings(overlayConfig.runtimeErrors),
+                }
+              : overlayConfig
+          );
+        }
+
+        if (!this.stats) {
+          return;
+        }
+
+        this.sendStats([client], this.getStats(this.stats), true);
+      }
+    );
+  }
+
+  /**
+   * @private
+   * @param {string} defaultOpenTarget
+   * @returns {void}
+   */
+  openBrowser(defaultOpenTarget) {
+    const open = require("open");
+
+    Promise.all(
+      /** @type {NormalizedOpen[]} */
+      (this.options.open).map((item) => {
+        /**
+         * @type {string}
+         */
+        let openTarget;
+
+        if (item.target === "<url>") {
+          openTarget = defaultOpenTarget;
+        } else {
+          openTarget = Server.isAbsoluteURL(item.target)
+            ? item.target
+            : new URL(item.target, defaultOpenTarget).toString();
+        }
+
+        return open(openTarget, item.options).catch(() => {
+          this.logger.warn(
+            `Unable to open "${openTarget}" page${
+              item.options.app
+                ? ` in "${
+                    /** @type {import("open").App} */
+                    (item.options.app).name
+                  }" app${
+                    /** @type {import("open").App} */
+                    (item.options.app).arguments
+                      ? ` with "${
+                          /** @type {import("open").App} */
+                          (item.options.app).arguments.join(" ")
+                        }" arguments`
+                      : ""
+                  }`
+                : ""
+            }. If you are running in a headless environvar assert = require('assert');
+var jp = require('../');
+
+var data = require('./data/store.json');
+
+suite('query', function() {
+
+  test('first-level member', function() {
+    var results = jp.nodes(data, '$.store');
+    assert.deepEqual(results, [ { path: ['$', 'store'], value: data.store } ]);
+  });
+
+  test('authors of all books in the store', function() {
+    var results = jp.nodes(data, '$.store.book[*].author');
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0, 'author'], value: 'Nigel Rees' },
+      { path: ['$', 'store', 'book', 1, 'author'], value: 'Evelyn Waugh' },
+      { path: ['$', 'store', 'book', 2, 'author'], value: 'Herman Melville' },
+      { path: ['$', 'store', 'book', 3, 'author'], value: 'J. R. R. Tolkien' }
+    ]);
+  });
+
+  test('all authors', function() {
+    var results = jp.nodes(data, '$..author');
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0, 'author'], value: 'Nigel Rees' },
+      { path: ['$', 'store', 'book', 1, 'author'], value: 'Evelyn Waugh' },
+      { path: ['$', 'store', 'book', 2, 'author'], value: 'Herman Melville' },
+      { path: ['$', 'store', 'book', 3, 'author'], value: 'J. R. R. Tolkien' }
+    ]);
+  });
+
+  test('all authors via subscript descendant string literal', function() {
+    var results = jp.nodes(data, "$..['author']");
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0, 'author'], value: 'Nigel Rees' },
+      { path: ['$', 'store', 'book', 1, 'author'], value: 'Evelyn Waugh' },
+      { path: ['$', 'store', 'book', 2, 'author'], value: 'Herman Melville' },
+      { path: ['$', 'store', 'book', 3, 'author'], value: 'J. R. R. Tolkien' }
+    ]);
+  });
+
+  test('all things in store', function() {
+    var results = jp.nodes(data, '$.store.*');
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book'], value: data.store.book },
+      { path: ['$', 'store', 'bicycle'], value: data.store.bicycle }
+    ]);
+  });
+
+  test('price of everything in the store', function() {
+    var results = jp.nodes(data, '$.store..price');
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0, 'price'], value: 8.95 },
+      { path: ['$', 'store', 'book', 1, 'price'], value: 12.99 },
+      { path: ['$', 'store', 'book', 2, 'price'], value: 8.99 },
+      { path: ['$', 'store', 'book', 3, 'price'], value: 22.99 },
+      { path: ['$', 'store', 'bicycle', 'price'], value: 19.95 }
+    ]);
+  });
+
+  test('last book in order via expression', function() {
+    var results = jp.nodes(data, '$..book[(@.length-1)]');
+    assert.deepEqual(results, [ { path: ['$', 'store', 'book', 3], value: data.store.book[3] }]);
+  });
+
+  test('first two books via union', function() {
+    var results = jp.nodes(data, '$..book[0,1]');
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0], value: data.store.book[0] },
+      { path: ['$', 'store', 'book', 1], value: data.store.book[1] }
+    ]);
+  });
+
+  test('first two books via slice', function() {
+    var results = jp.nodes(data, '$..book[0:2]');
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0], value: data.store.book[0] },
+      { path: ['$', 'store', 'book', 1], value: data.store.book[1] }
+    ]);
+  });
+
+  test('filter all books with isbn number', function() {
+    var results = jp.nodes(data, '$..book[?(@.isbn)]');
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 2], value: data.store.book[2] },
+      { path: ['$', 'store', 'book', 3], value: data.store.book[3] }
+    ]);
+  });
+
+  test('filter all books with a price less than 10', function() {
+    var results = jp.nodes(data, '$..book[?(@.price<10)]');
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0], value: data.store.book[0] },
+      { path: ['$', 'store', 'book', 2], value: data.store.book[2] }
+    ]);
+  });
+
+  test('first ten of all elements', function() {
+    var results = jp.nodes(data, '$..*', 10);
+    assert.deepEqual(results, [
+      { path: [ '$', 'store' ], value: data.store },
+      { path: [ '$', 'store', 'book' ], value: data.store.book },
+      { path: [ '$', 'store', 'bicycle' ], value: data.store.bicycle },
+      { path: [ '$', 'store', 'book', 0 ], value: data.store.book[0] },
+      { path: [ '$', 'store', 'book', 1 ], value: data.store.book[1] },
+      { path: [ '$', 'store', 'book', 2 ], value: data.store.book[2] },
+      { path: [ '$', 'store', 'book', 3 ], value: data.store.book[3] },
+      { path: [ '$', 'store', 'book', 0, 'category' ], value: 'reference' },
+      { path: [ '$', 'store', 'book', 0, 'author' ], value: 'Nigel Rees' },
+      { path: [ '$', 'store', 'book', 0, 'title' ], value: 'Sayings of the Century' }
+    ])
+  });
+
+  test('all elements', function() {
+    var results = jp.nodes(data, '$..*');
+
+    assert.deepEqual(results, [
+      { path: [ '$', 'store' ], value: data.store },
+      { path: [ '$', 'store', 'book' ], value: data.store.book },
+      { path: [ '$', 'store', 'bicycle' ], value: data.store.bicycle },
+      { path: [ '$', 'store', 'book', 0 ], value: data.store.book[0] },
+      { path: [ '$', 'store', 'book', 1 ], value: data.store.book[1] },
+      { path: [ '$', 'store', 'book', 2 ], value: data.store.book[2] },
+      { path: [ '$', 'store', 'book', 3 ], value: data.store.book[3] },
+      { path: [ '$', 'store', 'book', 0, 'category' ], value: 'reference' },
+      { path: [ '$', 'store', 'book', 0, 'author' ], value: 'Nigel Rees' },
+      { path: [ '$', 'store', 'book', 0, 'title' ], value: 'Sayings of the Century' },
+      { path: [ '$', 'store', 'book', 0, 'price' ], value: 8.95 },
+      { path: [ '$', 'store', 'book', 1, 'category' ], value: 'fiction' },
+      { path: [ '$', 'store', 'book', 1, 'author' ], value: 'Evelyn Waugh' },
+      { path: [ '$', 'store', 'book', 1, 'title' ], value: 'Sword of Honour' },
+      { path: [ '$', 'store', 'book', 1, 'price' ], value: 12.99 },
+      { path: [ '$', 'store', 'book', 2, 'category' ], value: 'fiction' },
+      { path: [ '$', 'store', 'book', 2, 'author' ], value: 'Herman Melville' },
+      { path: [ '$', 'store', 'book', 2, 'title' ], value: 'Moby Dick' },
+      { path: [ '$', 'store', 'book', 2, 'isbn' ], value: '0-553-21311-3' },
+      { path: [ '$', 'store', 'book', 2, 'price' ], value: 8.99 },
+      { path: [ '$', 'store', 'book', 3, 'category' ], value: 'fiction' },
+      { path: [ '$', 'store', 'book', 3, 'author' ], value: 'J. R. R. Tolkien' },
+      { path: [ '$', 'store', 'book', 3, 'title' ], value: 'The Lord of the Rings' },
+      { path: [ '$', 'store', 'book', 3, 'isbn' ], value: '0-395-19395-8' },
+      { path: [ '$', 'store', 'book', 3, 'price' ], value: 22.99 },
+      { path: [ '$', 'store', 'bicycle', 'color' ], value: 'red' },
+      { path: [ '$', 'store', 'bicycle', 'price' ], value: 19.95 }
+    ]);
+  });
+
+  test('all elements via subscript wildcard', function() {
+    var results = jp.nodes(data, '$..*');
+    assert.deepEqual(jp.nodes(data, '$..[*]'), jp.nodes(data, '$..*'));
+  });
+
+  test('object subscript wildcard', function() {
+    var results = jp.query(data, '$.store[*]');
+    assert.deepEqual(results, [ data.store.book, data.store.bicycle ]);
+  });
+
+  test('no match returns empty array', function() {
+    var results = jp.nodes(data, '$..bookz');
+    assert.deepEqual(results, []);
+  });
+
+  test('member numeric literal gets first element', function() {
+    var results = jp.nodes(data, '$.store.book.0');
+    assert.deepEqual(results, [ { path: [ '$', 'store', 'book', 0 ], value: data.store.book[0] } ]);
+  });
+
+  test('member numeric literal matches string-numeric key', function() {
+    var data = { authors: { '1': 'Herman Melville', '2': 'J. R. R. Tolkien' } };
+    var results = jp.nodes(data, '$.authors.1');
+    assert.deepEqual(results, [ { path: [ '$', 'authors', 1 ], value: 'Herman Melville' } ]);
+  });
+
+  test('descendant numeric literal gets first element', function() {
+    var results = jp.nodes(data, '$.store.book..0');
+    assert.deepEqual(results, [ { path: [ '$', 'store', 'book', 0 ], value: data.store.book[0] } ]);
+  });
+
+  test('root element gets us original obj', function() {
+    var results = jp.nodes(data, '$');
+    assert.deepEqual(results, [ { path: ['$'], value: data } ]);
+  });
+
+  test('subscript double-quoted string', function() {
+    var results = jp.nodes(data, '$["store"]');
+    assert.deepEqual(results, [ { path: ['$', 'store'], value: data.store} ]);
+  });
+
+  test('subscript single-quoted string', function() {
+    var results = jp.nodes(data, "$['store']");
+    assert.deepEqual(results, [ { path: ['$', 'store'], value: data.store} ]);
+  });
+
+  test('leading member component', function() {
+    var results = jp.nodes(data, "store");
+    assert.deepEqual(results, [ { path: ['$', 'store'], value: data.store} ]);
+  });
+
+  test('union of three array slices', function() {
+    var results = jp.query(data, "$.store.book[0:1,1:2,2:3]");
+    assert.deepEqual(results, data.store.book.slice(0,3));
+  });
+
+  test('slice with step > 1', function() {
+    var results = jp.query(data, "$.store.book[0:4:2]");
+    assert.deepEqual(results, [ data.store.book[0], data.store.book[2]]);
+  });
+
+  test('union of subscript string literal keys', function() {
+    var results = jp.nodes(data, "$.store['book','bicycle']");
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book'], value: data.store.book },
+      { path: ['$', 'store', 'bicycle'], value: data.store.bicycle },
+    ]);
+  });
+
+  test('union of subscript string literal three keys', function() {
+    var results = jp.nodes(data, "$.store.book[0]['title','author','price']");
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0, 'title'], value: data.store.book[0].title },
+      { path: ['$', 'store', 'book', 0, 'author'], value: data.store.book[0].author },
+      { path: ['$', 'store', 'book', 0, 'price'], value: data.store.book[0].price }
+    ]);
+  });
+
+  test('union of subscript integer three keys followed by member-child-identifier', function() {
+    var results = jp.nodes(data, "$.store.book[1,2,3]['title']");
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 1, 'title'], value: data.store.book[1].title },
+      { path: ['$', 'store', 'book', 2, 'title'], value: data.store.book[2].title },
+      { path: ['$', 'store', 'book', 3, 'title'], value: data.store.book[3].title }
+    ]);
+  });
+
+  test('union of subscript integer three keys followed by union of subscript string literal three keys', function() {
+    var results = jp.nodes(data, "$.store.book[0,1,2,3]['title','author','price']");
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0, 'title'], value: data.store.book[0].title },
+      { path: ['$', 'store', 'book', 0, 'author'], value: data.store.book[0].author },
+      { path: ['$', 'store', 'book', 0, 'price'], value: data.store.book[0].price },
+      { path: ['$', 'store', 'book', 1, 'title'], value: data.store.book[1].title },
+      { path: ['$', 'store', 'book', 1, 'author'], value: data.store.book[1].author },
+      { path: ['$', 'store', 'book', 1, 'price'], value: data.store.book[1].price },
+      { path: ['$', 'store', 'book', 2, 'title'], value: data.store.book[2].title },
+      { path: ['$', 'store', 'book', 2, 'author'], value: data.store.book[2].author },
+      { path: ['$', 'store', 'book', 2, 'price'], value: data.store.book[2].price },
+      { path: ['$', 'store', 'book', 3, 'title'], value: data.store.book[3].title },
+      { path: ['$', 'store', 'book', 3, 'author'], value: data.store.book[3].author },
+      { path: ['$', 'store', 'book', 3, 'price'], value: data.store.book[3].price }
+    ]);
+  });
+  
+  test('union of subscript integer four keys, including an inexistent one, followed by union of subscript string literal three keys', function() {
+    var results = jp.nodes(data, "$.store.book[0,1,2,3,151]['title','author','price']");
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0, 'title'], value: data.store.book[0].title },
+      { path: ['$', 'store', 'book', 0, 'author'], value: data.store.book[0].author },
+      { path: ['$', 'store', 'book', 0, 'price'], value: data.store.book[0].price },
+      { path: ['$', 'store', 'book', 1, 'title'], value: data.store.book[1].title },
+      { path: ['$', 'store', 'book', 1, 'author'], value: data.store.book[1].author },
+      { path: ['$', 'store', 'book', 1, 'price'], value: data.store.book[1].price },
+      { path: ['$', 'store', 'book', 2, 'title'], value: data.store.book[2].title },
+      { path: ['$', 'store', 'book', 2, 'author'], value: data.store.book[2].author },
+      { path: ['$', 'store', 'book', 2, 'price'], value: data.store.book[2].price },
+      { path: ['$', 'store', 'book', 3, 'title'], value: data.store.book[3].title },
+      { path: ['$', 'store', 'book', 3, 'author'], value: data.store.book[3].author },
+      { path: ['$', 'store', 'book', 3, 'price'], value: data.store.book[3].price }
+    ]);
+  });
+  
+  test('union of subscript integer three keys followed by union of subscript string literal three keys, followed by inexistent literal key', function() {
+    var results = jp.nodes(data, "$.store.book[0,1,2,3]['title','author','price','fruit']");
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0, 'title'], value: data.store.book[0].title },
+      { path: ['$', 'store', 'book', 0, 'author'], value: data.store.book[0].author },
+      { path: ['$', 'store', 'book', 0, 'price'], value: data.store.book[0].price },
+      { path: ['$', 'store', 'book', 1, 'title'], value: data.store.book[1].title },
+      { path: ['$', 'store', 'book', 1, 'author'], value: data.store.book[1].author },
+      { path: ['$', 'store', 'book', 1, 'price'], value: data.store.book[1].price },
+      { path: ['$', 'store', 'book', 2, 'title'], value: data.store.book[2].title },
+      { path: ['$', 'store', 'book', 2, 'author'], value: data.store.book[2].author },
+      { path: ['$', 'store', 'book', 2, 'price'], value: data.store.book[2].price },
+      { path: ['$', 'store', 'book', 3, 'title'], value: data.store.book[3].title },
+      { path: ['$', 'store', 'book', 3, 'author'], value: data.store.book[3].author },
+      { path: ['$', 'store', 'book', 3, 'price'], value: data.store.book[3].price }
+    ]);
+  });
+
+  test('union of subscript 4 array slices followed by union of subscript string literal three keys', function() {
+    var results = jp.nodes(data, "$.store.book[0:1,1:2,2:3,3:4]['title','author','price']");
+    assert.deepEqual(results, [
+      { path: ['$', 'store', 'book', 0, 'title'], value: data.store.book[0].title },
+      { path: ['$', 'store', 'book', 0, 'author'], value: data.store.book[0].author },
+      { path: ['$', 'store', 'book', 0, 'price'], value: data.store.book[0].price },
+      { path: ['$', 'store', 'book', 1, 'title'], value: data.store.book[1].title },
+      { path: ['$', 'store', 'book', 1, 'author'], value: data.store.book[1].author },
+      { path: ['$', 'store', 'book', 1, 'price'], value: data.store.book[1].price },
+      { path: ['$', 'store', 'book', 2, 'title'], value: data.store.book[2].title },
+      { path: ['$', 'store', 'book', 2, 'author'], value: data.store.book[2].author },
+      { path: ['$', 'store', 'book', 2, 'price'], value: data.store.book[2].price },
+      { path: ['$', 'store', 'book', 3, 'title'], value: data.store.book[3].title },
+      { path: ['$', 'store', 'book', 3, 'author'], value: data.store.book[3].author },
+      { path: ['$', 'store', 'book', 3, 'price'], value: data.store.book[3].price }
+    ]);
+  });
+
+
+  test('nested parentheses eval', function() {
+    var pathExpression = '$..book[?( @.price && (@.price + 20 || false) )]'
+    var results = jp.query(data, pathExpression);
+    assert.deepEqual(results, data.store.book);
+  });
+
+  test('array indexes from 0 to 100', function() {
+    var data = [];
+    for (var i = 0; i <= 100; ++i)
+      data[i] = Math.random();
+
+    for (var i = 0; i <= 100; ++i) {
+      var results = jp.query(data, '$[' + i.toString() +  ']');
+      assert.deepEqual(results, [data[i]]);
+    }
+  });
+
+  test('descendant subscript numeric literal', function() {
+    var data = [ 0, [ 1, 2, 3 ], [ 4, 5, 6 ] ];
+    var results = jp.query(data, '$..[0]');
+    assert.deepEqual(results, [ 0, 1, 4 ]);
+  });
+
+  test('descendant subscript numeric literal', function() {
+    var data = [ 0, 1, [ 2, 3, "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const patternRequired_1 = __importDefault(require("../definitions/patternRequired"));
+const patternRequired = (ajv) => ajv.addKeyword((0, patternRequired_1.default)());
+exports.default = patternRequired;
+module.exports = patternRequired;
+//# sourceMappingURL=patternRequired.js.map               Bµ8y©ôA>a'nÅGUÙÕÕ$¿êÁtî+ÊKªT˜¿Ó˜“¿ğ}#jËOm—x‘ì¿SèKâåûº4K…’~¹ƒ6KØ…×º4E×ÈVŒˆğuz¥æYr]‚[NPQ¡İ©T}ª­¤
+øÃ:EµÆÒEGw×ÕŠ®Ê«Fì!"Ü:TÍù.®=¯ÜÃ,õ€ˆ‰õí·ä6ÙÒÃS'I‹ß(á¿ªì´ÖÌˆ4Á³ªšpkÕ¬Ã"ÚåFÂf»h¿³m—”¿’ÌÉuğVµÙ¬µz‹=ºÔ£\Vƒz	
+8oÿîÉƒ9&çìİ—‡¥hØí*y˜8^¿´DÌº8øú$ä
+Ù4úğö6Û¶r¿VH¬$%¤gœEâÄŠ>@}	ÅEDH¡Â™ç­G’‹!óˆ8fÍùa«é“´ÂÎ ±Rå§Ú¢€lQUGæìø²QíJåaáœ»•64v½~zÉs²Â>›0ù&WEª]I‰—ìŠú)ÄdFLàÃV~¿8i‰İë·x-èY³¶¿A$sÓonÔfsf5ËNdãÁŒÇŸ^Œ÷^'k(¯foq²ò·=;›f7ª’
+1‡dK|±J/òáà+³=\m_º	JäwªˆâØ`T;'UÙ®&#ş6Y‚;]—º{˜o‰K«ïVÇ®„Ü2Fn:ë˜!#-•¬ÙJug¾Œït|¸ º±nŒ—¸½İeEP÷EóÁWğÉ1¼F}ƒÄ"Ş77±‚ş)f†Ù­öY}yô"ì8ôIKèkĞr<P'EB}áAùjìòNùµóivïL×}ŒÄ%DğT
+§× Rvò)¿â‡ùèÉ‚ŸÇ“}âÛÑ‡ğ›ÿ%Œ#èøØ²"‘úí±/BÑìÍ¸˜úşv–ãÁ û7?ŞdeY0ü9ñáÆM¶ñ>
+O°|à©|QÔñ8°ûƒI¥Nøu–éĞYæËõ˜¯áM½ÃüÎo*íè¯Î®{3)>sp}dóa¯&Ùù`Ğ¿|(!KäM\F¶õ°¡}ĞN>AĞ§=ÊG®>€™½ú¯É…{cÅ¯¨R7@¶ûÑY47¸‡ş†ÔÕ·‰¿aßRÜy&¨G€üJØaÑc…Š‹xç=x¬)æÿzÿädÿğ0 ?:>½8ù÷ı×¿îïï½8èƒ¢óâ¦˜‚À§øÃuqÓêi)Â~«gV†[=µË éx¢”
+´£âQò[0€½èÎdúO;%G†C¢“auæs1"Ä`ÈÀˆ‚1˜‹
+!ö&Ÿp:7ğùÏêÂ¯Â’úÙdxª`İZd
+fÊyÚ]=¹p‘¤z€È; ªÚ[I•ú˜‘rŠÀQx¬qd¶@„Mx(éUè§üíèˆÕrf„›¢¨%TBoÓòû23¡Çíı·sÆ[Ÿï6ø£ríou¢‘jİÕ-hl<j¥Œ›fˆXÀ¯ıbƒÙ¤)×‹ÑÏ§#@>Ş¬§c©ğã§&®Œ.j-É©Ò|¾Réü*«P“ö ¢ø]ª*”\¿‡J9¨+“i¶…ùQÏk4"ô®«sØ Æ­J!dQzœçºü¼İµ#¹Ú?¸#’jC^–ŒéZß¿«l»ªï“:DãèÃ¸ëD«õj§ë[–“‘Û”ö•p‚Ğ úİÄd¼%9ƒ.ÏAmîµO&	(‘¤'<
+[v,1‰OíæÈvpƒ^½ˆcBôd—ÙH¤ÜdïsXá³Ñı]v_­›—(Î&ã1DœG‘íG`Ò3š{VÊG=ºZÂC+¦Hmw¶SÁuuT{ÕëÁ{ÍwK+œÊ½Ã±,m^S)VucüJ…ÊCòÜ1h²IŞ®Ğ)„’+K,Ã0ÿ‘ÎM\ÒÛs‡jŸ½îÿÒÿ_îµ¹Éïúpâ*‘M%›ûD¢“e9ÑÆ–]–\¹-K‘#iÖ$GÅ!¥(*ş÷EwãÆÌHöV6Ç*ËäĞh4€F£Ñ³ãıw‡'öOŒ˜?n®i»áªøğhØyºwêå2ÏÿÈaT¦”ÙŒma+¬ÏU9V`v1Ú:z"ŠjİrH«”kj'JÎM¾ª³yIŒÑT-ägŞ°ô/‹™œqÎèÌ¸c|ı+á¹ÕŸg7²0æ°f¼3±')§Â¼›ÉÂ®Ç8g|øDsğ9‡(+Ïˆ…—÷D¯_óû£Ëã<ÇÜÀĞÕ±Ó…¿ğGµöüAãVÀ\Ö­°şæ<B¡6Â‘j$ kMK4W½¬fC½¨®‹ËUgD±£ÏÏÎn–åª<; vğğÜM%ƒ¡Ë×«›õŠ!‰4j
+¡RB¡£&õH­‰q‘Uù íäÀ…ÇÅâ)ŒBÙÏ°9gèÅÁ‚‰hçËOm¨H'¦Ëç;/¾=;ûğéãáÙÙ‹çI~´é< Z›PrôüA¹ÿÏ²XtÎ±Äyw3î‡Ü*qÆÁ=×ùLb‰Ë°ÓbaOğwlò³ª«ìs.÷ü%ÊˆÈ±à¶?[LÅÊ
+ìÑŠT|,¤~5[¡ Gšè Ğwî‘ÿ°çø@Ìüênºçu‹ğ%Vüxt©E3İÒf+ü¸)UÇóØ6’U ä»ğÇ 1<÷×cG ‚WÚ—9bH®ì›+k+4öìªklwí®hùÆ9MrÜŞ­^Ávæ/âN¸ª]°)Vø(ÚQÜ8ü=Ÿèüğáì_"q ³ª#Xbú‰ç_ZxÃİŞSBK¬#¨ÃIü÷nØ•°Ñ-oLva³ì×İF*Í>n »»M3JzÂœ-Ÿ í	ÚãÄ*‘ğ9‘NZ^1úE
+KS*Æ¬²¢‡î’öğºŞ°!,åïäAÿ¸Ú:*W‡W­1_GpøIU®›œ.ãQH¤ÕNbSæ/ıMzHjV–é’J·²iM†Ç“iŞıY;%DJğnÍ¤?N$éJÌÓV‰®ù]:nD›æòí¤Åúè!‘€Nç_õ ÎÇOg˜a°·’)¾ÆùsŒL1ŒP©/®o¶¶¤P-^­‹Ùôƒ”?äé‹Ì}¬áÛ'#çë7oßï¿>Û?~±gO¿}(˜EøbXdÿxÿí?TíàyR[íçÃãÃû§TïoğÇ>nmºN/àüéşÜ›n×Ü‹Våz9Éße7ÙäZçmùM.zù†tçÅ‹-ñB)æfy¶¬0	d°¬dP<¿Ìf³J®–Égğ¡L¾ 2t4E5D``“òœ#ä¿ùª"0¤ù»ÈÅm¾¼3†¯Ë˜1‹r¡ ÏQœ™•‹«|	 W×„•¨ÃÎ rM+(}SÊ’×¹lk½*fÊ*°Ø±F¸Ë¼ÊWØıÓòpîLà§ ÀºğA_uéÆ˜¨‰œ
+B.›æ^1w¢&à(buøúî’`Kˆ]7é&è›!8v²#¿ôDe=ÛSù,V.MÔìğ§0,ï <âéOšÊ¡°¾1¨<ã±†ñ¹„qD\˜[xÅª­úÙW—şİ­z·«Í¸8Wc
+»äÄ.Áï =¶ÒC'R7løNüıäı1¥Íö°q›êÏ™9¨ZõÇGˆÑØ×4ódu™·9^ˆÄv`]Ü|YÆ™Â.¾C§hQíS¤×Šëì’uÚñÿN«;ÜŠ§®ín°xq{1zƒ0D2|òE3$ËT¢Š‹­ÅÍC¹ßÊØ†wvÄ«{yºÆhØèE~)á³…R/ƒ³Ó]l@J\¨”Íå)¹!.œ‰Ü*úİµ<y³µĞ/Á¸†ø¬bå1»7ªì>íà”‚ÛD)®àÆQ–XæÓõ$wÁ`p‹‘¬yê-U" ô
+’MæËy¯/ÊÕµÂY"UÌic˜çóR2ûu•]å}ô¡ç'Œ7òè`°åSB¥êßÑe8ËÄ´Ì«Å6Ü= |…Û Å,êsÊ3¼«&ùBŠQ¥BŒû¨yrXŠK=š!xÄÄ]VÙC«¬q¹,çøĞMO&›ØÑ KSË@8n9Ü!t-)ë‹#Ùí¼^pÎ‘e7êaâ@"Âëbå"µññTØSó7¤œuí}êvæ ¹÷ã&‡ÚÑèA°yB..[±'ÜİPA·¯‡^X<I £ig®'­*=ÇœĞA9}0„$ŒhWâïŠ”‡^h`Ä‡è&ÅÙÈ°´‘ ôsãbã‰İ¸ÍKıÂ‹us é|k	½º+¸ÒF˜¨~SŞÄ7K8Õœn˜g¤	ÑÇ"/ÅÁ­-<æõcºı·
+ZÂäW ¥D²¨ï®	ÎGhXTìzÀGîÆÇT‰Ğ¦;uÃ~E:»‹ŸvÍÔg¹Ùz¼TÇsğà£!x›Yø!è{ôã¸—,´µ%åÑç;ñ[x3dká.˜‰O±¼À¤@x^¢„ßdÀ¼¤°XÎns³×[È1À„ ıo<YM­^]lh=öOO?½útzxöëá?~{ÿñõ‰“=w´É]w	0·ï$Gİ†«/wåSñêdæ¡Ù7º»ùkşRD\}¯ãB~åáfåÕgúN: g›ë†â7s_5™H"˜ÂUG‹ÛlV˜Æ4hÚUhG‡‡ğgñı«¿œÆr*YkIìewÿ†9&™v:êÁ=.õxèğªÃQ¸üšßÛ*İî^ÿî‘²ú-»„j@œÅ¯Şzl1 *lÚş2ıAõ7 qÂì÷Å!½Š÷¦7f”~¬9NŠşÃ­6¡[©*¦Ğ öo¼µv=`Óck¹ÙúõW†i:1DNÖ/{d5›7İŸ=HY€'¨3ˆ‰½\µd®7Ëù¡2ôp+sìÒŸ?Å1ıñ•î£ù°ÙgiÈŸèÕ÷àgJ¨óêyà-ªIaO„ï”9F"ºiÅ„}§NfJ"}¡‘éöXª™ò¸ ˆˆ¸ÿş$F>qìK9Ìwo:¨ƒˆàVåQÚN¾../åä0àöĞ¯º!ı«}kà?zİh0ª}E´™ck½êê"Î=U­ÊyP€¶4‰Cx>Ã‘ÜÚ‚{'8n.+µñ*­¨;Â@İQ­Tf,JŠÕ£LÏºÃºëˆ÷)Ù<8ÿV<@pöB+ÿ-Y¹Míµ±WKeİN5úüa[ˆí>xlf+ê®Oÿ«»y™FÆSŸ±O€É•âÓRÀšt”Ål·‰ú®^YÜ;RàªÅóú¤Cø*„N·šâOU>jh>!×¨±aí/Ê»×N±«&êFİiÀUWkìNU³¢šĞŸÌ„ì@|ïËÇNß˜€ºÿš‰€¬ÊU6{§°cäñŞÀ¸ñíû¤u~¹‚Š’æûŸ‡‹é×­ÇçYj|Gzìd²dPj«ïvH/cz†UQõõ3ıÊ–®NU;¾çw`¨;Ï~ïD/{>VœÌŸŠ¹§_SFFùz×LÃ­à0:Ò³ZÍäâÖsçØŒáœDcäÒŞÂ&(pé5¢ê˜3f$x»fíÈm Twy\®®1ˆŒ~E±mœÔ‹Ó£w‡¯Ï>¼ıôóÑñÙ/ïßÿ
+§22ÛÜÎÖx0=€<ı¿dÕõ6-²í¸€“ğ¼ßØ´~r•/ ¨UşjéõÓY™™:$º} }¿y¦#æ'7½÷’}¢ä?z}/%˜bBB‰ÿÊCMhÅñİ›b–ZÎ‚§GÓğÖG_ı‚”~§ËlQÁŒFÍØ”nˆu‘•~©`,%E§­q°ÏÖòÔñ-Oq
+unğY=K#Xëô¢vUX4º•¡4‘ÂÂÆF(˜á×eùæo<GÂó/–,t+áÁoŸ;§rrÅlœm4èPx5®?80ªçNSB®2ìçĞƒE•çsWØ{õ~®ªdK«`a»Mà´ëØÆzRvF%©9¥¤$"Û <´W=á@Û‚pÚ²ÍA¨¦ÆÔd Ö£1sq‰GH‘ì#(;ÖéNéÀ¨ÉÅºÓ¹°Å.%FŸoK¨ouCìõ-°¨o½¹U-2kĞÙ}lµÂ‹…åyîwŸ÷aÇt‰ÊIõê•·-x©_„¶õÍí7}¨Ä.ûÏiãj’»˜}+F.xéçÖ™gËÏÄi÷ÿ5ä/€P+ùb"Ï’ûhÂi¨¤&¡}Ò/L9)ºF«èQh«Œİ·EU¬4Ë¯ıfw]ë“ı"ÜSiM”L@õâÊ‚+£ÒzLî¡£Ö†ÈÁ+&ÅjvÿVî·ù”RR¹ËÃgºgÉA&²™&—EÃÖt‰ÆWwK‚{#áyRLså|j‡ZäQÛhÁtyŒ|âu@IÄñ!¾)ÛÜ 	Èí7W¡)Wx§M|cSìáõáÉÁÇ£à¼g.#¬%óÀñ°EüìÆµQ#BM6p{S.m ª³{&c\  ”/!pŒUù\EfØŸÍNòl9¹† …ğ¿²ß_+Y—/…ë
+¶`Ó8˜ßAe9ñgõ,š*ŠƒG={ıwÆb@×!YyuP,'ëY¶Ô^Ä"Æ‰8†[Àù6À&U©ã)jT¹nÖ\±°±ï³¨;	·ÔÈ+P¶ÙÄÛ÷ÑĞ7aL8u‡ÁÙL8D«tÛŒªà¤Ö£5Lœ°¼r›Zç¸b8¶˜»]¸‡¶ØÙó»“Üø}‚”¤N˜•­+‘Ğ±Öÿ®¡› ˆvüR7ÊÀŒâ£;Ü©ƒb7D%2‰P5o¸·M¦İ«Û‹{],ó	cÑÕ„µÛUGx\bë\¶âÀ¹)0ûd 6,f@‘E#N¡ÛõÏ´u£)åƒiÙè«\wŞ'Sãº€¡­A¨Æ4ƒ•‡ZÔK÷~vZ4Iå›N¸lEyÁ\-³ˆ'0un”%Ë[¬@sÉ7=ÁFt ]Ï*ë‰ø¾>hQí ã‚ÿ‡ş»bŠîKÁS…N:WïE»•ÜÅõöÄìÁA¥	¨[@+è3b­_PŠcİOfµÕ]‘¶®én^?ªô‘Ú±XÌ¼2l‰ÜqU;Z`ô´û H(»bnÜÄxY·¾ráj²,hpkÆ¬0Ú)¶?jŸÂEŞqiò—æ‹Dt©¢|ÚıµKÆ†²–ÖÉîºò8‹Sõ©‚@Ø¨ÚÆÅ÷¡,¸ô!X:Æ•jâ{5W6Äpêµwˆ5å3íA/Æ.«Vü‹\‹Wvõ2sV‹`„Y­YÖº–½ r7,GÎ°lı:Â_j†çÕı1\O§«,UÉ–‹c™ÏòÛl±rÇ˜ï­áÜ‡hÇÒ¨€ƒÖGc®`á²ê*5$¸¦`-Ÿ8–„;ÿ÷ı0îx'ÓÀ½R› Ñ¶u@Ï™``“/oåÆv%÷5r*|¡è¸M)gÚÙy5“+ôå´¨`~¼„°÷/ÑBñ@Hc÷’
+í,Ê— ÿe6+2kãI„Á0xù |~ŞáĞáÚĞOª`ùxOğìÚ~1C<{‚ç›yÅ/ËÈ¾Pr5Ã
+şs0³åÊƒ%²¢Øº+jL¦áBcèv8QKIJ>U£RÂ„y&£÷MU”®Ø<‘´öG]¬HŒª‘.;O
+®åÎ«²œåYT®eÇùîîìˆßĞÑ`Q®ÄºÊÓRÇE>Ét°KW	858¸ˆqSŞ¬!vé´í5™‹©"°\®Æ–©˜ªGâq‹ÖÄ1ë£õ,€»ç0>Z¢ìU±˜²îÂ,`*ªÂrÛıíj?Õ2%c™î8¼·/i•âB-Bu!Ë­Søt|dFh,öö€cwI¯—«¶©C ¡mÀ‹¾•íÛ­0Q£éƒl9ˆUçÑ1¢‘ë¥ŠqƒÓTÇNKÅ1-\@”¨î¸±·ò<¯t´û§¸º
+Š‚×:ù¸ ¹¢Èğ  ¾m’ÆQ}T0((=×kÆØjx\¢)(¶•ÙÓv—Ôµıbµd*¦1ÙØôı"™"`R,X/ŠI¹\ìÜ väe…‘¦SEÿ9´ ì$öpt5é¶åXüÿ§õšB'Zîòÿ>°²^ÍšîşÄ	 Š»u½ÓOÛŞ¿l_o¿¡ÿg’y¯_LŸLêz¡xŒ¤ µháCu#9 C;ƒ‰IìÎ¢L•hı Vq6@_Çø·0_µÚ¾ƒ:üUà.W~^GzEï5«cä–áöz†ø ©ä‚Â*˜¸6¼Ã ÑVù¢"³	ù=QV"ûœ¿Í¯²YÇVÛÃ6T|Íï{â¥y¥³ÖŠñ®«.Š…BîÏ:­/éC?úİÌYG‹\±²5›Nµ_áiù¶¼óò*ªu.îµ¼³#ªõ\¬oĞ_UÙsÃIBÄ©4.„"[!×ĞÊ1ÂºZR#ş‡?R”
+í‚tğa‰!¡Yyé&1 É`±™ïÈIJå=Æ¯h™Læ­ø›Q±ÿ†XÚ÷”_|%_A–¸’eJL˜bîı›È¨&6tPªïê’÷¬¾U¥ÆÃ¯“èŞƒœ¿xş`Üc6çÌ‘`Ò"!/êZe†0ÅwM k+RFåDMW˜Ã7×h[Ÿ–¶õI¹^ _ºe‹6D£ Op9®à’^iÀåûZ²VQ¬\ˆè9áZïEe4Zè¯o¡•è½Qm1ÆqØ¥tLïZÇ*Ó\®}ÍhÓ¡Â¹Ğ´\ÌÊtu§å«œİWècJ“šˆÆ•n©š×j^ê89m+d³»ì¾:¸Î'ŸóiÛJÖp‡»¾ç.6ºÃ˜X8dJÂ	£³Õ^¤8gl=3<w*êwæÂ½:‹ß^h#4„çGÊ·ÜÒ¯?N«yFaÈø±Ò‰¦íP,"G+˜(ö{µÛ›ğ,Àü{÷(~“äÇ1%¤!ì×&
+nyÉµ"Ú°ó‰ÔêŠş–ÇHÅ×1Inkí«Ã'¹êÒ·ö¢†ÂBõáö+à³Š½øÄ~ÈÔşãeñ¼ı’¨ˆ	4bË™:TXnˆ$60#Z[¨¢¼;•¾]¾I˜pâN76ºÂvØÇ¤MktükÖîfA!° såÿªvn§w¼Oø^zÚ³ôO’ˆ…’é	$Úl=n—6B‚eÉÃá%öj¹N˜g+p8‡{Sã5}rGÃv[ˆ´ÀÉGlãkìYH"Ø“G b7xğx&BlÀŠğy ïÊÂÅi’r¢åáDdQ­L®;}°³47D1fD€†L1º€±M7oXñ*B¼'F¶è¸×ÓÎçé%–"[—]ûş™]AOœ£ÇGhä8c÷PÇ/˜â·€à`¥
+WWn3A²…XÃ˜(ûmq®Î†/èø¿6cDªáÀŒCÛşÚ·Ş‘¡F«ğ§*4^mT	­f5£Gp<Y˜c„}SÔ1ˆ¨w­®nTb*8×™Õ¸­pNÕª¿vvèqŠÖÓúÚu„¨ÚL¢æõPÙaç¨g³húyí$¦è¼¼M©ß6ı¥ÎdF·_¾[vn£#Ø‹:7ºÒ­aÊÑX>•{øM0†'‘ÍÏÒ8Û°]eá”¯·%Kï%j4Óú	Zªh¡ì5Ujì"Ë˜ç‡¿“b‚ÉÆÎNê³ˆP7?+¯¸3a)…uÃO™öšzÕm”¢³ğc¢VáTåR0íbgnØ—dnŠÂ]JQè¾v‹x9èÂBú~ÓÛ6·û;%ÄÈŒç–|Vm¦z®¶3<c&HÖôjk‘òÍÑÔøŒ¥2uúyÉ1r%D…ìƒd¢¥Ø¤âË	N0%:+)oB¦Wnvúcà*bö8ÔûÆõ0í!H—¹©)ËçÏ4Ê¼ØbWŸYùïÜTØ<ÍêçÊ¹ÑÆ¸÷aà1Á¬xRpİ©à<j¼5¨ùòèòà~"g«ÙÓÔ]ùÖ×.5ªœ”˜å:Ïñ->Ù™±¶)AÌåf7i	˜•E/’‹©q)±…;68îÖÌà‘ƒ™kO_ËñzWÔÌò!SËÑ=jqÖ&Šœ?Û:¶ñøÔŸMwø¸Tş„9ÿ„´re€„0DÊ) Ì	Šİ4.åñÃJMú´#vë]7ìò{{™#)œ’"HX?=„í6‘z,­×4ßMf’òGßkÖ7_§Y‡ãsîVi¢õØ×Nm_^5‡¢YĞ¢Ş¢æbEYlT+å@¢kããÄA©ëŸÑÙ©	ÑûáV‚ße¼§§Üß¢’œ±"½Í]Gã®+ïöşfY^€BÇHŒJöÃ­y¸Ï"é³,_;7"Ğª'Sğzø¨X¸¹<İo¶j3½´ÉŒ9ÍÜãînPƒ«‡$`ŠdeÀ7åR"Na]ŒhÀĞ tmÚÇ(ØjMƒFË±<0Ù–=ê™òUL‰•–N‚eõÄLGÊâë¦=pZWÄp°ÛÇax½s*AïDí…)'Íğ?ŞM¦Ëş•t+Ñ{wÉNßß¤eŠ6/¹xk¹_0~½öÀÔ‚ÚrÚ1‚~·QàÎÍlš˜ä˜ üÓñ¯Çï;>û°úK·ïF3ÂÈO/–º½­”ŒÒñÕ­_¬°cøš{Âÿ‹Tİ¨½ÁJ`\¹›C|M€¡æQ­Y½!i—ÛÕ%’d`?ç«ıé´€.›E…cWÈ\ÉĞÛb>ØzH§¬³î${?t…9’ÿ*n–Ã{ª3+;ê«x<#^°,øÿÁböÙY@Ë‘ü°ó#_±
+7SC3=zş˜ÿ•6ïT!%ku¸2™µT¨‚¢*EGosq‘çlÅm‘QAø&´ÙÒK£WY÷r\®!—
+DIš®ÁØŒyïµ×Î…5•ïór€M$Î¼HIŠ˜¶EÓ4R5bAßN«ÍŠÅgeMÊ0Ô©>á–GópªvÜ</×áã¡pKÁ£¥PÚëãR°ş¯ØJ“l{…>¾b\œ|×”/¹Ou–î#»Çµø´¨‡»ÙjQ=cytıÉV^QŒûøÚ2Şù¹\¼åZòp¡[W.«7uÔ,˜gWÅä„2²MfåÂ³n2k^Á¤ª&l“S’Şô%œylÿı ‚rÜ¼Ä÷ï²b…jÖÃ?ĞÆUäö¢é@ÎÂ¤qË«íÔ«ê¾ZåóHwTf”7XSşõšµ—š~µw˜Úe¾ÇõÜ¬L'Âä…àÕª‡A( üzµ*ç~Dì‰ğu€eô/º¤'œÕfwí	6~ŠóU¹QUŒZ±	EÁ‰ñdBÏÉÎö·ÏşÅŞ³6·qäøùô+Ú+$†r’·%•V§ØÊ®·Ù%ÛÙºÒ©HŠIc‘3‡´¬hç¿_èú5Êö&Wu¬²LÎôF£4è$ô¡ê:»ƒ:9}]V¸‚YƒnOM³¯.»ÿ)ü«ÒˆvUS§ƒÆú‘£³aI› ê€ßN_üÈÊ[%:Q}y¯9ÒYšógNIºD²+ÚàššŸS_Ç\¬Af¥ä¸;ß‚0p}7]MÖÅ÷\‡§˜w~´çñNQZÀ+rãßïD[¿¨:“²¸Ì¯¤(>ˆÓüê®¸İâ°DNy(áòı®èŞa3àÙ hí°Ë¼¸qZÎfk•)Z)Üë+§¾çŞ˜G¸?¨ô¦ÔéøÖ–ˆ#›‡ã	²é…ü­6ä+T)y_-•µµü·ÎW(Çb/„…¿ç|ÒNÊ9ÔÃµ³ˆø§Q¹Í­Iâ›É°y›»í2û2R
+’KQÁ´SÆƒAc‚â8Rû14ùVE‡-D%i·puçAtY6rŠ>÷¦6ÆaİF{5×‹éx¥™Z×aqÁ¶Eo0ˆHÄ‡‡¢;F®p‡€…;Z€ŠºİÌt,kËY¹û=É™;—€ğ_‡&ñº^¼J¬N¤úb”OG@k°Ä/!4*:oˆgˆ5İğ’.è¡Ú±tò CîàÉµäº^¹í‹à`+¼Ÿ‰_‹
+©˜E¾BY:RÒ†éÏÃñ¥Š‹¨¥ $#“OŒ[ºy‚›¸
+M³¹›ïuˆŞcbÏ ĞëÃé¨D)*ä¼\o³àE~5‹Åév±buüQ™dNG˜ÛÒ~D¨zf,ü.üã©{ƒmOÕğÓMmxåEv‘?º?nªáwµ¹›ÀÃ¯Ï’5iÆ$ª_‡¦
+Ä2Í.ÖWW~Œc!y9Ü@ˆn¦ÀDK¸}¢ §*á÷$tšÂÜíxY˜,İúcıkUÛöA²Y„ô‡csOtúi¢Ö	Ò5ÕAšº:‘È~VšÈ«{‚0x$é¾ª0ÖÓ9aøoïŠ)0ĞXĞƒ±…+¨ø£$d¡f­j‡/¼Š¾5ÓA^hëD‹h´‰Ø
+‹½JÁ5§½(h‚Ü¦ü·ÉÖfå•ª)¿%K1^¨J³'~Ñb=½–BŸÎĞQ9«fÁßÄ"ePéØÅ·TsúØĞ)X:³ZÆ¦r™ı¶Îª•gãÕóÙmgöğƒ74÷œÔÛÙm#Mé
+jÎ³ä$
+ŸŠºb÷o+ÀL»zo£ãexÂQ€EúşÎáï)Æî¦36Ê”›AdSRU_/KÙó¼kD ¾Í¼çÃÑG…aOtú¤
+¶#så‘£
+"ˆ£7o•w¾ÜòK8~7w‚¤Š„AÀÉ3ëT’Iö{¢ÅtY.P¶ IÚ|•¬29Y#Â%ÂªcêÖt)›G'ÒÛœ¤•Ê0sˆ üìõ;”€¨}%y«„Ÿ¶·“š®ÌQ¿¶Pÿ`|ÀIJÌ¨j®~cbrä:Ç7JÑ(1É‘xyúN|E®Ë+ÀŸ„Ó„’É^'µ1}Ñ!944ÜÉ%¤×gøÒñC ª•í¼\®Ñîo¤¬Ô…°¶“°°Kšö£õëèÓù‡DĞ¦Q#1ßì»‰¾„ +dß6ÚÛß4^S´íÈ¼ã™¤åU¸rAWå?Ş¼:‰9¼xiµÚsI×“MÔ,§Xc€U[nÈ1=NÕˆšÄv>_„0~“z	ÃŞù[JÎ¦
+P?´ßÜ
+Ê8jŒ^ï–ğ]‹œâşK·.·G©j™0ZØhC{"a!pª1ÍSU`OÜ¢®MA•vzbŞ1|üñ NQÃj#nõŒWG³…_Úuæ¬¢˜»ï67Prç„Xº%³¨v×èãİ¤o¶S7a!wÊÄØˆíâ %Ï§ 	JÆ-É¸i›Œ-A¥ g‹n×c‡UêÉ×_Gš S×y„EkÙ
+`. ud gSë]Şî	ë¨Ÿ 7åŞ«¥”m¨/rØ÷hšväín¤àÖ,ÓA'Ş	kl¾)¢ aàÆh7Lm]á½J3òß8Ï
+ÏIBÑGWSN¦! ±!Aq°6ö™¸¼eªoÀUª+%w’$Î±~åß„…oøÂ¸{¼uğş±ÁÑÑ~¡6—Ç˜2Œ¼Íæˆ4ú2—«f Í«~[«¼r®ğëğŞŸ==W™ó'eywÊaĞn¨"sOKHOÀô¢ÈS/1ÔbPb­¤Mß‰n®Ğm8û>JGY'ITbP]zîå§LüïŠü·uæiìÔĞı—pNR<pKß$—™=_Ã‘ñJAsŒÏ¨ÇáI’ññÇ(ıæ*–d2~IÃ*{IR™ùáªä~8„*Ù]b™Òã­>AËa•BÒv)B“<iÿ6ÂàIĞ^ŞEÓY¥Ç,…86å¦×€IÏ9‚qŸèsåPÇöú´jEvN
+ Š@Ä¿˜;®È/‘İvå·]£7ÖœbàĞ-¢Vÿ÷´n¸	3ÖMkÑ¶#"ø¤—Ÿ½9¢Æ§‡o:ıhÚ 5è“ùl†ÈÀà—ñZjââï`{la¥êF1Éñ“®xG}»ğîÁİÛb{`!4_¹'«›`ıRk‡9¼İ›}"‡>Í¨Ñ{\dä<÷*
+Z/ÍK%X%Ÿ¼@¾è’À¯ñ‘à+3ú…­ş;—ĞË&E·ÓM|{êÜMöë„™½ä˜ÓÓótîê»…'è‹‹ñUöÁ`°¡D38ßS•ñƒ^Ë@)—ıÒ^Jfß£ï5d(†²¦€ÙÂlÈäòo»J%|nCñ,"€Ó`r_H
+¬¥û0C3PİÚ*\
+¿6©uaÁl¶ï£úÀ™±ü!„aÁk+…ĞÏ‡ÈäÊLïz-ÀŸßEæçŠ‹kŞÚš‘cg“lA>&&|“†˜¯+tqâ…i‹y²Ìq?QZCz’ŞCl|ÁMgÏÛV¶#Ş·ÅY{
+Ğ5>}&¡·—ÚIŒje´ •pŠMÙAj²akˆQAA4MYe2°Nù%} Bò4c«úX=ÕÕûÌ›­_ cª;Tª FÅê.Ày˜P¾†¡jhùDÛAÓm«ö¿éDß°ÖŠSË,¹™FšÀ	OÖˆu[ª©‰÷íÎ¶âUP!.©¥ä-¤>|°Am¦¿ëV°ıŒ¸d×a‹Ô4Òâbk×¾¢tÌÊ¼+ «Êò¯}‹éãÉÛZ]×mË”`ˆ_3å6([Ãj——rê^æ…œšïE9&‰‰Ğ;¸DÌÖó¢/ğt±Ö'D¬é¡©ÏÂÍjd*†äùñûuc—±9vâë"äãÕäZt‘=ıA'î£¼|õ·—Ç¿¿şóèô¤/ì
+s’gĞ¢j—üù(ˆB™Ûx}¦D…Á%“-ú*…ê/MÿM¹§R»SP‰xIòÒ8å£ÔÓåÜÀ²+ñé]1µ¯ÛÜïjÂÁ† ŞŸ)vw )\áÖsël /¤Bûw%U9*pöyÄc%+<^ß­¬YCnÜım‹I*~™MDU–X7aÛ…‚/Î¾%„Û…BçŸmÆ†ÇŠ¬ÉÔù×¿şÕÁÑç@: Æ(#yÁ càó02,f“«„uãæH
+ıû;›E“h.]kS€"Tæ ÇŸ‹'‘‡£ó.“×‡,¦1nbşKÒ®ŠN'ˆ‚x.A`¼Å6gáÒmÙØ	ä´´ïŸçËHÅ~0ğ´ò1KlÚ0:Ù®Ü`	A¶­Vöµlj¶[gª6è.†äV¹!D‰½îKEKc@ƒ|ˆ‘ÊLì.'Â¡—¯Ê¿(ˆ¿°â‰¼ù¬ÒñÇd%o}x<t©°˜±Ø^• €Säv
+9À«Ü`u0ê!¨¤
+f}$6EQ†ª	ËşÆ›á^`9µ9kÌµsÂÑ[›É\ÓûÂGŞ?)Ì^Õ7ç±jÆ´Ã«[UfâB(”]P~i‘W~“F7^]/ËõÕµ˜"w€3{3A,ÀùxªáC7Œùò¶T3t–"ñ€=ÒGwl“”ì¤àÙ|ä–¦ÔF(œ$×pj{oZôW:ı©·T¬ë$ï@şhé&«ÎuxÆx£‰´gŒ'±ò/ój¥"ú'›<ß4´®²©‹ÂXÓgOÏ£wbe7FàÖ!½®£Ç¶Ò‰Í.ó¬,.gùDŸïU8
+.¦a?ÓóvŞc‰ˆáŒÆ›HH§şêù+Òq!“)æ +äÒØd2p%3_iş}‘á5òY~#Y¸	–ÿxûX¨éeüiDsüñsÍvó×8½´šû£ùE~µ.×&³!†Ê§z¥5ˆsúùWGæJÓJZ¯{ÚÌšçºwÔÍ'+l®³ul¦@;È‚	h²5„i¶«04)ÆÒˆ
+XAÛüu”p£‡f" Šƒ-ƒïëß’	>)Kß©R@º4ôc±Û¦fbwÜ(D¦QN³ƒºXøİp0a#B[ØL«¾ZVíô,ıTXŸè7œ¨ØrlvÓ%T[—Oqu½„{•Î3diÎ¥\hšTèc`Ûtµkû<tú÷‰Á–Mç‘ÅsU¸F¦…qÄ‘8p78˜Jå™‡¹ƒe/ó¼ E[÷ª<3Â|L{©„6ö6…ªì4>Z/ú£ÛÂÆõ×¦ÿ^v3aÒßdĞÂ€®ôs9Ä‹êRÆÆĞ‰¼PÓ½¯ŒùÃ9¡HŠ)˜=Lí

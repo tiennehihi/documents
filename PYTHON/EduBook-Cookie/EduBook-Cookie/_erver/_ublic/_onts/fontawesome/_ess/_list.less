@@ -1,0 +1,1 @@
+hallowEqual(node, opts);\n}\nexport function isArrayTypeAnnotation(\n  node: t.Node | null | undefined,\n  opts?: Opts<t.ArrayTypeAnnotation> | null,\n): node is t.ArrayTypeAnnotation {\n  if (!node) return false;\n\n  if (node.type !== \"ArrayTypeAnnotation\") return false;\n\n  return opts == null || shallowEqual(node,

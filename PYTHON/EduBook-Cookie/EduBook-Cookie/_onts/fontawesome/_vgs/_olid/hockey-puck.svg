@@ -1,0 +1,7 @@
+# import/no-relative-parent-imports
+
+<!-- end auto-generated rule header -->
+
+Use this rule to prevent imports to folders in relative parent paths.
+
+This rule is useful for enforcing tree-like folder structures instead of complex gr

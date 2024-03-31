@@ -1,0 +1,8 @@
+
+  OuterExpressionKinds2[OuterExpressionKinds2["ExcludeJSDocTypeAssertion"] = 16] = "ExcludeJSDocTypeAssertion";
+  return OuterExpressionKinds2;
+})(OuterExpressionKinds || {});
+var LexicalEnvironmentFlags = /* @__PURE__ */ ((LexicalEnvironmentFlags2) => {
+  LexicalEnvironmentFlags2[LexicalEnvironmentFlags2["None"] = 0] = "None";
+  LexicalEnvironmentFlags2[LexicalEnvironmentFlags2["InParameters"] = 1] = "InParameters";
+  LexicalEnvironmentFlags2[LexicalEnvironmentFlags2["Va

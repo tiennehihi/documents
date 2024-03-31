@@ -1,0 +1,33 @@
+/**
+ * @fileoverview Rule to enforce getter and setter pairs in objects and classes.
+ * @author Gyandeep Singh
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const astUtils = require("./utils/ast-utils");
+
+//------------------------------------------------------------------------------
+// Typedefs
+//------------------------------------------------------------------------------
+
+/**
+ * Property name if it can be computed statically, otherwise the list of the tokens of the key node.
+ * @typedef {string|Token[]} Key
+ */
+
+/**
+ * Accessor nodes with the same key.
+ * @typedef {Object} AccessorData
+ * @property {Key} key Accessor's key
+ * @property {ASTNode[]} getters List of getter nodes.
+ * @property {ASTNode[]} setters List of setter nodes.
+ */
+
+//------------------------------------------------------------------------------
+// Helpers
+//--------------------------------------------------------------------------

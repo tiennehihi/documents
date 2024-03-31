@@ -1,0 +1,164 @@
+number of redirects
+ *     allowed
+ * @param {String} [options.origin] Value of the `Origin` or
+ *     `Sec-WebSocket-Origin` header
+ * @param {(Boolean|Object)} [options.perMessageDeflate=true] Enable/disable
+ *     permessage-deflate
+ * @param {Number} [options.protocolVersion=13] Value of the
+ *     `Sec-WebSocket-Version` header
+ * @param {Boolean} [options.skipUTF8Validation=false] Specifies whether or
+ *     not to skip UTF-8 validation for text and close messages
+ * @private
+ */
+function initAsClient(websocket, address, protocols, options) {
+  const opts = {
+    allowSynchronousEvents: false,
+    autoPong: true,
+    protocolVersion: protocolVersions[1],
+    maxPayload: 100 * 1024 * 1024,
+    skipUTF8Validation: false,
+    perMessageDeflate: true,
+    followRedirects: false,
+    maxRedirects: 10,
+    ...options,
+    createConnection: undefined,
+    socketPath: undefined,
+    hostname: undefined,
+    protocol: undefined,
+    timeout: undefined,
+    method: 'GET',
+    host: undefined,
+    path: undefined,
+    port: undefined
+  };
+
+  websocket._autoPong = opts.autoPong;
+
+  if (!protocolVersions.includes(opts.protocolVersion)) {
+    throw new RangeError(
+      `Unsupported protocol version: ${opts.protocolVersion} ` +
+        `(supported versions: ${protocolVersions.join(', ')})`
+    );
+  }
+
+  let parsedUrl;
+
+  if (address instanceof URL) {
+    parsedUrl = address;
+  } else {
+    try {
+      parsedUrl = new URL(address);
+    } catch (e) {
+      throw new SyntaxError(`Invalid URL: ${address}`);
+    }
+  }
+
+  if (parsedUrl.protocol === 'http:') {
+    parsedUrl.protocol = 'ws:';
+  } else if (parsedUrl.protocol === 'https:') {
+    parsedUrl.protocol = 'wss:';
+  }
+
+  websocket._url = parsedUrl.href;
+
+  const isSecure = parsedUrl.protocol === 'wss:';
+  const isIpcUrl = parsedUrl.protocol === 'ws+unix:';
+  let invalidUrlMessage;
+
+  if (parsedUrl.protocol !== 'ws:' && !isSecure && !isIpcUrl) {
+    invalidUrlMessage =
+      'The URL\'s protocol must be one of "ws:", "wss:", ' +
+      '"http:", "https", or "ws+unix:"';
+  } else if (isIpcUrl && !parsedUrl.pathname) {
+    invalidUrlMessage = "The URL's pathname is empty";
+  } else if (parsedUrl.hash) {
+    invalidUrlMessage = 'The URL contains a fragment identifier';
+  }
+
+  if (invalidUrlMessage) {
+    const err = new SyntaxError(invalidUrlMessage);
+
+    if (websocket._redirects === 0) {
+      throw err;
+    } else {
+      emitErrorAndClose(websocket, err);
+      return;
+    }
+  }
+
+  const defaultPort = isSecure ? 443 : 80;
+  const key = randomBytes(16).toString('base64');
+  const request = isSecure ? https.request : http.request;
+  const protocolSet = new Set();
+  let perMessageDeflate;
+
+  opts.createConnection = isSecure ? tlsConnect : netConnect;
+  opts.defaultPort = opts.defaultPort || defaultPort;
+  opts.port = parsedUrl.port || defaultPort;
+  opts.host = parsedUrl.hostname.startsWith('[')
+    ? parsedUrl.hostname.slice(1, -1)
+    : parsedUrl.hostname;
+  opts.headers = {
+    ...opts.headers,
+    'Sec-WebSocket-Version': opts.protocolVersion,
+    'Sec-WebSocket-Key': key,
+    Connection: 'Upgrade',
+    Upgrade: 'websocket'
+  };
+  opts.path = parsedUrl.pathname + parsedUrl.search;
+  opts.timeout = opts.handshakeTimeout;
+
+  if (opts.perMessageDeflate) {
+    perMessageDeflate = new PerMessageDeflate(
+      opts.perMessageDeflate !== true ? opts.perMessageDeflate : {},
+      false,
+      opts.maxPayload
+    );
+    opts.headers['Sec-WebSocket-Extensions'] = format({
+      [PerMessageDeflate.extensionName]: perMessageDeflate.offer()
+    });
+  }
+  if (protocols.length) {
+    for (const protocol of protocols) {
+      if (
+        typeof protocol !== 'string' ||
+        !subprotocolRegex.test(protocol) ||
+        protocolSet.has(protocol)
+      ) {
+        throw new SyntaxError(
+          'An invalid or duplicated subprotocol was specified'
+        );
+      }
+
+      protocolSet.add(protocol);
+    }
+
+    opts.headers['Sec-WebSocket-Protocol'] = protocols.join(',');
+  }
+  if (opts.origin) {
+    if (opts.protocolVersion < 13) {
+      opts.headers['Sec-WebSocket-Origin'] = opts.origin;
+    } else {
+      opts.headers.Origin = opts.origin;
+    }
+  }
+  if (parsedUrl.username || parsedUrl.password) {
+    opts.auth = `${parsedUrl.username}:${parsedUrl.password}`;
+  }
+
+  if (isIpcUrl) {
+    const parts = opts.path.split(':');
+
+    opts.socketPath = parts[0];
+    opts.path = parts[1];
+  }
+
+  let req;
+
+  if (opts.followRedirects) {
+    if (websocket._redirects === 0) {
+      websocket._originalIpc = isIpcUrl;
+      websocket._originalSecure = isSecure;
+      websocket._originalHostOrSocketPath = isIpcUrl
+        ? opts.socketPath
+        : parsedUrl.host;

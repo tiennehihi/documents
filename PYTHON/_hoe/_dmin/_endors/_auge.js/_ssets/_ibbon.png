@@ -1,0 +1,254 @@
+# fast-glob
+
+> It's a very fast and efficient [glob][glob_definition] library for [Node.js][node_js].
+
+This package provides methods for traversing the file system and returning pathnames that matched a defined set of a specified pattern according to the rules used by the Unix Bash shell with some simplifications, meanwhile results are returned in **arbitrary order**. Quick, simple, effective.
+
+## Table of Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
+* [Highlights](#highlights)
+* [Old and modern mode](#old-and-modern-mode)
+* [Pattern syntax](#pattern-syntax)
+  * [Basic syntax](#basic-syntax)
+  * [Advanced syntax](#advanced-syntax)
+* [Installation](#installation)
+* [API](#api)
+  * [Asynchronous](#asynchronous)
+  * [Synchronous](#synchronous)
+  * [Stream](#stream)
+    * [patterns](#patterns)
+    * [[options]](#options)
+  * [Helpers](#helpers)
+    * [generateTasks](#generatetaskspatterns-options)
+    * [isDynamicPattern](#isdynamicpatternpattern-options)
+    * [escapePath](#escapepathpath)
+	* [convertPathToPattern](#convertpathtopatternpath)
+* [Options](#options-3)
+  * [Common](#common)
+    * [concurrency](#concurrency)
+    * [cwd](#cwd)
+    * [deep](#deep)
+    * [followSymbolicLinks](#followsymboliclinks)
+    * [fs](#fs)
+    * [ignore](#ignore)
+    * [suppressErrors](#suppresserrors)
+    * [throwErrorOnBrokenSymbolicLink](#throwerroronbrokensymboliclink)
+  * [Output control](#output-control)
+    * [absolute](#absolute)
+    * [markDirectories](#markdirectories)
+    * [objectMode](#objectmode)
+    * [onlyDirectories](#onlydirectories)
+    * [onlyFiles](#onlyfiles)
+    * [stats](#stats)
+    * [unique](#unique)
+  * [Matching control](#matching-control)
+    * [braceExpansion](#braceexpansion)
+    * [caseSensitiveMatch](#casesensitivematch)
+    * [dot](#dot)
+    * [extglob](#extglob)
+    * [globstar](#globstar)
+    * [baseNameMatch](#basenamematch)
+* [FAQ](#faq)
+  * [What is a static or dynamic pattern?](#what-is-a-static-or-dynamic-pattern)
+  * [How to write patterns on Windows?](#how-to-write-patterns-on-windows)
+  * [Why are parentheses match wrong?](#why-are-parentheses-match-wrong)
+  * [How to exclude directory from reading?](#how-to-exclude-directory-from-reading)
+  * [How to use UNC path?](#how-to-use-unc-path)
+  * [Compatible with `node-glob`?](#compatible-with-node-glob)
+* [Benchmarks](#benchmarks)
+  * [Server](#server)
+  * [Nettop](#nettop)
+* [Changelog](#changelog)
+* [License](#license)
+
+</details>
+
+## Highlights
+
+* Fast. Probably the fastest.
+* Supports multiple and negative patterns.
+* Synchronous, Promise and Stream API.
+* Object mode. Can return more than just strings.
+* Error-tolerant.
+
+## Old and modern mode
+
+This package works in two modes, depending on the environment in which it is used.
+
+* **Old mode**. Node.js below 10.10 or when the [`stats`](#stats) option is *enabled*.
+* **Modern mode**. Node.js 10.10+ and the [`stats`](#stats) option is *disabled*.
+
+The modern mode is faster. Learn more about the [internal mechanism][nodelib_fs_scandir_old_and_modern_modern].
+
+## Pattern syntax
+
+> :warning: Always use forward-slashes in glob expressions (patterns and [`ignore`](#ignore) option). Use backslashes for escaping characters.
+
+There is more than one form of syntax: basic and advanced. Below is a brief overview of the supported features. Also pay attention to our [FAQ](#faq).
+
+> :book: This package uses [`micromatch`][micromatch] as a library for pattern matching.
+
+### Basic syntax
+
+* An asterisk (`*`) — matches everything except slashes (path separators), hidden files (names starting with `.`).
+* A double star or globstar (`**`) — matches zero or more directories.
+* Question mark (`?`) – matches any single character except slashes (path separators).
+* Sequence (`[seq]`) — matches any character in sequence.
+
+> :book: A few additional words about the [basic matching behavior][picomatch_matching_behavior].
+
+Some examples:
+
+* `src/**/*.js` — matches all files in the `src` directory (any level of nesting) that have the `.js` extension.
+* `src/*.??` — matches all files in the `src` directory (only first level of nesting) that have a two-character extension.
+* `file-[01].js` — matches files: `file-0.js`, `file-1.js`.
+
+### Advanced syntax
+
+* [Escapes characters][micromatch_backslashes] (`\\`) — matching special characters (`$^*+?()[]`) as literals.
+* [POSIX character classes][picomatch_posix_brackets] (`[[:digit:]]`).
+* [Extended globs][micromatch_extglobs] (`?(pattern-list)`).
+* [Bash style brace expansions][micromatch_braces] (`{}`).
+* [Regexp character classes][micromatch_regex_character_classes] (`[1-5]`).
+* [Regex groups][regular_expressions_brackets] (`(a|b)`).
+
+> :book: A few additional words about the [advanced matching behavior][micromatch_extended_globbing].
+
+Some examples:
+
+* `src/**/*.{css,scss}` — matches all files in the `src` directory (any level of nesting) that have the `.css` or `.scss` extension.
+* `file-[[:digit:]].js` — matches files: `file-0.js`, `file-1.js`, …, `file-9.js`.
+* `file-{1..3}.js` — matches files: `file-1.js`, `file-2.js`, `file-3.js`.
+* `file-(1|2)` — matches files: `file-1.js`, `file-2.js`.
+
+## Installation
+
+```console
+npm install fast-glob
+```
+
+## API
+
+### Asynchronous
+
+```js
+fg(patterns, [options])
+fg.async(patterns, [options])
+fg.glob(patterns, [options])
+```
+
+Returns a `Promise` with an array of matching entries.
+
+```js
+const fg = require('fast-glob');
+
+const entries = await fg(['.editorconfig', '**/index.js'], { dot: true });
+
+// ['.editorconfig', 'services/index.js']
+```
+
+### Synchronous
+
+```js
+fg.sync(patterns, [options])
+fg.globSync(patterns, [options])
+```
+
+Returns an array of matching entries.
+
+```js
+const fg = require('fast-glob');
+
+const entries = fg.sync(['.editorconfig', '**/index.js'], { dot: true });
+
+// ['.editorconfig', 'services/index.js']
+```
+
+### Stream
+
+```js
+fg.stream(patterns, [options])
+fg.globStream(patterns, [options])
+```
+
+Returns a [`ReadableStream`][node_js_stream_readable_streams] when the `data` event will be emitted with matching entry.
+
+```js
+const fg = require('fast-glob');
+
+const stream = fg.stream(['.editorconfig', '**/index.js'], { dot: true });
+
+for await (const entry of stream) {
+	// .editorconfig
+	// services/index.js
+}
+```
+
+#### patterns
+
+* Required: `true`
+* Type: `string | string[]`
+
+Any correct pattern(s).
+
+> :1234: [Pattern syntax](#pattern-syntax)
+>
+> :warning: This package does not respect the order of patterns. First, all the negative patterns are applied, and only then the positive patterns. If you want to get a certain order of records, use sorting or split calls.
+
+#### [options]
+
+* Required: `false`
+* Type: [`Options`](#options-3)
+
+See [Options](#options-3) section.
+
+### Helpers
+
+#### `generateTasks(patterns, [options])`
+
+Returns the internal representation of patterns ([`Task`](./src/managers/tasks.ts) is a combining patterns by base directory).
+
+```js
+fg.generateTasks('*');
+
+[{
+    base: '.', // Parent directory for all patterns inside this task
+    dynamic: true, // Dynamic or static patterns are in this task
+    patterns: ['*'],
+    positive: ['*'],
+    negative: []
+}]
+```
+
+##### patterns
+
+* Required: `true`
+* Type: `string | string[]`
+
+Any correct pattern(s).
+
+##### [options]
+
+* Required: `false`
+* Type: [`Options`](#options-3)
+
+See [Options](#options-3) section.
+
+#### `isDynamicPattern(pattern, [options])`
+
+Returns `true` if the passed pattern is a dynamic pattern.
+
+> :1234: [What is a static or dynamic pattern?](#what-is-a-static-or-dynamic-pattern)
+
+```js
+fg.isDynamicPattern('*'); // true
+fg.isDynamicPattern('abc'); // false
+```
+
+##### pattern
+
+* Required: `true`
+* Type: 

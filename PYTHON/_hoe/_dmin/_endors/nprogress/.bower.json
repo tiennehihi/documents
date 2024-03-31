@@ -1,0 +1,49 @@
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.default = watch;
+
+function path() {
+  const data = _interopRequireWildcard(require('path'));
+
+  path = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _ansiEscapes() {
+  const data = _interopRequireDefault(require('ansi-escapes'));
+
+  _ansiEscapes = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _chalk() {
+  const data = _interopRequireDefault(require('chalk'));
+
+  _chalk = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _exit() {
+  const data = _interopRequireDefault(require('exit'));
+
+  _exit = function () {
+    return data;
+  };
+
+  return data;
+}
+
+function _slash() {
+  const data = _interopRequireDefault(require('slash'

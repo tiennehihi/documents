@@ -1,0 +1,19 @@
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+var _jsxAstUtils = require("jsx-ast-utils");
+var _schemas = require("../util/schemas");
+var _getElementType = _interopRequireDefault(require("../util/getElementType"));
+var _hasAccessibleChild = _interopRequireDefault(require("../util/hasAccessibleChild"));
+/**
+ * @fileoverview Enforce label tags have htmlFor attribute.
+ * @author Ethan Cohen
+ */
+
+// ----------------------------------------------------------------------------
+// Rule Definition
+// -------------------------

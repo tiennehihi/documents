@@ -1,0 +1,16 @@
+tion: FlowDeclaration;
+  FlowPredicate: FlowPredicate;
+  EnumBody: EnumBody;
+  EnumMember: EnumMember;
+  JSX: JSX;
+  Miscellaneous: Miscellaneous;
+  TypeScript: TypeScript;
+  TSTypeElement: TSTypeElement;
+  TSType: TSType;
+  TSBaseType: TSBaseType;
+  ModuleDeclaration: ModuleDeclaration;
+}
+
+export function arrayExpression(elements?: Array<null | Expression | SpreadElement>): ArrayExpression;
+export function assignmentExpression(operator: string, left: LVal | OptionalMemberExpression, right: Expression): AssignmentExpression;
+export function binaryExpression(operator: "+" |

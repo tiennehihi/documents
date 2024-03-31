@@ -1,0 +1,1 @@
+rint(node.typeAnnotation,node),this.tokenChar(63)},exports.TSParameterProperty=function(node){node.accessibility&&(this.word(node.accessibility)

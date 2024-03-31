@@ -1,0 +1,36 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+function helpers() {
+  const data = require("@babel/helpers");
+  helpers = function () {
+    return data;
+  };
+  return data;
+}
+function _traverse() {
+  const data = require("@babel/traverse");
+  _traverse = function () {
+    return data;
+  };
+  return data;
+}
+function _codeFrame() {
+  const data = require("@babel/code-frame");
+  _codeFrame = function () {
+    return data;
+  };
+  return data;
+}
+function _t() {
+  const data = require("@babel/types");
+  _t = function () {
+    return data;
+  };
+  return data;
+}
+function _helperModuleTransforms() {
+  const data = req

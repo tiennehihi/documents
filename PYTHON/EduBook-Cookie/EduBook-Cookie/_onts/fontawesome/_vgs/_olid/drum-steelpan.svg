@@ -1,0 +1,20 @@
+oryResult ? result : result.module);
+			}
+		);
+	}
+
+	/**
+	 * @param {string} context context string path
+	 * @param {Dependency} dependency dependency used to create Module chain
+	 * @param {ModuleCallback} callback callback for when module chain is complete
+	 * @returns {void} will throw if dependency instance is not a valid Dependency
+	 */
+	addModuleChain(context, dependency, callback) {
+		return this.addModuleTree({ context, dependency }, callback);
+	}
+
+	/**
+	 * @param {Object} options options
+	 * @param {string} options.context context string path
+	 * @param {Dependency} options.dependency dependency used to create Module chain
+	 * @param {Partial<ModuleFactoryCreateDataContextInfo>=} options.contextInfo additional con

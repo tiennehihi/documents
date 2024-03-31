@@ -1,0 +1,14 @@
+/**
+ * @fileoverview A rule to verify `super()` callings in constructor.
+ * @author Toru Nagashima
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Helpers
+//------------------------------------------------------------------------------
+
+/**
+ * Checks all segments in a set and returns true if any are reachable.
+ * @para

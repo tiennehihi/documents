@@ -1,0 +1,5 @@
+opts?: object | null): asserts node is TSTypeParameterInstantiation;
+declare function assertTSTypeParameterDeclaration(node: object | null | undefined, opts?: object | null): asserts node is TSTypeParameterDeclaration;
+declare function assertTSTypeParameter(node: object | null | undefined, opts?: object | null): asserts node is TSTypeParameter;
+declare function assertStandardized(node: object | null | undefined, opts?: object | null): asserts node is Standardized;
+declare function assertExpression(node: object | null | undefined, opts?: object | null): asserts node is E

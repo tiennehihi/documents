@@ -1,0 +1,11 @@
+: object | null | undefined, opts?: object | null): node is BooleanLiteralTypeAnnotation;
+export function assertBooleanLiteralTypeAnnotation(node: object | null | undefined, opts?: object | null): void;
+export function isBooleanTypeAnnotation(node: object | null | undefined, opts?: object | null): node is BooleanTypeAnnotation;
+export function assertBooleanTypeAnnotation(node: object | null | undefined, opts?: object | null): void;
+export function isBreakStatement(node: object | null | undefined, opts?: object | null): node is BreakStatement;
+export function assertBreakStatement(node: object | null | undefined, opts?: object | null): void;
+export function isCallExpression(node: object | null | undefined, opts?: object | null): node is CallExpression;
+export function assertCallExpression(node: object | null | undefined, opts?: object | null): void;
+export function isCatchClause(node: object | null | undefined, opts?: object | null): node is CatchClause;
+export function assertCatchClause(node: object | null | undefined, opts?: object | null): void;
+export functio

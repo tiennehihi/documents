@@ -1,0 +1,11 @@
+de.transformFlags |= 268435456 /* ContainsUpdateExpressionForIdentifier */;
+    }
+    return node;
+  }
+  function updatePrefixUnaryExpression(node, operand) {
+    return node.operand !== operand ? update(createPrefixUnaryExpression(node.operator, operand), node) : node;
+  }
+  function createPostfixUnaryExpression(operand, operator) {
+    const node = createBaseNode(225 /* PostfixUnaryExpression */);
+    node.operator = operator;
+    no

@@ -1,0 +1,11 @@
+/**
+ * @fileoverview Prevent usage of unsafe lifecycle methods
+ * @author Sergei Startsev
+ */
+
+'use strict';
+
+const astUtil = require('../util/ast');
+const componentUtil = require('../util/componentUtil');
+const docsUrl = require('../util/docsUrl');
+const testReactVersion = require('../util/version').testReactVersi

@@ -1,0 +1,29 @@
+prefix}.@{fa-css-prefix}-file-archive-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-css-prefix}.@{fa-css-prefix}-file-archive-o:before { content: @fa-var-file-zipper; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-file-zip-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-css-prefix}.@{fa-css-prefix}-file-zip-o:before { content: @fa-var-file-zipper; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-file-audio-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-css-prefix}.@{fa-css-prefix}-file-audio-o:before { content: @fa-var-file-audio; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-file-sound-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-css-prefix}.@{fa-css-prefix}-file-sound-o:before { content: @fa-var-file-audio; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-file-video-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-cs

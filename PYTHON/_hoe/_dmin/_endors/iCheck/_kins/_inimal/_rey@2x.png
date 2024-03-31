@@ -1,0 +1,47 @@
+/**
+ * @fileoverview Ensure autocomplete attribute is correct.
+ * @author Wilco Fiers
+ */
+
+// -----------------------------------------------------------------------------
+// Requirements
+// -----------------------------------------------------------------------------
+
+import { RuleTester } from 'eslint';
+import parserOptionsMapper from '../../__util__/parserOptionsMapper';
+import { axeFailMessage } from '../../__util__/axeMapping';
+import parsers from '../../__util__/helpers/parsers';
+import rule from '../../../src/rules/autocomplete-valid';
+
+// -----------------------------------------------------------------------------
+// Tests
+// -----------------------------------------------------------------------------
+
+const ruleTester = new RuleTester();
+
+const invalidAutocomplete = [{
+  message: axeFailMessage('autocomplete-valid'),
+  type: 'JSXOpeningElement',
+}];
+
+const inappropriateAutocomplete = [{
+  message: axeFailMessage('autocomplete-appropriate'),
+  type: 'JSXOpeningElement',
+}];
+
+const componentsSettings = {
+  'jsx-a11y': {
+    components: {
+      Input: 'input',
+    },
+  },
+};
+
+ruleTester.run('autocomplete-valid', rule, {
+  valid: parsers.all([].concat(
+    // INAPPLICABLE
+    { code: '<input type="text" />;' },
+    // // PASSED AUTOCOMPLETE
+    { code: '<input type="text" autocomplete="name" />;' },
+    { code: '<input type="text" autocomplete="" />;' },
+    { code: '<input typ

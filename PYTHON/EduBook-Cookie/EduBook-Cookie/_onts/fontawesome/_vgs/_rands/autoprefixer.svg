@@ -1,0 +1,11 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+exports.default = function (worker, concurrency) {
+    var _worker = (0, _wrapAsync2.default)(worker);
+    return (0, _queue2.default)((items, cb) => {
+        _worker(items[0], cb);
+    }, concur

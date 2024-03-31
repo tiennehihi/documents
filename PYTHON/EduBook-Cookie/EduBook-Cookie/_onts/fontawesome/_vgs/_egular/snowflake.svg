@@ -1,0 +1,55 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const ignore_1 = __importDefault(require("ignore"));
+const util_1 = require("../util");
+const getESLintCoreRule_1 = require("../util/getESLintCoreRule");
+const baseRule = (0, getESLintCoreRule_1.getESLintCoreRule)('no-restricted-imports');
+const allowTypeImportsOptionSchema = {
+    allowTypeImports: {
+        type: 'boolean',
+        default: false,
+    },
+};
+const schemaForMergeArrayOfStringsOrObjects = {
+    items: {
+        anyOf: [
+            {},
+            {
+                properties: allowTypeImportsOptionSchema,
+            },
+        ],
+    },
+};
+const schemaForMergeArrayOfStringsOrObjectPatterns = {
+    anyOf: [
+        {},
+        {
+            items: {
+                properties: allowTypeImportsOptionSchema,
+            },
+        },
+    ],
+};
+const schema = (0, util_1.deepMerge)(Object.assign({}, baseRule.meta.schema), {
+    anyOf: [
+        schemaForMergeArrayOfStringsOrObjects,
+        {
+            items: {
+                properties: {
+                    paths: schemaForMergeArrayOfStringsOrObjects,
+                    patterns: schemaForMergeArrayOfStringsOrObjectPatterns,
+                },
+            },
+        },
+    ],
+});
+function isObjectOfPaths(obj) {
+    return Object.prototype.hasOwnProperty.call(obj, 'paths');
+}
+function isObjectOfPatterns(obj) {
+    return Object.prototype.hasOwnProperty.call(obj, 'patterns');
+}
+function isOptions

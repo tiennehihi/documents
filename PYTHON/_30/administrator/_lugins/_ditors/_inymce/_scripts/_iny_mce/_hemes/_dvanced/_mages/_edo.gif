@@ -1,0 +1,5 @@
+e;
+        if (actualNode.hasAttribute('src')) {
+          return !!actualNode.getAttribute('src');
+        }
+        var sourceWithSrc = Array.from(actualNode.getElemen

@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FunctionScope = void 0;
+const types_1 = require("@typescript-eslint/types");
+const ScopeBase_1 = require("./ScopeBase");
+const ScopeType_1 = require("./ScopeType");
+class FunctionScope extends ScopeBase_1.ScopeBase {
+    constructor(scopeManager, upperScope, block, isMethodDefinition) {
+        super(scopeManager, ScopeType_1.ScopeType.function, upperScope, block, isMethodDefinition);
+        // section 9.2.13, FunctionDeclarationInstantiation.
+        // NOTE Arrow functions never have an arguments objects.
+        if (this.block.type !== types_1.AST_NODE_TYPES.ArrowFunctionExpressio

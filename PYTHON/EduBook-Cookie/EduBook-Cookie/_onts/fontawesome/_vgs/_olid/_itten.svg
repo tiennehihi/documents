@@ -1,0 +1,11 @@
+option instead. */
+	maxParallelFileReads: number;
+	moduleContext: (id: string) => string;
+	onwarn: WarningHandler;
+	perf: boolean;
+	plugins: Plugin[];
+	preserveEntrySignatures: PreserveEntrySignaturesOption;
+	/** @deprecated Use the "preserveModules" output option instead. */
+	preserveModules: boolean | undefined;
+	preserveSymlinks: boolean;
+	s

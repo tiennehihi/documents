@@ -1,0 +1,16 @@
+/**
+ * @fileoverview `FileEnumerator` class.
+ *
+ * `FileEnumerator` class has two responsibilities:
+ *
+ * 1. Find target files by processing glob patterns.
+ * 2. Tie each target file and appropriate configuration.
+ *
+ * It provides a method:
+ *
+ * - `iterateFiles(patterns)`
+ *     Iterate files which are matched by given patterns together with the
+ *     corresponded configuration. This is for `CLIEngine#executeOnFiles()`.
+ *     While iterating files, it loads the configuration file of each directory
+ *     before iterate files on the directory, so we can use the configuration
+ *     files to determine target fi

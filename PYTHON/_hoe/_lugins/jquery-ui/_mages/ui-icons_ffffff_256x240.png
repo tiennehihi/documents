@@ -1,0 +1,166 @@
+# ajv-keywords
+
+Custom JSON-Schema keywords for [Ajv](https://github.com/epoberezkin/ajv) validator
+
+[![build](https://github.com/ajv-validator/ajv-keywords/workflows/build/badge.svg)](https://github.com/ajv-validator/ajv-keywords/actions?query=workflow%3Abuild)
+[![npm](https://img.shields.io/npm/v/ajv-keywords.svg)](https://www.npmjs.com/package/ajv-keywords)
+[![npm downloads](https://img.shields.io/npm/dm/ajv-keywords.svg)](https://www.npmjs.com/package/ajv-keywords)
+[![coverage](https://coveralls.io/repos/github/ajv-validator/ajv-keywords/badge.svg?branch=master)](https://coveralls.io/github/ajv-validator/ajv-keywords?branch=master)
+[![gitter](https://img.shields.io/gitter/room/ajv-validator/ajv.svg)](https://gitter.im/ajv-validator/ajv)
+
+**Please note**: This readme file is for [ajv-keywords v5.0.0](https://github.com/ajv-validator/ajv-keywords/releases/tag/v5.0.0) that should be used with [ajv v8](https://github.com/ajv-validator/ajv).
+
+[ajv-keywords v3](https://github.com/ajv-validator/ajv-keywords/tree/v3) should be used with [ajv v6](https://github.com/ajv-validator/ajv/tree/v6).
+
+## Contents
+
+- [Install](#install)
+- [Usage](#usage)
+- [Keywords](#keywords)
+  - [Types](#types)
+    - [typeof](#typeof)
+    - [instanceof](#instanceof)<sup>\+</sup>
+  - [Keywords for numbers](#keywords-for-numbers)
+    - [range and exclusiveRange](#range-and-exclusiverange)
+  - [Keywords for strings](#keywords-for-strings)
+    - [regexp](#regexp)
+    - [transform](#transform)<sup>\*</sup>
+  - [Keywords for arrays](#keywords-for-arrays)
+    - [uniqueItemProperties](#uniqueitemproperties)<sup>\+</sup>
+  - [Keywords for objects](#keywords-for-objects)
+    - [allRequired](#allrequired)
+    - [anyRequired](#anyrequired)
+    - [oneRequired](#onerequired)
+    - [patternRequired](#patternrequired)
+    - [prohibited](#prohibited)
+    - [deepProperties](#deepproperties)
+    - [deepRequired](#deeprequired)
+    - [dynamicDefaults](#dynamicdefaults)<sup>\*</sup><sup>\+</sup>
+  - [Keywords for all types](#keywords-for-all-types)
+    - [select/selectCases/selectDefault](#selectselectcasesselectdefault)
+- [Security contact](#security-contact)
+- [Open-source software support](#open-source-software-support)
+- [License](#license)
+
+<sup>\*</sup> - keywords that modify data
+<sup>\+</sup> - keywords that are not supported in [standalone validation code](https://github.com/ajv-validator/ajv/blob/master/docs/standalone.md)
+
+## Install
+
+To install version 4 to use with [Ajv v7](https://github.com/ajv-validator/ajv):
+
+```
+npm install ajv-keywords
+```
+
+## Usage
+
+To add all available keywords:
+
+```javascript
+const Ajv = require("ajv")
+const ajv = new Ajv()
+require("ajv-keywords")(ajv)
+
+ajv.validate({instanceof: "RegExp"}, /.*/) // true
+ajv.validate({instanceof: "RegExp"}, ".*") // false
+```
+
+To add a single keyword:
+
+```javascript
+require("ajv-keywords")(ajv, "instanceof")
+```
+
+To add multiple keywords:
+
+```javascript
+require("ajv-keywords")(ajv, ["typeof", "instanceof"])
+```
+
+To add a single keyword directly (to avoid adding unused code):
+
+```javascript
+require("ajv-keywords/dist/keywords/select")(ajv, opts)
+```
+
+To add all keywords via Ajv options:
+
+```javascript
+const ajv = new Ajv({keywords: require("ajv-keywords/dist/definitions")(opts)})
+```
+
+To add one or several keywords via options:
+
+```javascript
+const ajv = new Ajv({
+  keywords: [
+    require("ajv-keywords/dist/definitions/typeof")(),
+    require("ajv-keywords/dist/definitions/instanceof")(),
+    // select exports an array of 3 definitions - see "select" in docs
+    ...require("ajv-keywords/dist/definitions/select")(opts),
+  ],
+})
+```
+
+`opts` is an optional object with a property `defaultMeta` - URI of meta-schema to use for keywords that use subschemas (`select` and `deepProperties`). The default is `"http://json-schema.org/schema"`.
+
+## Keywords
+
+### Types
+
+#### `typeof`
+
+Based on JavaScript `typeof` operation.
+
+The value of the keyword should be a string (`"undefined"`, `"string"`, `"number"`, `"object"`, `"function"`, `"boolean"` or `"symbol"`) or an array of strings.
+
+To pass validation the result of `typeof` operation on the value should be equal to the string (or one of the strings in the array).
+
+```javascript
+ajv.validate({typeof: "undefined"}, undefined) // true
+ajv.validate({typeof: "undefined"}, null) // false
+ajv.validate({typeof: ["undefined", "object"]}, null) // true
+```
+
+#### `instanceof`
+
+Based on JavaScript `instanceof` operation.
+
+The value of the keyword should be a string (`"Object"`, `"Array"`, `"Function"`, `"Number"`, `"String"`, `"Date"`, `"RegExp"` or `"Promise"`) or an array of strings.
+
+To pass validation the result of `data instanceof ...` operation on the value should be true:
+
+```javascript
+ajv.validate({instanceof: "Array"}, []) // true
+ajv.validate({instanceof: "Array"}, {}) // false
+ajv.validate({instanceof: ["Array", "Function"]}, function () {}) // true
+```
+
+You can add your own constructor function to be recognised by this keyword:
+
+```javascript
+class MyClass {}
+const instanceofDef = require("ajv-keywords/dist/definitions/instanceof")
+instanceofDef.CONSTRUCTORS.MyClass = MyClass
+ajv.validate({instanceof: "MyClass"}, new MyClass()) // true
+```
+
+**Please note**: currently `instanceof` is not supported in [standalone validation code](https://github.com/ajv-validator/ajv/blob/master/docs/standalone.md) - it has to be implemented as [`code` keyword](https://github.com/ajv-validator/ajv/blob/master/docs/keywords.md#define-keyword-with-code-generation-function) to support it (PR is welcome).
+
+### Keywords for numbers
+
+#### `range` and `exclusiveRange`
+
+Syntax sugar for the combination of minimum and maximum keywords (or exclusiveMinimum and exclusiveMaximum), also fails schema compilation if there are no numbers in the range.
+
+The value of these keywords must be an array consisting of two numbers, the second must be greater or equal than the first one.
+
+If the validated value is not a number the validation passes, otherwise to pass validation the value should be greater (or equal) than the first number and smaller (or equal) than the second number in the array.
+
+```javascript
+const schema = {type: "number", range: [1, 3]}
+ajv.validate(schema, 1) // true
+ajv.validate(schema, 2) // true
+ajv.validate(schema, 3) // true
+ajv.validate(s

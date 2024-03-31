@@ -1,0 +1,12 @@
+++;
+        continue;
+      }
+      separatorAllowed = true;
+      if (!isDigit(ch) || ch - 48 /* _0 */ >= base) {
+        break;
+      }
+      value += text[pos];
+      pos++;
+      isPreviousTokenSeparator = false;
+    }
+    if (text.charCodeAt(pos - 1) ===

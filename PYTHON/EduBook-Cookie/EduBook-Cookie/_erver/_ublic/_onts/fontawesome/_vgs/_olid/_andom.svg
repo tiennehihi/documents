@@ -1,0 +1,41 @@
+    "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "shirt": {
+    "aliases": {
+      "names": [
+        "t-shirt",
+        "tshirt"
+      ],
+      "unicodes": {
+        "composite": [
+          "1f455"
+        ],
+        "secondary": [
+          "10f553"
+        ]
+      }
+    },
+    "changes": [
+      "5.0.13",
+      "5.10.2",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f553",
+    "label": "T-Shirt",
+    "voted": true,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321863,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 512\"><path d=\"M211.8 

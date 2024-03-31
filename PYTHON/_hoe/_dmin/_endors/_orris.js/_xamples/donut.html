@@ -1,0 +1,24 @@
+herwise be
+         * lost if not stored on the instance. Once the right expression has
+         * been evaluated, this property is no longer used.
+         * @type {Array<CodePathSegment>|null}
+         */
+        this.prevSegments = null;
+
+        /**
+         * Segments representing the start of everything to the left of the
+         * `of` keyword. This can be used to move forward towards
+         * `endOfLeftSegments`. `leftSegments` and `endOfLeftSegments` are
+         * effectively the head and tail of a doubly-linked list.
+         * @type {Array<CodePathSegment>|null}
+         */
+        this.leftSegments = null;
+
+        /**
+         * Segments representing the end of everything to the left of the
+         * `of` keyword. This can be used to move backward towards `leftSegments`.
+         * `leftSegments` and `endOfLeftSegments` are effectively the head
+         * and tail of a doubly-linked list.
+         * @type {Array<CodePathSegment>|null}
+         */
+        this.endOf

@@ -1,0 +1,533 @@
+ONMARK$2 = 0x003F; // U+003F QUESTION MARK (?)
+    var U$1 = 0x0075;            // U+0075 LATIN SMALL LETTER U (u)
+
+    function eatHexSequence(offset, allowDash) {
+        for (var pos = this.scanner.tokenStart + offset, len = 0; pos < this.scanner.tokenEnd; pos++) {
+            var code = this.scanner.source.charCodeAt(pos);
+
+            if (code === HYPHENMINUS$4 && allowDash && len !== 0) {
+                if (eatHexSequence.call(this, offset + len + 1, false) === 0) {
+                    this.error();
+                }
+
+                return -1;
+            }
+
+            if (!isHexDigit$4(code)) {
+                this.error(
+                    allowDash && len !== 0
+                        ? 'HyphenMinus' + (len < 6 ? ' or hex digit' : '') + ' is expected'
+                        : (len < 6 ? 'Hex digit is expected' : 'Unexpected input'),
+                    pos
+                );
+            }
+
+            if (++len > 6) {
+                this.error('Too many hex digits', pos);
+            }    }
+
+        this.scanner.next();
+        return len;
+    }
+
+    function eatQuestionMarkSequence(max) {
+        var count = 0;
+
+        while (this.scanner.isDelim(QUESTIONMARK$2)) {
+            if (++count > max) {
+                this.error('Too many question marks');
+            }
+
+            this.scanner.next();
+        }
+    }
+
+    function startsWith$1(code) {
+        if (this.scanner.source.charCodeAt(this.scanner.tokenStart) !== code) {
+            this.error(NAME$3[code] + ' is expected');
+        }
+    }
+
+    // https://drafts.csswg.org/css-syntax/#urange
+    // Informally, the <urange> production has three forms:
+    // U+0001
+    //      Defines a range consisting of a single code point, in this case the code point "1".
+    // U+0001-00ff
+    //      Defines a range of codepoints between the first and the second value, in this case
+    //      the range between "1" and "ff" (255 in decimal) inclusive.
+    // U+00??
+    //      Defines a range of codepoints where the "?" characters range over all hex digits,
+    //      in this case defining the same as the value U+0000-00ff.
+    // In each form, a maximum of 6 digits is allowed for each hexadecimal number (if you treat "?" as a hexadecimal digit).
+    //
+    // <urange> =
+    //   u '+' <ident-token> '?'* |
+    //   u <dimension-token> '?'* |
+    //   u <number-token> '?'* |
+    //   u <number-token> <dimension-token> |
+    //   u <number-token> <number-token> |
+    //   u '+' '?'+
+    function scanUnicodeRange() {
+        var hexLength = 0;
+
+        // u '+' <ident-token> '?'*
+        // u '+' '?'+
+        if (this.scanner.isDelim(PLUSSIGN$6)) {
+            this.scanner.next();
+
+            if (this.scanner.tokenType === IDENT$e) {
+                hexLength = eatHexSequence.call(this, 0, true);
+                if (hexLength > 0) {
+                    eatQuestionMarkSequence.call(this, 6 - hexLength);
+                }
+                return;
+            }
+
+            if (this.scanner.isDelim(QUESTIONMARK$2)) {
+                this.scanner.next();
+                eatQuestionMarkSequence.call(this, 5);
+                return;
+            }
+
+            this.error('Hex digit or question mark is expected');
+            return;
+        }
+
+        // u <number-token> '?'*
+        // u <number-token> <dimension-token>
+        // u <number-token> <number-token>
+        if (this.scanner.tokenType === NUMBER$7) {
+            startsWith$1.call(this, PLUSSIGN$6);
+            hexLength = eatHexSequence.call(this, 1, true);
+
+            if (this.scanner.isDelim(QUESTIONMARK$2)) {
+                eatQuestionMarkSequence.call(this, 6 - hexLength);
+                return;
+            }
+
+            if (this.scanner.tokenType === DIMENSION$5 ||
+                this.scanner.tokenType === NUMBER$7) {
+                startsWith$1.call(this, HYPHENMINUS$4);
+                eatHexSequence.call(this, 1, false);
+                return;
+            }
+
+            return;
+        }
+
+        // u <dimension-token> '?'*
+        if (this.scanner.tokenType === DIMENSION$5) {
+            startsWith$1.call(this, PLUSSIGN$6);
+            hexLength = eatHexSequence.call(this, 1, true);
+
+            if (hexLength > 0) {
+                eatQuestionMarkSequence.call(this, 6 - hexLength);
+            }
+
+            return;
+        }
+
+        this.error();
+    }
+
+    var UnicodeRange = {
+        name: 'UnicodeRange',
+        structure: {
+            value: String
+        },
+        parse: function() {
+            var start = this.scanner.tokenStart;
+
+            // U or u
+            if (!cmpChar$4(this.scanner.source, start, U$1)) {
+                this.error('U is expected');
+            }
+
+            if (!cmpChar$4(this.scanner.source, start + 1, PLUSSIGN$6)) {
+                this.error('Plus sign is expected');
+            }
+
+            this.scanner.next();
+            scanUnicodeRange.call(this);
+
+            return {
+                type: 'UnicodeRange',
+                loc: this.getLocation(start, this.scanner.tokenStart),
+                value: this.scanner.substrToCursor(start)
+            };
+        },
+        generate: function(node) {
+            this.chunk(node.value);
+        }
+    };
+
+    var isWhiteSpace$2 = tokenizer.isWhiteSpace;
+    var cmpStr$4 = tokenizer.cmpStr;
+    var TYPE$C = tokenizer.TYPE;
+
+    var FUNCTION$3 = TYPE$C.Function;
+    var URL$1 = TYPE$C.Url;
+    var RIGHTPARENTHESIS$7 = TYPE$C.RightParenthesis;
+
+    // <url-token> | <function-token> <string> )
+    var Url = {
+        name: 'Url',
+        structure: {
+            value: ['String', 'Raw']
+        },
+        parse: function() {
+            var start = this.scanner.tokenStart;
+            var value;
+
+            switch (this.scanner.tokenType) {
+                case URL$1:
+                    var rawStart = start + 4;
+                    var rawEnd = this.scanner.tokenEnd - 1;
+
+                    while (rawStart < rawEnd && isWhiteSpace$2(this.scanner.source.charCodeAt(rawStart))) {
+                        rawStart++;
+                    }
+
+                    while (rawStart < rawEnd && isWhiteSpace$2(this.scanner.source.charCodeAt(rawEnd - 1))) {
+                        rawEnd--;
+                    }
+
+                    value = {
+                        type: 'Raw',
+                        loc: this.getLocation(rawStart, rawEnd),
+                        value: this.scanner.source.substring(rawStart, rawEnd)
+                    };
+
+                    this.eat(URL$1);
+                    break;
+
+                case FUNCTION$3:
+                    if (!cmpStr$4(this.scanner.source, this.scanner.tokenStart, this.scanner.tokenEnd, 'url(')) {
+                        this.error('Function name must be `url`');
+                    }
+
+                    this.eat(FUNCTION$3);
+                    this.scanner.skipSC();
+                    value = this.String();
+                    this.scanner.skipSC();
+                    this.eat(RIGHTPARENTHESIS$7);
+                    break;
+
+                default:
+                    this.error('Url or Function is expected');
+            }
+
+            return {
+                type: 'Url',
+                loc: this.getLocation(start, this.scanner.tokenStart),
+                value: value
+            };
+        },
+        generate: function(node) {
+            this.chunk('url');
+            this.chunk('(');
+            this.node(node.value);
+            this.chunk(')');
+        }
+    };
+
+    var Value = {
+        name: 'Value',
+        structure: {
+            children: [[]]
+        },
+        parse: function() {
+            var start = this.scanner.tokenStart;
+            var children = this.readSequence(this.scope.Value);
+
+            return {
+                type: 'Value',
+                loc: this.getLocation(start, this.scanner.tokenStart),
+                children: children
+            };
+        },
+        generate: function(node) {
+            this.children(node);
+        }
+    };
+
+    var WHITESPACE$9 = tokenizer.TYPE.WhiteSpace;
+    var SPACE$2 = Object.freeze({
+        type: 'WhiteSpace',
+        loc: null,
+        value: ' '
+    });
+
+    var WhiteSpace$1 = {
+        name: 'WhiteSpace',
+        structure: {
+            value: String
+        },
+        parse: function() {
+            this.eat(WHITESPACE$9);
+            return SPACE$2;
+
+            // return {
+            //     type: 'WhiteSpace',
+            //     loc: this.getLocation(this.scanner.tokenStart, this.scanner.tokenEnd),
+            //     value: this.consume(WHITESPACE)
+            // };
+        },
+        generate: function(node) {
+            this.chunk(node.value);
+        }
+    };
+
+    var node = {
+        AnPlusB: AnPlusB,
+        Atrule: Atrule,
+        AtrulePrelude: AtrulePrelude,
+        AttributeSelector: AttributeSelector,
+        Block: Block,
+        Brackets: Brackets,
+        CDC: CDC_1,
+        CDO: CDO_1,
+        ClassSelector: ClassSelector,
+        Combinator: Combinator,
+        Comment: Comment,
+        Declaration: Declaration,
+        DeclarationList: DeclarationList,
+        Dimension: Dimension,
+        Function: _Function,
+        HexColor: HexColor,
+        Identifier: Identifier,
+        IdSelector: IdSelector,
+        MediaFeature: MediaFeature,
+        MediaQuery: MediaQuery,
+        MediaQueryList: MediaQueryList,
+        Nth: Nth,
+        Number: _Number,
+        Operator: Operator,
+        Parentheses: Parentheses,
+        Percentage: Percentage,
+        PseudoClassSelector: PseudoClassSelector,
+        PseudoElementSelector: PseudoElementSelector,
+        Ratio: Ratio,
+        Raw: Raw,
+        Rule: Rule,
+        Selector: Selector,
+        SelectorList: SelectorList,
+        String: _String,
+        StyleSheet: StyleSheet,
+        TypeSelector: TypeSelector,
+        UnicodeRange: UnicodeRange,
+        Url: Url,
+        Value: Value,
+        WhiteSpace: WhiteSpace$1
+    };
+
+    var data = getCjsExportFromNamespace(defaultSyntax$1);
+
+    var lexer = {
+        generic: true,
+        types: data.types,
+        properties: data.properties,
+        node: node
+    };
+
+    var cmpChar$5 = tokenizer.cmpChar;
+    var cmpStr$5 = tokenizer.cmpStr;
+    var TYPE$D = tokenizer.TYPE;
+
+    var IDENT$f = TYPE$D.Ident;
+    var STRING$2 = TYPE$D.String;
+    var NUMBER$8 = TYPE$D.Number;
+    var FUNCTION$4 = TYPE$D.Function;
+    var URL$2 = TYPE$D.Url;
+    var HASH$4 = TYPE$D.Hash;
+    var DIMENSION$6 = TYPE$D.Dimension;
+    var PERCENTAGE$2 = TYPE$D.Percentage;
+    var LEFTPARENTHESIS$5 = TYPE$D.LeftParenthesis;
+    var LEFTSQUAREBRACKET$3 = TYPE$D.LeftSquareBracket;
+    var COMMA$3 = TYPE$D.Comma;
+    var DELIM$5 = TYPE$D.Delim;
+    var NUMBERSIGN$3 = 0x0023;  // U+0023 NUMBER SIGN (#)
+    var ASTERISK$5 = 0x002A;    // U+002A ASTERISK (*)
+    var PLUSSIGN$7 = 0x002B;    // U+002B PLUS SIGN (+)
+    var HYPHENMINUS$5 = 0x002D; // U+002D HYPHEN-MINUS (-)
+    var SOLIDUS$4 = 0x002F;     // U+002F SOLIDUS (/)
+    var U$2 = 0x0075;           // U+0075 LATIN SMALL LETTER U (u)
+
+    var _default = function defaultRecognizer(context) {
+        switch (this.scanner.tokenType) {
+            case HASH$4:
+                return this.HexColor();
+
+            case COMMA$3:
+                context.space = null;
+                context.ignoreWSAfter = true;
+                return this.Operator();
+
+            case LEFTPARENTHESIS$5:
+                return this.Parentheses(this.readSequence, context.recognizer);
+
+            case LEFTSQUAREBRACKET$3:
+                return this.Brackets(this.readSequence, context.recognizer);
+
+            case STRING$2:
+                return this.String();
+
+            case DIMENSION$6:
+                return this.Dimension();
+
+            case PERCENTAGE$2:
+                return this.Percentage();
+
+            case NUMBER$8:
+                return this.Number();
+
+            case FUNCTION$4:
+                return cmpStr$5(this.scanner.source, this.scanner.tokenStart, this.scanner.tokenEnd, 'url(')
+                    ? this.Url()
+                    : this.Function(this.readSequence, context.recognizer);
+
+            case URL$2:
+                return this.Url();
+
+            case IDENT$f:
+                // check for unicode range, it should start with u+ or U+
+                if (cmpChar$5(this.scanner.source, this.scanner.tokenStart, U$2) &&
+                    cmpChar$5(this.scanner.source, this.scanner.tokenStart + 1, PLUSSIGN$7)) {
+                    return this.UnicodeRange();
+                } else {
+                    return this.Identifier();
+                }
+
+            case DELIM$5:
+                var code = this.scanner.source.charCodeAt(this.scanner.tokenStart);
+
+                if (code === SOLIDUS$4 ||
+                    code === ASTERISK$5 ||
+                    code === PLUSSIGN$7 ||
+                    code === HYPHENMINUS$5) {
+                    return this.Operator(); // TODO: replace with Delim
+                }
+
+                // TODO: produce a node with Delim node type
+
+                if (code === NUMBERSIGN$3) {
+                    this.error('Hex or identifier is expected', this.scanner.tokenStart + 1);
+                }
+
+                break;
+        }
+    };
+
+    var atrulePrelude = {
+        getNode: _default
+    };
+
+    var TYPE$E = tokenizer.TYPE;
+
+    var DELIM$6 = TYPE$E.Delim;
+    var IDENT$g = TYPE$E.Ident;
+    var DIMENSION$7 = TYPE$E.Dimension;
+    var PERCENTAGE$3 = TYPE$E.Percentage;
+    var NUMBER$9 = TYPE$E.Number;
+    var HASH$5 = TYPE$E.Hash;
+    var COLON$5 = TYPE$E.Colon;
+    var LEFTSQUAREBRACKET$4 = TYPE$E.LeftSquareBracket;
+    var NUMBERSIGN$4 = 0x0023;      // U+0023 NUMBER SIGN (#)
+    var ASTERISK$6 = 0x002A;        // U+002A ASTERISK (*)
+    var PLUSSIGN$8 = 0x002B;        // U+002B PLUS SIGN (+)
+    var SOLIDUS$5 = 0x002F;         // U+002F SOLIDUS (/)
+    var FULLSTOP$2 = 0x002E;        // U+002E FULL STOP (.)
+    var GREATERTHANSIGN$2 = 0x003E; // U+003E GREATER-THAN SIGN (>)
+    var VERTICALLINE$3 = 0x007C;    // U+007C VERTICAL LINE (|)
+    var TILDE$2 = 0x007E;           // U+007E TILDE (~)
+
+    function getNode(context) {
+        switch (this.scanner.tokenType) {
+            case LEFTSQUAREBRACKET$4:
+                return this.AttributeSelector();
+
+            case HASH$5:
+                return this.IdSelector();
+
+            case COLON$5:
+                if (this.scanner.lookupType(1) === COLON$5) {
+                    return this.PseudoElementSelector();
+                } else {
+                    return this.PseudoClassSelector();
+                }
+
+            case IDENT$g:
+                return this.TypeSelector();
+
+            case NUMBER$9:
+            case PERCENTAGE$3:
+                return this.Percentage();
+
+            case DIMENSION$7:
+                // throws when .123ident
+                if (this.scanner.source.charCodeAt(this.scanner.tokenStart) === FULLSTOP$2) {
+                    this.error('Identifier is expected', this.scanner.tokenStart + 1);
+                }
+                break;
+
+            case DELIM$6:
+                var code = this.scanner.source.charCodeAt(this.scanner.tokenStart);
+
+                switch (code) {
+                    case PLUSSIGN$8:
+                    case GREATERTHANSIGN$2:
+                    case TILDE$2:
+                        context.space = null;
+                        context.ignoreWSAfter = true;
+                        return this.Combinator();
+
+                    case SOLIDUS$5:  // /deep/
+                        return this.Combinator();
+
+                    case FULLSTOP$2:
+                        return this.ClassSelector();
+
+                    case ASTERISK$6:
+                    case VERTICALLINE$3:
+                        return this.TypeSelector();
+
+                    case NUMBERSIGN$4:
+                        return this.IdSelector();
+                }
+
+                break;
+        }
+    }
+    var selector = {
+        getNode: getNode
+    };
+
+    // https://drafts.csswg.org/css-images-4/#element-notation
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/element
+    var element = function() {
+        this.scanner.skipSC();
+
+        var children = this.createSingleNodeList(
+            this.IdSelector()
+        );
+
+        this.scanner.skipSC();
+
+        return children;
+    };
+
+    // legacy IE function
+    // expression( <any-value> )
+    var expressmentPrefix);
+  writeChunk(destination, formattedContentID);
+  return writeChunkAndReturn(destination, completeBoundaryScript3);
+}
+var clientRenderScript1Full = stringToPrecomputedChunk(clientRenderFunction + ';$RX("');
+var clientRenderScript1Partial = stringToPrecomputedChunk('$RX("');
+var clientRenderScript1A = stringToPrecomputedChunk('"');
+var clientRenderScript2 = stringToPrecomputedChunk(')</script>');
+var clientRenderErrorScriptArgInterstitial = stringToPrecomputedChunk(',');
+function writeClientRenderBoundaryInstruction(destination, responseState, boundaryID, errorDigest, errorMessage, errorComponentStack) {
+  writeChunk(destination, responseState.startInlineScript);
+
+  if (!responseSt

@@ -1,0 +1,45 @@
+# jsx-ast-utils <sup>[![Version Badge][npm-version-svg]][package-url]</sup>
+
+[![github actions][actions-image]][actions-url]
+[![coverage][codecov-image]][codecov-url]
+[![dependency status][deps-svg]][deps-url]
+[![dev dependency status][dev-deps-svg]][dev-deps-url]
+[![License][license-image]][license-url]
+[![Downloads][downloads-image]][downloads-url]
+
+[![npm badge][npm-badge-png]][package-url]
+
+AST utility module for statically analyzing JSX.
+
+## Installation
+```sh
+$ npm i jsx-ast-utils --save
+```
+
+## Usage
+This is a utility module to evaluate AST objects for JSX syntax. This can be super useful when writing linting rules for JSX code. It was originally in the code for [eslint-plugin-jsx-a11y](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y), however I thought it could be useful to be extracted and maintained separately so **you** could write new interesting rules to statically analyze JSX.
+
+### ESLint example
+```js
+import { hasProp } from 'jsx-ast-utils';
+// OR: var hasProp = require('jsx-ast-utils').hasProp;
+// OR: const hasProp = require('jsx-ast-utils/hasProp');
+// OR: import hasProp from 'jsx-ast-utils/hasProp';
+
+module.exports = context => ({
+  JSXOpeningElement: node => {
+    const onChange = hasProp(node.attributes, 'onChange');
+
+    if (onChange) {
+      context.report({
+        node,
+        message: `No onChange!`
+      });
+    }
+  }
+});
+```
+
+## API
+### AST Resources
+1. [JSX spec](https://github.com/facebook/jsx/blob/

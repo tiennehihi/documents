@@ -1,0 +1,71 @@
+.decode = function (buf, offset) {
+  if (!offset) offset = 0
+
+  offset += 2
+  const host = ip.v6.decode(buf, offset)
+  raaaa.decode.bytes = 18
+  return host
+}
+
+raaaa.decode.bytes = 0
+
+raaaa.encodingLength = function () {
+  return 18
+}
+
+const roption = exports.option = {}
+
+roption.encode = function (option, buf, offset) {
+  if (!buf) buf = Buffer.alloc(roption.encodingLength(option))
+  if (!offset) offset = 0
+  const oldOffset = offset
+
+  const code = optioncodes.toCode(option.code)
+  buf.writeUInt16BE(code, offset)
+  offset += 2
+  if (option.data) {
+    buf.writeUInt16BE(option.data.length, offset)
+    offset += 2
+    option.data.copy(buf, offset)
+    offset += option.data.length
+  } else {
+    switch (code) {
+      // case 3: NSID.  No encode makes sense.
+      // case 5,6,7: Not implementable
+      case 8: // ECS
+        // note: do IP math before calling
+        const spl = option.sourcePrefixLength || 0
+        const fam = option.family || ip.familyOf(option.ip)
+        const ipBuf = ip.encode(option.ip, Buffer.alloc)
+        const ipLen = Math.ceil(spl / 8)
+        buf.writeUInt16BE(ipLen + 4, offset)
+        offset += 2
+        buf.writeUInt16BE(fam, offset)
+        offset += 2
+        buf.writeUInt8(spl, offset++)
+        buf.writeUInt8(option.scopePrefixLength || 0, offset++)
+
+        ipBuf.copy(buf, offset, 0, ipLen)
+        offset += ipLen
+        break
+      // case 9: EXPIRE (experimental)
+      // case 10: COOKIE.  No encode makes sense.
+      case 11: // KEEP-ALIVE
+        if (option.timeout) {
+          buf.writeUInt16BE(2, offset)
+          offset += 2
+          buf.writeUInt16BE(option.timeout, offset)
+          offset += 2
+        } else {
+          buf.writeUInt16BE(0, offset)
+          offset += 2
+        }
+        break
+      case 12: // PADDING
+        const len = option.length || 0
+        buf.writeUInt16BE(len, offset)
+        offset += 2
+        buf.fill(0, offset, offset + len)
+        offset += len
+        break
+     

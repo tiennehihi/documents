@@ -1,0 +1,31 @@
+'use strict';
+
+var Scalar = require('../nodes/Scalar.js');
+var resolveEnd = require('./resolve-end.js');
+
+function resolveFlowScalar(scalar, strict, onError) {
+    const { offset, type, source, end } = scalar;
+    let _type;
+    let value;
+    const _onError = (rel, code, msg) => onError(offset + rel, code, msg);
+    switch (type) {
+        case 'scalar':
+            _type = Scalar.Scalar.PLAIN;
+            value = plainValue(source, _onError);
+            break;
+        case 'single-quoted-scalar':
+            _type = Scalar.Scalar.QUOTE_SINGLE;
+            value = singleQuotedValue(source, _onError);
+            break;
+        case 'double-quoted-scalar':
+            _type = Scalar.Scalar.QUOTE_DOUBLE;
+            value = doubleQuotedValue(source, _onError);
+            break;
+        /* istanbul ignore next should not happen */
+        default:
+            onError(scalar, 'UNEXPECTED_TOKEN', `Expected a flow scalar value, but found: ${type}`);
+            return {
+                value: '',
+                type: null,
+                comment: '',
+                range: [off

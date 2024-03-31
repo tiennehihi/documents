@@ -1,0 +1,67 @@
+  return (node.getAttribute('class') || '').split(' ').filter(function (i) {
+        return i;
+      });
+    }
+  }
+  function htmlEscape(str) {
+    return "".concat(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function joinAttributes(attributes) {
+    return Object.keys(attributes || {}).reduce(function (acc, attributeName) {
+      return acc + "".concat(attributeName, "=\"").concat(htmlEscape(attributes[attributeName]), "\" ");
+    }, '').trim();
+  }
+  function joinStyles(styles) {
+    return Object.keys(styles || {}).reduce(function (acc, styleName) {
+      return acc + "".concat(styleName, ": ").concat(styles[styleName].trim(), ";");
+    }, '');
+  }
+  function transformIsMeaningful(transform) {
+    return transform.size !== meaninglessTransform.size || transform.x !== meaninglessTransform.x || transform.y !== meaninglessTransform.y || transform.rotate !== meaninglessTransform.rotate || transform.flipX || transform.flipY;
+  }
+  function transformForSvg(_ref) {
+    var transform = _ref.transform,
+        containerWidth = _ref.containerWidth,
+        iconWidth = _ref.iconWidth;
+    var outer = {
+      transform: "translate(".concat(containerWidth / 2, " 256)")
+    };
+    var innerTranslate = "translate(".concat(transform.x * 32, ", ").concat(transform.y * 32, ") ");
+    var innerScale = "scale(".concat(transform.size / 16 * (transform.flipX ? -1 : 1), ", ").concat(transform.size / 16 * (transform.flipY ? -1 : 1), ") ");
+    var innerRotate = "rotate(".concat(transform.rotate, " 0 0)");
+    var inner = {
+      transform: "".concat(innerTranslate, " ").concat(innerScale, " ").concat(innerRotate)
+    };
+    var path = {
+      transform: "translate(".concat(iconWidth / 2 * -1, " -256)")
+    };
+    return {
+      outer: outer,
+      inner: inner,
+      path: path
+    };
+  }
+  function transformForCss(_ref2) {
+    var transform = _ref2.transform,
+        _ref2$width = _ref2.width,
+        width = _ref2$width === void 0 ? UNITS_IN_GRID : _ref2$width,
+        _ref2$height = _ref2.height,
+        height = _ref2$height === void 0 ? UNITS_IN_GRID : _ref2$height,
+        _ref2$startCentered = _ref2.startCentered,
+        startCentered = _ref2$startCentered === void 0 ? false : _ref2$startCentered;
+    var val = '';
+
+    if (startCentered && IS_IE) {
+      val += "translate(".concat(transform.x / d - width / 2, "em, ").concat(transform.y / d - height / 2, "em) ");
+    } else if (startCentered) {
+      val += "translate(calc(-50% + ".concat(transform.x / d, "em), calc(-50% + ").concat(transform.y / d, "em)) ");
+    } else {
+      val += "translate(".concat(transform.x / d, "em, ").concat(transform.y / d, "em) ");
+    }
+
+    val += "scale(".concat(transform.size / d * (transform.flipX ? -1 : 1), ", ").concat(transform.size / d * (transform.flipY ? -1 : 1), ") ");
+    val += "rotate(".concat(transform.rotate, "deg) ");
+    return val;
+  }
+
+  var baseStyles = ":host,:root{--fa-font-solid:normal 900 1em/1 \"Font Awesome 6 Solid\";--fa-font-regular:normal 400 1em/1 \"Font Awesome 6 Regular\";--fa-font-light:normal 300 1em/1 \"Font Awesome 6 Light\";--fa-font-thin:normal 100 1em/1 \"Font Awesome 6 Thin\";--fa-font-duotone:normal 900 1em/1 \"Font Awesome 6 Duotone\";--fa-font-sharp-solid:normal 900 1em/1 \"Font Awesome 6 Sharp\";--fa-font-brands:normal 400 1em/1 \"Font Awesome 6 Brands\"}svg:not(:host).svg-inline--fa,svg:not(:root).svg-inline--fa{overflow:visible;box-sizing:content-box}.svg-inline--fa{display:var(--fa-display,inline-block);height:1em;overflow:visible;vertical-align:-.125em}.svg-inline--fa.fa-2xs{vertical-align:.1em}.svg-inline--fa.fa-xs{vertical-align:0}.svg-inline--fa.fa-sm{vertical-align:-.0714285705em}.svg-inline--fa.fa-lg{vertical-align:-.2em}.svg-inline--fa.fa-xl{vertical-align:-.25em}.svg-inline--fa.fa-2xl{vertical-align:-.3125em}.svg-inline--fa.fa-pull-left{margin-right:var(--fa-pull-margin,.3em);width:auto}.svg-inline--fa.fa-pull-right{margin-left:var(--fa-pull-margin,.3em);width:auto

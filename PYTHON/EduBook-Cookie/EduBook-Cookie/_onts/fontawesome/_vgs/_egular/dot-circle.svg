@@ -1,0 +1,14 @@
+
+  for (let i = 0; i < array.length; i++) {
+    if (predicate(array[i])) {
+      unorderedRemoveItemAt(array, i);
+      return true;
+    }
+  }
+  return false;
+}
+function createGetCanonicalFileName(useCaseSensitiveFileNames2) {
+  return useCaseSensitiveFileNames2 ? identity : toFileNameLowerCase;
+}
+function patternText({ prefix, suffix }) {
+  return `${prefix}*${suffix}`

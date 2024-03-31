@@ -1,0 +1,20 @@
+��指定されていません",
+        "emptyAttr": "要素に空のplacehoder属性が指定されています"
+      }
+    },
+    "non-empty-title": {
+      "pass": "要素にtitle属性が存在しています",
+      "fail": {
+        "noAttr": "要素にtitle属性が指定されていません",
+        "emptyAttr": "要素に空のtitle属性が指定されています"
+      }
+    },
+    "non-empty-value": {
+      "pass": "要素に空ではないvalue属性が存在しています",
+      "fail": {
+        "noAttr": "要素にvalue属性が指定されていません",
+        "emptyAttr": "要素に空のvalue属性が指定されています"
+      }
+    },
+    "presentational-role": {
+      "pass": "要素のデフォルトのセマ�

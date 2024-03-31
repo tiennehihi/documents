@@ -1,0 +1,53 @@
+/**
+ * @license Fraction.js v4.2.1 20/08/2023
+ * https://www.xarg.org/2014/03/rational-numbers-in-javascript/
+ *
+ * Copyright (c) 2023, Robert Eisele (robert@raw.org)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ **/
+
+
+/**
+ *
+ * This class offers the possibility to calculate fractions.
+ * You can pass a fraction in different formats. Either as array, as double, as string or as an integer.
+ *
+ * Array/Object form
+ * [ 0 => <numerator>, 1 => <denominator> ]
+ * [ n => <numerator>, d => <denominator> ]
+ *
+ * Integer form
+ * - Single integer value
+ *
+ * Double form
+ * - Single double value
+ *
+ * String form
+ * 123.456 - a simple double
+ * 123/456 - a string fraction
+ * 123.'456' - a double with repeating decimal places
+ * 123.(456) - synonym
+ * 123.45'6' - a double with repeating last place
+ * 123.45(6) - synonym
+ *
+ * Example:
+ *
+ * let f = new Fraction("9.4'31'");
+ * f.mul([-4, 3]).div(4.9);
+ *
+ */
+
+(function(root) {
+
+  "use strict";
+
+  // Set Identity function to downgrade BigInt to Number if needed
+  if (typeof BigInt === 'undefined') BigInt = function(n) { if (isNaN(n)) throw new Error(""); return n; };
+
+  const C_ONE = BigInt(1);
+  const C_ZERO = BigInt(0);
+  const C_TEN = BigInt(10);
+  const C_TWO = BigInt(2);
+  const C_FIVE = BigInt(5);
+
+  // Maximum search depth for cyclic rational numbers. 2000 should be more than 

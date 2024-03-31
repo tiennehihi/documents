@@ -1,0 +1,104 @@
+
+
+```js
+type foo = { [key: string]: number };
+
+// Options: ["never"]
+type foo = { [key: string]: number };
+
+// Options: ["never"]
+type foo = { [string]: number };
+```
+
+
+
+<a name="eslint-plugin-flowtype-rules-require-inexact-type"></a>
+### <code>require-inexact-type</code>
+
+This rule enforces explicit inexact object types.
+
+<a name="eslint-plugin-flowtype-rules-require-inexact-type-options-9"></a>
+#### Options
+
+The rule has one string option:
+
+- `"always"` (default): Report all object type definitions that aren't explicit inexact, but ignore exact objects.
+- `"never"`: Report all object type definitions that are explicit inexact.
+
+```js
+{
+  "rules": {
+    "flowtype/require-inexact-type": [
+      2,
+      "always"
+    ]
+  }
+}
+
+{
+  "rules": {
+    "flowtype/require-inexact-type": [
+      2,
+      "never"
+    ]
+  }
+}
+```
+
+The following patterns are considered problems:
+
+```js
+type foo = {};
+// Message: Type must be explicit inexact.
+
+type foo = { bar: string };
+// Message: Type must be explicit inexact.
+
+// Options: ["always"]
+type foo = {};
+// Message: Type must be explicit inexact.
+
+// Options: ["always"]
+type foo = { bar: string };
+// Message: Type must be explicit inexact.
+
+// Options: ["never"]
+type foo = {...};
+// Message: Type must not be explicit inexact.
+
+// Options: ["never"]
+type foo = { bar: string, ... };
+// Message: Type must not be explicit inexact.
+```
+
+The following patterns are not considered problems:
+
+```js
+type foo = { foo: string, ... };
+
+interface Foo { foo: string }
+
+declare class Foo { foo: string }
+
+type foo = {| |};
+
+type foo = {| bar: string |};
+
+type foo = { [key: string]: string, ... };
+
+type foo = number;
+
+// Options: ["always"]
+type foo = {| |};
+
+// Options: ["always"]
+type foo = {...};
+
+// Options: ["always"]
+type foo = { bar: string, ... };
+
+// Options: ["always"]
+type foo = {| bar: string |};
+
+// Options: ["always"]
+type foo

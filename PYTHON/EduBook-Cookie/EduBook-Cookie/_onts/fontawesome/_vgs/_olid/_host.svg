@@ -1,0 +1,5 @@
+ Message */, "Convert_to_named_function_95124", "Convert to named function"),
+  Convert_to_arrow_function: diag(95125, 3 /* Message */, "Convert_to_arrow_function_95125", "Convert to arrow function"),
+  Remove_parentheses: diag(95126, 3 /* Message */, "Remove_parentheses_95126", "Remove parentheses"),
+  Could_not_find_a_containing_arrow_function: diag(95127, 3 /* Message */, "Could_not_find_a_containing_arrow_function_95127", "Could not find a containing arrow function"),
+  Containing_function_is_not_an_arrow_function: diag(95128, 3 /* Message */, "Containing_function_is_not_an_arrow_functi

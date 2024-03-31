@@ -1,0 +1,463 @@
+d"]
+(a): T => a
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+() => {}
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+a => a
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+([a, b]) => {}
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+([a, b]) => a
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+({ a, b }) => {}
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+({ a, b }) => a + b
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+(a = 10) => {}
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+(...a) => a[0]
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+(a, b) => {}
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+a => ({})
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+async a => ({})
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+async a => a
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+(a: T) => a
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+(a): T => a
+
+// Options: ["always",{"requireForBlockBody":true}]
+<T>(a: T) => a
+
+// Options: ["as-needed",{"requireForBlockBody":false}]
+<T>(a: T) => { return a; }
+
+// Options: ["always",{"requireForBlockBody":true}]
+<T>(a: T) => { return a; }
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+<T>(a: T) => { return a; }
+
+// Options: ["as-needed",{"requireForBlockBody":true}]
+(a): %checks => typeof a === "number"
+```
+
+
+
+<a name="eslint-plugin-flowtype-rules-boolean-style"></a>
+### <code>boolean-style</code>
+
+_The `--fix` option on the command line automatically fixes problems reported by this rule._
+
+Enforces a particular style for boolean type annotations. This rule takes one argument.
+
+If it is `'boolean'` then a problem is raised when using `bool` instead of `boolean`.
+
+If it is `'bool'` then a problem is raised when using `boolean` instead of `bool`.
+
+The default value is `'boolean'`.
+
+The following patterns are considered problems:
+
+```js
+type X = bool
+// Message: Use "boolean", not "bool"
+
+// Options: ["boolean"]
+type X = bool
+// Message: Use "boolean", not "bool"
+
+// Options: ["bool"]
+type X = boolean
+// Message: Use "bool", not "boolean"
+```
+
+The following patterns are not considered problems:
+
+```js
+type X = boolean
+
+// Options: ["boolean"]
+type X = boolean
+
+// Options: ["bool"]
+type X = bool
+
+// Options: ["boolean"]
+// Settings: {"flowtype":{"onlyFilesWithFlowAnnotation":true}}
+type X = bool
+```
+
+
+
+<a name="eslint-plugin-flowtype-rules-define-flow-type"></a>
+### <code>define-flow-type</code>
+
+Marks Flow type identifiers as defined.
+
+Used to suppress [`no-undef`](http://eslint.org/docs/rules/no-undef) reporting of type identifiers.
+
+The following patterns are not considered problems:
+
+```js
+var a: AType
+// Additional rules: {"no-undef":2}
+
+var a: AType; var b: AType
+// Additional rules: {"no-undef":2}
+
+var a; (a: AType)
+// Additional rules: {"no-undef":2}
+
+var a: AType<BType>
+// Additional rules: {"no-undef":2}
+
+type A = AType
+// Additional rules: {"no-undef":2}
+
+declare type A = number
+// Additional rules: {"no-undef":2}
+
+opaque type A = AType
+// Additional rules: {"no-undef":2}
+
+function f(a: AType) {}
+// Additional rules: {"no-undef":2}
+
+function f(a: AType.a) {}
+// Additional rules: {"no-undef":2}
+
+function f(a: AType.a.b) {}
+// Additional rules: {"no-undef":2}
+
+function f(a): AType {}; var a: AType
+// Additional rules: {"no-undef":2}
+
+function f(a): AType {}
+// Additional rules: {"no-undef":2}
+
+class C { a: AType }
+// Additional rules: {"no-undef":2}
+
+class C { a: AType.a }
+// Additional rules: {"no-undef":2}
+
+class C { a: AType.a.b }
+// Additional rules: {"no-undef":2}
+
+class C implements AType {}
+// Additional rules: {"no-undef":2}
+
+declare interface A {}
+// Additional rules: {"no-undef":2}
+
+({ a: ({b() {}}: AType) })
+// Additional rules: {"no-undef":2}
+
+type X = {Y<AType>(): BType}
+// Additional rules: {"no-undef":2}
+
+// Settings: {"flowtype":{"onlyFilesWithFlowAnnotation":true}}
+
+/**
+* Copyright 2019 no corp
+* @flow
+*/
+type Foo = $ReadOnly<{}>
+// Additional rules: {"no-undef":2}
+
+var a: AType
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+var a: AType; var b: AType
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+var a; (a: AType)
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+var a: AType<BType>
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+type A = AType
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+declare type A = number
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+opaque type A = AType
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+function f(a: AType) {}
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+function f(a: AType.a) {}
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+function f(a: AType.a.b) {}
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+function f(a): AType {}; var a: AType
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+function f(a): AType {}
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+class C { a: AType }
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+class C { a: AType.a }
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+class C { a: AType.a.b }
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+class C implements AType {}
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+declare interface A {}
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+({ a: ({b() {}}: AType) })
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+type X = {Y<AType>(): BType}
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+
+// Settings: {"flowtype":{"onlyFilesWithFlowAnnotation":true}}
+
+/**
+* Copyright 2019 no corp
+* @flow
+*/
+type Foo = $ReadOnly<{}>
+// Additional rules: {"no-undef":2,"no-use-before-define":[2,"nofunc"]}
+```
+
+
+
+<a name="eslint-plugin-flowtype-rules-delimiter-dangle"></a>
+### <code>delimiter-dangle</code>
+
+_The `--fix` option on the command line automatically fixes problems reported by this rule._
+
+Enforces consistent use of trailing commas in Object and Tuple annotations.
+
+This rule takes three arguments where the possible values are the same as ESLint's default `comma-dangle` rule:
+
+1. The first argument is for Object and Tuple annotations. The default value is `'never'`.
+2. The second argument is used for Interface annotations. This defaults to the value of the first argument.
+3. The third argument is used for inexact object notation (trailing `...`). The default value is `'never'`.
+
+If it is `'never'` then a problem is raised when there is a trailing comma.
+
+If it is `'always'` then a problem is raised when there is no trailing comma.
+
+If it is `'always-multiline'` then a problem is raised when there is no trailing comma on a multi-line definition, or there _is_ a trailing comma on a single-line definition.
+
+If it is `'only-multiline'` then a problem is raised when there is a trailing comma on a single-line definition. It allows, but does not enforce, trailing commas on multi-line definitions.
+
+The following patterns are considered problems:
+
+```js
+type X = { foo: string, }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never"]
+type X = { foo: string, }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never"]
+type X = { foo: string; }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never"]
+type X = {
+foo: string,
+}
+// Message: Unexpected trailing delimiter
+
+// Options: ["always"]
+type X = { foo: string }
+// Message: Missing trailing delimiter
+
+// Options: ["always"]
+type X = {
+foo: string
+}
+// Message: Missing trailing delimiter
+
+// Options: ["always-multiline"]
+type X = { foo: string, }
+// Message: Unexpected trailing delimiter
+
+// Options: ["always-multiline"]
+type X = {
+foo: string
+}
+// Message: Missing trailing delimiter
+
+// Options: ["only-multiline"]
+type X = { foo: string; }
+// Message: Unexpected trailing delimiter
+
+// Options: ["always","never"]
+interface X { foo: string; }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never"]
+type X = { [key: string]: number, }
+// Message: Unexpected trailing delimiter
+
+// Options: ["always"]
+type X = { [key: string]: number }
+// Message: Missing trailing delimiter
+
+// Options: ["always-multiline"]
+type X = { [key: string]: number, }
+// Message: Unexpected trailing delimiter
+
+// Options: ["always-multiline"]
+type X = {
+[key: string]: number
+}
+// Message: Missing trailing delimiter
+
+// Options: ["only-multiline"]
+type X = { [key: string]: number; }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never"]
+type X = { [key: string]: number, foo: string, }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never"]
+type X = {
+[key: string]: number,
+foo: string,
+}
+// Message: Unexpected trailing delimiter
+
+// Options: ["never"]
+type X = {
+[key: string]: number,
+aReallyLongPropertyNameHere: string,
+}
+// Message: Unexpected trailing delimiter
+
+// Options: ["always"]
+type X = { [key: string]: number, foo: string }
+// Message: Missing trailing delimiter
+
+// Options: ["always"]
+type X = {
+[key: string]: number;
+foo: string
+}
+// Message: Missing trailing delimiter
+
+// Options: ["always-multiline"]
+type X = { [key: string]: number, foo: string, }
+// Message: Unexpected trailing delimiter
+
+// Options: ["always-multiline"]
+type X = {
+[key: string]: number,
+foo: string
+}
+// Message: Missing trailing delimiter
+
+// Options: ["only-multiline"]
+type X = { [key: string]: number, foo: string, }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never"]
+type X = { foo: string, [key: string]: number, }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never"]
+type X = {
+foo: string,
+[key: string]: number,
+}
+// Message: Unexpected trailing delimiter
+
+// Options: ["never"]
+type X = {
+aReallyLongPropertyNameHere: string,
+[key: string]: number,
+}
+// Message: Unexpected trailing delimiter
+
+// Options: ["always"]
+type X = { foo: string, [key: string]: number }
+// Message: Missing trailing delimiter
+
+// Options: ["always"]
+type X = { foo: string; [key: string]: number }
+// Message: Missing trailing delimiter
+
+// Options: ["always-multiline"]
+type X = { foo: string, [key: string]: number; }
+// Message: Unexpected trailing delimiter
+
+// Options: ["always-multiline"]
+type X = {
+foo: string,
+[key: string]: number
+}
+// Message: Missing trailing delimiter
+
+// Options: ["only-multiline"]
+type X = { foo: string, [key: string]: number; }
+// Message: Unexpected trailing delimiter
+
+type X = { ..., }
+// Message: Unexpected trailing delimiter
+
+type X = { ...; }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never","never","never"]
+type X = { ..., }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never","never","never"]
+type X = { ...; }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never","never","always"]
+type X = { ... }
+// Message: Missing trailing delimiter
+
+// Options: ["never","never","always-multiline"]
+type X = { ..., }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never","never","always-multiline"]
+type X = { ...; }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never","never","only-multiline"]
+type X = { ..., }
+// Message: Unexpected trailing delimiter
+
+// Options: ["never","never","only-multiline"]
+type X = { ...; }
+// 

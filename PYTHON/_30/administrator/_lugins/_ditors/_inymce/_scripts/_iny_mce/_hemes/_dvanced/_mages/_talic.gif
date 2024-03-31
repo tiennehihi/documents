@@ -1,0 +1,4 @@
+irtual);
+      }
+      if (_isHiddenForEveryone(vNode, {
+        skipAncestors:

@@ -1,0 +1,1 @@
+{"version":3,"file":"readdir-or-error.js","sourceRoot":"","sources":["../../src/readdir-or-error.ts"],"names":[],"mappings":";;;AAAA,kDAAkD;AAClD,6CAA6C;AAC7C,mCAA+C;AAC/C,MAAM,EAAE,OAAO,EAAE,GAAG,gBAAQ,CAAA;AACrB,MAAM

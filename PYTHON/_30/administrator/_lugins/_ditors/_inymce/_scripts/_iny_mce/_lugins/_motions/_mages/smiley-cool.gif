@@ -1,0 +1,15 @@
+{
+	"name": "@csstools/postcss-ic-unit",
+	"description": "Use the ic length unit",
+	"version": "1.0.1",
+	"author": "Jonathan Neal <jonathantneal@hotmail.com>",
+	"license": "CC0-1.0",
+	"funding": {
+		"type": "opencollective",
+		"url": "https://opencollective.com/csstools"
+	},
+	"engines": {
+		"node": "^12 || ^14 || >=16"
+	},
+	"main": "dist/index.cjs",
+	"m

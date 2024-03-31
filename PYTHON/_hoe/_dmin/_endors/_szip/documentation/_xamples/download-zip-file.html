@@ -1,0 +1,40 @@
+/* global __webpack_require__ */
+var Refresh = require('react-refresh/runtime');
+
+/**
+ * Extracts exports from a webpack module object.
+ * @param {string} moduleId A Webpack module ID.
+ * @returns {*} An exports object from the module.
+ */
+function getModuleExports(moduleId) {
+  if (typeof moduleId === 'undefined') {
+    // `moduleId` is unavailable, which indicates that this module is not in the cache,
+    // which means we won't be able to capture any exports,
+    // and thus they cannot be refreshed safely.
+    // These are likely runtime or dynamically generated modules.
+    return {};
+  }
+
+  var maybeModule = __webpack_require__.c[moduleId];
+  if (typeof maybeModule === 'undefined') {
+    // `moduleId` is available but the module in cache is unavailable,
+    // which indicates the module is somehow corrupted (e.g. broken Webpacak `module` globals).
+    // We will warn the user (as this is likely a mistake) and assume they cannot be refreshed.
+    console.warn('[React Refresh] Failed to get exports for module: ' + moduleId + '.');
+    return {};
+  }
+
+  var exportsOrPromise = maybeModule.exports;
+  if (typeof Promise !== 'undefined' && exportsOrPromise instanceof Promise) {
+    return exportsOrPromise.then(function (exports) {
+      return exports;
+    });
+  }
+  return exportsOrPromise;
+}
+
+/**
+ * Calculates the signature of a React refresh boundary.
+ * If this signature changes, it's unsafe to accept the boundary.
+ *
+ * This implementation is based on the one in [Metro](https://github.com/facebook/metro/blob/907d6af22ac6ebe58572be418e9253a90665ecbd/packages/metro/src/lib/polyfills/require.js#L795-L816

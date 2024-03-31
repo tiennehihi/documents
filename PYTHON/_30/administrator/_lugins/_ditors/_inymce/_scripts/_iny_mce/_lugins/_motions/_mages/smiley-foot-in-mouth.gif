@@ -1,0 +1,1 @@
+"use strict";function e(e){return e&&"object"==typeof e&&"default"in e?e:{default:e}}var t=e(require("postcss-selector-parser"));function n(e){return"attribute"===e.type&&e.insensitive}function s(e,t,n){const c=n.charAt(t);if(""===c)return e;let r=e.map((e=>e+c));const o=c.toLocaleUpperCase();return o!==c&&(r=r.concat(e.map((e=>e+o)))),s(r,t+

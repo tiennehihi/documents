@@ -1,0 +1,6 @@
+ons can only be declared inside a block."),
+  Unterminated_template_literal: diag(1160, 1 /* Error */, "Unterminated_template_literal_1160", "Unterminated template literal."),
+  Unterminated_regular_expression_literal: diag(1161, 1 /* Error */, "Unterminated_regular_expression_literal_1161", "Unterminated regular expression literal."),
+  An_object_member_cannot_be_declared_optional: diag(1162, 1 /* Error */, "An_object_member_cannot_be_declared_optional_1162", "An object member cannot be declared optional."),
+  A_yield_expression_is_only_allowed_in_a_generator_body: diag(1163, 1 /* Error */, "A_yield_expression_is_only_allowed_in_a_generator_body_1163", "A 'yield' expression is only allowed in a generator body."),
+  Computed_property_names_are_not_allowed_in_enums: diag(1164, 1 /* 

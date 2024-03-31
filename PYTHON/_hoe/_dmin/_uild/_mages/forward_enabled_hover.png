@@ -1,0 +1,44 @@
+nCancel(handleWrapper);
+    } else {
+        ret = this._then(successClear, failureClear,
+                            undefined, handleWrapper, undefined);
+    }
+
+    return ret;
+};
+
+};
+
+},{"./util":36}],35:[function(_dereq_,module,exports){
+"use strict";
+module.exports = function (Promise, apiRejection, tryConvertToPromise,
+    createContext, INTERNAL, debug) {
+    var util = _dereq_("./util");
+    var TypeError = _dereq_("./errors").TypeError;
+    var inherits = _dereq_("./util").inherits;
+    var errorObj = util.errorObj;
+    var tryCatch = util.tryCatch;
+    var NULL = {};
+
+    function thrower(e) {
+        setTimeout(function(){throw e;}, 0);
+    }
+
+    function castPreservingDisposable(thenable) {
+        var maybePromise = tryConvertToPromise(thenable);
+        if (maybePromise !== thenable &&
+            typeof thenable._isDisposable === "function" &&
+            typeof thenable._getDisposer === "function" &&
+            thenable._isDisposable()) {
+            maybePromise._setDisposable(thenable._getDisposer());
+        }
+        return maybePromise;
+    }
+    function dispose(resources, inspection) {
+        var i = 0;
+        var len = resources.length;
+        var ret = new Promise(INTERNAL);
+        function iterator() {
+            if (i >= len) return ret._fulfill();
+            var maybePromise = castPreservingDisposable(resources[i++]);
+   

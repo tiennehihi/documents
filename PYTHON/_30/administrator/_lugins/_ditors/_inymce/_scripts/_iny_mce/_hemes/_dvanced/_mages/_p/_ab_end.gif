@@ -1,0 +1,6 @@
+d, ref) {
+        if (this._options.onBackreference) {
+            this._options.onBackreference(start, end, ref);
+        }
+    }
+    onCharacterClassEnter(start, negat

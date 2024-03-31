@@ -1,0 +1,32 @@
+rands
+  label: Renren
+  unicode: f18b
+  voted: false
+repeat:
+  aliases:
+    unicodes:
+      composite:
+        - 1f501
+      secondary:
+        - 10f363
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Repeat
+  unicode: f363
+  voted: false
+reply:
+  aliases:
+    names:
+      - mail-reply
+    unicodes:
+      composite:
+   

@@ -1,0 +1,48 @@
+n(offset);
+
+                if (token === null && token.type !== NUMBER) {
+                    return 0;
+                }
+            } else {
+                return offset_;
+            }
+        }
+
+        if (!sign) {
+            var code = token.value.charCodeAt(0);
+            if (code !== PLUSSIGN && code !== HYPHENMINUS$1) {
+                // Number sign is expected
+                return 0;
+            }
+        }
+
+        return checkInteger(token, sign ? 0 : 1, sign, offset);
+    }
+
+    // An+B microsyntax https://www.w3.org/TR/css-syntax-3/#anb
+    var genericAnPlusB = function anPlusB(token, getNextToken) {
+        /* eslint-disable brace-style*/
+        var offset = 0;
+
+        if (!token) {
+            return 0;
+        }
+
+        // <integer>
+        if (token.type === NUMBER) {
+            return checkInteger(token, 0, ALLOW_SIGN, offset); // b
+        }
+
+        // -n
+        // -n <signed-integer>
+        // -n ['+' | '-'] <signless-integer>
+        // -n- <signless-integer>
+        // <dashndashdigit-ident>
+        else if (token.type === IDENT && token.value.charCodeAt(0) === HYPHENMINUS$1) {
+            // expect 1st char is N
+            if (!cmpChar$1(token.value, 1, N)) {
+                return 0;
+            }
+
+            switch (token.value.length) {
+                /

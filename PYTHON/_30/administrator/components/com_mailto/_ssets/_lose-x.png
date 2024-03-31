@@ -1,0 +1,5 @@
+{
+    "name": "@xtuc/long",
+    "version": "4.2.2",
+    "author": "Daniel Wirtz <dcode@dcode.io>",
+    "description": "A Long class for representing a 64-bit two'

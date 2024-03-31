@@ -1,0 +1,10 @@
+    delete currentCallback.cb;
+          currentCallback.id = id;
+          currentCallback = null;
+        });
+        conf.on('delete', function(id) {
+          var result;
+          if (hasOwnProperty.call(waiting, id)) {
+            return;
+          }
+      

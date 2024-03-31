@@ -1,0 +1,6 @@
+e.pem.decode(pem)[0];
+
+  if(msg.type !== 'ENCRYPTED PRIVATE KEY' &&
+    msg.type !== 'PRIVATE KEY' &&
+    msg.type !== 'RSA PRIVATE KEY') {
+    var error = new Error('Could not convert priva

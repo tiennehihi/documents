@@ -1,0 +1,34 @@
+ache
+immediately. You can immediately put it back in the cache if you
+wish, thus resetting the TTL.
+
+This may be overridden by passing an options object to
+`cache.get()`. The `cache.has()` method will always return
+`false` for stale items.
+
+Boolean, default false, only relevant if `ttl` is set.
+
+### `noDeleteOnStaleGet`
+
+When using time-expiring entries with `ttl`, by default stale
+items will be removed from the cache when the key is accessed
+with `cache.get()`.
+
+Setting `noDeleteOnStaleGet` to `true` will cause stale items to
+remain in the cache, until they are explicitly deleted with
+`cache.delete(key)`, or retrieved with `noDeleteOnStaleGet` set
+to `false`.
+
+This may be overridden by passing an options object to
+`cache.get()`.
+
+Boolean, default false, only relevant if `ttl` is set.
+
+### `updateAgeOnGet`
+
+When using time-expiring entries with `ttl`, setting this to
+`true` will make each item's age reset to 0 whenever it is
+retrieved from cache with `get()`, causing it to not expire. (It
+can still fall out of cache based on recency of use, of course.)
+
+This may be overridden by 

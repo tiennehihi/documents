@@ -1,0 +1,8 @@
+# Parse, serialize, and manipulate MIME types
+
+This package will parse [MIME types](https://mimesniff.spec.whatwg.org/#understanding-mime-types) into a structured format, which can then be manipulated and serialized:
+
+```js
+const MIMEType = require("whatwg-mimetype");
+
+c

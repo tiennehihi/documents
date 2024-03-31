@@ -1,0 +1,19 @@
+{
+    "name": "esprima",
+    "description": "ECMAScript parsing infrastructure for multipurpose analysis",
+    "homepage": "http://esprima.org",
+    "main": "esprima.js",
+    "bin": {
+        "esparse": "./bin/esparse.js",
+        "esvalidate": "./bin/esvalidate.js"
+    },
+    "version": "1.2.2",
+    "files": [
+        "bin",
+        "test/run.js",
+        "test/runner.js",
+        "test/test.js",
+        "test/compat.js",
+        "test/reflect.js",
+        "esprima.js"
+ 

@@ -1,0 +1,21 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+const asyncLib = require("neo-async");
+const {
+	HookMap,
+	SyncHook,
+	SyncBailHook,
+	SyncWaterfallHook,
+	AsyncSeriesHook,
+	AsyncSeriesBailHook,
+	AsyncParallelHook
+} = require("tapable");
+const util = require("util");
+const { CachedSource } = require("webpack-sources");
+const { MultiItemCache } = require("./CacheFacade");
+const Chun

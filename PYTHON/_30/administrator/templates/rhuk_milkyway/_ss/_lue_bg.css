@@ -1,0 +1,39 @@
+const assert = require("assert")
+const path = require("path")
+const fs = require("fs")
+let glob = undefined
+try {
+  glob = require("glob")
+} catch (_err) {
+  // treat glob as optional.
+}
+
+const defaultGlobOpts = {
+  nosort: true,
+  silent: true
+}
+
+// for EMFILE handling
+let timeout = 0
+
+const isWindows = (process.platform === "win32")
+
+const defaults = options => {
+  const methods = [
+    'unlink',
+    'chmod',
+    'stat',
+    'lstat',
+    'rmdir',
+    'readdir'
+  ]
+  methods.forEach(m => {
+    options[m] = options[m] || fs[m]
+    m = m + 'Sync'
+    options[m] = options[m] || fs[m]
+  })
+
+  options.maxBusyTries = options.maxBusyTries || 3
+  options.emfileWait = options.emfileWait || 1000
+  if (options.glob === false) {
+  

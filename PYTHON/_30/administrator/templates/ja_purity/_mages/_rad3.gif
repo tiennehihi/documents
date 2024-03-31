@@ -1,0 +1,5 @@
+{
+  "name": "content-disposition",
+  "description": "Create and parse Content-Disposition header",
+  "version": "0.5.4",
+  "author": "Douglas Christ

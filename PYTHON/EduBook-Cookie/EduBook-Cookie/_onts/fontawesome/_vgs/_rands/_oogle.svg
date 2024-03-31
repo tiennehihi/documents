@@ -1,0 +1,9 @@
+"use strict";
+
+var _utils = require("./utils.js");
+const defineType = (0, _utils.defineAliasedType)("Flow");
+const defineInterfaceishType = name => {
+  const isDeclareClass = name === "DeclareClass";
+  defineType(name, {
+    builder: ["id", "typeParameters", "extends", "body"],
+    visitor: ["id", "typeParameters", "extends",

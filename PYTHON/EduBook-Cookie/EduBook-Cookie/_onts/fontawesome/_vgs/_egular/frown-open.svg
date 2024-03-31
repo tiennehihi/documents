@@ -1,0 +1,4 @@
+_type_2316", "Global type '{0}' must be a class or interface type."),
+  Global_type_0_must_have_1_type_parameter_s: diag(2317, 1 /* Error */, "Global_type_0_must_have_1_type_parameter_s_2317", "Global type '{0}' must have {1} type parameter(s)."),
+  Cannot_find_global_type_0: diag(2318, 1 /* Error */, "Cannot_find_global_type_0_2318", "Cannot find global type '{0}'."),
+  Named_property_0_of_types_1_and_2_are_not_identical: diag(2319, 1 /* Error */, "Named_property_0_of_types_1_and_2_are_not_identical_2319", "Named property '{0}' of typ

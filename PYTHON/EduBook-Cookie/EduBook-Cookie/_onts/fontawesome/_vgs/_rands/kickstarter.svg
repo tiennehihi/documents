@@ -1,0 +1,17 @@
+/**
+ * @fileoverview Prevent usage of referential-type variables as default param in functional component
+ * @author Chang Yan
+ */
+
+'use strict';
+
+const values = require('object.values');
+
+const Components = require('../util/Components');
+const docsUrl = require('../util/docsUrl');
+const report = require('../util/report');
+
+const FORBIDDEN_TYPES_MAP = {
+  ArrowFunctionExpression: 'arrow function',
+  FunctionExpression: 'function expression',
+  ObjectExpression: 'ob

@@ -1,0 +1,76 @@
+/// <reference types="node" />
+
+import * as events from "events";
+import * as http from "http";
+import * as https from "https";
+import * as net from "net";
+import * as stream from "stream";
+import * as url from "url";
+
+interface ProxyTargetDetailed {
+    host: string;
+    port: number;
+    protocol?: string | undefined;
+    hostname?: string | undefined;
+    socketPath?: string | undefined;
+    key?: string | undefined;
+    passphrase?: string | undefined;
+    pfx?: Buffer | string | undefined;
+    cert?: string | undefined;
+    ca?: string | undefined;
+    ciphers?: string | undefined;
+    secureProtocol?: string | undefined;
+}
+
+declare class Server<TIncomingMessage = http.IncomingMessage, TServerResponse = http.ServerResponse>
+    extends events.EventEmitter
+{
+    /**
+     * Creates the proxy server with specified options.
+     * @param options - Config object passed to the proxy
+     */
+    constructor(options?: Server.ServerOptions);
+
+    /**
+     * Used for proxying regular HTTP(S) requests
+     * @param req - Client request.
+     * @param res - Client response.
+     * @param options - Additional options.
+     */
+    web(
+        req: http.IncomingMessage,
+        res: http.ServerResponse,
+        options?: Server.ServerOptions,
+        callback?: Server.ErrorCallback,
+    ): void;
+
+    /**
+     * Used for proxying regular HTTP(S) requests
+     * @param req - Client request.
+     * @param socket - Client socket.
+     * @param head - Client head.
+     * @param options - Additionnal options.
+     */
+    ws(
+        req: http.IncomingMessage,
+        socket: any,
+        head: any,
+        options?: Server.ServerOptions,
+        callback?: Server.ErrorCallback,
+    ): void;
+
+    /**
+     * A function that wraps the object in a webserver, for your convenience
+     * @param port - Port to listen on
+     * @param hostname - The hostname to listen on
+     */
+    listen(port: number, hostname?: string): Server<TIncomingMessage, TServerResponse>;
+
+    /**
+     * A function that closes the inner webserver and stops listening on given port
+     */
+    close(callback?: () => void): void;
+
+    /**
+     * Creates the proxy server with specified options.
+     * @param

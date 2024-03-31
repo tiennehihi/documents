@@ -1,0 +1,6 @@
+/*!
+ * Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ * Copyright 2022 Fonticons, Inc.
+ */
+:host,:root{--fa-style-family-brands:"Font Awesome 6 Brands";--fa-font-brands:normal 400 1em/1 "Font Awesome 6 Brands"}@font-face{font-family:"Font Awesome 6 Brands";font-style:normal;font-weight:400;font-display:block;src:url(../webfonts/fa-brands-400.woff2) format("woff2"),url(../webfonts/fa-brands-400.ttf) format("truetype")}.fa-brands,.fab{font-weight:400}.fa-monero:before{content:"\f3d0"}.fa-hooli:before{content:"\f427"}.fa-yelp:before{content:"\f1e9"}.fa-cc-visa:before{content:"\f1f0"}.fa-lastfm:before{content:"\f202"}.fa-shopware:before{content:"\f5b5"}.fa-creative-commons-nc:before{content:"\f4e8"}.fa-aws:before{content:"\f375"}.fa-redhat:before{content:"\f7bc"}.fa-yoas

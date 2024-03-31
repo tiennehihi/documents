@@ -1,0 +1,42 @@
+) {
+            var sign = 0;
+            code = source.charCodeAt(offset + 1);
+
+            // ... optionally followed by U+002D HYPHEN-MINUS (-) or U+002B PLUS SIGN (+) ...
+            if (code === 0x002D || code === 0x002B) {
+                sign = 1;
+                code = source.charCodeAt(offset + 2);
+            }
+
+            // ... followed by a digit
+            if (isDigit$1(code)) {
+                // 5.1 Consume them.
+                // 5.2 Append them to repr.
+
+                // 5.3 Set type to "number".
+                // TODO
+
+                // 5.4 While the next input code point is a digit, consume it and append it to repr.
+                offset = findDecimalNumberEnd(source, offset + 1 + sign + 1);
+            }
+        }
+
+        return offset;
+    }
+
+    // § 4.3.14. Consume the remnants of a bad url
+    // ... its sole use is to consume enough of the input stream to reach a recovery point
+    // where normal tokenizing can resume.
+    function consumeBadUrlRemnants(source, offset) {
+        // Repeatedly consume the next input code point from the stream:
+        for (; offset < source.length; offset++) {
+            var code = source.charCodeAt(offset);
+
+            // U+0029 RIGHT PARENTHESIS ())
+            // EOF
+            if (code === 0x0029) {
+                // Return.
+                offset++;
+                break;
+            }
+

@@ -1,0 +1,13 @@
+# import/no-self-import
+
+<!-- end auto-generated rule header -->
+
+Forbid a module from importing itself. This can sometimes happen during refactoring.
+
+## Rule Details
+
+### Fail
+
+```js
+// foo.js
+i

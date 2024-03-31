@@ -1,0 +1,3 @@
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@jridgewell/sourcemap-codec'), require('@jridgewell/resolve-uri')) :
+    typeof define === 'function' && define.amd ? define(['exports', '@jridgewell/sourcemap-cod

@@ -1,0 +1,96 @@
+*{
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box;
+}
+html {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+#slide {
+    width: 800px;
+    height: 800px;
+    display: block;
+    position: relative;
+}
+#slider {
+    background-image: url('https://cdn-i.vtcnews.vn/resize/th/upload/2024/01/09/quynh2-09242173.png');
+    padding-top: 100%;
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.btn {
+    position: absolute;
+    width: 70%;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.btn .back,
+.btn .next,
+.btn .stop,
+.btn .play {
+    height: 30px;
+    width: 50px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 5px;
+}
+.btn .back:hover,
+.btn .next:hover,
+.btn .stop:hover,
+.btn .play:hover {
+    background-color: blue;
+    color: #fff;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+}
+
+.modal-content {
+    width: 100%;
+    height: 80vh;
+    overflow: aut;
+
+}
+
+.modal-search-input {
+    width: 80%;
+    padding: 10px 0;
+    outline: none;
+    border: none;
+    margin: 0 0 0 20px;
+    border-right: 1px solid #757575;
+}
+
+.modal-header {
+    padding: 0;
+}
+
+.modal-header .btn-close {
+    text-align: center;
+    margin: 0;
+    padding: 16px;
+}
+
+.modal__btn-search {
+    margin-left: 16px;
+    cursor: pointer;
+}
+
+.modal__btn-search:hover {
+    opacity: 0.8;
+}
+
+.modal-body__header,
+.modal-body {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-body__header-list {
+    display: flex;
+}

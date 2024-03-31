@@ -1,0 +1,3 @@
+change_in_compilerOptions_6406", "Project '{0}' is out of date because buildinfo file '{1}' indicates there is change in compilerOptions"),
+  Allow_imports_to_include_TypeScript_file_extensions_Requires_moduleResolution_bundler_and_either_noEmit_or_emitDeclarationOnly_to_be_set: diag(6407, 3 /* Message */, "Allow_imports_to_include_TypeScript_file_extensions_Requires_moduleResolution_bundler_and_either_noE_6407", "Allow imports to include TypeScript file extensions. Requires '--moduleResolution bundler' and either '--noEmit' or '--emitDeclarationOnly' to be set."),
+  Use_the_package_json_exports_field_when_resolving_package_imports: diag(6408, 3 /* Message */, "Use_the_package_json_exports_field_when_resolving_package_imports_6408", 

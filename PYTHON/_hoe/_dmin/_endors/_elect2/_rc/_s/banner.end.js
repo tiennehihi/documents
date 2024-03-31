@@ -1,0 +1,1 @@
+{"version":3,"file":"wrap-words-to-lines.d.ts","sourceRoot":"","sources":["../../../../src/eslint-bulk-suppressions/cli/utils/wrap-words-to-lines.ts"

@@ -1,0 +1,33 @@
+import Ajv from 'ajv';
+import { JSONSchema6 } from 'json-schema';
+import { betterAjvErrors } from './index';
+
+describe('betterAjvErrors', () => {
+  let ajv: Ajv;
+  let schema: JSONSchema6;
+  let data: Record<string, unknown>;
+
+  beforeEach(() => {
+    ajv = new Ajv({ allErrors: true });
+    schema = {
+      type: 'object',
+      required: ['str'],
+      properties: {
+        str: {
+          type: 'string',
+        },
+        enum: {
+          type: 'string',
+          enum: ['one', 'two'],
+        },
+        bounds: {
+          type: 'number',
+          minimum: 2,
+          maximum: 4,
+        },
+        nested: {
+          type: 'object',
+          required: ['deepReq'],
+          properties: {
+            deepReq: {
+       

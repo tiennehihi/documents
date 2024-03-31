@@ -1,0 +1,692 @@
+The `v8.takeCoverage()` method allows the user to write the coverage started by `NODE_V8_COVERAGE` to disk on demand. This method can be invoked multiple
+     * times during the lifetime of the process. Each time the execution counter will
+     * be reset and a new coverage report will be written to the directory specified
+     * by `NODE_V8_COVERAGE`.
+     *
+     * When the process is about to exit, one last coverage will still be written to
+     * disk unless {@link stopCoverage} is invoked before the process exits.
+     * @since v15.1.0, v14.18.0, v12.22.0
+     */
+    function takeCoverage(): void;
+    /**
+     * The `v8.stopCoverage()` method allows the user to stop the coverage collection
+     * started by `NODE_V8_COVERAGE`, so that V8 can release the execution count
+     * records and optimize code. This can be used in conjunction with {@link takeCoverage} if the user wants to collect the coverage on demand.
+     * @since v15.1.0, v14.18.0, v12.22.0
+     */
+    function stopCoverage(): void;
+    /**
+     * The API is a no-op if `--heapsnapshot-near-heap-limit` is already set from the command line or the API is called more than once.
+     * `limit` must be a positive integer. See [`--heapsnapshot-near-heap-limit`](https://nodejs.org/docs/latest-v20.x/api/cli.html#--heapsnapshot-near-heap-limitmax_count) for more information.
+     * @experimental
+     * @since v18.10.0, v16.18.0
+     */
+    function setHeapSnapshotNearHeapLimit(limit: number): void;
+    /**
+     * This API collects GC data in current thread.
+     * @since v19.6.0, v18.15.0
+     */
+    class GCProfiler {
+        /**
+         * Start collecting GC data.
+         * @since v19.6.0, v18.15.0
+         */
+        start(): void;
+        /**
+         * Stop collecting GC data and return an object.The content of object
+         * is as follows.
+         *
+         * ```json
+         * {
+         *   "version": 1,
+         *   "startTime": 1674059033862,
+         *   "statistics": [
+         *     {
+         *       "gcType": "Scavenge",
+         *       "beforeGC": {
+         *         "heapStatistics": {
+         *           "totalHeapSize": 5005312,
+         *           "totalHeapSizeExecutable": 524288,
+         *           "totalPhysicalSize": 5226496,
+         *           "totalAvailableSize": 4341325216,
+         *           "totalGlobalHandlesSize": 8192,
+         *           "usedGlobalHandlesSize": 2112,
+         *           "usedHeapSize": 4883840,
+         *           "heapSizeLimit": 4345298944,
+         *           "mallocedMemory": 254128,
+         *           "externalMemory": 225138,
+         *           "peakMallocedMemory": 181760
+         *         },
+         *         "heapSpaceStatistics": [
+         *           {
+         *             "spaceName": "read_only_space",
+         *             "spaceSize": 0,
+         *             "spaceUsedSize": 0,
+         *             "spaceAvailableSize": 0,
+         *             "physicalSpaceSize": 0
+         *           }
+         *         ]
+         *       },
+         *       "cost": 1574.14,
+         *       "afterGC": {
+         *         "heapStatistics": {
+         *           "totalHeapSize": 6053888,
+         *           "totalHeapSizeExecutable": 524288,
+         *           "totalPhysicalSize": 5500928,
+         *           "totalAvailableSize": 4341101384,
+         *           "totalGlobalHandlesSize": 8192,
+         *           "usedGlobalHandlesSize": 2112,
+         *           "usedHeapSize": 4059096,
+         *           "heapSizeLimit": 4345298944,
+         *           "mallocedMemory": 254128,
+         *           "externalMemory": 225138,
+         *           "peakMallocedMemory": 181760
+         *         },
+         *         "heapSpaceStatistics": [
+         *           {
+         *             "spaceName": "read_only_space",
+         *             "spaceSize": 0,
+         *             "spaceUsedSize": 0,
+         *             "spaceAvailableSize": 0,
+         *             "physicalSpaceSize": 0
+         *           }
+         *         ]
+         *       }
+         *     }
+         *   ],
+         *   "endTime": 1674059036865
+         * }
+         * ```
+         *
+         * Here's an example.
+         *
+         * ```js
+         * const { GCProfiler } = require('v8');
+         * const profiler = new GCProfiler();
+         * profiler.start();
+         * setTimeout(() => {
+         *   console.log(profiler.stop());
+         * }, 1000);
+         * ```
+         * @since v19.6.0, v18.15.0
+         */
+        stop(): GCProfilerResult;
+    }
+    interface GCProfilerResult {
+        version: number;
+        startTime: number;
+        endTime: number;
+        statistics: Array<{
+            gcType: string;
+            cost: number;
+            beforeGC: {
+                heapStatistics: HeapStatistics;
+                heapSpaceStatistics: HeapSpaceStatistics[];
+            };
+            afterGC: {
+                heapStatistics: HeapStatistics;
+                heapSpaceStatistics: HeapSpaceStatistics[];
+            };
+        }>;
+    }
+    interface HeapStatistics {
+        totalHeapSize: number;
+        totalHeapSizeExecutable: number;
+        totalPhysicalSize: number;
+        totalAvailableSize: number;
+        totalGlobalHandlesSize: number;
+        usedGlobalHandlesSize: number;
+        usedHeapSize: number;
+        heapSizeLimit: number;
+        mallocedMemory: number;
+        externalMemory: number;
+        peakMallocedMemory: number;
+    }
+    interface HeapSpaceStatistics {
+        spaceName: string;
+        spaceSize: number;
+        spaceUsedSize: number;
+        spaceAvailableSize: number;
+        physicalSpaceSize: number;
+    }
+    /**
+     * Called when a promise is constructed. This does not mean that corresponding before/after events will occur, only that the possibility exists. This will
+     * happen if a promise is created without ever getting a continuation.
+     * @since v17.1.0, v16.14.0
+     * @param promise The promise being created.
+     * @param parent The promise continued from, if applicable.
+     */
+    interface Init {
+        (promise: Promise<unknown>, parent: Promise<unknown>): void;
+    }
+    /**
+     * Called before a promise continuation executes. This can be in the form of `then()`, `catch()`, or `finally()` handlers or an await resuming.
+     *
+     * The before callback will be called 0 to N times. The before callback will typically be called 0 times if no continuation was ever made for the promise.
+     * The before callback may be called many times in the case where many continuations have been made from the same promise.
+     * @since v17.1.0, v16.14.0
+     */
+    interface Before {
+        (promise: Promise<unknown>): void;
+    }
+    /**
+     * Called immediately after a promise continuation executes. This may be after a `then()`, `catch()`, or `finally()` handler or before an await after another await.
+     * @since v17.1.0, v16.14.0
+     */
+    interface After {
+        (promise: Promise<unknown>): void;
+    }
+    /**
+     * Called when the promise receives a resolution or rejection value. This may occur synchronously in the case of {@link Promise.resolve()} or
+     * {@link Promise.reject()}.
+     * @since v17.1.0, v16.14.0
+     */
+    interface Settled {
+        (promise: Promise<unknown>): void;
+    }
+    /**
+     * Key events in the lifetime of a promise have been categorized into four areas: creation of a promise, before/after a continuation handler is called or
+     * around an await, and when the promise resolves or rejects.
+     *
+     * Because promises are asynchronous resources whose lifecycle is tracked via the promise hooks mechanism, the `init()`, `before()`, `after()`, and
+     * `settled()` callbacks must not be async functions as they create more promises which would produce an infinite loop.
+     * @since v17.1.0, v16.14.0
+     */
+    interface HookCallbacks {
+        init?: Init;
+        before?: Before;
+        after?: After;
+        settled?: Settled;
+    }
+    interface PromiseHooks {
+        /**
+         * The `init` hook must be a plain function. Providing an async function will throw as it would produce an infinite microtask loop.
+         * @since v17.1.0, v16.14.0
+         * @param init The {@link Init | `init` callback} to call when a promise is created.
+         * @return Call to stop the hook.
+         */
+        onInit: (init: Init) => Function;
+        /**
+         * The `settled` hook must be a plain function. Providing an async function will throw as it would produce an infinite microtask loop.
+         * @since v17.1.0, v16.14.0
+         * @param settled The {@link Settled | `settled` callback} to call when a promise is created.
+         * @return Call to stop the hook.
+         */
+        onSettled: (settled: Settled) => Function;
+        /**
+         * The `before` hook must be a plain function. Providing an async function will throw as it would produce an infinite microtask loop.
+         * @since v17.1.0, v16.14.0
+         * @param before The {@link Before | `before` callback} to call before a promise continuation executes.
+         * @return Call to stop the hook.
+         */
+        onBefore: (before: Before) => Function;
+        /**
+         * The `after` hook must be a plain function. Providing an async function will throw as it would produce an infinite microtask loop.
+         * @since v17.1.0, v16.14.0
+         * @param after The {@link After | `after` callback} to call after a promise continuation executes.
+         * @return Call to stop the hook.
+         */
+        onAfter: (after: After) => Function;
+        /**
+         * Registers functions to be called for different lifetime events of each promise.
+         * The callbacks `init()`/`before()`/`after()`/`settled()` are called for the respective events during a promise's lifetime.
+         * All callbacks are optional. For example, if only promise creation needs to be tracked, then only the init callback needs to be passed.
+         * The hook callbacks must be plain functions. Providing async functions will throw as it would produce an infinite microtask loop.
+         * @since v17.1.0, v16.14.0
+         * @param callbacks The {@link HookCallbacks | Hook Callbacks} to register
+         * @return Used for disabling hooks
+         */
+        createHook: (callbacks: HookCallbacks) => Function;
+    }
+    /**
+     * The `promiseHooks` interface can be used to track promise lifecycle events.
+     * @since v17.1.0, v16.14.0
+     */
+    const promiseHooks: PromiseHooks;
+    type StartupSnapshotCallbackFn = (args: any) => any;
+    interface StartupSnapshot {
+        /**
+         * Add a callback that will be called when the Node.js instance is about to get serialized into a snapshot and exit.
+         * This can be used to release resources that should not or cannot be serialized or to convert user data into a form more suitable for serialization.
+         * @since v18.6.0, v16.17.0
+         */
+        addSerializeCallback(callback: StartupSnapshotCallbackFn, data?: any): void;
+        /**
+         * Add a callback that will be called when the Node.js instance is deserialized from a snapshot.
+         * The `callback` and the `data` (if provided) will be serialized into the snapshot, they can be used to re-initialize the state of the application or
+         * to re-acquire resources that the application needs when the application is restarted from the snapshot.
+         * @since v18.6.0, v16.17.0
+         */
+        addDeserializeCallback(callback: StartupSnapshotCallbackFn, data?: any): void;
+        /**
+         * This sets the entry point of the Node.js application when it is deserialized from a snapshot. This can be called only once in the snapshot building script.
+         * If called, the deserialized application no longer needs an additional entry point script to start up and will simply invoke the callback along with the deserialized
+         * data (if provided), otherwise an entry point script still needs to be provided to the deserialized application.
+         * @since v18.6.0, v16.17.0
+         */
+        setDeserializeMainFunction(callback: StartupSnapshotCallbackFn, data?: any): void;
+        /**
+         * Returns true if the Node.js instance is run to build a snapshot.
+         * @since v18.6.0, v16.17.0
+         */
+        isBuildingSnapshot(): boolean;
+    }
+    /**
+     * The `v8.startupSnapshot` interface can be used to add serialization and deserialization hooks for custom startup snapshots.
+     *
+     * ```bash
+     * $ node --snapshot-blob snapshot.blob --build-snapshot entry.js
+     * # This launches a process with the snapshot
+     * $ node --snapshot-blob snapshot.blob
+     * ```
+     *
+     * In the example above, `entry.js` can use methods from the `v8.startupSnapshot` interface to specify how to save information for custom objects
+     * in the snapshot during serialization and how the information can be used to synchronize these objects during deserialization of the snapshot.
+     * For example, if the `entry.js` contains the following script:
+     *
+     * ```js
+     * 'use strict';
+     *
+     * const fs = require('node:fs');
+     * const zlib = require('node:zlib');
+     * const path = require('node:path');
+     * const assert = require('node:assert');
+     *
+     * const v8 = require('node:v8');
+     *
+     * class BookShelf {
+     *   storage = new Map();
+     *
+     *   // Reading a series of files from directory and store them into storage.
+     *   constructor(directory, books) {
+     *     for (const book of books) {
+     *       this.storage.set(book, fs.readFileSync(path.join(directory, book)));
+     *     }
+     *   }
+     *
+     *   static compressAll(shelf) {
+     *     for (const [ book, content ] of shelf.storage) {
+     *       shelf.storage.set(book, zlib.gzipSync(content));
+     *     }
+     *   }
+     *
+     *   static decompressAll(shelf) {
+     *     for (const [ book, content ] of shelf.storage) {
+     *       shelf.storage.set(book, zlib.gunzipSync(content));
+     *     }
+     *   }
+     * }
+     *
+     * // __dirname here is where the snapshot script is placed
+     * // during snapshot building time.
+     * const shelf = new BookShelf(__dirname, [
+     *   'book1.en_US.txt',
+     *   'book1.es_ES.txt',
+     *   'book2.zh_CN.txt',
+     * ]);
+     *
+     * assert(v8.startupSnapshot.isBuildingSnapshot());
+     * // On snapshot serialization, compress the books to reduce size.
+     * v8.startupSnapshot.addSerializeCallback(BookShelf.compressAll, shelf);
+     * // On snapshot deserialization, decompress the books.
+     * v8.startupSnapshot.addDeserializeCallback(BookShelf.decompressAll, shelf);
+     * v8.startupSnapshot.setDeserializeMainFunction((shelf) => {
+     *   // process.env and process.argv are refreshed during snapshot
+     *   // deserialization.
+     *   const lang = process.env.BOOK_LANG || 'en_US';
+     *   const book = process.argv[1];
+     *   const name = `${book}.${lang}.txt`;
+     *   console.log(shelf.storage.get(name));
+     * }, shelf);
+     * ```
+     *
+     * The resulted binary will get print the data deserialized from the snapshot during start up, using the refreshed `process.env` and `process.argv` of the launched process:
+     *
+     * ```bash
+     * $ BOOK_LANG=es_ES node --snapshot-blob snapshot.blob book1
+     * # Prints content of book1.es_ES.txt deserialized from the snapshot.
+     * ```
+     *
+     * Currently the application deserialized from a user-land snapshot cannot be snapshotted again, so these APIs are only available to applications that are not deserialized from a user-land snapshot.
+     *
+     * @experimental
+     * @since v18.6.0, v16.17.0
+     */
+    const startupSnapshot: StartupSnapshot;
+}
+declare module "node:v8" {
+    export * from "v8";
+}
+                                             îµ8ˇÓ£¨,
+°1k∏ãÊ•©∞æ
+?Ã™ÔGsûœ¨#Üëˇ(T_œ∫⁄sÕ!'òÈ@¢»«˚¡c1áåD5#büÀŸa∆’pè¡Œ≈:q¸∆£éËìãpDGÆcÕìp¸\7¯kƒXY#π3√M~Îí)∑ñLä∆˚…â¢/$Áò‘§ˆöF<i¬±
+ëtîrÏK‡®L rTöÕ0¨ìΩ}gKG7CìsîFí7*ˇŒ’	‡e»R‘ˆuVä¬®\dî¢Î£E)Ú8»Oy Ω~ç°•àßﬂêî¬◊,î*ä≤BRû}åîıçp≤û¬µ!o>P §˛
+Ùkby_ﬁt∞á03lá` ˜ÅMë"”ÄOºÕ≥pûºÿ-Õ¥[BÌn)Ø›Ú«Lõ[.‘Â∑Ï≤ªÂ'Ìñ%v∑,‘n…∞ªeövÀ0∫¢8ÿGdí°⁄Â¯‚ó]⁄Â˙tŸª≤,Œ=úÜeà{Æ§Î˝˝h}‡∫\∏H))èê >ÿ©¡o7Y0òNÏv¶Ì¶ºI-˛Ÿ˙{i´Òºßl]P˝ãœ≈;}EA¢k’*¿5Í8 BôEÕzûêéƒ”wßGÖ∆y.¶û™Ôπ‰r~s>0Ójv∏€Ÿfd—Ωuê{Âà≤ÏˇÓ˝Êê”∏t-‡c∏Ç*Ñ{"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const types_1 = require("./types");
+const __1 = require("..");
+const codegen_1 = require("../codegen");
+const ref_error_1 = require("../ref_error");
+const names_1 = require("../names");
+const code_1 = require("../../vocabularies/code");
+const ref_1 = require("../../vocabularies/jtd/ref");
+const type_1 = require("../../vocabularies/jtd/type");
+const parseJson_1 = require("../../runtime/parseJson");
+const util_1 = require("../util");
+const timestamp_1 = require("../../runtime/timestamp");
+const genParse = {
+    elements: parseElements,
+    values: parseValues,
+    discriminator: parseDiscriminator,
+    properties: parseProperties,
+    optionalProperties: parseProperties,
+    enum: parseEnum,
+    type: parseType,
+    ref: parseRef,
+};
+function compileParser(sch, definitions) {
+    const _sch = __1.getCompilingSchema.call(this, sch);
+    if (_sch)
+        return _sch;
+    const { es5, lines } = this.opts.code;
+    const { ownProperties } = this.opts;
+    const gen = new codegen_1.CodeGen(this.scope, { es5, lines, ownProperties });
+    const parseName = gen.scopeName("parse");
+    const cxt = {
+        self: this,
+        gen,
+        schema: sch.schema,
+        schemaEnv: sch,
+        definitions,
+        data: names_1.default.data,
+        parseName,
+        char: gen.name("c"),
+    };
+    let sourceCode;
+    try {
+        this._compilations.add(sch);
+        sch.parseName = parseName;
+        parserFunction(cxt);
+        gen.optimize(this.opts.code.optimize);
+        const parseFuncCode = gen.toString();
+        sourceCode = `${gen.scopeRefs(names_1.default.scope)}return ${parseFuncCode}`;
+        const makeParse = new Function(`${names_1.default.scope}`, sourceCode);
+        const parse = makeParse(this.scope.get());
+        this.scope.value(parseName, { ref: parse });
+        sch.parse = parse;
+    }
+    catch (e) {
+        if (sourceCode)
+            this.logger.error("Error compiling parser, function code:", sourceCode);
+        delete sch.parse;
+        delete sch.parseName;
+        throw e;
+    }
+    finally {
+        this._compilations.delete(sch);
+    }
+    return sch;
+}
+exports.default = compileParser;
+const undef = (0, codegen_1._) `undefined`;
+function parserFunction(cxt) {
+    const { gen, parseName, char } = cxt;
+    gen.func(parseName, (0, codegen_1._) `${names_1.default.json}, ${names_1.default.jsonPos}, ${names_1.default.jsonPart}`, false, () => {
+        gen.let(names_1.default.data);
+        gen.let(char);
+        gen.assign((0, codegen_1._) `${parseName}.message`, undef);
+        gen.assign((0, codegen_1._) `${parseName}.position`, undef);
+        gen.assign(names_1.default.jsonPos, (0, codegen_1._) `${names_1.default.jsonPos} || 0`);
+        gen.const(names_1.default.jsonLen, (0, codegen_1._) `${names_1.default.json}.length`);
+        parseCode(cxt);
+        skipWhitespace(cxt);
+        gen.if(names_1.default.jsonPart, () => {
+            gen.assign((0, codegen_1._) `${parseName}.position`, names_1.default.jsonPos);
+            gen.return(names_1.default.data);
+        });
+        gen.if((0, codegen_1._) `${names_1.default.jsonPos} === ${names_1.default.jsonLen}`, () => gen.return(names_1.default.data));
+        jsonSyntaxError(cxt);
+    });
+}
+function parseCode(cxt) {
+    let form;
+    for (const key of types_1.jtdForms) {
+        if (key in cxt.schema) {
+            form = key;
+            break;
+        }
+    }
+    if (form)
+        parseNullable(cxt, genParse[form]);
+    else
+        parseEmpty(cxt);
+}
+const parseBoolean = parseBooleanToken(true, parseBooleanToken(false, jsonSyntaxError));
+function parseNullable(cxt, parseForm) {
+    const { gen, schema, data } = cxt;
+    if (!schema.nullable)
+        return parseForm(cxt);
+    tryParseToken(cxt, "null", parseForm, () => gen.assign(data, null));
+}
+function parseElements(cxt) {
+    const { gen, schema, data } = cxt;
+    parseToken(cxt, "[");
+    const ix = gen.let("i", 0);
+    gen.assign(data, (0, codegen_1._) `[]`);
+    parseItems(cxt, "]", () => {
+        const el = gen.let("el");
+        parseCode({ ...cxt, schema: schema.elements, data: el });
+        gen.assign((0, codegen_1._) `${data}[${ix}++]`, el);
+    });
+}
+function parseValues(cxt) {
+    const { gen, schema, data } = cxt;
+    parseToken(cxt, "{");
+    gen.assign(data, (0, codegen_1._) `{}`);
+    parseItems(cxt, "}", () => parseKeyValue(cxt, schema.values));
+}
+function parseItems(cxt, endToken, block) {
+    tryParseItems(cxt, endToken, block);
+    parseToken(cxt, endToken);
+}
+function tryParseItems(cxt, endToken, block) {
+    const { gen } = cxt;
+    gen.for((0, codegen_1._) `;${names_1.default.jsonPos}<${names_1.default.jsonLen} && ${jsonSlice(1)}!==${endToken};`, () => {
+        block();
+        tryParseToken(cxt, ",", () => gen.break(), hasItem);
+    });
+    function hasItem() {
+        tryParseToken(cxt, endToken, () => { }, jsonSyntaxError);
+    }
+}
+function parseKeyValue(cxt, schema) {
+    const { gen } = cxt;
+    const key = gen.let("key");
+    parseString({ ...cxt, data: key });
+    parseToken(cxt, ":");
+    parsePropertyValue(cxt, key, schema);
+}
+function parseDiscriminator(cxt) {
+    const { gen, data, schema } = cxt;
+    const { discriminator, mapping } = schema;
+    parseToken(cxt, "{");
+    gen.assign(data, (0, codegen_1._) `{}`);
+    const startPos = gen.const("pos", names_1.default.jsonPos);
+    const value = gen.let("value");
+    const tag = gen.let("tag");
+    tryParseItems(cxt, "}", () => {
+        const key = gen.let("key");
+        parseString({ ...cxt, data: key });
+        parseToken(cxt, ":");
+        gen.if((0, codegen_1._) `${key} === ${discriminator}`, () => {
+            parseString({ ...cxt, data: tag });
+            gen.assign((0, codegen_1._) `${data}[${key}]`, tag);
+            gen.break();
+        }, () => parseEmpty({ ...cxt, data: value }) // can be discarded/skipped
+        );
+    });
+    gen.assign(names_1.default.jsonPos, startPos);
+    gen.if((0, codegen_1._) `${tag} === undefined`);
+    parsingError(cxt, (0, codegen_1.str) `discriminator tag not found`);
+    for (const tagValue in mapping) {
+        gen.elseIf((0, codegen_1._) `${tag} === ${tagValue}`);
+        parseSchemaProperties({ ...cxt, schema: mapping[tagValue] }, discriminator);
+    }
+    gen.else();
+    parsingError(cxt, (0, codegen_1.str) `discriminator value not in schema`);
+    gen.endIf();
+}
+function parseProperties(cxt) {
+    const { gen, data } = cxt;
+    parseToken(cxt, "{");
+    gen.assign(data, (0, codegen_1._) `{}`);
+    parseSchemaProperties(cxt);
+}
+function parseSchemaProperties(cxt, discriminator) {
+    const { gen, schema, data } = cxt;
+    const { properties, optionalProperties, additionalProperties } = schema;
+    parseItems(cxt, "}", () => {
+        const key = gen.let("key");
+        parseString({ ...cxt, data: key });
+        parseToken(cxt, ":");
+        gen.if(false);
+        parseDefinedProperty(cxt, key, properties);
+        parseDefinedProperty(cxt, key, optionalProperties);
+        if (discriminator) {
+            gen.elseIf((0, codegen_1._) `${key} === ${discriminator}`);
+            const tag = gen.let("tag");
+            parseString({ ...cxt, data: tag }); // can be discarded, it is already assigned
+        }
+        gen.else();
+        if (additionalProperties) {
+            parseEmpty({ ...cxt, data: (0, codegen_1._) `${data}[${key}]` });
+        }
+        else {
+            parsingError(cxt, (0, codegen_1.str) `property ${key} not allowed`);
+        }
+        gen.endIf();
+    });
+    if (properties) {
+        const hasProp = (0, code_1.hasPropFunc)(gen);
+        const allProps = (0, codegen_1.and)(...Object.keys(properties).map((p) => (0, codegen_1._) `${hasProp}.call(${data}, ${p})`));
+        gen.if((0, codegen_1.not)(allProps), () => parsingError(cxt, (0, codegen_1.str) `missing required properties`));
+    }
+}
+function parseDefinedProperty(cxt, key, schemas = {}) {
+    const { gen } = cxt;
+    for (const prop in schemas) {
+        gen.elseIf((0, codegen_1._) `${key} === ${prop}`);
+        parsePropertyValue(cxt, key, schemas[prop]);
+    }
+}
+function parsePropertyValue(cxt, key, schema) {
+    parseCode({ ...cxt, schema, data: (0, codegen_1._) `${cxt.data}[${key}]` });
+}
+function parseType(cxt) {
+    const { gen, schema, data, self } = cxt;
+    switch (schema.type) {
+        case "boolean":
+            parseBoolean(cxt);
+            break;
+        case "string":
+            parseString(cxt);
+            break;
+        case "timestamp": {
+            parseString(cxt);
+            const vts = (0, util_1.useFunc)(gen, timestamp_1.default);
+            const { allowDate, parseDate } = self.opts;
+            const notValid = allowDate ? (0, codegen_1._) `!${vts}(${data}, true)` : (0, codegen_1._) `!${vts}(${data})`;
+            const fail = parseDate
+                ? (0, codegen_1.or)(notValid, (0, codegen_1._) `(${data} = new Date(${data}), false)`, (0, codegen_1._) `isNaN(${data}.valueOf())`)
+                : notValid;
+            gen.if(fail, () => parsingError(cxt, (0, codegen_1.str) `invalid timestamp`));
+            break;
+        }
+        case "float32":
+        case "float64":
+            parseNumber(cxt);
+            break;
+        default: {
+            const t = schema.type;
+            if (!self.opts.int32range && (t === "int32" || t === "uint32")) {
+                parseNumber(cxt, 16); // 2 ** 53 - max safe integer
+                if (t === "uint32") {
+                    gen.if((0, codegen_1._) `${data} < 0`, () => parsingError(cxt, (0, codegen_1.str) `integer out of range`));
+                }
+            }
+            else {
+                const [min, max, maxDigits] = type_1.intRange[t];
+                parseNumber(cxt, maxDigits);
+                gen.if((0, codegen_1._) `${data} < ${min} || ${data} > ${max}`, () => parsingError(cxt, (0, codegen_1.str) `integer out of range`));
+            }
+        }
+    }
+}
+function parseString(cxt) {
+    parseToken(cxt, '"');
+    parseWith(cxt, parseJson_1.parseJsonString);
+}
+function parseEnum(cxt) {
+    const { gen, data, schema } = cxt;
+    const enumSch = schema.enum;
+    parseToken(cxt, '"');
+    // TODO loopEnum
+    gen.if(false);
+    for (const value of enumSch) {
+        const valueStr = JSON.stringify(value).slice(1); // remove starting quote
+        gen.elseIf((0, codegen_1._) `${jsonSlice(valueStr.length)} === ${valueStr}`);
+        gen.assign(data, (0, codegen_1.str) `${value}`);
+        gen.add(names_1.default.jsonPos, valueStr.length);
+    }
+    gen.else();
+    jsonSyntaxError(cxt);
+    gen.endIf();
+}
+function parseNumber(cxt, maxDigits) {
+    const { gen } = cxt;
+    skipWhitespace(cxt);
+    gen.if((0, codegen_1._) `"-0123456789".indexOf(${jsonSlice(1)}) < 0`, () => jsonSyntaxError(cxt), () => parseWith(cxt, parseJson_1.parseJsonNumber, maxDigits));
+}
+function parseBooleanToken(bool, fail) {
+    return (cxt) => {
+        const { gen, data } = cxt;
+        tryParseToken(cxt, `${bool}`, () => fail(cxt), () => gen.assign(data, bool));
+    };
+}
+function parseRef(cxt) {
+    const { gen, self, definitions, schema, schemaEnv } = cxt;
+    const { ref } = schema;
+    const refSchema = definitions[ref];
+    if (!refSchema)
+        throw new ref_error_1.default(self.opts.uriResolver, "", ref, `No definition ${ref}`);
+    if (!(0, ref_1.hasRef)(refSchema))
+        return parseCode({ ...cxt, schema: refSchema });
+    const { root } = schemaEnv;
+    const sch = compileParser.call(self, new __1.SchemaEnv({ schema: refSchema, root }), definitions);
+    partialParse(cxt, getParser(gen, sch), true);
+}
+function getParser(gen, sch) {
+    return sch.parse
+        ? gen.scopeValue("parse", { ref: sch.parse })
+        : (0, codegen_1._) `${gen.scopeValue("wrapper", { ref: sch })}.parse`;
+}
+function parseEmpty(cxt) {
+    parseWith(cxt, parseJson_1.parseJson);
+}
+function parseWith(cxt, parseFunc, args) {
+    partialParse(cxt, (0, util_1.useFunc)(cxt.gen, parseFunc), args);
+}
+function partialParse(cxt, parseFunc, args) {
+    const { gen, data } = cxt;
+    gen.assign(data, (0, codegen_1._) `${parseFunc}(${names_1.default.json}, ${names_1.default.jsonPos}${args ? (0, codegen_1._) `, ${args}` : codegen_1.nil})`);
+    gen.assign(names_1.default.jsonPos, (0, codegen_1._) `${parseFunc}.position`);
+    gen.if((0, codegen_1._) `${data} === undefined`, () => parsingError(cxt, (0, codegen_1._) `${parseFunc}.message`));
+}
+function parseToken(cxt, tok) {
+    tryParseToken(cxt, tok, jsonSyntaxError);
+}
+function tryParseToken(cxt, tok, fail, success) {
+    const { gen } = cxt;
+    const n = tok.length;
+    skipWhitespace(cxt);
+    gen.if((0, codegen_1._) `${jsonSlice(n)} === $

@@ -1,0 +1,930 @@
+: 'title',
+        attributes: {
+          id: content.attributes['aria-labelledby'] || "title-".concat(titleId || nextUniqueId())
+        },
+        children: [title]
+      });
+      delete content.attributes.title;
+    }
+
+    var args = _objectSpread2(_objectSpread2({}, content), {}, {
+      prefix: prefix,
+      iconName: iconName,
+      main: main,
+      mask: mask,
+      maskId: maskId,
+      transform: transform,
+      symbol: symbol,
+      styles: _objectSpread2(_objectSpread2({}, uploadedIconWidthStyle), extra.styles)
+    });
+
+    var _ref2 = mask.found && main.found ? callProvided('generateAbstractMask', args) || {
+      children: [],
+      attributes: {}
+    } : callProvided('generateAbstractIcon', args) || {
+      children: [],
+      attributes: {}
+    },
+        children = _ref2.children,
+        attributes = _ref2.attributes;
+
+    args.children = children;
+    args.attributes = attributes;
+
+    if (symbol) {
+      return asSymbol(args);
+    } else {
+      return asIcon(args);
+    }
+  }
+  function makeLayersTextAbstract(params) {
+    var content = params.content,
+        width = params.width,
+        height = params.height,
+        transform = params.transform,
+        title = params.title,
+        extra = params.extra,
+        _params$watchable2 = params.watchable,
+        watchable = _params$watchable2 === void 0 ? false : _params$watchable2;
+
+    var attributes = _objectSpread2(_objectSpread2(_objectSpread2({}, extra.attributes), title ? {
+      'title': title
+    } : {}), {}, {
+      'class': extra.classes.join(' ')
+    });
+
+    if (watchable) {
+      attributes[DATA_FA_I2SVG] = '';
+    }
+
+    var styles = _objectSpread2({}, extra.styles);
+
+    if (transformIsMeaningful(transform)) {
+      styles['transform'] = transformForCss({
+        transform: transform,
+        startCentered: true,
+        width: width,
+        height: height
+      });
+      styles['-webkit-transform'] = styles['transform'];
+    }
+
+    var styleString = joinStyles(styles);
+
+    if (styleString.length > 0) {
+      attributes['style'] = styleString;
+    }
+
+    var val = [];
+    val.push({
+      tag: 'span',
+      attributes: attributes,
+      children: [content]
+    });
+
+    if (title) {
+      val.push({
+        tag: 'span',
+        attributes: {
+          class: 'sr-only'
+        },
+        children: [title]
+      });
+    }
+
+    return val;
+  }
+  function makeLayersCounterAbstract(params) {
+    var content = params.content,
+        title = params.title,
+        extra = params.extra;
+
+    var attributes = _objectSpread2(_objectSpread2(_objectSpread2({}, extra.attributes), title ? {
+      'title': title
+    } : {}), {}, {
+      'class': extra.classes.join(' ')
+    });
+
+    var styleString = joinStyles(extra.styles);
+
+    if (styleString.length > 0) {
+      attributes['style'] = styleString;
+    }
+
+    var val = [];
+    val.push({
+      tag: 'span',
+      attributes: attributes,
+      children: [content]
+    });
+
+    if (title) {
+      val.push({
+        tag: 'span',
+        attributes: {
+          class: 'sr-only'
+        },
+        children: [title]
+      });
+    }
+
+    return val;
+  }
+
+  var styles$1 = namespace.styles;
+  function asFoundIcon(icon) {
+    var width = icon[0];
+    var height = icon[1];
+
+    var _icon$slice = icon.slice(4),
+        _icon$slice2 = _slicedToArray(_icon$slice, 1),
+        vectorData = _icon$slice2[0];
+
+    var element = null;
+
+    if (Array.isArray(vectorData)) {
+      element = {
+        tag: 'g',
+        attributes: {
+          class: "".concat(config.cssPrefix, "-").concat(DUOTONE_CLASSES.GROUP)
+        },
+        children: [{
+          tag: 'path',
+          attributes: {
+            class: "".concat(config.cssPrefix, "-").concat(DUOTONE_CLASSES.SECONDARY),
+            fill: 'currentColor',
+            d: vectorData[0]
+          }
+        }, {
+          tag: 'path',
+          attributes: {
+            class: "".concat(config.cssPrefix, "-").concat(DUOTONE_CLASSES.PRIMARY),
+            fill: 'currentColor',
+            d: vectorData[1]
+          }
+        }]
+      };
+    } else {
+      element = {
+        tag: 'path',
+        attributes: {
+          fill: 'currentColor',
+          d: vectorData
+        }
+      };
+    }
+
+    return {
+      found: true,
+      width: width,
+      height: height,
+      icon: element
+    };
+  }
+  var missingIconResolutionMixin = {
+    found: false,
+    width: 512,
+    height: 512
+  };
+
+  function maybeNotifyMissing(iconName, prefix) {
+    if (!PRODUCTION && !config.showMissingIcons && iconName) {
+      console.error("Icon with name \"".concat(iconName, "\" and prefix \"").concat(prefix, "\" is missing."));
+    }
+  }
+
+  function findIcon(iconName, prefix) {
+    var givenPrefix = prefix;
+
+    if (prefix === 'fa' && config.styleDefault !== null) {
+      prefix = getDefaultUsablePrefix();
+    }
+
+    return new Promise(function (resolve, reject) {
+      var val = {
+        found: false,
+        width: 512,
+        height: 512,
+        icon: callProvided('missingIconAbstract') || {}
+      };
+
+      if (givenPrefix === 'fa') {
+        var shim = byOldName(iconName) || {};
+        iconName = shim.iconName || iconName;
+        prefix = shim.prefix || prefix;
+      }
+
+      if (iconName && prefix && styles$1[prefix] && styles$1[prefix][iconName]) {
+        var icon = styles$1[prefix][iconName];
+        return resolve(asFoundIcon(icon));
+      }
+
+      maybeNotifyMissing(iconName, prefix);
+      resolve(_objectSpread2(_objectSpread2({}, missingIconResolutionMixin), {}, {
+        icon: config.showMissingIcons && iconName ? callProvided('missingIconAbstract') || {} : {}
+      }));
+    });
+  }
+
+  var noop$1 = function noop() {};
+
+  var p = config.measurePerformance && PERFORMANCE && PERFORMANCE.mark && PERFORMANCE.measure ? PERFORMANCE : {
+    mark: noop$1,
+    measure: noop$1
+  };
+  var preamble = "FA \"6.2.1\"";
+
+  var begin = function begin(name) {
+    p.mark("".concat(preamble, " ").concat(name, " begins"));
+    return function () {
+      return end(name);
+    };
+  };
+
+  var end = function end(name) {
+    p.mark("".concat(preamble, " ").concat(name, " ends"));
+    p.measure("".concat(preamble, " ").concat(name), "".concat(preamble, " ").concat(name, " begins"), "".concat(preamble, " ").concat(name, " ends"));
+  };
+
+  var perf = {
+    begin: begin,
+    end: end
+  };
+
+  var noop$2 = function noop() {};
+
+  function isWatched(node) {
+    var i2svg = node.getAttribute ? node.getAttribute(DATA_FA_I2SVG) : null;
+    return typeof i2svg === 'string';
+  }
+
+  function hasPrefixAndIcon(node) {
+    var prefix = node.getAttribute ? node.getAttribute(DATA_PREFIX) : null;
+    var icon = node.getAttribute ? node.getAttribute(DATA_ICON) : null;
+    return prefix && icon;
+  }
+
+  function hasBeenReplaced(node) {
+    return node && node.classList && node.classList.contains && node.classList.contains(config.replacementClass);
+  }
+
+  function getMutator() {
+    if (config.autoReplaceSvg === true) {
+      return mutators.replace;
+    }
+
+    var mutator = mutators[config.autoReplaceSvg];
+    return mutator || mutators.replace;
+  }
+
+  function createElementNS(tag) {
+    return DOCUMENT.createElementNS('http://www.w3.org/2000/svg', tag);
+  }
+
+  function createElement(tag) {
+    return DOCUMENT.createElement(tag);
+  }
+
+  function convertSVG(abstractObj) {
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var _params$ceFn = params.ceFn,
+        ceFn = _params$ceFn === void 0 ? abstractObj.tag === 'svg' ? createElementNS : createElement : _params$ceFn;
+
+    if (typeof abstractObj === 'string') {
+      return DOCUMENT.createTextNode(abstractObj);
+    }
+
+    var tag = ceFn(abstractObj.tag);
+    Object.keys(abstractObj.attributes || []).forEach(function (key) {
+      tag.setAttribute(key, abstractObj.attributes[key]);
+    });
+    var children = abstractObj.children || [];
+    children.forEach(function (child) {
+      tag.appendChild(convertSVG(child, {
+        ceFn: ceFn
+      }));
+    });
+    return tag;
+  }
+
+  function nodeAsComment(node) {
+    var comment = " ".concat(node.outerHTML, " ");
+    /* BEGIN.ATTRIBUTION */
+
+    comment = "".concat(comment, "Font Awesome fontawesome.com ");
+    /* END.ATTRIBUTION */
+
+    return comment;
+  }
+
+  var mutators = {
+    replace: function replace(mutation) {
+      var node = mutation[0];
+
+      if (node.parentNode) {
+        mutation[1].forEach(function (abstract) {
+          node.parentNode.insertBefore(convertSVG(abstract), node);
+        });
+
+        if (node.getAttribute(DATA_FA_I2SVG) === null && config.keepOriginalSource) {
+          var comment = DOCUMENT.createComment(nodeAsComment(node));
+          node.parentNode.replaceChild(comment, node);
+        } else {
+          node.remove();
+        }
+      }
+    },
+    nest: function nest(mutation) {
+      var node = mutation[0];
+      var abstract = mutation[1]; // If we already have a replaced node we do not want to continue nesting within it.
+      // Short-circuit to the standard replacement
+
+      if (~classArray(node).indexOf(config.replacementClass)) {
+        return mutators.replace(mutation);
+      }
+
+      var forSvg = new RegExp("".concat(config.cssPrefix, "-.*"));
+      delete abstract[0].attributes.id;
+
+      if (abstract[0].attributes.class) {
+        var splitClasses = abstract[0].attributes.class.split(' ').reduce(function (acc, cls) {
+          if (cls === config.replacementClass || cls.match(forSvg)) {
+            acc.toSvg.push(cls);
+          } else {
+            acc.toNode.push(cls);
+          }
+
+          return acc;
+        }, {
+          toNode: [],
+          toSvg: []
+        });
+        abstract[0].attributes.class = splitClasses.toSvg.join(' ');
+
+        if (splitClasses.toNode.length === 0) {
+          node.removeAttribute('class');
+        } else {
+          node.setAttribute('class', splitClasses.toNode.join(' '));
+        }
+      }
+
+      var newInnerHTML = abstract.map(function (a) {
+        return toHtml(a);
+      }).join('\n');
+      node.setAttribute(DATA_FA_I2SVG, '');
+      node.innerHTML = newInnerHTML;
+    }
+  };
+
+  function performOperationSync(op) {
+    op();
+  }
+
+  function perform(mutations, callback) {
+    var callbackFunction = typeof callback === 'function' ? callback : noop$2;
+
+    if (mutations.length === 0) {
+      callbackFunction();
+    } else {
+      var frame = performOperationSync;
+
+      if (config.mutateApproach === MUTATION_APPROACH_ASYNC) {
+        frame = WINDOW.requestAnimationFrame || performOperationSync;
+      }
+
+      frame(function () {
+        var mutator = getMutator();
+        var mark = perf.begin('mutate');
+        mutations.map(mutator);
+        mark();
+        callbackFunction();
+      });
+    }
+  }
+  var disabled = false;
+  function disableObservation() {
+    disabled = true;
+  }
+  function enableObservation() {
+    disabled = false;
+  }
+  var mo = null;
+  function observe(options) {
+    if (!MUTATION_OBSERVER) {
+      return;
+    }
+
+    if (!config.observeMutations) {
+      return;
+    }
+
+    var _options$treeCallback = options.treeCallback,
+        treeCallback = _options$treeCallback === void 0 ? noop$2 : _options$treeCallback,
+        _options$nodeCallback = options.nodeCallback,
+        nodeCallback = _options$nodeCallback === void 0 ? noop$2 : _options$nodeCallback,
+        _options$pseudoElemen = options.pseudoElementsCallback,
+        pseudoElementsCallback = _options$pseudoElemen === void 0 ? noop$2 : _options$pseudoElemen,
+        _options$observeMutat = options.observeMutationsRoot,
+        observeMutationsRoot = _options$observeMutat === void 0 ? DOCUMENT : _options$observeMutat;
+    mo = new MUTATION_OBSERVER(function (objects) {
+      if (disabled) return;
+      var defaultPrefix = getDefaultUsablePrefix();
+      toArray(objects).forEach(function (mutationRecord) {
+        if (mutationRecord.type === 'childList' && mutationRecord.addedNodes.length > 0 && !isWatched(mutationRecord.addedNodes[0])) {
+          if (config.searchPseudoElements) {
+            pseudoElementsCallback(mutationRecord.target);
+          }
+
+          treeCallback(mutationRecord.target);
+        }
+
+        if (mutationRecord.type === 'attributes' && mutationRecord.target.parentNode && config.searchPseudoElements) {
+          pseudoElementsCallback(mutationRecord.target.parentNode);
+        }
+
+        if (mutationRecord.type === 'attributes' && isWatched(mutationRecord.target) && ~ATTRIBUTES_WATCHED_FOR_MUTATION.indexOf(mutationRecord.attributeName)) {
+          if (mutationRecord.attributeName === 'class' && hasPrefixAndIcon(mutationRecord.target)) {
+            var _getCanonicalIcon = getCanonicalIcon(classArray(mutationRecord.target)),
+                prefix = _getCanonicalIcon.prefix,
+                iconName = _getCanonicalIcon.iconName;
+
+            mutationRecord.target.setAttribute(DATA_PREFIX, prefix || defaultPrefix);
+            if (iconName) mutationRecord.target.setAttribute(DATA_ICON, iconName);
+          } else if (hasBeenReplaced(mutationRecord.target)) {
+            nodeCallback(mutationRecord.target);
+          }
+        }
+      });
+    });
+    if (!IS_DOM) return;
+    mo.observe(observeMutationsRoot, {
+      childList: true,
+      attributes: true,
+      characterData: true,
+      subtree: true
+    });
+  }
+  function disconnect() {
+    if (!mo) return;
+    mo.disconnect();
+  }
+
+  function styleParser (node) {
+    var style = node.getAttribute('style');
+    var val = [];
+
+    if (style) {
+      val = style.split(';').reduce(function (acc, style) {
+        var styles = style.split(':');
+        var prop = styles[0];
+        var value = styles.slice(1);
+
+        if (prop && value.length > 0) {
+          acc[prop] = value.join(':').trim();
+        }
+
+        return acc;
+      }, {});
+    }
+
+    return val;
+  }
+
+  function classParser (node) {
+    var existingPrefix = node.getAttribute('data-prefix');
+    var existingIconName = node.getAttribute('data-icon');
+    var innerText = node.innerText !== undefined ? node.innerText.trim() : '';
+    var val = getCanonicalIcon(classArray(node));
+
+    if (!val.prefix) {
+      val.prefix = getDefaultUsablePrefix();
+    }
+
+    if (existingPrefix && existingIconName) {
+      val.prefix = existingPrefix;
+      val.iconName = existingIconName;
+    }
+
+    if (val.iconName && val.prefix) {
+      return val;
+    }
+
+    if (val.prefix && innerText.length > 0) {
+      val.iconName = byLigature(val.prefix, node.innerText) || byUnicode(val.prefix, toHex(node.innerText));
+    }
+
+    if (!val.iconName && config.autoFetchSvg && node.firstChild && node.firstChild.nodeType === Node.TEXT_NODE) {
+      val.iconName = node.firstChild.data;
+    }
+
+    return val;
+  }
+
+  function attributesParser (node) {
+    var extraAttributes = toArray(node.attributes).reduce(function (acc, attr) {
+      if (acc.name !== 'class' && acc.name !== 'style') {
+        acc[attr.name] = attr.value;
+      }
+
+      return acc;
+    }, {});
+    var title = node.getAttribute('title');
+    var titleId = node.getAttribute('data-fa-title-id');
+
+    if (config.autoA11y) {
+      if (title) {
+        extraAttributes['aria-labelledby'] = "".concat(config.replacementClass, "-title-").concat(titleId || nextUniqueId());
+      } else {
+        extraAttributes['aria-hidden'] = 'true';
+        extraAttributes['focusable'] = 'false';
+      }
+    }
+
+    return extraAttributes;
+  }
+
+  function blankMeta() {
+    return {
+      iconName: null,
+      title: null,
+      titleId: null,
+      prefix: null,
+      transform: meaninglessTransform,
+      symbol: false,
+      mask: {
+        iconName: null,
+        prefix: null,
+        rest: []
+      },
+      maskId: null,
+      extra: {
+        classes: [],
+        styles: {},
+        attributes: {}
+      }
+    };
+  }
+  function parseMeta(node) {
+    var parser = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+      styleParser: true
+    };
+
+    var _classParser = classParser(node),
+        iconName = _classParser.iconName,
+        prefix = _classParser.prefix,
+        extraClasses = _classParser.rest;
+
+    var extraAttributes = attributesParser(node);
+    var pluginMeta = chainHooks('parseNodeAttributes', {}, node);
+    var extraStyles = parser.styleParser ? styleParser(node) : [];
+    return _objectSpread2({
+      iconName: iconName,
+      title: node.getAttribute('title'),
+      titleId: node.getAttribute('data-fa-title-id'),
+      prefix: prefix,
+      transform: meaninglessTransform,
+      mask: {
+        iconName: null,
+        prefix: null,
+        rest: []
+      },
+      maskId: null,
+      symbol: false,
+      extra: {
+        classes: extraClasses,
+        styles: extraStyles,
+        attributes: extraAttributes
+      }
+    }, pluginMeta);
+  }
+
+  var styles$2 = namespace.styles;
+
+  function generateMutation(node) {
+    var nodeMeta = config.autoReplaceSvg === 'nest' ? parseMeta(node, {
+      styleParser: false
+    }) : parseMeta(node);
+
+    if (~nodeMeta.extra.classes.indexOf(LAYERS_TEXT_CLASSNAME)) {
+      return callProvided('generateLayersText', node, nodeMeta);
+    } else {
+      return callProvided('generateSvgReplacementMutation', node, nodeMeta);
+    }
+  }
+
+  var knownPrefixes = new Set();
+  FAMILIES.map(function (family) {
+    knownPrefixes.add("fa-".concat(family));
+  });
+  Object.keys(PREFIX_TO_STYLE[FAMILY_CLASSIC]).map(knownPrefixes.add.bind(knownPrefixes));
+  Object.keys(PREFIX_TO_STYLE[FAMILY_SHARP]).map(knownPrefixes.add.bind(knownPrefixes));
+  knownPrefixes = _toConsumableArray(knownPrefixes);
+
+  function onTree(root) {
+    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    if (!IS_DOM) return Promise.resolve();
+    var htmlClassList = DOCUMENT.documentElement.classList;
+
+    var hclAdd = function hclAdd(suffix) {
+      return htmlClassList.add("".concat(HTML_CLASS_I2SVG_BASE_CLASS, "-").concat(suffix));
+    };
+
+    var hclRemove = function hclRemove(suffix) {
+      return htmlClassList.remove("".concat(HTML_CLASS_I2SVG_BASE_CLASS, "-").concat(suffix));
+    };
+
+    var prefixes = config.autoFetchSvg ? knownPrefixes : FAMILIES.map(function (f) {
+      return "fa-".concat(f);
+    }).concat(Object.keys(styles$2));
+
+    if (!prefixes.includes('fa')) {
+      prefixes.push('fa');
+    }
+
+    var prefixesDomQuery = [".".concat(LAYERS_TEXT_CLASSNAME, ":not([").concat(DATA_FA_I2SVG, "])")].concat(prefixes.map(function (p) {
+      return ".".concat(p, ":not([").concat(DATA_FA_I2SVG, "])");
+    })).join(', ');
+
+    if (prefixesDomQuery.length === 0) {
+      return Promise.resolve();
+    }
+
+    var candidates = [];
+
+    try {
+      candidates = toArray(root.querySelectorAll(prefixesDomQuery));
+    } catch (e) {// noop
+    }
+
+    if (candidates.length > 0) {
+      hclAdd('pending');
+      hclRemove('complete');
+    } else {
+      return Promise.resolve();
+    }
+
+    var mark = perf.begin('onTree');
+    var mutations = candidates.reduce(function (acc, node) {
+      try {
+        var mutation = generateMutation(node);
+
+        if (mutation) {
+          acc.push(mutation);
+        }
+      } catch (e) {
+        if (!PRODUCTION) {
+          if (e.name === 'MissingIcon') {
+            console.error(e);
+          }
+        }
+      }
+
+      return acc;
+    }, []);
+    return new Promise(function (resolve, reject) {
+      Promise.all(mutations).then(function (resolvedMutations) {
+        perform(resolvedMutations, function () {
+          hclAdd('active');
+          hclAdd('complete');
+          hclRemove('pending');
+          if (typeof callback === 'function') callback();
+          mark();
+          resolve();
+        });
+      }).catch(function (e) {
+        mark();
+        reject(e);
+      });
+    });
+  }
+
+  function onNode(node) {
+    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    generateMutation(node).then(function (mutation) {
+      if (mutation) {
+        perform([mutation], callback);
+      }
+    });
+  }
+
+  function resolveIcons(next) {
+    return function (maybeIconDefinition) {
+      var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var iconDefinition = (maybeIconDefinition || {}).icon ? maybeIconDefinition : findIconDefinition(maybeIconDefinition || {});
+      var mask = params.mask;
+
+      if (mask) {
+        mask = (mask || {}).icon ? mask : findIconDefinition(mask || {});
+      }
+
+      return next(iconDefinition, _objectSpread2(_objectSpread2({}, params), {}, {
+        mask: mask
+      }));
+    };
+  }
+
+  var render = function render(iconDefinition) {
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var _params$transform = params.transform,
+        transform = _params$transform === void 0 ? meaninglessTransform : _params$transform,
+        _params$symbol = params.symbol,
+        symbol = _params$symbol === void 0 ? false : _params$symbol,
+        _params$mask = params.mask,
+        mask = _params$mask === void 0 ? null : _params$mask,
+        _params$maskId = params.maskId,
+        maskId = _params$maskId === void 0 ? null : _params$maskId,
+        _params$title = params.title,
+        title = _params$title === void 0 ? null : _params$title,
+        _params$titleId = params.titleId,
+        titleId = _params$titleId === void 0 ? null : _params$titleId,
+        _params$classes = params.classes,
+        classes = _params$classes === void 0 ? [] : _params$classes,
+        _params$attributes = params.attributes,
+        attributes = _params$attributes === void 0 ? {} : _params$attributes,
+        _params$styles = params.styles,
+        styles = _params$styles === void 0 ? {} : _params$styles;
+    if (!iconDefinition) return;
+    var prefix = iconDefinition.prefix,
+        iconName = iconDefinition.iconName,
+        icon = iconDefinition.icon;
+    return domVariants(_objectSpread2({
+      type: 'icon'
+    }, iconDefinition), function () {
+      callHooks('beforeDOMElementCreation', {
+        iconDefinition: iconDefinition,
+        params: params
+      });
+
+      if (config.autoA11y) {
+        if (title) {
+          attributes['aria-labelledby'] = "".concat(config.replacementClass, "-title-").concat(titleId || nextUniqueId());
+        } else {
+          attributes['aria-hidden'] = 'true';
+          attributes['focusable'] = 'false';
+        }
+      }
+
+      return makeInlineSvgAbstract({
+        icons: {
+          main: asFoundIcon(icon),
+          mask: mask ? asFoundIcon(mask.icon) : {
+            found: false,
+            width: null,
+            height: null,
+            icon: {}
+          }
+        },
+        prefix: prefix,
+        iconName: iconName,
+        transform: _objectSpread2(_objectSpread2({}, meaninglessTransform), transform),
+        symbol: symbol,
+        title: title,
+        maskId: maskId,
+        titleId: titleId,
+        extra: {
+          attributes: attributes,
+          styles: styles,
+          classes: classes
+        }
+      });
+    });
+  };
+  var ReplaceElements = {
+    mixout: function mixout() {
+      return {
+        icon: resolveIcons(render)
+      };
+    },
+    hooks: function hooks() {
+      return {
+        mutationObserverCallbacks: function mutationObserverCallbacks(accumulator) {
+          accumulator.treeCallback = onTree;
+          accumulator.nodeCallback = onNode;
+          return accumulator;
+        }
+      };
+    },
+    provides: function provides(providers$$1) {
+      providers$$1.i2svg = function (params) {
+        var _params$node = params.node,
+            node = _params$node === void 0 ? DOCUMENT : _params$node,
+            _params$callback = params.callback,
+            callback = _params$callback === void 0 ? function () {} : _params$callback;
+        return onTree(node, callback);
+      };
+
+      providers$$1.generateSvgReplacementMutation = function (node, nodeMeta) {
+        var iconName = nodeMeta.iconName,
+            title = nodeMeta.title,
+            titleId = nodeMeta.titleId,
+            prefix = nodeMeta.prefix,
+            transform = nodeMeta.transform,
+            symbol = nodeMeta.symbol,
+            mask = nodeMeta.mask,
+            maskId = nodeMeta.maskId,
+            extra = nodeMeta.extra;
+        return new Promise(function (resolve, reject) {
+          Promise.all([findIcon(iconName, prefix), mask.iconName ? findIcon(mask.iconName, mask.prefix) : Promise.resolve({
+            found: false,
+            width: 512,
+            height: 512,
+            icon: {}
+          })]).then(function (_ref) {
+            var _ref2 = _slicedToArray(_ref, 2),
+                main = _ref2[0],
+                mask = _ref2[1];
+
+            resolve([node, makeInlineSvgAbstract({
+              icons: {
+                main: main,
+                mask: mask
+              },
+              prefix: prefix,
+              iconName: iconName,
+              transform: transform,
+              symbol: symbol,
+              maskId: maskId,
+              title: title,
+              titleId: titleId,
+              extra: extra,
+              watchable: true
+            })]);
+          }).catch(reject);
+        });
+      };
+
+      providers$$1.generateAbstractIcon = function (_ref3) {
+        var children = _ref3.children,
+            attributes = _ref3.attributes,
+            main = _ref3.main,
+            transform = _ref3.transform,
+            styles = _ref3.styles;
+        var styleString = joinStyles(styles);
+
+        if (styleString.length > 0) {
+          attributes['style'] = styleString;
+        }
+
+        var nextChild;
+
+        if (transformIsMeaningful(transform)) {
+          nextChild = callProvided('generateAbstractTransformGrouping', {
+            main: main,
+            transform: transform,
+            containerWidth: main.width,
+            iconWidth: main.width
+          });
+        }
+
+        children.push(nextChild || main.icon);
+        return {
+          children: children,
+          attributes: attributes
+        };
+      };
+    }
+  };
+
+  var Layers = {
+    mixout: function mixout() {
+      return {
+        layer: function layer(assembler) {
+          var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+          var _params$classes = params.classes,
+              classes = _params$classes === void 0 ? [] : _params$classes;
+          return domVariants({
+            type: 'layer'
+          }, function () {
+            callHooks('beforeDOMElementCreation', {
+              assembler: assembler,
+              params: params
+            });
+            var children = [];
+            assembler(function (args) {
+              Array.isArray(args) ? args.map(function (a) {
+                children = children.concat(a.abstract);
+              }) : children = children.concat(args.abstract);
+            });
+            return [{
+              tag: 'span',
+              attributes: {
+                class: ["".concat(config.cssPrefix, "-layers")].concat(_toConsumableArray(classes)).join(' ')
+              },
+              children: children
+            }];
+          });
+        }
+      };
+    }
+  };
+
+  var LayersCounter = {
+    mixout: function mixout() {
+      return {
+        counter: function counter(content) {
+          var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+          var _params$title = params.title,
+              title = _params$title === void 0 ? null : _params$title,
+              _params$classes = params.classes,
+              classes = _params$classes === void 0 ? [] : _params$classes,
+              _param

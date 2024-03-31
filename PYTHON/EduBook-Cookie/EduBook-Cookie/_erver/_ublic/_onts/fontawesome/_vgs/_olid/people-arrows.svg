@@ -1,0 +1,45 @@
+ 59.6-56.2 77c-20.5 25.6-59.1 25.6-79.6 0c-13.9-17.4-35.7-45.7-56.2-77V449.4l192 54.9V255z"
+        }
+      }
+    },
+    "familyStylesByLicense": {
+      "free": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "map-location-dot": {
+    "aliases": {
+      "names": [
+        "map-marked-alt"
+      ],
+      "unicodes": {
+        "secondary": [
+          "10f5a0"
+        ]
+      }
+    },
+    "changes": [
+      "5.1.0",
+      "6.0.0-beta1",
+      "6.0.0-beta3",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f5a0",
+    "label": "Map location dot",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321841,
+          "raw":

@@ -1,0 +1,150 @@
+= true;
+        return true;
+      }
+
+      if (lowerCasedName === 'is' && value !== null && value !== undefined && typeof value !== 'string') {
+        error('Received a `%s` for a string attribute `is`. If this is expected, cast ' + 'the value to a string.', typeof value);
+
+        warnedProperties$1[name] = true;
+        return true;
+      }
+
+      if (typeof value === 'number' && isNaN(value)) {
+        error('Received NaN for the `%s` attribute. If this is expected, cast ' + 'the value to a string.', name);
+
+        warnedProperties$1[name] = true;
+        return true;
+      }
+
+      var propertyInfo = getPropertyInfo(name);
+      var isReserved = propertyInfo !== null && propertyInfo.type === RESERVED; // Known attributes should match the casing specified in the property config.
+
+      if (possibleStandardNames.hasOwnProperty(lowerCasedName)) {
+        var standardName = possibleStandardNames[lowerCasedName];
+
+        if (standardName !== name) {
+          error('Invalid DOM property `%s`. Did you mean `%s`?', name, standardName);
+
+          warnedProperties$1[name] = true;
+          return true;
+        }
+      } else if (!isReserved && name !== lowerCasedName) {
+        // Unknown attributes should have lowercase casing since that's how they
+        // will be cased anyway with server rendering.
+        error('React does not recognize the `%s` prop on a DOM element. If you ' + 'intentionally want it to appear in the DOM as a custom ' + 'attribute, spell it as lowercase `%s` instead. ' + 'If you accidentally passed it from a parent component, remove ' + 'it from the DOM element.', name, lowerCasedName);
+
+        warnedProperties$1[name] = true;
+        return true;
+      }
+
+      if (typeof value === 'boolean' && shouldRemoveAttributeWithWarning(name, value, propertyInfo, false)) {
+        if (value) {
+          error('Received `%s` for a non-boolean attribute `%s`.\n\n' + 'If you want to write it to the DOM, pass a string instead: ' + '%s="%s" or %s={value.toString()}.', value, name, name, value, name);
+        } else {
+          error('Received `%s` for a non-boolean attribute `%s`.\n\n' + 'If you want to write it to the DOM, pass a string instead: ' + '%s="%s" or %s={value.toString()}.\n\n' + 'If you used to conditionally omit it with %s={condition && value}, ' + 'pass %s={condition ? value : undefined} instead.', value, name, name, value, name, name, name);
+        }
+
+        warnedProperties$1[name] = true;
+        return true;
+      } // Now that we've validated casing, do not validate
+      // data types for reserved props
+
+
+      if (isReserved) {
+        return true;
+      } // Warn when a known attribute is a bad type
+
+
+      if (shouldRemoveAttributeWithWarning(name, value, propertyInfo, false)) {
+        warnedProperties$1[name] = true;
+        return false;
+      } // Warn when passing the strings 'false' or 'true' into a boolean prop
+
+
+      if ((value === 'false' || value === 'true') && propertyInfo !== null && propertyInfo.type === BOOLEAN) {
+        error('Received the string `%s` for the boolean attribute `%s`. ' + '%s ' + 'Did you mean %s={%s}?', value, name, value === 'false' ? 'The browser will interpret it as a truthy value.' : 'Although this works, it will not work as expected if you pass the string "false".', name, value);
+
+        warnedProperties$1[name] = true;
+        return true;
+      }
+
+      return true;
+    };
+  }
+
+  var warnUnknownProperties = function (type, props, eventRegistry) {
+    {
+      var unknownProps = [];
+
+      for (var key in props) {
+        var isValid = validateProperty$1(type, key, props[key], eventRegistry);
+
+        if (!isValid) {
+          unknownProps.push(key);
+        }
+      }
+
+      var unknownPropString = unknownProps.map(function (prop) {
+        return '`' + prop + '`';
+      }).join(', ');
+
+      if (unknownProps.length === 1) {
+        error('Invalid value for prop %s on <%s> tag. Either remove it from the element, ' + 'or pass a string or number value to keep it in the DOM. ' + 'For details, see https://reactjs.org/link/attribute-behavior ', unknownPropString, type);
+      } else if (unknownProps.length > 1) {
+        error('Invalid values for props %s on <%s> tag. Either remove them from the element, ' + 'or pass a string or number value to keep them in the DOM. ' + 'For details, see https://reactjs.org/link/attribute-behavior ', unknownPropString, type);
+      }
+    }
+  };
+
+  function validateProperties$2(type, props, eventRegistry) {
+    if (isCustomComponent(type, props)) {
+      return;
+    }
+
+    warnUnknownProperties(type, props, eventRegistry);
+  }
+
+  var warnValidStyle = function () {};
+
+  {
+    // 'msTransform' is correct, but the other prefixes should be capitalized
+    var badVendoredStyleNamePattern = /^(?:webkit|moz|o)[A-Z]/;
+    var msPattern = /^-ms-/;
+    var hyphenPattern = /-(.)/g; // style values shouldn't contain a semicolon
+
+    var badStyleValueWithSemicolonPattern = /;\s*$/;
+    var warnedStyleNames = {};
+    var warnedStyleValues = {};
+    var warnedForNaNValue = false;
+    var warnedForInfinityValue = false;
+
+    var camelize = function (string) {
+      return string.replace(hyphenPattern, function (_, character) {
+        return character.toUpperCase();
+      });
+    };
+
+    var warnHyphenatedStyleName = function (name) {
+      if (warnedStyleNames.hasOwnProperty(name) && warnedStyleNames[name]) {
+        return;
+      }
+
+      warnedStyleNames[name] = true;
+
+      error('Unsupported style property %s. Did you mean %s?', name, // As Andi Smith suggests
+      // (http://www.andismith.com/blog/2012/02/modernizr-prefixed/), an `-ms` prefix
+      // is converted to lowercase `ms`.
+      camelize(name.replace(msPattern, 'ms-')));
+    };
+
+    var warnBadVendoredStyleName = function (name) {
+      if (warnedStyleNames.hasOwnProperty(name) && warnedStyleNames[name]) {
+        return;
+      }
+
+      warnedStyleNames[name] = true;
+
+      error('Unsupported vendor-prefixed style property %s. Did you mean %s?', name, name.charAt(0).toUpperCase() + name.slice(1));
+    };
+
+    var warnStyleValueWithSemicolon = f

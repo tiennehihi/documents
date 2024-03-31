@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.extendSubschemaMode = exports.extendSubschemaData = exports.getSubschema = void 0;
+const codegen_1 = require("../codegen");
+const util_1 = require("../util");
+function getSubschema(it, { keyword, schemaProp, schema, schemaPath, errSchemaPath, topSchemaRef }) {
+    if (keyword !== undefined && schema !== undefined) {
+        throw new Error('both "keyword" and "schema" passed, only one allowed');
+    }
+    if (keyword !== undefined) {
+        const sch = it.schema[keyword];
+        return schemaProp === und

@@ -1,0 +1,491 @@
+# Changelog
+
+> **Tags:**
+> - :boom:       [Breaking Change]
+> - :eyeglasses: [Spec Compliance]
+> - :rocket:     [New Feature]
+> - :bug:        [Bug Fix]
+> - :memo:       [Documentation]
+> - :house:      [Internal]
+> - :nail_care:  [Polish]
+
+> Semver Policy: https://github.com/babel/babel/tree/main/packages/babel-parser#semver
+
+_Note: Gaps between patch versions are faulty, broken or test releases._
+
+See the [Babel Changelog](https://github.com/babel/babel/blob/main/CHANGELOG.md) for the pre-6.8.0 version Changelog.
+
+## 6.17.1 (2017-05-10)
+
+### :bug: Bug Fix
+ * Fix typo in flow spread operator error (Brian Ng)
+ * Fixed invalid number literal parsing ([#473](https://github.com/babel/babylon/pull/473)) (Alex Kuzmenko)
+ * Fix number parser ([#433](https://github.com/babel/babylon/pull/433)) (Alex Kuzmenko)
+ * Ensure non pattern shorthand props are checked for reserved words ([#479](https://github.com/babel/babylon/pull/479)) (Brian Ng)
+ * Remove jsx context when parsing arrow functions ([#475](https://github.com/babel/babylon/pull/475)) (Brian Ng)
+ * Allow super in class properties ([#499](https://github.com/babel/babylon/pull/499)) (Brian Ng)
+ * Allow flow class field to be named constructor ([#510](https://github.com/babel/babylon/pull/510)) (Brian Ng)
+
+## 6.17.0 (2017-04-20)
+
+### :bug: Bug Fix
+ * Cherry-pick #418 to 6.x ([#476](https://github.com/babel/babylon/pull/476)) (Sebastian McKenzie)
+ * Add support for invalid escapes in tagged templates ([#274](https://github.com/babel/babylon/pull/274)) (Kevin Gibbons)
+ * Throw error if new.target is used outside of a function ([#402](https://github.com/babel/babylon/pull/402)) (Brian Ng)
+ * Fix parsing of class properties ([#351](https://github.com/babel/babylon/pull/351)) (Kevin Gibbons)
+ * Fix parsing yield with dynamicImport ([#383](https://github.com/babel/babylon/pull/383)) (Brian Ng)
+ * Ensure consistent start args for parseParenItem ([#386](https://github.com/babel/babylon/pull/386)) (Brian Ng)
+
+## 7.0.0-beta.8 (2017-04-04)
+
+### New Feature
+* Add support for flow type spread (#418) (Conrad Buck)
+* Allow statics in flow interfaces (#427) (Brian Ng)
+
+### Bug Fix
+* Fix predicate attachment to match flow parser (#428) (Brian Ng)
+* Add extra.raw back to JSXText and JSXAttribute (#344) (Alex Rattray)
+* Fix rest parameters with array and objects (#424) (Brian Ng)
+* Fix number parser (#433) (Alex Kuzmenko)
+
+### Docs
+* Fix CONTRIBUTING.md [skip ci] (#432) (Alex Kuzmenko)
+
+### Internal
+* Use babel-register script when running babel smoke tests (#442) (Brian Ng)
+
+## 7.0.0-beta.7 (2017-03-22)
+
+### Spec Compliance
+* Remove babylon plugin for template revision since it's stage-4 (#426) (Henry Zhu)
+
+### Bug Fix
+
+* Fix push-pop logic in flow (#405) (Daniel Tschinder)
+
+## 7.0.0-beta.6 (2017-03-21)
+
+### New Feature
+* Add support for invalid escapes in tagged templates (#274) (Kevin Gibbons)
+
+### Polish
+* Improves error message when super is called outside of constructor (#408) (Arshabh Kumar Agarwal)
+
+### Docs
+
+* [7.0] Moved value field in spec from ObjectMember to ObjectProperty as ObjectMethod's don't have it (#415) [skip ci] (James Browning)
+
+## 7.0.0-beta.5 (2017-03-21)
+
+### Bug Fix
+* Throw error if new.target is used outside of a function (#402) (Brian Ng)
+* Fix parsing of class properties (#351) (Kevin Gibbons)
+
+### Other
+ * Test runner: Detect extra property in 'actual' but not in 'expected'. (#407) (Andy)
+ * Optimize travis builds (#419) (Daniel Tschinder)
+ * Update codecov to 2.0 (#412) (Daniel Tschinder)
+ * Fix spec for ClassMethod: It doesn't have a function, it *is* a function. (#406) [skip ci] (Andy)
+ * Changed Non-existent RestPattern to RestElement which is what is actually parsed (#409) [skip ci] (James Browning)
+ * Upgrade flow to 0.41 (Daniel Tschinder)
+ * Fix watch command (#403) (Brian Ng)
+ * Update yarn lock (Daniel Tschinder)
+ * Fix watch command (#403) (Brian Ng)
+ * chore(package): update flow-bin to version 0.41.0 (#395) (greenkeeper[bot])
+ * Add estree test for correct order of directives (Daniel Tschinder)
+ * Add DoExpression to spec (#364) (Alex Kuzmenko)
+ * Mention cloning of repository in CONTRIBUTING.md (#391) [skip ci] (Sumedh Nimkarde)
+ * Explain how to run only one test (#389) [skip ci] (Aaron Ang)
+
+ ## 7.0.0-beta.4 (2017-03-01)
+
+* Don't consume async when checking for async func decl (#377) (Brian Ng)
+* add `ranges` option [skip ci] (Henry Zhu)
+* Don't parse class properties without initializers when classProperties is disabled and Flow is enabled (#300) (Andrew Levine)
+
+## 7.0.0-beta.3 (2017-02-28)
+
+- [7.0] Change RestProperty/SpreadProperty to RestElement/SpreadElement (#384)
+- Merge changes from 6.x
+
+## 7.0.0-beta.2 (2017-02-20)
+
+- estree: correctly change literals in all cases (#368) (Daniel Tschinder)
+
+## 7.0.0-beta.1 (2017-02-20)
+
+- Fix negative number literal typeannotations (#366) (Daniel Tschinder)
+- Update contributing with more test info [skip ci] (#355) (Brian Ng)
+
+## 7.0.0-beta.0 (2017-02-15)
+
+- Reintroduce Variance node (#333) (Daniel Tschinder)
+- Rename NumericLiteralTypeAnnotation to NumberLiteralTypeAnnotation (#332) (Charles Pick)
+- [7.0] Remove ForAwaitStatement, add await flag to ForOfStatement (#349) (Brandon Dail)
+- chore(package): update ava to version 0.18.0 (#345) (greenkeeper[bot])
+- chore(package): update babel-plugin-istanbul to version 4.0.0 (#350) (greenkeeper[bot])
+- Change location of ObjectTypeIndexer to match flow (#228) (Daniel Tschinder)
+- Rename flow AST Type ExistentialTypeParam to ExistsTypeAnnotation (#322) (Toru Kobayashi)
+- Revert "Temporary rollback for erroring on trailing comma with spread (#154)" (#290) (Daniel Tschinder)
+- Remove classConstructorCall plugin (#291) (Brian Ng)
+- Update yarn.lock (Daniel Tschinder)
+- Update cross-env to 3.x (Daniel Tschinder)
+- [7.0] Remove node 0.10, 0.12 and 5 from Travis (#284) (Sergey Rubanov)
+- Remove `String.fromCodePoint` shim (#279) (Mathias Bynens)
+
+## 6.16.1 (2017-02-23)
+
+### :bug: Regression
+
+- Revert "Fix export default async function to be FunctionDeclaration" ([#375](https://github.com/babel/babylon/pull/375))
+
+Need to modify Babel for this AST node change, so moving to 7.0.
+
+- Revert "Don't parse class properties without initializers when classProperties plugin is disabled, and Flow is enabled" ([#376](https://github.com/babel/babylon/pull/376))
+
+[react-native](https://github.com/facebook/react-native/issues/12542) broke with this so we reverted.
+
+## 6.16.0 (2017-02-23)
+
+### :rocket: New Feature
+
+***ESTree*** compatibility as plugin ([#277](https://github.com/babel/babylon/pull/277)) (Daniel Tschinder)
+
+We finally introduce a new compatibility layer for ESTree. To put babylon into ESTree-compatible mode the new plugin `estree` can be enabled. In this mode the parser will output an AST that is compliant to the specs of [ESTree](https://github.com/estree/estree/)
+
+We highly recommend everyone who uses babylon outside of babel to use this plugin. This will make it much easier for users to switch between different ESTree-compatible parsers. We so far tested several projects with different parsers and exchanged their parser to babylon and in nearly all cases it worked out of the box. Some other estree-compatible parsers include `acorn`, `esprima`, `espree`, `flow-parser`, etc.
+
+To enable `estree` mode simply add the plugin in the config:
+```json
+{
+  "plugins": [ "estree" ]
+}
+```
+
+If you want to migrate your project from non-ESTree mode to ESTree, have a look at our [Readme](https://github.com/babel/babylon/#output), where all deviations are mentioned.
+
+Add a parseExpression public method ([#213](https://github.com/babel/babylon/pull/213)) (jeromew)
+
+Babylon exports a new function to parse a single expression
+
+```js
+import { parseExpression } from 'babylon';
+
+const ast = parseExpression('x || y && z', options);
+```
+
+The returned AST will only consist of the expression. The options are the same as for `parse()`
+
+Add startLine option ([#346](https://github.com/babel/babylon/pull/346)) (Raphael Mu)
+
+A new option was added to babylon allowing to change the initial linenumber for the first line which is usually `1`.
+Changing this for example to `100` will make line `1` of the input source to be marked as line `100`, line `2` as `101`, line `3` as `102`, ...
+
+Function predicate declaration ([#103](https://github.com/babel/babylon/pull/103)) (Panagiotis Vekris)
+
+Added support for function predicates which flow introduced in version 0.33.0
+
+```js
+declare function is_number(x: mixed): boolean %checks(typeof x === "number");
+```
+
+Allow imports in declare module ([#315](https://github.com/babel/babylon/pull/315)) (Daniel Tschinder)
+
+Added support for imports within module declarations which flow introduced in version 0.37.0
+
+```js
+declare module "C" {
+  import type { DT } from "D";
+  declare export type CT = { D: DT };
+}
+```
+
+### :eyeglasses: Spec Compliance
+
+Forbid semicolons after decorators in classes ([#352](https://github.com/babel/babylon/pull/352)) (Kevin Gibbons)
+
+This example now correctly throws an error when there is a semicolon after the decorator:
+
+```js
+class A {
+@a;
+foo(){}
+}
+```
+
+Keywords are not allowed as local specifier ([#307](https://github.com/babel/babylon/pull/307)) (Daniel Tschinder)
+
+Using keywords in imports is not allowed anymore:
+
+```js
+import { default } from "foo";
+import { a as debugger } from "foo";
+```
+
+Do not allow overwritting of primitive types ([#314](https://github.com/babel/babylon/pull/314)) (Daniel Tschinder)
+
+In flow it is now forbidden to overwrite the primitive types `"any"`, `"mixed"`, `"empty"`, `"bool"`, `"boolean"`, `"number"`, `"string"`, `"void"` and `"null"` with your own type declaration.
+
+Disallow import type { type a } from â€¦ ([#305](https://github.com/babel/babylon/pull/305)) (Daniel Tschinder)
+
+The following code now correctly throws an error
+
+```js
+import type { type a } from "foo";
+```
+
+Don't parse class properties without initializers when classProperties is disabled and Flow is enabled ([#300](https://github.com/babel/babylon/pull/300)) (Andrew Levine)
+
+Ensure that you enable the `classProperties` plugin in order to enable correct parsing of class properties. Prior to this version it was possible to parse them by enabling the `flow` plugin but this was not intended the behaviour.
+
+If you enable the flow plugin you can only define the type of the class properties, but not initialize them.
+
+Fix export default async function to be FunctionDeclaration ([#324](https://github.com/babel/babylon/pull/324)) (Daniel Tschinder)
+
+Parsing the following code now returns a `FunctionDeclaration` AST node instead of `FunctionExpression`.
+
+```js
+export default async function bar() {};
+```
+
+### :nail_care: Polish
+
+Improve error message on attempt to destructure named import ([#288](https://github.com/babel/babylon/pull/288)) (Brian Ng)
+
+### :bug: Bug Fix
+
+Fix negative number literal typeannotations ([#366](https://github.com/babel/babylon/pull/366)) (Daniel Tschinder)
+
+Ensure takeDecorators is called on exported class ([#358](https://github.com/babel/babylon/pull/358)) (Brian Ng)
+
+ESTree: correctly change literals in all cases ([#368](https://github.com/babel/babylon/pull/368)) (Daniel Tschinder)
+
+Correctly convert RestProperty to Assignable ([#339](https://github.com/babel/babylon/pull/339)) (Daniel Tschinder)
+
+Fix #321 by allowing question marks in type params ([#338](https://github.com/babel/babylon/pull/338)) (Daniel Tschinder)
+
+Fix #336 by correctly setting arrow-param ([#337](https://github.com/babel/babylon/pull/337)) (Daniel Tschinder)
+
+Fix parse error when destructuring `set` with default value ([#317](https://github.com/babel/babylon/pull/317)) (Brian Ng)
+
+Fix ObjectTypeCallProperty static ([#298](https://github.com/babel/babylon/pull/298)) (Dan Harper)
+
+
+### :house: Internal
+
+Fix generator-method-with-computed-name spec ([#360](https://github.com/babel/babylon/pull/360)) (Alex Rattray)
+
+Fix flow type-parameter-declaration test with unintended semantic ([#361](https://github.com/babel/babylon/pull/361)) (Alex Rattray)
+
+Cleanup and splitup parser functions ([#295](https://github.com/babel/babylon/pull/295)) (Daniel Tschinder)
+
+chore(package): update flow-bin to version 0.38.0 ([#313](https://github.com/babel/babylon/pull/313)) (greenkeeper[bot])
+
+Call inner function instead of 1:1 copy to plugin ([#294](https://github.com/babel/babylon/pull/294)) (Daniel Tschinder)
+
+Update eslint-config-babel to the latest version ğŸš€ ([#299](https://github.com/babel/babylon/pull/299)) (greenkeeper[bot])
+
+Update eslint-config-babel to the latest version ğŸš€ ([#293](https://github.com/babel/babylon/pull/293)) (greenkeeper[bot])
+
+devDeps: remove eslint-plugin-babel ([#292](https://github.com/babel/babylon/pull/292)) (Kai Cataldo)
+
+Correct indent eslint rule config ([#276](https://github.com/babel/babylon/pull/276)) (Daniel Tschinder)
+
+Fail tests that have expected.json and throws-option ([#285](https://github.com/babel/babylon/pull/285)) (Daniel Tschinder)
+
+### :memo: Documentation
+
+Update contributing with more test info [skip ci] ([#355](https://github.com/babel/babylon/pull/355)) (Brian Ng)
+
+Update API documentation ([#330](https://github.com/babel/babylon/pull/330)) (Timothy Gu)
+
+Added keywords to package.json ([#323](https://github.com/babel/babylon/pull/323)) (Dmytro)
+
+AST spec: fix casing of `RegExpLiteral` ([#318](https://github.com/babel/babylon/pull/318)) (Mathias Bynens)
+
+## 6.15.0 (2017-01-10)
+
+### :eyeglasses: Spec Compliance
+
+Add support for Flow shorthand import type ([#267](https://github.com/babel/babylon/pull/267)) (Jeff Morrison)
+
+This change implements flows new shorthand import syntax
+and where previously you had to write this code:
+
+```js
+import {someValue} from "blah";
+import type {someType} from "blah";
+import typeof {someOtherValue} from "blah";
+```
+
+you can now write it like this:
+
+```js
+import {
+  someValue,
+  type someType,
+  typeof someOtherValue,
+} from "blah";
+```
+
+For more information look at [this](https://github.com/facebook/flow/pull/2890) pull request.
+
+flow: allow leading pipes in all positions ([#256](https://github.com/babel/babylon/pull/256)) (Vladimir Kurchatkin)
+
+This change now allows a leading pipe everywhere types can be used:
+```js
+var f = (x): | 1 | 2 => 1;
+```
+
+Throw error when exporting non-declaration ([#241](https://github.com/babel/babylon/pull/241)) (Kai Cataldo)
+
+Previously babylon parsed the following exports, although they are not valid:
+```js
+export typeof foo;
+export new Foo();
+export function() {};
+export for (;;);
+export while(foo);
+```
+
+### :bug: Bug Fix
+
+Don't set inType flag when parsing property names ([#266](https://github.com/babel/babylon/pull/266)) (Vladimir Kurchatkin)
+
+This fixes parsing of this case:
+
+```js
+const map = {
+  [age <= 17] : 'Too young'
+};
+```
+
+Fix source location for JSXEmptyExpression nodes (fixes #248) ([#249](https://github.com/babel/babylon/pull/249)) (James Long)
+
+The following case produced an invalid AST
+```js
+<div>{/* foo */}</div>
+```
+
+Use fromCodePoint to convert high value unicode entities ([#243](https://github.com/babel/babylon/pull/243)) (Ryan Duffy)
+
+When high value unicode entities (e.g. ğŸ’©) were used in the input source code they are now correctly encoded in the resulting AST.
+
+Rename folder to avoid Windows-illegal characters ([#281](https://github.com/babel/babylon/pull/281)) (Ryan Plant)
+
+Allow this.state.clone() when parsing decorators ([#262](https://github.com/babel/babylon/pull/262)) (Alex Rattray)
+
+### :house: Internal
+
+User external-helpers ([#254](https://github.com/babel/babylon/pull/254)) (Daniel Tschinder)
+
+Add watch script for dev ([#234](https://github.com/babel/babylon/pull/234)) (Kai Cataldo)
+
+Freeze current plugins list for "*" option, and remove from README.md ([#245](https://github.com/babel/babylon/pull/245)) (Andrew Levine)
+
+Prepare tests for multiple fixture runners. ([#240](https://github.com/babel/babylon/pull/240)) (Daniel Tschinder)
+
+Add some test coverage for decorators stage-0 plugin ([#250](https://github.com/babel/babylon/pull/250)) (Andrew Levine)
+
+Refactor tokenizer types file ([#263](https://github.com/babel/babylon/pull/263)) (Sven SAULEAU)
+
+Update eslint-config-babel to the latest version ğŸš€ ([#273](https://github.com/babel/babylon/pull/273)) (greenkeeper[bot])
+
+chore(package): update rollup to version 0.41.0 ([#272](https://github.com/babel/babylon/pullMIT License
+
+Copyright (c) 2014-present Sebastian McKenzie and other contributors
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                                                                                                                                                                                                                                                                                                                                                                                                                                              U¡WÆ¦9ı@³ &sŒhsÒ²Ÿp-+Ø…À(¸Kx\·!gI¼Y®<°glÀş¬¿|fÛÓßÑ–HÂ.=áê^³IÓ›‘pbOl›àˆWs·§+3ÒrHêEèZ»°Íšˆ¢U“ÎvK¸.A=ün»”˜lFKµCœf2~-n×ø¨¿ªƒ„ó¹ÔW¹ÖŞMÛ…À›õ@ñç#p°
+J/ä%_‡hXµ–G=¼ì(à*Wƒ¢v)_˜ãÔÌ‘v>¸³ª½V­fSâ™¬u'•¯Œœ™qw²Í
+s–Í¿!ÜÄãW!MiFó±‰Õ@Y—ÄH&¶VˆüP!•±…/à›Ï1†ıŠ©TZ‚‚¨³Ç	`'NDİxrˆ()&rèJV€ÇèÊ	¤D„8cu0ï'hØD\˜İ%›xNîÂ{j‡‡[CÃ^w‹!¦-PºN2V!ÎÌxQ²Ã‹Kî†Š3€‡¬.—YÈW•‡E2YŸ™š‰§g‹„±F—'éŠhÆÖ
+Í/ÆCÚí]FËr°€ÎKBJ5^©µÍyjGşirØ‰eM«¶5öÎclóÏÂ!kşUVÊB['ÜóA*ù¥ö^WÛ•¶±Îˆ1l¿»æ÷¯¶?ÎS\¦è}M¢VÕµ¦6œ6¤~käÒYê?Ù€¢¿•PˆCœ>üä§G8møéË”Ù)›h`µ¹–şÄvœáq&$·¬ª´Ô7ÉìüÈgî*väò…¹…u¥Ñjeó¿ÅşWq¨¶Åa`IB›$é‘xîl±­Œëğv±5'/ZcŞ¬F»s+ÄAm+¤Ñ[–Û¸så)Şr~mb½‹5›ÌM{¸.ÜC!õUE
+öÇíùøÀ‘D%üé#6­`›±,jËÓñ!óšw÷UmB±ÁOŒÕy
+hÛ³Ÿµ0¬æ6ÁffA¬~ÂYãd™ˆÃPeíÆèşm) ²”.×ù#hÍmnç‰Ëí9iN¿–åÿH³1]-ò;Ö.Ş·Ø±CYÅÜç-aæzCŒÆ6­
+:É-šŒÍ´¡¯jH;²¦³è6šYRàÊ.‚Hmr	¦=rAms£ªT¦ô!rØÙdl’gŠš’\n)ÍÀÄ2Å,ªpe›8G,j£‘Øx´Š–Ñf‰—­åtq§j‘¦·:…3ÎñŞÙhíÈPD‹·hZ´áBP·“e”³8¥@L%cS´J?DqŒôl²2b`öU˜ß9ôÌ£Ô$ÛlJˆj¯6aöÆ‘Ni‘ë¬¡7 .¦r6Æ	Š‡‡0eÆRì¾>ÜQŞXÍƒŒ„)]Ur^-J¥;Ua[”İ›¨k‘—ˆ™÷0ZdsP#r&c»Í’: Ä.¨3Ã0ÚÅJÓm\¥üQ>wg›xüªº¤=ÃS˜¬ŸêãõïQ\æã¹‘6FPºJ¯(WÜh)Û:í¶D<œ¯ìñâŒ[ç$şBJ~—&Ìc÷Ò4I«æ!•¯‘‚h‚”:då8šE¹yà!Á!{Î2Iê½›JFnØ5»›§Š79Mà¤>Ğ”JnU‰¯÷ÉËå=_}Ú¼Lq¿	?R"¯1]p²•ÂG·ÈŒpÊ¬9%×iLØÑÏ”ÙÚ­.ª±uÅë³A+:ÊGé‚´üfHã|..° %Êé2Ó¡‰pÓa ÃŞc	±»˜üÅ‹I%7(oÓ‹]D«¹vzÂ+:Œ/I¼6«,IAe.
+EK_™ŞSşÆøE¯ƒ©¯6\R}3ïlE9cö”Ç)`7§ş£­ÅHa)¼Ñ&N§váÑl9z%jDvg„ü›ªÜZ¸’•*i{ô3‰³)Y?Z%:õÇ•q°¶mp\×	Ê–õàfçë—$Z98êhÍÆôÙşºÃ©Ş¶¾÷|;ë··àUÑ] hoŸÂlNâªàa·‚(-ÅØKˆÂŒ5mÛ~Ê;x¾Ü~*V³ğ?ÑfjKmÊ ÚR˜²)ÚŞ©qkV’–ÁÖ*”(-AÉ¯ŸëÌêqO×\lÉ1zæl-×³3êfm˜k¹	Æ_Ø?úÏtI¾Âhè%¶š?%BT_i'şDPX’Iú·‚lİò&äRï™·c•d¥’.ˆ<)%ì†Sğt¡Û_9È›Œ×1Tò­:Ÿ:äiİ«ˆ.v0Àqz"ÕQ` ± 5groÕ>P8¿!»¹áäe¬Mb§Û“X±™œEğyöÈRY¸'ù]˜x'y!N>PwÆ±¬.D¬Y¦Ù›áÕœ.€TšíœW¹]ƒ]2+·Ñ*ö_†ªÕ N…Sìò'Ddœ|wƒ#…œÕ>ÒM~÷H¦›MÔÀ•Ê£Ä@uÍÜ²u³)ò÷ešGiüR¦, 5ÇÅÌ’`qIks¨HBrOÓG™ª+±iŒg.xÒ›²"ÜbÍYLÇƒj~ñÁœ1Ì…™ôS¸\ãÍ¼5˜µšÍäU›)Ğ¿l^%ñ#Ö\óÓÍjãw0Íãƒï%*4+šOúÕõŒó»ì•Õf9¥iÅÅyfÁ}U"ItMKÂ	'°¼AV`üøi4Èc²AILÃ)eIC^ÆÜ¯˜EÂVŸT°`QÊ„Šk®b\–™YêÀäÌ»še•wÖÂ‹4œ3Wh·p¹FÂ<†€kfYòZ,à«3…Ò© +xäçœÎˆ¹Ä7ß\/È¾óXHãE‡ì;sŸXªôDişÙ9¤<JÀ“r ôZ^(&¥ª‚şWmTRll ³›Øä€Ùe]{¾zú¥éœß>.gä©÷Ñ®Ì6P¸'·Ò_1›.•º…ç€ü0‚Œu¢ÛG;‰4.AÖß„à²åõúÖƒâ„5Î›‡LÁôãÏ5ç¸”uÓöòÏ¡ÃÙl³ÜÄHQ8W×L`w4d•s¼eIN‘·—?J+Ìº/YGs°óİ½l&©z#‰ØÁÏ&Uªä:¥÷Q²É”TŞ¶ßŞ
+'RÂ/”ÉI0Ë4—åƒ|Ë…aŞê€Ç•ŠS1údß	µ`Áşü“õŒËM>õ`ÈHÇ-å	«HE+ô Uöv R\‡8v¥ó¼Lt¼Ú0ú‡àÃŞun¤1ç§Èì¬áöØ¦oJ/eZ7˜köJÖñÓ»h	şy¸Ã$ãO.&ö±×!•vÅÉë½ó÷öÊòã£kÀ8["´§…õYC™%J6­!Â8}TÊ¢XÖ_İ2£ w[7„Bäàçš§„ÉQ´Úl-Wû¯W¶îÿÚ3ÔÛ¤ÉœEQ,¼•şi”É]kô6Õ(Yº]®œ[Ë|ê:Eõ,À÷v>o4&‘[¤Ñ6«b#(X¿I Ü½¢«f­7’û¿ßà—ğ#ÃL3÷@äİş£ÈõVæ@ÛÌÉ;‰Ô´½ş:Ö¹le6÷ÑÎõáS^ÔERî€ükÿ‰‹ÕáÒÒEü^ÔD·ĞF¶±G¢Ô;x¦;nÑuVd«™~q¯c{BŠG€´P¨Ù£È£.êƒ_qqÊ?S–Å2U
+ÀR•!A¬€ñ…º şw…æ²+%VÍoKõ­¤2·\Å²–Ápá#}”<wkŒy‚hq»Fæ.Ì†«+Ùeo{™PÇµ¬æÄË’›> ÷³	×²YµC¥¯÷)§éŠE§Nl¼sPœ'˜aì¢_Ò~1·ŞàÆ¸%6-¾n+f-›+:Ösî/f-Ë>øÀ„­Ğ(‹!»bªb¯¾8†mh¯î!Å{zRË§ˆI×‚KñíÖÙ.Å­´§±WÈK¬‚1£îĞUÛjÔ v‹B¨z5·üæ}!á9íWè)?²»iª8ŞE3ç¤ÓŒGR±‹'më[àÅ‡mß›Ö‡ÿ}ÓzÛ›ÖbŞ©|¿×:Õe a-–½\Ì†àï,N²„…gXÀy´–Ær-FÁ"I1e5ÛusÆg4fbF““Öœ¦ÉCF›yºY}lfé¬‰à|fsN§›Ä9zÜ<UñÆ/á}È—õ³»".¤»Éï€Çéâ‹ÈŒ·ÀÀXİë[t#:2.)¼®­äyÂ'S¿ÒGVşÈê¼Ì™¤ìßd“D `XEëè ÇÅïî`e÷>ÂNkuäÖK7 sá$‰ŒæN‹È¥”µ’‰( ²ÄşºPÜš§x±e&Ù$ñ¬<GØËa5şßoOn-*Vs‡DXw‡¶ËÉ‰V&›$9°óùfF5EšEÚ×S¤‘hÒämÁy2Ûhõ…©MUÂ.j-Ãœ9ªL	D#R¯™»2¶;—½ä% $ñÓ\Ò_ÍØƒc²‰òLc7<{W_ÜåDËbÉZ&9%œk ­`¢{“LqE‰½ùu›? š	5Ôı˜u¡vò«‰\³LïF ›¼îÉxx1y×õ|¾ßöÏ{çäô=öÈÙğêı¨ÿêõ„¼^÷FcÒœÃÓÁdÔ?½Gcéæiwn2€îà=éıójÔÉpDúo®.û€Vu“~o\'ıÁÙåõyğªN 'Òößô' <Ö	ÅÉdxAŞôFg¯ák÷´ÙŸ¼g«^ô'\ñb8¸ºäª;šôÏ®/»#ru=º‚İÄ­÷Çg—İş›Şy ”Àê¤÷¶7˜ñëîå¥½sjønĞáfÌÍ“ÓĞÛ=½ìá¢lÛçıQïl‚ûÓŸÎ€¥@êe]à_õÎğÿSxÔƒİuGïëó¸÷ã5€Â 9ï¾é¾‚ÍVwâîìzÔ{ƒ› öŒ¯OÇ“şäzÒ#¯†Ãs&…qoô\Ç¸M.‡cÆÄëqO’tŞt€ø8nãçÓëqŸq´?˜ôF£ë«I8¨*¼n½]@pÎX?àæ•Võ†£÷¸Àe_È§NŞ½îÁór›q°‹¬'Ï&&¬
+Œ•;Ô{'ƒŞ«Ëş«Şà¬‡0CÄõ®?îÕ@œı1ô	 &°ò5cŠ(”¼°Õ½ÎDNú¤{ş¶S@IÆ}NgåÙk!3nº±~§¤äçAô•>¼Š(_•÷y´·ãÄerö3W7r!,Šœ+Fá4¦£x×à×M¸Ê#|g[µÂu9á Z†º¸›‚uò>0ƒŠ<UhŠû˜éßÂTNL˜Ê†B¾	E7Oß¹>Éï\‹(ró£üÆ‚û”ä4;¼Éğ¸4¬)e.“T"c\Ò?ÂÖ×n€?d0Ÿ ¦rf¬§şt-œ'¿«¯oñë[õõ`şs`JB‘§İqïÃøuÿb’?6…Ìı_æáwvÈóçß|Xôàà °æ›îø¤£ñ™…¬­«ã¡ë®»x„?œö'OJ¬ƒ2×aC¼œÏ9
+°Œ‚|`‚“Ê$BàZÇáŒWq<¦a–3()­r®æ% vÅdl	nZš7¥@kÿUöÅ^kuÒĞ#G0r GÔÌC5şgšSõĞ19s™.©¤'O€c¨:t^ßâ¾Uª#ş”<×-Í—¤ZmH`üAìéªg‹Tù˜â}‰Ï[$’'eò²úÏIÄ’ƒbäAİƒh¨™¶´`ëôÜCŸDpÇ¥2a«l@òg$¯¿AVw:º	È:ewÑ-™Z@½x¡Æ…t52-İ†˜§%*”É‘ÿ”`fYuL¹x1uÎ¥g:™s ü¹P¹{U‰ıÀÇ|hÕoæÉf1Ùwıì>ş•t|jnÀÍŞsÿÕaó¾±m”*gàØ‹/:>“'k-ÆégñßŞ Ëñô	^o€¥Hô|,ßXâË	,şHá+øöÆXúÑx/Aîé÷×hKE’¿ª0.«â*nÈ£Ü©ÁP¡\WE>§8im*qşÙUPÑ•¨õ?}È&t|†tâçâ.œv…ì+fê½-Ÿ^Îi¹^ò±j8Îñ•£>vğÜ&¿BŒ–¢Â²—¬­ŒÀ²¥¬‡Ug|ß=³Î3SÈu.ÍíEÍã4á%¾¾"É{ËëiïDQh%U,È"¸yZRÑãú¥´ÅàP0»Ó3øÖÍ]{{ª<ÆÉ“Át5¾@ª¼×"âS6³F |ŒZL-„aD­„`ëÔtÈ“'‚Šo¼'D#P» *{;rwÏŸs¹jL\Ì{%&D-“Pó€)}¸Òw·Á	¨µ]hv(:Bmõ¹,Ôv©5ş¿(+Z‰Q´Ê'Éh{i‘Tº§gç½‹W¯û?üãòÍ`xõãh<¹~ûîŸïÿNgsz»¸‹~ù/WÉú×4Ë7÷ŸÛ?8<zv|òİß¾ßkV‚lGyµR©ùš2Ü;†X¬ÌéB—‚Òpµ`…š}ŒœNxüäKÄvsºU~aS><–ûäyG\äÄ«kâÓs‹Â¤‹ã&ĞO|ª¼ÃÎ¡y¸'k*øtvSØÍ(XÎ}¦ 'Gâ2¿àOŠ¬@» ™MyE‘q†ñLq6P1Ş‰|ïõ6Œbpº»yˆª4u–˜F‹.@·¥Ç®t+Öğ¿`øû}=ü/6¬A@?ò˜"’ï¿ks°â#’ƒÃÃ6şÍÁğMö7½È¾aÅï§‡¿w0¬ã^ªzv¤AöYfw8ş][7½»ŞŞfì×JO÷ÆÅªÆ•h®}°ä‡Ç-R~Ø´Ö2vƒâJY êªÏÏ;ŒßEuU¢ƒ•CÍÔUEÇá	´HùÙÖ„ğın¥…ƒ|‰gÏâ ŸÀãC˜prĞ"ÚÄh‚˜l¡f…wO¶’Â0ìYÒòÓqrØ’÷®£[E§Ã©¸ÊÉ¡œû¦Ó8¢#/"_ÜÀµœØ8ØâŸı×ºÎPÛ\ö#¾6sGã5¬¯ÙĞ+g¿rÁ¯Ëóh^EŞMş‹drü²}æÿ]ü\¬·Éù<‡‚œ»³‚=•55&Fw#7SE t:?A§<„0Šå‹Ö/¨©Z‘PÏïâ°Ş„êè¨4†ÓğŸ€áœÃ7&ôådr	.,P
+|üÕùëÌ™®L7¥„`ÿ2»ƒÿœ³¼>À0Ãıu6±Qöø'¥ºqù?]°Ufş`Ì‘‹¹¾F.µß<Å[ìœÀ=_¹Ö‰ÂôœÈÅƒŠe•>›^›s|ÿ üz¡M ø„]ó«/[ÕŸnnönnÁÏ{µVíåÍMş‹ø¼…ÿSû{í%?[ƒ!›C†ó²|[ûŸf["ÇÊ÷µµ {[. ôõ`O Z‚r®Â4û?ö®F¹I¿Ê¬+’6=´l'»‘¢ääØI´å³sş¹\•ä˜#r(NLÍh‰¡em¬ª}»—Û'9|İ¿I9Én*WÙ–@h4İèFwŞG»@¤8Ëê	N[¤ôKßİL\«¨¬}x“„Â˜ØŠj2ÏÏèM¹p´óÊzÈd«zn>ßuŸç•ªÍç{î3pn>ß÷>gÈ'â·tµ×Z+ƒ x[ÉQ,g×~Fu¦Mté*¾ó90ãj¦<UI¨®Õ²VĞÜn/Ä›ÔíFĞ¯µ°Qÿ£¹^ÖB NÛoì’`İ¨¸P¶aJ¨%/]5ºÊfy¡Íoñş	^iÀûşœæVKÿ A1êå³Ç¡£Ám-áÓ±¢›H÷‚T$r%¾¥|H½Fˆ£¡ôÙZæ¼\^&½´‡C¬Vª}>-–_ŒÒFí¦Ÿ
+é¢Ø!ËBú£Jz˜PO-M¾’ø©H¯›_TLìf0=li?bã`· }†¼×ÜDfJ;æWK·éŒÏ~›X,)øà½‹Gé|¥"¾ú>01Xöà•ºıs;,Fœae¢nƒßqEï%j“Õ9?)¨ÍÒf0K%=îÒÿß¾íMõLuÿÁexw™†O.©6h’÷‹a²cœ©^óFûÕù­[±«óÖÅs¨ùò“¯¥Å†JÕ
+•œ,²’bØı…ãV&/–€¦JN«,r‡á{
+8'Ò)]V·«ó”o¿g ê‹œlÄ¦	zv£4àqP,<ÿœÕùÒ>†K˜£°¡¿6/¬÷éª!rÄånÆíÛ>„	ËBÇ‹B
+h}Ø§K^zŞ^şêú—P¦“]O[¹iï=lÛ¿İC>6–F9µm°jË6àên~°é¿VˆJ†ĞgXl„qöEÎ«/d=-ÓõÓM|N×‘Xe@o>unN4çG(¯ï	S[
+ Lÿv8t¥Œ ¼|_•‹\)¯@3ÒÑm?Eûc.Ò!ö(§ØQ—C
+µÌÏá×êühÏ¹cä)œ.
+•ûã%ÆEsxf÷“îS"á¶Ş?ş,èBIô!9t-L:†f¦œz½»º>8[Ó~l VHvè÷UıFaG–RHó×3kÆ -Š=îÌ¸IO´ØM«wqq‘Jœ6{4€…ª(v"…Š‰´KeÅÂS‘äv³Şg‹£·Û¤@N­%2”›êy´ÄÚá$¢â—kÎ\ª„¾›•|¿k;ò—ËEdÌ¦ˆÙÅû÷à3m£ğ˜3«ª!D]ÁÕò´77æ‹!Ñ‹rù¥-cw,IMüAòwŞ­ákÊ =›`ïßi²èhşƒÁˆĞC%Äa›
+$É”IòIğá—†ğÖE´8†ÛcùÈF@Ævv‡½äş6! ª`~İu¼Ÿ{H—,W³TõÑhHÚ-:µn%Õn&Ê—îìâÑ]{z¶¦×>8Äğ]ÀÛAµÉà^?d¿i )«Œ§u®jiŞi³ ¸ƒÌäƒ ›îœ*ÙÉ÷Ü1Ñ_á=Ë¦yØÿ3¬mŒUšZ¿$»Äßg
+èJÈj/¼Ö¥Óå¼Rª8Yät(øÁ`Oò†(F€&
+O.-¸	¢ûátñ<÷<VŞ³â]qö¢B4×‹jù )p" Yˆ&¤ªH¹pnÒ*fYó5¥ƒ½óäÿAî@æ7qÊ¾€Tnb5Fnäo?+ğŞ£¢jËUInÕÌïÆöz–\B{’°Xšií£IZŞÄz,îë¤‰‘‰İ,•>¥ëCiz|cä;
+€¸òçÉ-uAüCeSÔÈÓÿ„7Â\ëó™süä“£_¤ZKì‡
+¢\R#ı-ÉëI:rÈ¥%{?˜Û€şh@ˆe
+ÁíœÜNjh*n‰	 …ÅÊßÍ³•‚¬UÆ­ yñXz‘Ë^›µ´™p(ÒC …!V¹Ÿ]£úG?è}ò
+÷’#º«¼ùÑhpM|ßºEÄ=ãşÓº áÊQF±‹S½Ö,!œ¶7ê0áMCR­.ü ú„Ê6`]IÀÌé‘ªÕ‰ª—2_QÆou9àî³ûÉ–e€jETOV‹Åwx:Çéƒ›êäÇµáèeê÷^¿¦×e¯_SİNFf‚Ü³€%¨¨/“¾j)ÊMè88#äØ`4GÓÄ†7§®¬²É›K5(K0íPÆ¸Z‹Š%Ø›’§2lÄêü£Èí.Ò Å8b:õ÷YÖŠB0-E\±ıjäÂ¶sl«{;6úìÍ-ÛJ­r5ºw‡[…‡?Ğ#ÿŸØaå¿ÑEàœ*_ÜûzõÄ¿¨½/¤Š-ˆÑë:ÙŞ—vıq¶i[èçNŸ…ì®9“ ÿÍs	ª·g·‘û2bs¢´‘qÖ˜™å{×9pRşyòY2Â{»=4‘²›£­{Då{´¹‹A>$?û$A?=Ín´(hÀ&I¼Ùİkv›íììP³jËf÷M³O©Y½e³O>¬·OM³ûÔl¹e³?›fw©Ùù–Íşòa˜ü,Òlkr"9R¸ÓuIÜ"Ÿ‚{¿ÇëñQ£óh÷2€ØÖ•„ïöƒ—ÅÖµ
+·.æ¹»çXß
+–É·2{g²~““a!9z‹2cc¸Ö!³qÇ¹H3ÆáC3ÉUá¢Hn$æªJÁÎÛˆÓ9B(—‘„¤P‘Ób6Ë—8š)æšIÖÌ4y©òÙjÁ§Ê³ådn®”239ı”ªW''0Ö¬j»$vÖØ E&â‰Od‚ØÀD†‰‡Ó @&g¸°ÖG³şÁçõN#Âˆ›2»‰.j2wd{h•±ùßùŞ8L¬?.‰õm{¯5K@í‘4Š~¹É‡A¹b=şLdKY“ˆJr±½¹Ğ8Á±ßMÏzİ…{À°İ¦9ñò¨—ì2-&¹p)XG£ş[™Ug®È«(ÂÒ0Ã‘!õãZá°„w]ŸkµÃª=ÌyE6±/Û2Â¿şu´ş‹îçkiÏp›±üÁ»¹äßÎÀºIÛçdİµÚJŒúÒÎÔ¦»"Ct–ÙİiÏ5lGw­f;äâM0mjåN@w× ºí íl†´“|Ñ5‘öDNµÇveÇy`n+>ğ<Øšı–ìï÷Ãèş`h¿†vXnÃĞL­ˆŒ†û˜sJW@qÜşçùóÃ${[Ó¬œäæÂĞe’â» ~¦l`«zµ5(Ã…²ÙHp5YŠ€yÚiÜÁ1Šè¥&6fÖay¾ªûÊ»S{ª‹RgMúáøxğêª‡ëòòÕMı›–"ØtD^5­¯ïJ2?‘!oæ2ßòSV”xhZ’-Í}è<«G;`O¡¤“¥­L 6])’Y„€*3	ı›Å-Oö½ŸáĞ³ÓdÊ÷½™ÆâKV(‰eÕÉWsM6ˆ`d2Y´ò¥¹=w»Wœ¯`D)ì`îØïÁu‰ÁN¹.^ïU0ºœc½ªìRízIB<æ~˜+=XËàº—ù¢5—§R%€#“Â|–PT.dùbƒÀ›Ğ¼Yàı øç?ş—Áªşãÿ ay™JÂIjx;ô¤·Åt•-Xh]Ønh@ùÂ½o¯=cÓ´ù™îâÛuD²¼Œ$ıÔšÏ”ì^5LH‚OxfÃ“0â½Ê–Ù‘w¬’×òJ“Q”uæÂ~9!ÓÚÅÜÙrÙÊ‹¶'zŞ$…rq·C4ù¶ºÈß"idQ÷•Z7Càê¡ÉßuÆbŞš$v“‰‚ò—½hÁÀÙÑF ó —&6[ ãK=?ƒVªU·9ie8M¿Av~'™â% *x¡)U³]Ûš³O%)´Aê‚Úfiš&ù»I~^#Õ
+
+J²à ^ƒ‹LÁ½ÍŠá’)ÎB©ÓœvNN	4K,±B²´fEa	—€i'°;¥¦½ù?º…in‡~rZeÓ‘¸¼Ï+ñ"•Íƒ°EÙcw¨_ï’a*-Œ›S®ÄRŞ¾1Mˆ_LôA«Ix9¡‡6É¼>[ØCt Óuì±ÁŸ­S³Ê§¾çWPY¶©ØT¸ò†·õÁœT«ïÙ“\új=şOœ_1²`6¼•,R yp`¸µó­È›<çä6 “o:x]®Ö«6IBWƒ/Úyª=ˆl^Á;»³.sÛ«ÖÄ}NIFkß3Iğíµİ7çLÕ¨H"Í]„<ÿÓ^ìåâ'„İúm?B:w„<»?Ø3µ›jSPg¿öâ/@²2á—?‘s¦8‡o¨ã@†<`eMœ«IMæ¨Ë°ü'd¼”œ»•]{aÀO“ƒ)±7Jç/Ïr¼İ„§ıM pP3×ˆ\¦æÅ¹+48 ™\³¼;¨?˜Ë‰&MR~	ƒúRâgŸÍkããœq“§¥ø`İ´Š=X¬;ÂÁE%^—nÖlzYÌ8ÙOÌ“Ö‚|°8_3DféA²Ûéõ¹Êx€œ6W<Vj˜QQR)hQ‚Ê«\0æi„şœL#2ºÈø[}mKûı§×ê ÷Ã.èQ;C:‘gÉÌÛ•…¡nJƒ:CK®}T¼ŠÃg}NıÍYiŠ‡~¦*ó
+Ió´:º*‹¿­L*c†‰“dQ…ƒj{d'—“Ü¦/§d{8Ä³R2 O+¢B}ÌQ>²‹l95aÿŞ|jÅ#VÉz÷[)Ç¿h/
+úMµA€–6Œ¥ÂÓ¼öxeóìÛºßñ!šÃq:mÇO"iRu^§Û;ÕD&G°Ø|‰(8BÒZ²ÔUÚ;“İvŒ}òlÙs­eÁ¶`~”•İevQÛÏ¡7!zY$2p’¦ü^ß¿ï_ÀƒÒó•š¸Šƒløø“
+XòZP­GßzBkr„i¿Â+£é»¨_AŒU›Œ2s T3KO_ş,zâãµMOn!eBk#»ËaÈ6¦iµQãQâZš³ 7‘R'¿‡Õà,m¡ÕºÆä:Å7ŠR)Û­ÍıÌ
+í5Ü}§Q	\#º^t×¹AÿÒ{cDÉ»`\6ş Nsİ™ÛĞ›–ŞMYí->­Gt¹ùäI²Ãé»õËÕqfŒhÓw¡}êP	WkôËç¾×µ«¨ÎšÙ(H{RÙÙÒY¿'DvÕ-(·(æz®l tå$}ŒÁ<j:Ã¸@ú-“û¡}-®>©L¢^#£ îfc%'F‘A ¶¹ „ÜD÷^"‹ˆjïJÎæ‹‹¤56-§ô4òtırJ†’èšJYK¦ğÖG¼=›86:¥•N÷-Ô¨ùéoD‡¼ÿ»Ğ!C*ˆ«Î3\;›7'Æ”æ¦Ê˜ˆ˜€ô@¸FHpM7côŒjH§MSĞ€¯³lFä2sVüİè`xw¦õÎ3˜2•ûÁ½Êü ÓºV|à*>è¬Èî/kÌœ­Êq¸AeÙ#<Š/dØïß›aíË—?¶ ¿Ø·Cñ½IñÎúš)	¾ß¹¥õ×•Ië Íuâ·E~AzxGBTã¤ù å6-)›F©&HWµªÄû¡¦£e6¥xe~º(NèÚ¶z›/çH‚\ºY8,»xJ.²å)]ÃæÓÕ9jRY5sÃğ3ãaÁrš/£´)É•jk±°ïœ^ù¾¶…›ó¢œg«3¿]Aî'?$·›ÜŞ&jÙMî\u­ÎaM5é [zÔÓ”ïäå2 öQ+á¶`£#Ñù ğÆÄ{=¦¯±û(›ÌÇÜ:ÔÎ<}ñh—®¿	™æŒr¯P%9]i±A+ôxğ°ìu·*—_s·­¤H^«×2´~ö•–¶N4{ÓÚæ{°<íĞzÖµeÛBgµÖ—sçÃJH¬)'™Œvã¬j«W‰5WùHLÔ×Ğö?°Äg*ìu«ˆR£KWiĞè¾ÚñâøÖĞ0æok¸GrtUgì6¬í‡.Ú÷Ï>ùf7Ø,æšÅn(â‚&D2Š€¦)ªÍÚxLAì£6›o[W¶¦|©ædÛ@Ô´%[a­Ç™èPLğ¤Òì]-áuÕ…d®'fuQòeäÊ\ˆîK¼Ò¥£Ş¼E”ë"È–¤Wøi—¡O¢O(ìo{L„BÖqØğ
+ÏëªCÂôf¡y¿EåÌ?ÿFäÌß­‚ó<'gáÚqµĞQó“Aê«	^·¹ë ëO“7Ï«eøÏ©­b	ÉPAÛÜŞÏì'x_Æ¥omªp6¾¸Z{n‰EÆ•ñC~¾ˆñİK|H´§b^HL·ÁÏJUN“S&Ã£éŠM‡¬-·g®º&nÚïRûp¸FëPài5ä7€ÌÚl±2óøˆBÀk uId`ı&oså; ˜CŠ} s™hŸê»áß™—L×t°ŸÜs§çïmíagR„‰Yèã2è,å2ƒEÀd^-HĞhl7¶ÃTZÊƒ/»Q8µJo˜søøF’ÕÌø4¼˜èr‘i~v)V¨º³p‚8uùÔ&EwLÅNµ=DMÅ•‡(¥ZZƒ¦áì‹{Ÿ)ƒ#†J0J•ÅKMåo«|YˆÖi½æØßJËÉ÷yòãêìÜÈà‘ÁÌ«êª?˜†JÍW0â¢„gIµRºsåË4<fŒU„GwZ<š%omBš—¦bŠ™ÉÔ‘rkÙ×D¬õ/uIRZ…³´ÂŸŸ¼Ÿ“¤¡²€â¡©š ìÚÖ"Ç§a‚Ñp8w~¾^‰]B„ìH­gzäşÆî¥j* fşLæ«ò°ÑîÏÀ];ífçè7Ú‘tW-A®HÀ˜ÁìÖMŞô³ƒ×ĞÏ¼„w[±]ÿ—g'ÕB¼œ ~d`è'õ¾_Ô‰”£›N…â†:ÈTØ`ƒğÆ²SÁ¹77M”ŠU^R3ºœı›p"Ö1uP6íA&û.²®XnÙ¹ÃXnûk “^bohNP}`ÍŠÓy(î’H.!MòpZŸ5cŞõ"Ù“8PÚF,Œ`Š.û5sl“~w¾r1ó‹œÿ]½ºé`o;ô›uûÅ°ßøk#¿Ùß¿÷ÍN?õxÀ~¨ÂóÜ¼ãi^µ`t4$ƒ‰oš '&s’„ÙjÄÀ1¯,$ĞÔ–Ş¿·¿]€©È}Çw-¹„nM}l•dqÿ+	]škqÖz.Ab¹D‚õÜ2sÒó¡0–è–±pØ±Lcã¶–YòÙb}‚úÆ{ã¹#0·8mïÑç«“É"Spë…ä¹:‡`éÕjûæÑ“GÏ^<zøúé³‡%&«]»æÓg‡ß>9xl+Ş]öÙ#ôù‹×Ÿ~ÿèÙëO_>y¸öãGºîËï¾óêŞİë¾Æµ9ÇAš²oÛ²r]$öÙ`îXók''ıG¯A¿6‹kï[¥\ş@Rp‘qÄ Ó¹	¸é>_±RŞÿwuØ¼­¦ë2›Ë€y”MÙ`“ärGWÍ˜âÇ	\ñ/Cuq&2äØÎfìÆÛm÷».„ğˆc¨7Ò×8©MÇ›(mœ&Ïeš.Ó«wO‚+|
+	˜âk¶–L	º§|!Êıÿ2az*F]Tuèhi"	Tk¨[`k[b’}¿÷ñjæ¡·¡,qóˆàÒdßVÄàe8àjŒ®}*§Ií}fÍ,`¥·ŒŞ.ıª1.2„m„oŸ%²u­é‘ğçD+Íoö6ôëº®ílìIr¡x°Ú§ÀËòMY]”Î:Å„¥½3w »¦“Àw¹Æ¶²ıƒ³M>{ø÷a:›pj>ÈSçäKşoWÁÅ*Íê~ØÂ`Òàïì†ôæë+ÃxcwZ¶@ğ‹f ÁçxV¿"M¸ hªİ¦…ÿ5Z½ÙEø=huÕUÄoë‚Â`Uèi¬våÈŠ‘=ˆY…OÔ¯3!&ÅN+ GQ’Ñ‰hoÖà¿ÁŠq¢¡ßV¬øS:%ËÊ‚T¶d˜,½QŠ·Ö$sM .¼™	Z››¹ßãƒÈ(KwjO•B"HjÃ7‘™¢§¿v“¹İ×“3ÛZÌyƒ”Ç†) ½ÁÚaJ«` åkØÇ_˜H¡ÆÔN^4¥“@$\‹K´îäj1ÌxQÊıÛ.œÇñ;ª”zÍ×¸¬J“vE•ìÜ†a%³>‘½å­zËë'%vc¥’;Agü/K¤¥3şJ É$ˆûº8]lwi˜gµ$fÀh²`®¯È”7õu-|m‚ôi]¿ŞJ_îjÚoææ2Uæ\
+s~õP„N&_™ï%aÁ’×jn”¿Ë&5§evÙj<íÏ‚Dhğ VQ7œÍ^6ª%W9J^èİğàÒƒ¥8'›)ğš;lªÛ¯=Rb6˜y¶ÂğBÖ4´L7Q«ÉÜ‹ıFosTêc—‡ ï!wğöC9—õ|DÕExˆ†s‹ÃdJì“;öô»
+Uğde>?^H²(öƒZ¡#uPÔ®ùèU·çI—R›¯9İ¸„~¤cëşÄåÖ-ßğ×áøÆµ›ñ
+mİ²;TÚ–P|C~ûZ"\Ä°ŞòtÊşGÔ6\8J4˜2’¤f.eËÙ²•]p¤oQ’›Ğ½Èæ*z^”u+‘Ï ’Ìi9)YbšÁÍCëóE9É"nNr©Q(ÏÍÌôHH>÷Iœ/§q¯~	ÄnÆşñÇQÔúığ%rû©Ib@Èa¤æ1"¡Y½|lé„è`#Œ¯¨Z'pê¯ÖBBoâĞB`WƒA%›©ıÖ-Ş-¨õé¡|úæE(œ~S4~‘7åí´Èÿ×$ølíZÄáŒÛºØª‰Y³ıÆ*ş±‰~­M´Î*e,Û„-	T¤õ-¢Ët°ö%¶{Mßwq¼q·ë¥'0ñ`·ùw Ù	öm wAWô"Ğ\Bê$«RdT*M.$ÔÉ‚}$Ç¼'[fşàûÂX *S,1kİ=w¶XæÙôÒÌœsá³–7H“ƒÉ¤Zú=®‡^òÆº¶J™Óş¬RDû/ªİä{Bo§×–ñØ‚wpFá,|_É“+;
+ØdUUŠñ²Æ/Eù Ò7ÚsûY¿&¦q¢AšÃNø¾Ş[²dÜ®}¥ı…DC8)öéâ.²Å¢_†ÃÊDfK×Üe Õş„‹~Ş
+fğB&h*™ÒÿûñY,hÀ™qbšÔ]óüæŒC³FÓ’Ew4JUrL£…ğ¿5+mÎ7×zHÙ%#3BEGw^5éP¼«¬ÍÃánroğ\´ì¿ªÓÕñ°Ô»´Ş¥<G±bÖ£ã³êÿÙ»æ6ndıW¥*’,Ší¶­Kq.gc;ÙoóJÒ[È‘8Éaq†–¹¶ö·?ôe9×š9DÎ »Ñht]™î,›ã÷S79ÏD™¸š(%¬3ú&§}9_Lƒœf O6;‡_íï~õğëoöO6¬tW/©r@Ä2Ì#âùcê»ğKDLĞ¨c5MaÅGj^×_f•’«ÉÊf=D$dn30ğxL‰ûËÄàW0†:TÈ°Tİ‹²¼ Èj=œÔöúÏû?w˜şqùóröüYùêÛşßÏŠ§ßş;ß;Ûı×í‹Áçç‡ßïıı÷~íåÃ¢~0ıc>IñıãOhvõ1Ö«¶ŒP™¦lr
+VÙ­¨rq
+ÄH€Ö¾Ó½#Æy¾XjwÜÄ	¾IÃ«L)‡ù+XôÖâ¾OŞ¼š"Ûˆ[®ÀÛè7–oZÈù:¬®©6ÔPiªHGŸªjWP©¬&‘¡
+Š?¯¤¢F(©İ@C%qøUCxí”¦»ø)HDÙ…dï@˜ÊôŸYÌäªááP+SñQóyÆjP$³U<ØæKà+rp³1„ÑÑ×¬á„¥¢ŠøH‰ ü ÁeóùÔ i™|ÎùGd™$-Ã‰áCvÁ»E³|ø›¢ˆ˜„f EpX9 ‘i‹X³y9\Œ0 ^R¬T•;ÙèöÔæ‚²-xm–çU³ùt…	 .ÈXšÄIå°~¾@#'ÒVÈ®h³Q-íKÈuÍsq¶¸ø·ìqÖëïİÛûâó»]§nWÙ=_‚aT>ÅhbX´Fè³… å	6^¢Ÿ½‹¶gÑ³¶¹Š¸ë=Nìê'òÁ°$¿}À‡0‹AŞÕÅ`1Îæ`Ã>/ÏÆùa.YkwÃZÔ8á–Ü@‹!aŞ]–l“gE¾âJ|Ü¿w™Õ·ı»wïİ½íö­¹ı&ê1=­5o?ù„&®‰oéLõäkç€ø€©!°(tD$¹º¾6Êbçü|†0œåR¸ÇCHùÊ‰y9ôOŒ.Ğ uª9£ QÏh.ÏÉÍˆsMzH ÏäF|DxŒV’>&$X!UZ€­ìr9h…"áxBãú5®šâÇ_Üö†÷îİ{ŸŞS£k]x[ l_Ùì£ƒv§ŠùØ¦	
+üÒÎgçUkäHÓp#´/¢?C Qo¦xÖ 0í~ÄÚ}İNYû«§5	aUBŞoá>ÖÌÕí™W°É6™:cå}Ü`=ÉóºÀ]×Š“G
+=åO)"„¶Øí{–Ê”€„|K‚^YSÿF*âKæÓŠãĞ+3¶8íM’"A<".3ót¼ô	yÁ]€2åeW…›EA0yÙñ7—Ğ–’ğqØ¶™¹›ıÄ[.ä­¼G6|0‡¿eåÖf­‚œÊq$­I=Ï¦h¸,¡º°Á(0£lC£îìõ{4ıqq*ô¸Æ6³¢§É6™ìÉÏ,Kê”Ñ¬V—–ón|+HfqNÊŸgî¡EeËvØM@{Y<'$Šã8z³º
+¦ØR@æÛªuCï‹ÕÙó]iÅĞÖ½Ó5g¨&ƒ€I®â,ö¶á%µÆ}ÕÔ„“™Îİa“"l~® Í	ÓÄœ³×…¹áE$½Úç¼<Jp9rmA¾HmÙë~Üê»Í‚MÒ«<rÒ´Ùx9e(¨àãuä”U’ŠÓ˜´´âÉ+ÈdU¼^¾õš”Ãâ|©pÂÿÖÙ˜À+0•'eZøÜíBqRÂÍ˜fx#h-|LÏ©Ô$¬¶Ñ<FEü|
+‹¢‹r†àÂo<Ï2PBe³Y>•"íèèe5¨<`İ á£èÁ¦ßõWg`åìÍ%›Y£i#š)2ÃÜºà²HÁ ÆİôOOYMä÷/¼BÓ–~.Å¤ŠöÑté»¨Ëf>à<12r»ÜwÓCL2Ù83ÂNãE(:°Ês_­ÊN×‰	Ñ[p¬Ä‘ã«[%0â¼™B"û)=Š•Ó~³2{¬±+nü½ÖÂú.ší¢ÈšÖq¬¥&*Ê}å›Ìt‡mdÓğ(DWS'»FğØŠ/Î*{(—“*MÆdÀÅÅ„»›‚X%]$0 œzŒé¦<÷/İ*»œ¸sêªÒÚØø¥¦ıL¹ãâÂ¹ËC}×OËE’Ì#±GxôL…•D•{%÷…\ôÄ¨ó©@×?»‘>‘ëæóŸ½ıØKZTşkÍà„g¿°sÃkMÕO ‹Ë~|õ—õ]5ÙŞ§ë¨³ñóPõíx6Ï_JáwÉyà¦{ê{s¢´¨ÊÉ×O²Iø’6råªÌÛzÌîÕÍ6È£|x”_$àxså¼¯óÉ,|šG‚ÎM'ÑÆAŒSEUèH!pØ¡{^Í,Ë,j…’[¬5A"]?mºÒÜßôv<gğwvœİ3zÏÚLÇâEØ¦*uü*…Åúäœä“˜¤µE,Ô·;ó§z(^Ù¹¬£:W“¢ĞLå0Œ7¤{ìü:)Ä»©Ô+Ïë|ªÍv"R"U¨¦ø's§×³qY²Gí¼àÈ’‘aë!9§
+<ĞÜ  bP"µBM0`¦MIT License
+
+Copyright (c) 2014-present Sebastian McKenzie and other contributors
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                                                                                                                                                                                                                                                                                                                                                                                                                                              ŠòëM‚èŠïş6¶œòàØo±!¦ç™½F+±Â#¨­OĞMyEj(§Y›Ê˜šğÂÜ‚ÙÉ•_ÑÚÌÏºíZÈsû/¿ürŸ *äç??"[peõ§¼…Á1XCSˆg4@Ìñ\rÃ¢œ»°MÊndQåóJÛ…Œò1¸¯äôçWN°KAÄÜÒ:˜½i‘é¢»rQ“³-¥–K5_L§èó‚!ÆâûgÏ~’'±ù+Q{”»z"A.”ã¬;¡`}>¯•—ÿ’oºƒ‹âA1<¸{÷³Ïî}a))”—üóyqxVı”Á}º7ªrøgãloõş›urÒ“ÿö:ña†œÆUR·È~Y|­ÜgÃ¤áÅÜJ¸cÚ¸6\RÊFØ#wšÔó@¥·>‚jcü¦·o…şèÉ6¶¨>&;ÂíºwnF‚ìéJaÕWEe¸¦‚™çƒÅ¼Â<ºyYRö˜sWf"xĞÁ•ˆEoX‚3ãÿóe@qnÜìôÍo »ğê%Üp‹–Å‹d‚	-3Ì”¿–ëéb.çê¹L·ÔÓÆ8µ4°y1vŒJN66ƒñ‘6~ B%5KNº[»›Ÿ\½­¿'ôíµu}¨earõ6Z7¤dù  ü¯RŞ.÷oÌİ™{¥ø}á«‹Ú‰à±lQå«èH DkşH’âu‘®›Áš­'‰ƒvò¨íbKºÒê•ËÑÛ"eÛ?Šç¬¡ÅTY~7%¦oic%h —n^aÿóÇS\ª¶´×[ÒĞÛ
+Kz—gï¶zP«7´zÍÙ:*2»¢ÍŠ2²š@E8Hè¡"ÂÛá4)M¯‡¸ÊôHf#®J¼f´c†'KB½25ÚñkŠ„˜ÉUõdÃ*^™-”`¬Ên'*B÷ÉY\l‹Ì˜¬Ìu+€ÖlxVÌÊ$×€gå~Â¦Y¥‘©…¢§õŸ¿^ëMbƒ"A5>€]ª|/ù™@K+¢«n„bÇµ?kŒ4ö+äÍrß*–ÜrH†Q.:Ó rVEÁ³: qT&Ÿ³\æ!/˜Ù$I×Y¾¦åwşN6XBßpbí’}	dõ¬éŸ.­wTÒdã
+A´xR¹¨£àD0,ó
+N¶
+bàÌC,~¤é¸%mÕ½RZ®7+*CÌªâlŒ44r1«´LztIª"@ˆ ‘^ä˜Åª?°òs€µ/‹, ¹·Ö—bÍn^jeRˆúPĞê-'ˆıÌcÏÓaQ±©­ÓX·>âéõ8N­©

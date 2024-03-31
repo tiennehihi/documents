@@ -1,0 +1,82 @@
+.form {
+    width: 400px;
+    height: 55vh;
+    background-color: #fff;
+    border: 1px solid #757575;
+    border-radius: 5px;
+    margin: auto;
+    padding: 20px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.main {
+    background-color: #f1ecec;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.form-group {
+    display: flex;
+    margin-bottom: 16px;
+    flex-direction: column;
+}
+
+.form-label {
+    font-size: 1.4rem;
+    line-height: 1.8rem;
+    font-weight: 700;
+    color: #000;
+    padding-bottom: 6px;
+    text-align: left;
+}
+
+.form-control {
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #b3b3b3;
+    border-radius: 3px;
+    outline: none;
+    font-size: 1.2rem;
+}
+
+.submit, .reset {
+    margin-top: 24px;
+    font-size: 18px;
+    padding: 8px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+.submit {
+    background-color: greenyellow;
+    margin-right: 10px;
+}
+
+.reset {
+    background-color: #757575;
+    margin-left: 10px;
+}
+
+select option {
+    overflow: auto;
+}
+
+.gender input:last-child{
+    margin-left: 20px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+}

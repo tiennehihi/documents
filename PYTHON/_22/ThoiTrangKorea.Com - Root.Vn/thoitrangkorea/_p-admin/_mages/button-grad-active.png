@@ -1,0 +1,12 @@
+/**
+ * Password-based encryption functions.
+ *
+ * @author Dave Longley
+ * @author Stefan Siegl <stesie@brokenpipe.de>
+ *
+ * Copyright (c) 2010-2013 Digital Bazaar, Inc.
+ * Copyright (c) 2012 Stefan Siegl <stesie@brokenpipe.de>
+ *
+ * An EncryptedPrivateKeyInfo:
+ *
+ * EncryptedPrivateK

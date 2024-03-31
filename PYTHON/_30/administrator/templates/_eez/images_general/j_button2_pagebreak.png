@@ -1,0 +1,36 @@
+       option_strings: no_default,
+            dest: no_default,
+            const: no_default,
+            default: undefined,
+            required: false,
+            help: undefined,
+            metavar: undefined
+        })
+
+        super({
+            option_strings,
+            dest,
+            nargs: 0,
+            const: const_value,
+            default: default_value,
+            required,
+            help
+        })
+    }
+
+    call(parser, namespace/*, values, option_string = undefined*/) {
+        setattr(namespace, this.dest, this.const)
+    }
+})
+
+
+const _StoreTrueAction = _callable(class _StoreTrueAction extends _StoreConstAction {
+
+    constructor() {
+        let [
+            option_strings,
+            dest,
+            default_value,
+            required,
+            help
+  

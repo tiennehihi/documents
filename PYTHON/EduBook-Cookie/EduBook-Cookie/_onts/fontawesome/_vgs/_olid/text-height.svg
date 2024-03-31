@@ -1,0 +1,4 @@
+rtion | TaggedTemplateExpression | TemplateLiteral | ThrowStatement | TupleExpression | TypeCastExpression | UnaryExpression | UpdateExpression | VariableDeclarator | WhileStatement | WithStatement | YieldExpression;
+    JSXEmptyExpression: JSXExpressionContainer;
+    JSXExpressionContainer: JSXAttribute | JSXElement | JSXFragment;
+    JSXFragment: ArrayExpression | ArrowFunctionExpression | AssignmentExpression | AssignmentPattern | AwaitExpression | BinaryExpression | BindExpression | CallExpression | ClassAccessorProperty | ClassDecla

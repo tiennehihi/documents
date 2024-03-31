@@ -1,0 +1,185 @@
+',
+         *    *     entryType: 'mark',
+         *    *     startTime: 55.897834,
+         *    *     duration: 0,
+         *    *     detail: null
+         *    *   },
+         *    *   PerformanceEntry {
+         *    *     name: 'meow',
+         *    *     entryType: 'mark',
+         *    *     startTime: 56.350146,
+         *    *     duration: 0,
+         *    *     detail: null
+         *    *   }
+         *    * ]
+         *
+         *   performance.clearMarks();
+         *   performance.clearMeasures();
+         *   observer.disconnect();
+         * });
+         * obs.observe({ type: 'mark' });
+         *
+         * performance.mark('test');
+         * performance.mark('meow');
+         * ```
+         * @since v8.5.0
+         */
+        getEntriesByType(type: EntryType): PerformanceEntry[];
+    }
+    type PerformanceObserverCallback = (list: PerformanceObserverEntryList, observer: PerformanceObserver) => void;
+    /**
+     * @since v8.5.0
+     */
+    class PerformanceObserver extends AsyncResource {
+        constructor(callback: PerformanceObserverCallback);
+        /**
+         * Disconnects the `PerformanceObserver` instance from all notifications.
+         * @since v8.5.0
+         */
+        disconnect(): void;
+        /**
+         * Subscribes the `PerformanceObserver` instance to notifications of new `PerformanceEntry` instances identified either by `options.entryTypes`or `options.type`:
+         *
+         * ```js
+         * const {
+         *   performance,
+         *   PerformanceObserver,
+         * } = require('node:perf_hooks');
+         *
+         * const obs = new PerformanceObserver((list, observer) => {
+         *   // Called once asynchronously. `list` contains three items.
+         * });
+         * obs.observe({ type: 'mark' });
+         *
+         * for (let n = 0; n < 3; n++)
+         *   performance.mark(`test${n}`);
+         * ```
+         * @since v8.5.0
+         */
+        observe(
+            options:
+                | {
+                    entryTypes: readonly EntryType[];
+                    buffered?: boolean | undefined;
+                }
+                | {
+                    type: EntryType;
+                    buffered?: boolean | undefined;
+                },
+        ): void;
+    }
+    namespace constants {
+        const NODE_PERFORMANCE_GC_MAJOR: number;
+        const NODE_PERFORMANCE_GC_MINOR: number;
+        const NODE_PERFORMANCE_GC_INCREMENTAL: number;
+        const NODE_PERFORMANCE_GC_WEAKCB: number;
+        const NODE_PERFORMANCE_GC_FLAGS_NO: number;
+        const NODE_PERFORMANCE_GC_FLAGS_CONSTRUCT_RETAINED: number;
+        const NODE_PERFORMANCE_GC_FLAGS_FORCED: number;
+        const NODE_PERFORMANCE_GC_FLAGS_SYNCHRONOUS_PHANTOM_PROCESSING: number;
+        const NODE_PERFORMANCE_GC_FLAGS_ALL_AVAILABLE_GARBAGE: number;
+        const NODE_PERFORMANCE_GC_FLAGS_ALL_EXTERNAL_MEMORY: number;
+        const NODE_PERFORMANCE_GC_FLAGS_SCHEDULE_IDLE: number;
+    }
+    const performance: Performance;
+    interface EventLoopMonitorOptions {
+        /**
+         * The sampling rate in milliseconds.
+         * Must be greater than zero.
+         * @default 10
+         */
+        resolution?: number | undefined;
+    }
+    interface Histogram {
+        /**
+         * Returns a `Map` object detailing the accumulated percentile distribution.
+         * @since v11.10.0
+         */
+        readonly percentiles: Map<number, number>;
+        /**
+         * The number of times the event loop delay exceeded the maximum 1 hour event
+         * loop delay threshold.
+         * @since v11.10.0
+         */
+        readonly exceeds: number;
+        /**
+         * The minimum recorded event loop delay.
+         * @since v11.10.0
+         */
+        readonly min: number;
+        /**
+         * The maximum recorded event loop delay.
+         * @since v11.10.0
+         */
+        readonly max: number;
+        /**
+         * The mean of the recorded event loop delays.
+         * @since v11.10.0
+         */
+        readonly mean: number;
+        /**
+         * The standard deviation of the recorded event loop delays.
+         * @since v11.10.0
+         */
+        readonly stddev: number;
+        /**
+         * Resets the collected histogram data.
+         * @since v11.10.0
+         */
+        reset(): void;
+        /**
+         * Returns the value at the given percentile.
+         * @since v11.10.0
+         * @param percentile A percentile value in the range (0, 100].
+         */
+        percentile(percentile: number): number;
+    }
+    interface IntervalHistogram extends Histogram {
+        /**
+         * Enables the update interval timer. Returns `true` if the timer was
+         * started, `false` if it was already started.
+         * @since v11.10.0
+         */
+        enable(): boolean;
+        /**
+         * Disables the update interval timer. Returns `true` if the timer was
+         * stopped, `false` if it was already stopped.
+         * @since v11.10.0
+         */
+        disable(): boolean;
+    }
+    interface RecordableHistogram extends Histogram {
+        /**
+         * @since v15.9.0, v14.18.0
+         * @param val The amount to record in the histogram.
+         */
+        record(val: number | bigint): void;
+        /**
+         * Calculates the amount of time (in nanoseconds) that has passed since the
+         * previous call to `recordDelta()` and records that amount in the histogram.
+         *
+         * ## Examples
+         * @since v15.9.0, v14.18.0
+         */
+        recordDelta(): void;
+        /**
+         * Adds the values from `other` to this histogram.
+         * @since v17.4.0, v16.14.0
+         */
+        add(other: RecordableHistogram): void;
+    }
+    /**
+     * _This property is an extension by Node.js. It is not available in Web browsers._
+     *
+     * Creates an `IntervalHistogram` object that samples and reports the event loop
+     * delay over time. The delays will be reported in nanoseconds.
+     *
+     * Using a timer to detect approximate event loop delay works because the
+     * execution of timers is tied specifically to the lifecycle of the libuv
+     * event loop. That is, a delay in the loop will cause a delay in the execution
+     * of the timer, and those delays are specifically what this API is intended to
+     * detect.
+     *
+     * ```js
+     * const { monitorEventLoopDelay } = require('node:perf_hooks');
+     * const h = monitorE

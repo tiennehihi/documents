@@ -1,0 +1,40 @@
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Turn down
+  unicode: f3be
+  voted: false
+turn-up:
+  aliases:
+    names:
+      - level-up-alt
+    unicodes:
+      composite:
+        - '2934'
+      secondary:
+        - 10f3bf
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Turn up
+  unicode: f3bf
+  voted: false
+tv:
+  aliases:
+    names:
+      - television
+      - tv-alt
+    unicodes:
+      composite:
+        - f8e5
+      primary:
+  

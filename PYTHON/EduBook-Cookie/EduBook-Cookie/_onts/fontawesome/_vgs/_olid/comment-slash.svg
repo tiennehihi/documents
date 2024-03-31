@@ -1,0 +1,15 @@
+var tokenizer = require('../../tokenizer');
+var TYPE = tokenizer.TYPE;
+
+var WhiteSpace = TYPE.WhiteSpace;
+var Semicolon = TYPE.Semicolon;
+var LeftCurlyBracket = TYPE.LeftCurlyBracket;
+var Delim = TYPE.Delim;
+var EXCLAMATIONMARK = 0x0021; // U+0021 EXCLAMATION MARK (!)
+
+function getOffsetExcludeWS() {
+    if (this.scanner.tokenIndex > 0) {
+        if (this.scanner.lookupType(-1) === WhiteSpace) {
+            return this.scanner.tokenIndex > 1
+                ? this.scanner.getTokenStart(this.scanner.tokenIndex - 1)
+                : this.scanner

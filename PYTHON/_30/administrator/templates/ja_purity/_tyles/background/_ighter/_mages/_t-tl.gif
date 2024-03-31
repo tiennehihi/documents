@@ -1,0 +1,5 @@
+{
+  "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
+  "name": "ini",
+  "description": "An ini encoder/decoder for node",
+  "vers

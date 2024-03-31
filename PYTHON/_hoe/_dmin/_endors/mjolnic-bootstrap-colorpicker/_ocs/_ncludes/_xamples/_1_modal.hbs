@@ -1,0 +1,11 @@
+ory2.createJSDocText(comments2.join(""));
+      }
+      function parseImplementsTag(start2, tagName, margin, indentText) {
+        const className = parseExpressionWithTypeArgumentsForAugments();
+        return finishNode(factory2.createJSDocImplementsTag(tagName, className, parseTrailingTagComments(start2, getNodePos(), margin, indentText)), start2);
+      }
+      function parseAugmentsTag(start2, tagName, margin, indentText) {
+        const className = parseExpressionWithTypeArgumentsForAugments();
+        return finishNode(factory2.createJSDocAugmentsTag(tagName, className, parseTrailingTagComments(start2, getNodePos(), margin, indentText)), start2);
+      }
+      function parseSatisf

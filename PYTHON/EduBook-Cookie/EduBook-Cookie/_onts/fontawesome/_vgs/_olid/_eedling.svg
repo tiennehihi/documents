@@ -1,0 +1,7 @@
+ames(imports);
+        let i = -1;
+        while (++i < keys.length) {
+          const key = keys[i];
+          const patternIndex = key.indexOf('*');
+          if (patternIndex !== -1 && name.startsWith(key.slice(0, -1))) {
+            const patternTrailer = key.slice(patternIndex + 1);

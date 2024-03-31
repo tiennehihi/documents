@@ -1,0 +1,1 @@
+ateKey.privateExponent",tagClass:s.Class.UNIVERSAL,type:s.Type.INTEGER,constructed:!1,capture:"privateKeyPrivateExponent"},{name:"RSAPrivateKey.prime1",tagClass:s.Class.UNIVERSAL,type:s.Type.INTEGER,constructed:!1,capture:"privateKeyPrime1

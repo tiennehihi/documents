@@ -1,0 +1,7 @@
+import * as Types from '../typebox';
+export declare class ValueCheckUnknownTypeError extends Error {
+    readonly schema: Types.TSchema;
+    constructor(schema: Types.TSchema);
+}
+export declare namespace ValueCheck {
+    function Check<T e

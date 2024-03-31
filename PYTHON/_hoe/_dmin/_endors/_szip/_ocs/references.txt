@@ -1,0 +1,17 @@
+ <A />                     <B />
+//   </Indirection>            </>
+//   <B />
+// </>
+//
+// However, we cannot skip any node that materializes an id. Otherwise, a parent
+// id that does not fork would be indistinguishable from its child id. For
+// example, this tree does not fork, but the parent and child must have
+// different ids.
+//
+// <Parent>
+//   <Child />
+// </Parent>
+//
+// To handle this scenario, every time we materialize an id, we allocate a
+// new level with a single slot. You can think of this as a fork with only one
+// prong, or an array of children with len

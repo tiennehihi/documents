@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>MESSAGE</title>
+        <link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="" type="image/x-icon"/>
+    </head>
+
+    <body>
+        <div id="toast">
+            
+        </div>
+
+        <div>
+            <div onclick="showSuccessToast();" class="btn btn--success">Show success toast</div>
+            <div onclick="showErrorToast();" class="btn btn--danger">Show error toast</div>
+        </div>
+
+        <script>
+            function toast({
+                title = '', 
+                message = '', 
+                type = 'info', 
+                duration = 3000
+            }) {
+                // get id 'toast' lưu vào biến main
+                const main = document.getElementById('toast');
+                // Kiểm tra xem có id 'toast' không
+                if (main) {
+                    // Tạo một thẻ 'div' mới lưu vào biến 'toast'
+                    const toast = document.createElement('div');
+
+                    // Auto remove toast
+                    // Sau khoảng thời gian 'duration + 1000' thì sẽ xóa 'toast' khỏi 'main'
+                    const autoRemoveId = setTimeout(function() {
+                        main.removeChild(toast);
+                    }, duration + 1000);
+
+                    // Remove toast when click
+                    // Khi click vào 'close' thì xóa 'toast' khỏi 'main' đồng thời cũng xóa hàm 'setTimeout()'
+                    toast.onclick = function (e) { 
+                        if (e.target.closest('.toast__close')) {
+                            main.removeChild(toast);
+                            clearTimeout(autoRemoveId);
+                        }
+                    }
+
+                    // Tạo 1 object 'icons' có chứa 4 icon
+                    const icons = {
+                        success: 'fa-solid fa-circle-check',
+                        info: 'fa-solid fa-circle-info',
+                        warning: 'fa-solid fa-circle-exclamation',
+                        error: 'fa-solid fa-circle-exclamation',
+                    }
+
+
+                    const icon = icons[type];
+                    const delay = (duration / 1000).toFixed(2);
+
+                    // add class mới vào thẻ 'div'
+                    toast.classList.add('toast', `toast--${type}`);
+                    // tạo animation
+                    toast.style.animation = `slideInLeft ease 0.3s, fadeOut linear 1s ${delay}s forwards`;
+
+                    // render ra
+                    toast.innerHTML = `
+                        <div class="toast__icon">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div class="toast__body">
+                            <h3 class="toast__title">${title}</h3>
+                            <p class="toast__msg">${message}</p>
+                        </div>
+                        <div class="toast__close">
+                            <i class="fa-solid fa-xmark"></i>
+                        </div>
+                    `;
+                    // thêm 'toast' vào 'main' (toast làm con của main) 
+                    main.appendChild(toast)
+
+                }
+            }
+
+            function showSuccessToast() {
+                toast({
+                    title: 'Thành công!',
+                    message: 'Bạn đã đăng kí thành công tài khoản tại F8!',
+                    type: 'success',
+                    duration: 5000
+                });
+            }
+            function showErrorToast() {
+                toast({
+                    title: 'Thất bại!',
+                    message: 'Có lỗi xảy ra, vui lòng liên hệ quản trị viên!',
+                    type: 'error',
+                    duration: 5000
+                });
+            }
+        </script>
+
+    </body>
+</html>

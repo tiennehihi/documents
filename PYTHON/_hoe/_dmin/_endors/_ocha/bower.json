@@ -1,0 +1,6 @@
+     const parentOfCandidate = getDirectoryPath(candidate);
+      if (!directoryProbablyExists(parentOfCandidate, state.host)) {
+        if (state.traceEnabled) {
+          trace(state.host, Diagnostics.Directory_0_does_not_exist_skipping_all_lookups_in_it, parentOfCandidate);
+        }
+    

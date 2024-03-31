@@ -1,0 +1,17 @@
+Mảng: 
+[[ 1  2  3  4]
+ [ 5  6  7  8]
+ [ 9 10 11 12]]
+Phần tử ở dòng 2 cột 3 là: 7
+Các giá trị max của các dòng là: [ 4  8 12]
+Các giá trị min của các dòng là: [1 5 9]
+Các giá trị max của các cột là:[ 9 10 11 12]
+Các giá trị min cua các cột là: [1 2 3 4]
+Size của mảng là: 12
+Shape của mảng là: (3, 4)
+Số chiều của mảng là: 2
+Mảng sau khi reshape là: 
+[[ 1  2  3]
+ [ 4  5  6]
+ [ 7  8  9]
+ [10 11 12]]

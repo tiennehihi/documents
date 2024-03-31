@@ -1,0 +1,1 @@
+{"version":3,"names":["_path","data","require","normalizeOptions","config","filename","cwd","filenameRelative","path","relative","sourceType","inputSourceMap","sourceMaps","sourceRoot","options","moduleRoot","sourceFileName","basename","comments","compact","opts","Object","assign","parserOpts","extname","plugins","generatorOpts","auxiliaryCommentBef

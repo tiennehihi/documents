@@ -1,0 +1,41 @@
+tylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: Stackpath
+  unicode: f842
+  voted: false
+staff-snake:
+  aliases:
+    names:
+      - rod-asclepius
+      - rod-snake
+      - staff-aesculapius
+  changes:
+    - 6.1.0
+    - 6.1.2
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Staff Aesculapius
+  unicode: e579
+  voted: false
+stairs:
+  changes:
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid

@@ -1,0 +1,21 @@
+var tokenize = require('../tokenizer');
+var TokenStream = require('../common/TokenStream');
+var tokenStream = new TokenStream();
+var astToTokens = {
+    decorator: function(handlers) {
+        var curNode = null;
+        var prev = { len: 0, node: null };
+        var nodes = [prev];
+        var buffer = '';
+
+        return {
+            children: handlers.children,
+            node: function(node) {
+                var tmp = curNode;
+                curNode = node;
+                handlers.node.call(this, node);
+                curNode = tmp;
+            },
+            chunk: function(chunk) {
+                buffer += chunk;
+                if (p

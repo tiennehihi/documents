@@ -1,0 +1,2 @@
+rn gridCellNode.clientRects.some(function(clientRect) {
+          var rect

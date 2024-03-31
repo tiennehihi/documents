@@ -1,0 +1,2 @@
+r_cannot_be_used_here: diag(1042, 1 /* Error */, "_0_modifier_cannot_be_used_here_1042", "'{0}' modifier cannot be used here."),
+  _0_modifier_cannot_appear_on_a_module_or_namespace_element: diag(1044, 1 /* Error */, "_0_modifier_cannot_appear_on_a_module_or_namespace_element_1044", "'{0}' modifier cann

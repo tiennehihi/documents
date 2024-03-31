@@ -1,0 +1,11 @@
+e": {
+      "enum": ["http", "https", "spdy"]
+    },
+    "ServerEnum": {
+      "enum": ["http", "https", "spdy"],
+      "cli": {
+        "exclude": true
+      }
+    },
+    "ServerString": {
+      "type": "s

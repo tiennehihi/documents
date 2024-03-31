@@ -1,0 +1,14 @@
+/**
+ * @fileoverview Define the cursor which iterates tokens and comments in reverse.
+ * @author Toru Nagashima
+ */
+"use strict";
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const Cursor = require("./cursor");
+const utils = require("./utils");
+
+//--

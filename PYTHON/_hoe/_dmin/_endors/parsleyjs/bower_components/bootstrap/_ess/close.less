@@ -1,0 +1,20 @@
+/**
+ * Stringify a CST document, token, or collection item
+ *
+ * Fair warning: This applies no validation whatsoever, and
+ * simply concatenates the sources in their logical order.
+ */
+const stringify = (cst) => 'type' in cst ? stringifyToken(cst) : stringifyItem(cst);
+function stringifyToken(token) {
+    switch (token.type) {
+        case 'block-scalar': {
+            let res = '';
+            for (const tok of token.props)
+                res += stringifyToken(tok);
+            return res + token.source;
+        }
+        case 'block-map':
+        case 'block-seq': {
+            let res = '';
+            for (const item of token.items)
+                res += stringifyItem(

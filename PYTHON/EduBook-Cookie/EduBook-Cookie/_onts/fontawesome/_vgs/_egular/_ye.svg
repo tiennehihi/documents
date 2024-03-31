@@ -1,0 +1,8 @@
+TypeParameter";
+  SyntaxKind5[SyntaxKind5["Parameter"] = 169] = "Parameter";
+  SyntaxKind5[SyntaxKind5["Decorator"] = 170] = "Decorator";
+  SyntaxKind5[SyntaxKind5["PropertySignature"] = 171] = "PropertySignature";
+  SyntaxKind5[SyntaxKind5["PropertyDeclaration"] = 172] = "PropertyDeclaration";
+  SyntaxKind5[SyntaxKind5["MethodSignature"] = 173] = "MethodSignature";
+  SyntaxKind5[SyntaxKind5["MethodDeclaration"] = 174] = "MethodDeclaration";
+  SyntaxKind5[SyntaxKind5["ClassStaticBlockDeclaration"] = 175]

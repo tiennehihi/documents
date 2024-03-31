@@ -1,0 +1,11 @@
+redPredicate | InferredPredicate | null;
+  returnType: TypeAnnotation | TSTypeAnnotation | Noop | null;
+  typeParameters: TypeParameterDeclaration | TSTypeParameterDeclaration | Noop | null;
+}
+
+export interface ClassBody extends BaseNode {
+  type: "ClassBody";
+  body: Array<ClassMethod | ClassPrivateMethod | ClassProperty | ClassPrivateProperty | ClassAccessorProperty | TSDeclareMethod | TSIndexSignature | StaticBlock>;
+}
+
+export interface ClassExpre

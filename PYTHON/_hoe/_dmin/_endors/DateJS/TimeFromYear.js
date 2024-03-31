@@ -1,0 +1,1 @@
+\n      validateString: function (value, refOrValue) {\n        var $reference = $(refOrValue);\n        if ($reference.length)\n          return value === $reference.val();\n        else\n          return value === refOrValue;\n      },\n      priority: 256\n 

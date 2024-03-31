@@ -1,0 +1,18 @@
+{{# def.definitions }}
+{{# def.errors }}
+{{# def.missing }}
+{{# def.setupKeyword }}
+{{# def.$data }}
+
+{{ var $vSchema = 'schema' + $lvl; }}
+
+{{## def.setupLoop:
+  {{? !$isData }}
+    var {{=$vSchema}} = validate.schema{{=$schemaPath}};
+  {{?}}
+
+  {{
+    var $i = 'i' + $lvl
+      , $propertyPath = 'schema' + $lvl + '[' + $i + ']'
+      , $missingProperty = '\' + ' + $propertyPath + ' + \'';
+    if (it.opts._errorDataPat

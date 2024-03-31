@@ -1,0 +1,62 @@
+      tokenizer.error('Expect a keyword');
+        }
+
+        return tokenizer.substringToPos(end);
+    }
+
+    function scanNumber(tokenizer) {
+        var end = tokenizer.pos;
+
+        for (; end < tokenizer.str.length; end++) {
+            var code = tokenizer.str.charCodeAt(end);
+            if (code < 48 || code > 57) {
+                break;
+            }
+        }
+
+        if (tokenizer.pos === end) {
+            tokenizer.error('Expect a number');
+        }
+
+        return tokenizer.substringToPos(end);
+    }
+
+    function scanString(tokenizer) {
+        var end = tokenizer.str.indexOf('\'', tokenizer.pos + 1);
+
+        if (end === -1) {
+            tokenizer.pos = tokenizer.str.length;
+            tokenizer.error('Expect an apostrophe');
+        }
+
+        return tokenizer.substringToPos(end + 1);
+    }
+
+    function readMultiplierRange(tokenizer) {
+        var min = null;
+        var max = null;
+
+        tokenizer.eat(LEFTCURLYBRACKET);
+
+        min = scanNumber(tokenizer);
+
+        if (tokenizer.charCode() === COMMA) {
+            tokenizer.pos++;
+            if (tokenizer.charCode() !== RIGHTCURLYBRACKET) {
+                max = scanNumber(tokenizer);
+            }
+        } else {
+            max = min;
+        }
+
+        tokenizer.eat(RIGHTCURLYBRACKET);
+
+        return {
+            min: Number(min),
+            max: max ? Number(max) : 0
+        };
+    }
+
+    function readMultiplier(tokenizer) {
+        var range = null;
+ 

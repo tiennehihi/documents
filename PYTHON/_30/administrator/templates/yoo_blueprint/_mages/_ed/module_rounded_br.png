@@ -1,0 +1,48 @@
+/* @flow strict */
+
+type CredentialsType = 'omit' | 'same-origin' | 'include'
+
+type ResponseType =  'default' | 'error'
+
+type BodyInit = string | URLSearchParams | FormData | Blob | ArrayBuffer | $ArrayBufferView
+
+type RequestInfo = Request | URL | string
+
+type RequestOptions = {|
+  body?: ?BodyInit;
+
+  credentials?: CredentialsType;
+  headers?: HeadersInit;
+  method?: string;
+  mode?: string;
+  referrer?: string;
+  signal?: ?AbortSignal;
+|}
+
+type ResponseOptions = {|
+  status?: number;
+  statusText?: string;
+  headers?: HeadersInit;
+|}
+
+type HeadersInit = Headers | {[string]: string}
+
+// https://github.com/facebook/flow/blob/f68b89a5012bd995ab3509e7a41b7325045c4045/lib/bom.js#L902-L914
+declare class Headers {
+  @@iterator(): Iterator<[string, string]>;
+  constructor(init?: HeadersInit): void;
+  append(name: string, value: string): void;
+  delete(name: string): void;
+  entries(): Iterator<[string, string]>;
+  forEach((value: string, name: string, headers: Headers) => any, thisArg?: any): void;
+  get(name: string): null | string;
+  has(name: string): boolean;
+  keys(): Iterator<string>;
+  set(name: string, value: string): void;
+  values(): Iterator<string>;
+}
+
+// https://github.com/facebook/flow/pull/6548
+interface AbortSignal {
+  aborted: boolean;
+  addEventListener(type: string, listener: (Event) => mixed, options?: Eve

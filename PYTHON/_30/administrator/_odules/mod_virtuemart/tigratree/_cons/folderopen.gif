@@ -1,0 +1,5 @@
+'use strict';
+
+var isGlob = require('is-glob');
+var pathPosixDirname = require('path').posix.dirname;
+var isWin32 = require('os').platform(

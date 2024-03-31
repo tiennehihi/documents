@@ -1,0 +1,21 @@
+// Port of python's argparse module, version 3.9.0:
+// https://github.com/python/cpython/blob/v3.9.0rc1/Lib/argparse.py
+
+'use strict'
+
+// Copyright (C) 2010-2020 Python Software Foundation.
+// Copyright (C) 2020 argparse.js authors
+
+/*
+ * Command-line parsing library
+ *
+ * This module is an optparse-inspired command-line parsing library that:
+ *
+ *     - handles both optional and positional arguments
+ *     - produces highly informative usage messages
+ *     - supports parsers that dispatch to sub-parsers
+ *
+ * The following is a simple usage example that sums integers from the
+ * command-line and writes the result to a file::
+ *
+ 

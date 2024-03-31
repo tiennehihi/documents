@@ -1,0 +1,380 @@
+cticModifier(node, 32 /* Export */);
+  }
+  function isExternalModuleExport(node) {
+    return currentNamespace === void 0 && hasSyntacticModifier(node, 32 /* Export */);
+  }
+  function isNamedExternalModuleExport(node) {
+    return isExternalModuleExport(node) && !hasSyntacticModifier(node, 2048 /* Default */);
+  }
+  function isDefaultExternalModuleExport(node) {
+    return isExternalModuleExport(node) && hasSyntacticModifier(node, 2048 /* Default */);
+  }
+  function createExportMemberAssignmentStatement(node) {
+    const expression = factory2.createAssignment(
+      factory2.getExternalModuleOrNamespaceExportName(
+        currentNamespaceContainerName,
+        node,
+        /*allowComments*/
+        false,
+        /*allowSourceMaps*/
+        true
+      ),
+      factory2.getLocalName(node)
+    );
+    setSourceMapRange(expression, createRange(node.name ? node.name.pos : node.pos, node.end));
+    const statement = factory2.createExpressionStatement(expression);
+    setSourceMapRange(statement, createRange(-1, node.end));
+    return statement;
+  }
+  function addExportMemberAssignment(statements, node) {
+    statements.push(createExportMemberAssignmentStatement(node));
+  }
+  function createNamespaceExport(exportName, exportValue, location) {
+    return setTextRange(
+      factory2.createExpressionStatement(
+        factory2.createAssignment(
+          factory2.getNamespaceMemberName(
+            currentNamespaceContainerName,
+            exportName,
+            /*allowComments*/
+            false,
+            /*allowSourceMaps*/
+            true
+          ),
+          exportValue
+        )
+      ),
+      location
+    );
+  }
+  function createNamespaceExportExpression(exportName, exportValue, location) {
+    return setTextRange(factory2.createAssignment(getNamespaceMemberNameWithSourceMapsAndWithoutComments(exportName), exportValue), location);
+  }
+  function getNamespaceMemberNameWithSourceMapsAndWithoutComments(name) {
+    return factory2.getNamespaceMemberName(
+      currentNamespaceContainerName,
+      name,
+      /*allowComments*/
+      false,
+      /*allowSourceMaps*/
+      true
+    );
+  }
+  function getNamespaceParameterName(node) {
+    const name = factory2.getGeneratedNameForNode(node);
+    setSourceMapRange(name, node.name);
+    return name;
+  }
+  function getNamespaceContainerName(node) {
+    return factory2.getGeneratedNameForNode(node);
+  }
+  function enableSubstitutionForNonQualifiedEnumMembers() {
+    if ((enabledSubstitutions & 8 /* NonQualifiedEnumMembers */) === 0) {
+      enabledSubstitutions |= 8 /* NonQualifiedEnumMembers */;
+      context.enableSubstitution(80 /* Identifier */);
+    }
+  }
+  function enableSubstitutionForNamespaceExports() {
+    if ((enabledSubstitutions & 2 /* NamespaceExports */) === 0) {
+      enabledSubstitutions |= 2 /* NamespaceExports */;
+      context.enableSubstitution(80 /* Identifier */);
+      context.enableSubstitution(304 /* ShorthandPropertyAssignment */);
+      context.enableEmitNotification(267 /* ModuleDeclaration */);
+    }
+  }
+  function isTransformedModuleDeclaration(node) {
+    return getOriginalNode(node).kind === 267 /* ModuleDeclaration */;
+  }
+  function isTransformedEnumDeclaration(node) {
+    return getOriginalNode(node).kind === 266 /* EnumDeclaration */;
+  }
+  function onEmitNode(hint, node, emitCallback) {
+    const savedApplicableSubstitutions = applicableSubstitutions;
+    const savedCurrentSourceFile = currentSourceFile;
+    if (isSourceFile(node)) {
+      currentSourceFile = node;
+    }
+    if (enabledSubstitutions & 2 /* NamespaceExports */ && isTransformedModuleDeclaration(node)) {
+      applicableSubstitutions |= 2 /* NamespaceExports */;
+    }
+    if (enabledSubstitutions & 8 /* NonQualifiedEnumMembers */ && isTransformedEnumDeclaration(node)) {
+      applicableSubstitutions |= 8 /* NonQualifiedEnumMembers */;
+    }
+    previousOnEmitNode(hint, node, emitCallback);
+    applicableSubstitutions = savedApplicableSubstitutions;
+    currentSourceFile = savedCurrentSourceFile;
+  }
+  function onSubstituteNode(hint, node) {
+    node = previousOnSubstituteNode(hint, node);
+    if (hint === 1 /* Expression */) {
+      return substituteExpression(node);
+    } else if (isShorthandPropertyAssignment(node)) {
+      return substituteShorthandPropertyAssignment(node);
+    }
+    return node;
+  }
+  function substituteShorthandPropertyAssignment(node) {
+    if (enabledSubstitutions & 2 /* NamespaceExports */) {
+      const name = node.name;
+      const exportedName = trySubstituteNamespaceExportedName(name);
+      if (exportedName) {
+        if (node.objectAssignmentInitializer) {
+          const initializer = factory2.createAssignment(exportedName, node.objectAssignmentInitializer);
+          return setTextRange(factory2.createPropertyAssignment(name, initializer), node);
+        }
+        return setTextRange(factory2.createPropertyAssignment(name, exportedName), node);
+      }
+    }
+    return node;
+  }
+  function substituteExpression(node) {
+    switch (node.kind) {
+      case 80 /* Identifier */:
+        return substituteExpressionIdentifier(node);
+      case 211 /* PropertyAccessExpression */:
+        return substitutePropertyAccessExpression(node);
+      case 212 /* ElementAccessExpression */:
+        return substituteElementAccessExpression(node);
+    }
+    return node;
+  }
+  function substituteExpressionIdentifier(node) {
+    return trySubstituteNamespaceExportedName(node) || node;
+  }
+  function trySubstituteNamespaceExportedName(node) {
+    if (enabledSubstitutions & applicableSubstitutions && !isGeneratedIdentifier(node) && !isLocalName(node)) {
+      const container = resolver.getReferencedExportContainer(
+        node,
+        /*prefixLocals*/
+        false
+      );
+      if (container && container.kind !== 312 /* SourceFile */) {
+        const substitute = applicableSubstitutions & 2 /* NamespaceExports */ && container.kind === 267 /* ModuleDeclaration */ || applicableSubstitutions & 8 /* NonQualifiedEnumMembers */ && container.kind === 266 /* EnumDeclaration */;
+        if (substitute) {
+          return setTextRange(
+            factory2.createPropertyAccessExpression(factory2.getGeneratedNameForNode(container), node),
+            /*location*/
+            node
+          );
+        }
+      }
+    }
+    return void 0;
+  }
+  function substitutePropertyAccessExpression(node) {
+    return substituteConstantValue(node);
+  }
+  function substituteElementAccessExpression(node) {
+    return substituteConstantValue(node);
+  }
+  function safeMultiLineComment(value) {
+    return value.replace(/\*\//g, "*_/");
+  }
+  function substituteConstantValue(node) {
+    const constantValue = tryGetConstEnumValue(node);
+    if (constantValue !== void 0) {
+      setConstantValue(node, constantValue);
+      const substitute = typeof constantValue === "string" ? factory2.createStringLiteral(constantValue) : constantValue < 0 ? factory2.createPrefixUnaryExpression(41 /* MinusToken */, factory2.createNumericLiteral(-constantValue)) : factory2.createNumericLiteral(constantValue);
+      if (!compilerOptions.removeComments) {
+        const originalNode = getOriginalNode(node, isAccessExpression);
+        addSyntheticTrailingComment(substitute, 3 /* MultiLineCommentTrivia */, ` ${safeMultiLineComment(getTextOfNode(originalNode))} `);
+      }
+      return substitute;
+    }
+    return node;
+  }
+  function tryGetConstEnumValue(node) {
+    if (getIsolatedModules(compilerOptions)) {
+      return void 0;
+    }
+    return isPropertyAccessExpression(node) || isElementAccessExpression(node) ? resolver.getConstantValue(node) : void 0;
+  }
+  function shouldEmitAliasDeclaration(node) {
+    return compilerOptions.verbatimModuleSyntax || isInJSFile(node) || (compilerOptions.preserveValueImports ? resolver.isValueAliasDeclaration(node) : resolver.isReferencedAliasDeclaration(node));
+  }
+}
+
+// src/compiler/transformers/classFields.ts
+function transformClassFields(context) {
+  const {
+    factory: factory2,
+    getEmitHelperFactory: emitHelpers,
+    hoistVariableDeclaration,
+    endLexicalEnvironment,
+    startLexicalEnvironment,
+    resumeLexicalEnvironment,
+    addBlockScopedVariable
+  } = context;
+  const resolver = context.getEmitResolver();
+  const compilerOptions = context.getCompilerOptions();
+  const languageVersion = getEmitScriptTarget(compilerOptions);
+  const useDefineForClassFields = getUseDefineForClassFields(compilerOptions);
+  const legacyDecorators = !!compilerOptions.experimentalDecorators;
+  const shouldTransformInitializersUsingSet = !useDefineForClassFields;
+  const shouldTransformInitializersUsingDefine = useDefineForClassFields && languageVersion < 9 /* ES2022 */;
+  const shouldTransformInitializers = shouldTransformInitializersUsingSet || shouldTransformInitializersUsingDefine;
+  const shouldTransformPrivateElementsOrClassStaticBlocks = languageVersion < 9 /* ES2022 */;
+  const shouldTransformAutoAccessors = languageVersion < 99 /* ESNext */ ? -1 /* True */ : !useDefineForClassFields ? 3 /* Maybe */ : 0 /* False */;
+  const shouldTransformThisInStaticInitializers = languageVersion < 9 /* ES2022 */;
+  const shouldTransformSuperInStaticInitializers = shouldTransformThisInStaticInitializers && languageVersion >= 2 /* ES2015 */;
+  const shouldTransformAnything = shouldTransformInitializers || shouldTransformPrivateElementsOrClassStaticBlocks || shouldTransformAutoAccessors === -1 /* True */;
+  const previousOnSubstituteNode = context.onSubstituteNode;
+  context.onSubstituteNode = onSubstituteNode;
+  const previousOnEmitNode = context.onEmitNode;
+  context.onEmitNode = onEmitNode;
+  let shouldTransformPrivateStaticElementsInFile = false;
+  let enabledSubstitutions;
+  let classAliases;
+  let pendingExpressions;
+  let pendingStatements;
+  let lexicalEnvironment;
+  const lexicalEnvironmentMap = /* @__PURE__ */ new Map();
+  const noSubstitution = /* @__PURE__ */ new Set();
+  let currentClassContainer;
+  let currentClassElement;
+  let shouldSubstituteThisWithClassThis = false;
+  let previousShouldSubstituteThisWithClassThis = false;
+  return chainBundle(context, transformSourceFile);
+  function transformSourceFile(node) {
+    if (node.isDeclarationFile) {
+      return node;
+    }
+    lexicalEnvironment = void 0;
+    shouldTransformPrivateStaticElementsInFile = !!(getInternalEmitFlags(node) & 32 /* TransformPrivateStaticElements */);
+    if (!shouldTransformAnything && !shouldTransformPrivateStaticElementsInFile) {
+      return node;
+    }
+    const visited = visitEachChild(node, visitor, context);
+    addEmitHelpers(visited, context.readEmitHelpers());
+    return visited;
+  }
+  function modifierVisitor(node) {
+    switch (node.kind) {
+      case 129 /* AccessorKeyword */:
+        return shouldTransformAutoAccessorsInCurrentClass() ? void 0 : node;
+      default:
+        return tryCast(node, isModifier);
+    }
+  }
+  function visitor(node) {
+    if (!(node.transformFlags & 16777216 /* ContainsClassFields */) && !(node.transformFlags & 134234112 /* ContainsLexicalThisOrSuper */)) {
+      return node;
+    }
+    switch (node.kind) {
+      case 129 /* AccessorKeyword */:
+        return Debug.fail("Use `modifierVisitor` instead.");
+      case 263 /* ClassDeclaration */:
+        return visitClassDeclaration(node);
+      case 231 /* ClassExpression */:
+        return visitClassExpression(node);
+      case 175 /* ClassStaticBlockDeclaration */:
+      case 172 /* PropertyDeclaration */:
+        return Debug.fail("Use `classElementVisitor` instead.");
+      case 303 /* PropertyAssignment */:
+        return visitPropertyAssignment(node);
+      case 243 /* VariableStatement */:
+        return visitVariableStatement(node);
+      case 260 /* VariableDeclaration */:
+        return visitVariableDeclaration(node);
+      case 169 /* Parameter */:
+        return visitParameterDeclaration(node);
+      case 208 /* BindingElement */:
+        return visitBindingElement(node);
+      case 277 /* ExportAssignment */:
+        return visitExportAssignment(node);
+      case 81 /* PrivateIdentifier */:
+        return visitPrivateIdentifier(node);
+      case 211 /* PropertyAccessExpression */:
+        return visitPropertyAccessExpression(node);
+      case 212 /* ElementAccessExpression */:
+        return visitElementAccessExpression(node);
+      case 224 /* PrefixUnaryExpression */:
+      case 225 /* PostfixUnaryExpression */:
+        return visitPreOrPostfixUnaryExpression(
+          node,
+          /*discarded*/
+          false
+        );
+      case 226 /* BinaryExpression */:
+        return visitBinaryExpression(
+          node,
+          /*discarded*/
+          false
+        );
+      case 217 /* ParenthesizedExpression */:
+        return visitParenthesizedExpression(
+          node,
+          /*discarded*/
+          false
+        );
+      case 213 /* CallExpression */:
+        return visitCallExpression(node);
+      case 244 /* ExpressionStatement */:
+        return visitExpressionStatement(node);
+      case 215 /* TaggedTemplateExpression */:
+        return visitTaggedTemplateExpression(node);
+      case 248 /* ForStatement */:
+        return visitForStatement(node);
+      case 110 /* ThisKeyword */:
+        return visitThisExpression(node);
+      case 262 /* FunctionDeclaration */:
+      case 218 /* FunctionExpression */:
+        return setCurrentClassElementAnd(
+          /*classElement*/
+          void 0,
+          fallbackVisitor,
+          node
+        );
+      case 176 /* Constructor */:
+      case 174 /* MethodDeclaration */:
+      case 177 /* GetAccessor */:
+      case 178 /* SetAccessor */: {
+        return setCurrentClassElementAnd(
+          node,
+          fallbackVisitor,
+          node
+        );
+      }
+      default:
+        return fallbackVisitor(node);
+    }
+  }
+  function fallbackVisitor(node) {
+    return visitEachChild(node, visitor, context);
+  }
+  function discardedValueVisitor(node) {
+    switch (node.kind) {
+      case 224 /* PrefixUnaryExpression */:
+      case 225 /* PostfixUnaryExpression */:
+        return visitPreOrPostfixUnaryExpression(
+          node,
+          /*discarded*/
+          true
+        );
+      case 226 /* BinaryExpression */:
+        return visitBinaryExpression(
+          node,
+          /*discarded*/
+          true
+        );
+      case 361 /* CommaListExpression */:
+        return visitCommaListExpression(
+          node,
+          /*discarded*/
+          true
+        );
+      case 217 /* ParenthesizedExpression */:
+        return visitParenthesizedExpression(
+          node,
+          /*discarded*/
+          true
+        );
+      default:
+        return visitor(node);
+    }
+  }
+  function heritageClauseVisitor(node) {
+    switch (node.kind) {
+      case 298 /* HeritageClause */:
+        return visitEachChild(node, heritageClauseVisitor, context);
+      case

@@ -1,0 +1,17 @@
+eArguments: (_e = referenceType.resolvedTypeArguments) == null ? void 0 : _e.map((t) => t.id),
+          referenceLocation: getLocation(referenceType.node)
+        };
+      }
+      let conditionalProperties = {};
+      if (type.flags & 16777216 /* Conditional */) {
+        const conditionalType = type;
+        conditionalProperties = {
+          conditionalCheckType: (_f = conditionalType.checkType) == null ? void 0 : _f.id,
+          conditionalExtendsType: (_g = conditionalType.extendsType) == null ? void 0 : _g.id,
+          conditionalTrueType: ((_h = conditionalType.resolvedTrueType) == null ? void 0 : _h.id) ?? -1,
+          conditionalFalseType: ((_i = conditionalType.resolvedFalseType) == null ? void 0 : _i.id) ?? -1
+        };
+      }
+      let substitutionProperties = {};
+      if (type.flags & 33554432 /* Substitution */) {
+        const sub

@@ -1,0 +1,62 @@
+foo: string
+}
+
+// Options: ["always"]
+type X = {
+foo: string,
+}
+
+// Options: ["always-multiline"]
+type X = { foo: string }
+
+// Options: ["always-multiline"]
+type X = {
+foo: string,
+}
+
+// Options: ["always-multiline"]
+type X = {
+foo: string;
+}
+
+// Options: ["only-multiline"]
+type X = { foo: string }
+
+// Options: ["only-multiline"]
+type X = {
+foo: string
+}
+
+// Options: ["only-multiline"]
+type X = {
+foo: string,
+}
+
+// Options: ["only-multiline"]
+type X = {
+foo: string;
+}
+
+// Options: ["never","always"]
+interface X { foo: string; }
+
+// Options: ["never"]
+type X = {}
+
+// Options: ["always"]
+type X = {}
+
+// Options: ["always-multiline"]
+type X = {}
+
+// Options: ["only-multiline"]
+type X = {}
+
+// Options: ["never"]
+type X = { [key: string]: number }
+
+// Options: ["always"]
+type X = { [key: string]: number, }
+
+// Options: ["always"]
+type X = { [key: string]: nu

@@ -1,0 +1,1 @@
+stTokEnd, this.start))\n  if (prevType === tt._else || prevType === tt.semi || prevType === tt.eof || prevType === tt.parenR || prevType === tt.arrow)\n    return true\n  if (prevType === tt.braceL)\n    return parent === types.b_stat\n  if (prevType === tt._var || prevType === tt._const || prevType === tt.name)\n    return fa

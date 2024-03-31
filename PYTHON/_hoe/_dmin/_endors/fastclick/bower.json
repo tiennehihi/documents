@@ -1,0 +1,6 @@
+bigint:
+    case _types3.TokenType.decimal:
+    case _types3.TokenType.string:
+    case _types3.TokenType._null:
+    case _types3.TokenType._true:
+    case _types3.TokenType.

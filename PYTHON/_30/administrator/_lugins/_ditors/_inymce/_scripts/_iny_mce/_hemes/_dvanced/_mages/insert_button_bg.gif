@@ -1,0 +1,19 @@
+        return get_overflow_hidden_ancestors_default;
+      },
+      getRootNode: function getRootNode() {
+        return get_root_node_default2;
+      },
+      getScrollOffset: function getScrollOffset() {
+        return get_scroll_offset_default;
+      },
+      getTabbableElements: function getTabbableElements() {
+        return get_tabbable_elements_default;
+      },
+      getTextElementStack: function getTextElementStack() {
+        return get_text_element_stack_default;
+      },
+      getViewportSize: function getViewportSize() {
+        return get_viewport_size_default;
+      },
+      getVisibleChildTextRects: function getVisibleChildTextRects() {
+        return get_visible_child_text_rec

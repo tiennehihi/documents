@@ -1,0 +1,13 @@
+are function tsIntersectionType(types: Array<TSType>): TSIntersectionType;
+
+declare function tsConditionalType(checkType: TSType, extendsType: TSType, trueType: TSType, falseType: TSType): TSConditionalType;
+
+declare function tsInferType(typeParameter: TSTypeParameter): TSInferType;
+
+declare function tsParenthesizedType(typeAnnotation: TSType): TSParenthesizedType;
+
+declare function tsTypeOperator(typeAnnotation: TSType): TSTypeOperator;
+
+declare function tsIndexedAccessType(objectType: TSType, indexType: TSType): TSIndexedAccessType;
+
+declare function tsMappedType(typeParameter: TSTypeParameter, typeAnnotation?: TSType | null, nameType?: TSType | null): TSMa

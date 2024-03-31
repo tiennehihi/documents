@@ -1,0 +1,141 @@
+fix() {
+    return _defaultUsablePrefix;
+  }
+  var emptyCanonicalIcon = function emptyCanonicalIcon() {
+    return {
+      prefix: null,
+      iconName: null,
+      rest: []
+    };
+  };
+  function getCanonicalPrefix(styleOrPrefix) {
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var _params$family = params.family,
+        family = _params$family === void 0 ? FAMILY_CLASSIC : _params$family;
+    var style = PREFIX_TO_STYLE[family][styleOrPrefix];
+    var prefix = STYLE_TO_PREFIX[family][styleOrPrefix] || STYLE_TO_PREFIX[family][style];
+    var defined = styleOrPrefix in namespace.styles ? styleOrPrefix : null;
+    return prefix || defined || null;
+  }
+  var PREFIXES_FOR_FAMILY = (_PREFIXES_FOR_FAMILY = {}, _defineProperty(_PREFIXES_FOR_FAMILY, FAMILY_CLASSIC, Object.keys(PREFIX_TO_LONG_STYLE[FAMILY_CLASSIC])), _defineProperty(_PREFIXES_FOR_FAMILY, FAMILY_SHARP, Object.keys(PREFIX_TO_LONG_STYLE[FAMILY_SHARP])), _PREFIXES_FOR_FAMILY);
+  function getCanonicalIcon(values) {
+    var _famProps;
+
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var _params$skipLookups = params.skipLookups,
+        skipLookups = _params$skipLookups === void 0 ? false : _params$skipLookups;
+    var famProps = (_famProps = {}, _defineProperty(_famProps, FAMILY_CLASSIC, "".concat(config.cssPrefix, "-").concat(FAMILY_CLASSIC)), _defineProperty(_famProps, FAMILY_SHARP, "".concat(config.cssPrefix, "-").concat(FAMILY_SHARP)), _famProps);
+    var givenPrefix = null;
+    var family = FAMILY_CLASSIC;
+
+    if (values.includes(famProps[FAMILY_CLASSIC]) || values.some(function (v) {
+      return PREFIXES_FOR_FAMILY[FAMILY_CLASSIC].includes(v);
+    })) {
+      family = FAMILY_CLASSIC;
+    }
+
+    if (values.includes(famProps[FAMILY_SHARP]) || values.some(function (v) {
+      return PREFIXES_FOR_FAMILY[FAMILY_SHARP].includes(v);
+    })) {
+      family = FAMILY_SHARP;
+    }
+
+    var canonical = values.reduce(function (acc, cls) {
+      var iconName = getIconName(config.cssPrefix, cls);
+
+      if (styles[cls]) {
+        cls = LONG_STYLE[family].includes(cls) ? LONG_STYLE_TO_PREFIX[family][cls] : cls;
+        givenPrefix = cls;
+        acc.prefix = cls;
+      } else if (PREFIXES[family].indexOf(cls) > -1) {
+        givenPrefix = cls;
+        acc.prefix = getCanonicalPrefix(cls, {
+          family: family
+        });
+      } else if (iconName) {
+        acc.iconName = iconName;
+      } else if (cls !== config.replacementClass && cls !== famProps[FAMILY_CLASSIC] && cls !== famProps[FAMILY_SHARP]) {
+        acc.rest.push(cls);
+      }
+
+      if (!skipLookups && acc.prefix && acc.iconName) {
+        var shim = givenPrefix === 'fa' ? byOldName(acc.iconName) : {};
+        var aliasIconName = byAlias(acc.prefix, acc.iconName);
+
+        if (shim.prefix) {
+          givenPrefix = null;
+        }
+
+        acc.iconName = shim.iconName || aliasIconName || acc.iconName;
+        acc.prefix = shim.prefix || acc.prefix;
+
+        if (acc.prefix === 'far' && !styles['far'] && styles['fas'] && !config.autoFetchSvg) {
+          // Allow a fallback from the regular style to solid if regular is not available
+          // but only if we aren't auto-fetching SVGs
+          acc.prefix = 'fas';
+        }
+      }
+
+      return acc;
+    }, emptyCanonicalIcon());
+
+    if (values.includes('fa-brands') || values.includes('fab')) {
+      canonical.prefix = 'fab';
+    }
+
+    if (values.includes('fa-duotone') || values.includes('fad')) {
+      canonical.prefix = 'fad';
+    }
+
+    if (!canonical.prefix && family === FAMILY_SHARP && (styles['fass'] || config.autoFetchSvg)) {
+      canonical.prefix = 'fass';
+      canonical.iconName = byAlias(canonical.prefix, canonical.iconName) || canonical.iconName;
+    }
+
+    if (canonical.prefix === 'fa' || givenPrefix === 'fa') {
+      // The fa prefix is not canonical. So if it has made it through until this point
+      // we will shift it to the correct prefix.
+      canonical.prefix = getDefaultUsablePrefix() || 'fas';
+    }
+
+    return canonical;
+  }
+
+  var Library = /*#__PURE__*/function () {
+    function Library() {
+      _classCallCheck(this, Library);
+
+      this.definitions = {};
+    }
+
+    _createClass(Library, [{
+      key: "add",
+      value: function add() {
+        var _this = this;
+
+        for (var _len = arguments.length, definitions = new Array(_len), _key = 0; _key < _len; _key++) {
+          definitions[_key] = arguments[_key];
+        }
+
+        var additions = definitions.reduce(this._pullDefinitions, {});
+        Object.keys(additions).forEach(function (key) {
+          _this.definitions[key] = _objectSpread2(_objectSpread2({}, _this.definitions[key] || {}), additions[key]);
+          defineIcons(key, additions[key]); // TODO can we stop doing this? We can't get the icons by 'fa-solid' any longer so this probably needs to change
+
+          var longPrefix = PREFIX_TO_LONG_STYLE[FAMILY_CLASSIC][key];
+          if (longPrefix) defineIcons(longPrefix, additions[key]);
+          build();
+        });
+      }
+    }, {
+      key: "reset",
+      value: function reset() {
+        this.definitions = {};
+      }
+    }, {
+      key: "_pullDefinitions",
+      value: function _pullDefinitions(additions, definition) {
+        var normalized = definition.prefix && definition.iconName && definition.icon ? {
+          0: definition
+        } : definition;
+        Obj

@@ -1,0 +1,2 @@
+module.exports = function properlyBoxed(method) {
+	// Check node 0.6.21 bug where third parameter is not boxed

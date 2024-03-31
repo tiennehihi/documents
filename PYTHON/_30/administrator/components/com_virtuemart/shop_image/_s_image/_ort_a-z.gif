@@ -1,0 +1,5 @@
+{
+  "name": "estraverse",
+  "description": "ECMAScript JS AST traversal functions",
+  "homepage": "https://github.com/estools/estraverse",
+  "main": "estraverse.j

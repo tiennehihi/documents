@@ -1,0 +1,9 @@
+via `this.getModuleInfo(id)` (#2565)
+- Plugins and JS API users get more information about the generated chunks: `dynamicImports`, `facadeModuleId`, `isDynamicEntry`, `name` (#2575)
+- Tree-shaken dynamic imports will no longer create chunks or influence chunking in any way (#2575)
+- Dynamic imports will no longer follow the `entryFileNames` but the `chunkFileNames` property reflecting those are solely internally used (#2575)
+- If there are chunk naming conflicts, entry chunks will always take precedence (#2575)
+- If an entry facade is created, only the facade chunk is marked as `isEntry` (#2575)
+- Dynamic chunks will only be marked as `isEntry` if they are actually entry chunks as well; thus there is now a 1-to-1 correspondence between modules listed in `input` and chunks marked as `isEntry` (#2575)
+- Chunks no longer contain imports for variables that are tree-shaken in the chunk but used in other chunks (#2584)
+- Chunks will always import re-exported variables directly from the chun

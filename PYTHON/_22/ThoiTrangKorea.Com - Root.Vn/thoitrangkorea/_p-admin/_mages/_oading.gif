@@ -1,0 +1,56 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FsaNodeFs = void 0;
+const tslib_1 = require("tslib");
+const optHelpers = require("../node/options");
+const util = require("../node/util");
+const buffer_1 = require("../internal/buffer");
+const FsPromises_1 = require("../node/FsPromises");
+const util_1 = require("./util");
+const constants_1 = require("../node/constants");
+const encoding_1 = require("../encoding");
+const FsaNodeDirent_1 = require("./FsaNodeDirent");
+const constants_2 = require("../constants");
+const FsaNodeStats_1 = require("./FsaNodeStats");
+const queueMicrotask_1 = require("../queueMicrotask");
+const FsaNodeWriteStream_1 = require("./FsaNodeWriteStream");
+const FsaNodeReadStream_1 = require("./FsaNodeReadStream");
+const FsaNodeCore_1 = require("./FsaNodeCore");
+const FileHandle_1 = require("../node/FileHandle");
+const notSupported = () => {
+    throw new Error('Method not supported by the File System Access API.');
+};
+const notImplemented = () => {
+    throw new Error('Not implemented');
+};
+const noop = () => { };
+/**
+ * Constructs a Node.js `fs` API from a File System Access API
+ * [`FileSystemDirectoryHandle` object](https://developer.mozilla.org/en-US/docs/Web/API/FileSystemDirectoryHandle).
+ */
+class FsaNodeFs extends FsaNodeCore_1.FsaNodeCore {
+    constructor() {
+        // ------------------------------------------------------------ FsPromisesApi
+        super(...arguments);
+        this.promises = new FsPromises_1.FsPromises(this, FileHandle_1.FileHandle);
+        // ------------------------------------------------------------ FsCallbackApi
+        this.open = (path, flags, a, b) => {
+            let mode = a;
+            let callback = b;
+            if (typeof a === 'function') {
+                mode = 438 /* MODE.DEFAULT */;
+                callback = a;
+            }
+            mode = mode || 438 /* MODE.DEFAULT */;
+            const modeNum = util.modeToNumber(mode);
+            const filename = util.pathToFilename(path);
+            const flagsNum = util.flagsToNumber(flags);
+            this.__open(filename, flagsNum, modeNum).then(openFile => callback(null, openFile.fd), error => callback(error));
+        };
+        this.close = (fd, callback) => {
+            util.validateFd(fd);
+            this.__close(fd).then(() => callback(null), error => callback(error));
+        };
+        this.read = (fd, buffer, offset, length, position, callback) => {
+            util.validateCallback(callback);
+            // This `if` bran

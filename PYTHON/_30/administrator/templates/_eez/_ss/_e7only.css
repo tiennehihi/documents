@@ -1,0 +1,43 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Glob = void 0;
+const minimatch_1 = require("minimatch");
+const path_scurry_1 = require("path-scurry");
+const url_1 = require("url");
+const pattern_js_1 = require("./pattern.js");
+const walker_js_1 = require("./walker.js");
+// if no process global, just call it linux.
+// so we default to case-sensitive, / separators
+const defaultPlatform = typeof process === 'object' &&
+    process &&
+    typeof process.platform === 'string'
+    ? process.platform
+    : 'linux';
+/**
+ * An object that can perform glob pattern traversals.
+ */
+class Glob {
+    absolute;
+    cwd;
+    root;
+    dot;
+    dotRelative;
+    follow;
+    ignore;
+    magicalBraces;
+    mark;
+    matchBase;
+    maxDepth;
+    nobrace;
+    nocase;
+    nodir;
+    noext;
+    noglobstar;
+    pattern;
+    platform;
+    realpath;
+    scurry;
+    stat;
+    signal;
+    windowsPathsNoEscape;
+    withFileTypes;

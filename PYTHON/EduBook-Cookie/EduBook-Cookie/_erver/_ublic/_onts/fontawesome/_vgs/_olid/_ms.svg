@@ -1,0 +1,75 @@
+ic
+        style: brands
+  label: Material Design for Bootstrap
+  unicode: f8ca
+  voted: false
+medal:
+  aliases:
+    unicodes:
+      composite:
+        - 1f3c5
+      secondary:
+        - 10f5a2
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Medal
+  unicode: f5a2
+  voted: true
+medapps:
+  changes:
+    - 5.0.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: MedApps
+  unicode: f3c6
+  voted: false
+medium:
+  aliases:
+    names:
+      - medium-m
+    unicodes:
+      composite:
+        - f3c7
+  changes:
+    - 4.3.0
+    - 5.0.0
+    - 6.0.0-beta1
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: Medium
+  unicode: f23a
+  voted: false
+medrt:
+  changes:
+    - 5.0.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: MRT
+  unicode: f3c8
+  voted: false
+meetup:
+  changes:

@@ -1,0 +1,12 @@
+/**
+ * @fileoverview Prevent usage of the return value of React.render
+ * @author Dustan Kasten
+ */
+
+'use strict';
+
+const testReactVersion = require('../util/version').testReactVersion;
+const docsUrl = require('../util/docsUrl');
+const report = require('../util/report');
+
+// --------------------------------------------

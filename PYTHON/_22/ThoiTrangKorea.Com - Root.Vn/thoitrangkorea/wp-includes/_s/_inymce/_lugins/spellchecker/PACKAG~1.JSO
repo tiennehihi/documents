@@ -1,0 +1,14 @@
+ero if required.                        "00" or "59"
+	 * 
+	 * h      The hour of the day between 1-12.                                            "1"  to "12"
+	 * hh     The hour of the day with leading zero if required.                           "01" to "12"
+	 * 
+	 * H      The hour of the day between 0-23.                                            "0"  to "23"
+	 * HH     The hour of the day with leading zero if required.                           "00" to "23"
+	 * 
+	 * d      The day of the month between 1 and 31.                                       "1"  to "31"
+	 * dd     The day of the month with leading zero if required.                          "01" to "31"
+	 * ddd    Abbreviated day name. Date.CultureInfo.abbreviatedDayNames.                                "Mon" to "Sun" 
+	 * dddd   The full day name. Date.CultureInfo.dayNames.                                              "Monday" to "Sunday"
+	 * 
+	 * M      The month of the year between 1-12.                                 

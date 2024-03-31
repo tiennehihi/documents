@@ -1,0 +1,27 @@
+= {
+                ...match[1].raws.tailwind,
+                candidate
+            };
+            // Apply final format selector
+            match = applyFinalFormat(match, {
+                context,
+                candidate
+            });
+            // Skip rules with invalid selectors
+            // This will cause the candidate to be added to the "not class"
+            // cache skipping it entirely for future builds
+            if (match === null) {
+                continue;
+            }
+            yield match;
+        }
+    }
+}
+function applyFinalFormat(match, { context , candidate  }) {
+    if (!match[0].collectedFormats) {
+        return match;
+    }
+    let isValid = true;
+    let finalFormat;
+    try {
+        finalFormat = (0, _formatVariantSelector.formatV

@@ -1,0 +1,21 @@
+'use strict';
+
+var cstScalar = require('./cst-scalar.js');
+var cstStringify = require('./cst-stringify.js');
+var cstVisit = require('./cst-visit.js');
+
+/** The byte order mark */
+const BOM = '\u{FEFF}';
+/** Start of doc-mode */
+const DOCUMENT = '\x02'; // C0: Start of Text
+/** Unexpected end of flow-mode */
+const FLOW_END = '\x18'; // C0: Cancel
+/** Next token is a scalar value */
+const SCALAR = '\x1f'; // C0: Unit Separator
+/** @returns `true` if `token` is a flow or block collection */
+const isCollection = (token) => !!token && 'items' in token;
+/** @returns `true` if `token` is a flow or block scalar; not an alias */
+const isScalar = (token) => !!token &&
+    (token.type === 'scalar' ||
+        token.type === 'single-quoted-scalar' ||
+        token.type ===

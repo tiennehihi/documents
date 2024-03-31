@@ -1,0 +1,18 @@
+/**
+ * Module dependencies.
+ */
+
+var tty = require('tty');
+var util = require('util');
+
+/**
+ * This is the Node.js implementation of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = require('./debug');
+exports.init = init;
+exports.log = log;
+exports.formatArgs = formatArgs;
+exports.save = save;

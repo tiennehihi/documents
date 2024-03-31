@@ -1,0 +1,11 @@
+"use strict";
+exports.__esModule = true;
+exports.LinesAndColumns = void 0;
+var LF = '\n';
+var CR = '\r';
+var LinesAndColumns = /** @class */ (function () {
+    function LinesAndColumns(string) {
+        this.string = string;
+        var offsets = [0];
+        for (var offset = 0; offset < string.length;) {
+            switch (string[of

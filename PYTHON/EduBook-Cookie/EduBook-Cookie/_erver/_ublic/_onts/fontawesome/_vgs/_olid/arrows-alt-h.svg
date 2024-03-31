@@ -1,0 +1,21 @@
+internet-explorer {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400; }
+
+.fa.fa-television:before {
+  content: "\f26c"; }
+
+.fa.fa-contao {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400; }
+
+.fa.fa-500px {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400; }
+
+.fa.fa-amazon {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400; }
+
+.fa.fa-calendar-plus-o {
+  font-family: 'Font 

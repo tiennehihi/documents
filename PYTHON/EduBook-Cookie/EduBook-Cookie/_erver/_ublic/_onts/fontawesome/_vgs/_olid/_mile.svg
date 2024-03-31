@@ -1,0 +1,28 @@
+ic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+      - family: classic
+        style: regular
+  label: Heart
+  unicode: f004
+  voted: false
+heart-circle-bolt:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Heart Circle-bolt
+  unicode: e4fc
+  voted: false
+heart-circle-check:
+  changes:
+    - 6.1.0
+    - 

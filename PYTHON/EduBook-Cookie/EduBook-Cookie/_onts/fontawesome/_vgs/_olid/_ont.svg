@@ -1,0 +1,2 @@
+0, 1 /* Error */, "extends_clause_of_exported_class_0_has_or_is_using_private_name_1_4020", "'extends' clause of exported class '{0}' has or is using private name '{1}'."),
+  extends_clause_of_exported_class_has_or_is_using_private_name_0: diag(4021, 1 /* Error */, "extends_clause_of_exported_class_has_or_is_using_private_name_0_4021", "'extends' clause of exported class has or is using private name '{0}'

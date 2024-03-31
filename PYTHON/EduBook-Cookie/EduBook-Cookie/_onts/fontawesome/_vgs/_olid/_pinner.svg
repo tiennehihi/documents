@@ -1,0 +1,20 @@
+/**
+ * @fileoverview Rule that warns when identifier names are shorter or longer
+ * than the values provided in configuration.
+ * @author Burak Yigit Kaya aka BYK
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const { getGraphemeCount } = require("../shared/string-utils");
+
+//------------------------------------------------------------------------------
+// Rule Definition
+//------------------------------------------------------------------------------
+
+/** @type {import('../shared/types').Rule} */
+mod

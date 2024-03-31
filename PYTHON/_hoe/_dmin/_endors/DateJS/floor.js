@@ -1,0 +1,2 @@
+/** Add World Map Data Points */
+jQuery.fn.vectorMap('addMap', 'north-america_en', {"width":950,"height":550,"paths":{"mx":{"path":"m 330.70592,371.79351 8.52959,26.86025 -3.97341,2.22511 0.44149,5.3332 7.50533,5.7746

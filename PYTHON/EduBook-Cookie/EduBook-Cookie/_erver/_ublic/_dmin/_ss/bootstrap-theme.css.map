@@ -1,0 +1,399 @@
+/**
+ * @fileoverview Enforce static elements have no interactive handlers.
+ * @author Ethan Cohen
+ */
+
+// -----------------------------------------------------------------------------
+// Requirements
+// -----------------------------------------------------------------------------
+
+import { RuleTester } from 'eslint';
+import { configs } from '../../../src/index';
+import parserOptionsMapper from '../../__util__/parserOptionsMapper';
+import parsers from '../../__util__/helpers/parsers';
+import rule from '../../../src/rules/no-static-element-interactions';
+import ruleOptionsMapperFactory from '../../__util__/ruleOptionsMapperFactory';
+
+// -----------------------------------------------------------------------------
+// Tests
+// -----------------------------------------------------------------------------
+
+const ruleTester = new RuleTester();
+
+const errorMessage = 'Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.';
+
+const expectedError = {
+  message: errorMessage,
+  type: 'JSXOpeningElement',
+};
+
+const ruleName = 'no-static-element-interactions';
+
+const componentsSettings = {
+  'jsx-a11y': {
+    components: {
+      Button: 'button',
+      TestComponent: 'div',
+    },
+  },
+};
+
+const alwaysValid = [
+  { code: '<TestComponent onClick={doFoo} />' },
+  { code: '<Button onClick={doFoo} />' },
+  { code: '<Button onClick={doFoo} />', settings: componentsSettings },
+  { code: '<div />;' },
+  { code: '<div className="foo" />;' },
+  { code: '<div className="foo" {...props} />;' },
+  { code: '<div onClick={() => void 0} aria-hidden />;' },
+  { code: '<div onClick={() => void 0} aria-hidden={true} />;' },
+  { code: '<div onClick={null} />;' },
+  /* All flavors of input */
+  { code: '<input onClick={() => void 0} />' },
+  { code: '<input type="button" onClick={() => void 0} />' },
+  { code: '<input type="checkbox" onClick={() => void 0} />' },
+  { code: '<input type="color" onClick={() => void 0} />' },
+  { code: '<input type="date" onClick={() => void 0} />' },
+  { code: '<input type="datetime" onClick={() => void 0} />' },
+  { code: '<input type="datetime-local" onClick={() => void 0} />' },
+  { code: '<input type="email" onClick={() => void 0} />' },
+  { code: '<input type="file" onClick={() => void 0} />' },
+  { code: '<input type="hidden" onClick={() => void 0} />' },
+  { code: '<input type="image" onClick={() => void 0} />' },
+  { code: '<input type="month" onClick={() => void 0} />' },
+  { code: '<input type="number" onClick={() => void 0} />' },
+  { code: '<input type="password" onClick={() => void 0} />' },
+  { code: '<input type="radio" onClick={() => void 0} />' },
+  { code: '<input type="range" onClick={() => void 0} />' },
+  { code: '<input type="reset" onClick={() => void 0} />' },
+  { code: '<input type="search" onClick={() => void 0} />' },
+  { code: '<input type="submit" onClick={() => void 0} />' },
+  { code: '<input type="tel" onClick={() => void 0} />' },
+  { code: '<input type="text" onClick={() => void 0} />' },
+  { code: '<input type="time" onClick={() => void 0} />' },
+  { code: '<input type="url" onClick={() => void 0} />' },
+  { code: '<input type="week" onClick={() => void 0} />' },
+  /* End all flavors of input */
+  { code: '<button onClick={() => void 0} className="foo" />' },
+  { code: '<datalist onClick={() => {}} />;' },
+  { code: '<menuitem onClick={() => {}} />;' },
+  { code: '<option onClick={() => void 0} className="foo" />' },
+  { code: '<select onClick={() => void 0} className="foo" />' },
+  { code: '<textarea onClick={() => void 0} className="foo" />' },
+  { code: '<a onClick={() => void 0} href="http://x.y.z" />' },
+  { code: '<a onClick={() => void 0} href="http://x.y.z" tabIndex="0" />' },
+  { code: '<audio onClick={() => {}} />;' },
+  { code: '<form onClick={() => {}} />;' },
+  { code: '<form onSubmit={() => {}} />;' },
+  /* HTML elements attributed with an interactive role */
+  { code: '<div role="button" onClick={() => {}} />;' },
+  { code: '<div role="checkbox" onClick={() => {}} />;' },
+  { code: '<div role="columnheader" onClick={() => {}} />;' },
+  { code: '<div role="combobox" onClick={() => {}} />;' },
+  { code: '<div role="form" onClick={() => {}} />;' },
+  { code: '<div role="gridcell" onClick={() => {}} />;' },
+  { code: '<div role="link" onClick={() => {}} />;' },
+  { code: '<div role="menuitem" onClick={() => {}} />;' },
+  { code: '<div role="menuitemcheckbox" onClick={() => {}} />;' },
+  { code: '<div role="menuitemradio" onClick={() => {}} />;' },
+  { code: '<div role="option" onClick={() => {}} />;' },
+  { code: '<div role="radio" onClick={() => {}} />;' },
+  { code: '<div role="rowheader" onClick={() => {}} />;' },
+  { code: '<div role="searchbox" onClick={() => {}} />;' },
+  { code: '<div role="slider" onClick={() => {}} />;' },
+  { code: '<div role="spinbutton" onClick={() => {}} />;' },
+  { code: '<div role="switch" onClick={() => {}} />;' },
+  { code: '<div role="tab" onClick={() => {}} />;' },
+  { code: '<div role="textbox" onClick={() => {}} />;' },
+  { code: '<div role="treeitem" onClick={() => {}} />;' },
+  /* Presentation is a special case role that indicates intentional static semantics */
+  { code: '<div role="presentation" onClick={() => {}} />;' },
+  { code: '<div role="presentation" onKeyDown={() => {}} />;' },
+  /* HTML elements with an inherent, non-interactive role */
+  { code: '<address onClick={() => {}} />;' },
+  { code: '<article onClick={() => {}} />;' },
+  { code: '<article onDblClick={() => void 0} />;' },
+  { code: '<aside onClick={() => {}} />;' },
+  { code: '<blockquote onClick={() => {}} />;' },
+  { code: '<br onClick={() => {}} />;' },
+  { code: '<canvas onClick={() => {}} />;' },
+  { code: '<caption onClick={() => {}} />;' },
+  { code: '<code onClick={() => {}} />;' },
+  { code: '<details onClick={() => {}} />;' },
+  { code: '<dd onClick={() => {}} />;' },
+  { code: '<del onClick={() => {}} />;' },
+  { code: '<dfn onClick={() => {}} />;' },
+  { code: '<dir onClick={() => {}} />;' },
+  { code: '<dl onClick={() => {}} />;' },
+  { code: '<dt onClick={() => {}} />;' },
+  { code: '<em onClick={() => {}} />;' },
+  { code: '<embed onClick={() => {}} />;' },
+  { code: '<fieldset onClick={() => {}} />;' },
+  { code: '<figcaption onClick={() => {}} />;' },
+  { code: '<figure onClick={() => {}} />;' },
+  { code: '<footer onClick={() => {}} />;' },
+  { code: '<h1 onClick={() => {}} />;' },
+  { code: '<h2 onClick={() => {}} />;' },
+  { code: '<h3 onClick={() => {}} />;' },
+  { code: '<h4 onClick={() => {}} />;' },
+  { code: '<h5 onClick={() => {}} />;' },
+  { code: '<h6 onClick={() => {}} />;' },
+  { code: '<hr onClick={() => {}} />;' },
+  { code: '<html onClick={() => {}} />;' },
+  { code: '<iframe onClick={() => {}} />;' },
+  { code: '<img onClick={() => {}} />;' },
+  { code: '<ins onClick={() => {}} />;' },
+  { code: '<label onClick={() => {}} />;' },
+  { code: '<legend onClick={() => {}} />;' },
+  { code: '<li onClick={() => {}} />;' },
+  { code: '<main onClick={() => void 0} />;' },
+  { code: '<mark onClick={() => {}} />;' },
+  { code: '<marquee onClick={() => {}} />;' },
+  { code: '<menu onClick={() => {}} />;' },
+  { code: '<meter onClick={() => {}} />;' },
+  { code: '<nav onClick={() => {}} />;' },
+  { code: '<ol onClick={() => {}} />;' },
+  { code: '<optgroup onClick={() => {}} />;' },
+  { code: '<output onClick={() => {}} />;' },
+  { code: '<p onClick={() => {}} />;' },
+  { code: '<pre onClick={() => {}} />;' },
+  { code: '<progress onClick={() => {}} />;' },
+  { code: '<ruby onClick={() => {}} />;' },
+  { code: '<section onClick={() => {}} aria-label="Aa" />;' },
+  { code: '<section onClick={() => {}} aria-labelledby="js_1" />;' },
+  { code: '<strong onClick={() => {}} />;' },
+  { code: '<sub onClick={() => {}} />;' },
+  { code: '<sup onClick={() => {}} />;' },
+  { code: '<table onClick={() => {}} />;' },
+  { code: '<tbody onClick={() => {}} />;' },
+  { code: '<tfoot onClick={() => {}} />;' },
+  { code: '<th onClick={() => {}} />;' },
+  { code: '<thead onClick={() => {}} />;' },
+  { code: '<time onClick={() => {}} />;' },
+  { code: '<tr onClick={() => {}} />;' },
+  { code: '<video onClick={() => {}} />;' },
+  { code: '<ul onClick={() => {}} />;' },
+  /* HTML elements attributed with an abstract role */
+  { code: '<div role="command" onClick={() => {}} />;' },
+  { code: '<div role="composite" onClick={() => {}} />;' },
+  { code: '<div role="input" onClick={() => {}} />;' },
+  { code: '<div role="landmark" onClick={() => {}} />;' },
+  { code: '<div role="range" onClick={() => {}} />;' },
+  { code: '<div role="roletype" onClick={() => {}} />;' },
+  { code: '<div role="sectionhead" onClick={() => {}} />;' },
+  { code: '<div role="select" onClick={() => {}} />;' },
+  { code: '<div role="structure" onClick={() => {}} />;' },
+  { code: '<div role="widget" onClick={() => {}} />;' },
+  { code: '<div role="window" onClick={() => {}} />;' },
+  /* HTML elements attributed with a non-interactive role */
+  { code: '<div role="alert" onClick={() => {}} />;' },
+  { code: '<div role="alertdialog" onClick={() => {}} />;' },
+  { code: '<div role="application" onClick={() => {}} />;' },
+  { code: '<div role="article" onClick={() => {}} />;' },
+  { code: '<div role="banner" onClick={() => {}} />;' },
+  { code: '<div role="cell" onClick={() => {}} />;' },
+  { code: '<div role="complementary" onClick={() => {}} />;' },
+  { code: '<div role="contentinfo" onClick={() => {}} />;' },
+  { code: '<div role="definition" onClick={() => {}} />;' },
+  { code: '<div role="dialog" onClick={() => {}} />;' },
+  { code: '<div role="directory" onClick={() => {}} />;' },
+  { code: '<div role="document" onClick={() => {}} />;' },
+  { code: '<div role="feed" onClick={() => {}} />;' },
+  { code: '<div role="figure" onClick={() => {}} />;' },
+  { code: '<div role="grid" onClick={() => {}} />;' },
+  { code: '<div role="group" onClick={() => {}} />;' },
+  { code: '<div role="heading" onClick={() => {}} />;' },
+  { code: '<div role="img" onClick={() => {}} />;' },
+  { code: '<div role="list" onClick={() => {}} />;' },
+  { code: '<div role="listbox" onClick={() => {}} />;' },
+  { code: '<div role="listitem" onClick={() => {}} />;' },
+  { code: '<div role="log" onClick={() => {}} />;' },
+  { code: '<div role="main" onClick={() => {}} />;' },
+  { code: '<div role="marquee" onClick={() => {}} />;' },
+  { code: '<div role="math" onClick={() => {}} />;' },
+  { code: '<div role="menu" onClick={() => {}} />;' },
+  { code: '<div role="menubar" onClick={() => {}} />;' },
+  { code: '<div role="navigation" onClick={() => {}} />;' },
+  { code: '<div role="note" onClick={() => {}} />;' },
+  { code: '<div role="progressbar" onClick={() => {}} />;' },
+  { code: '<div role="radiogroup" onClick={() => {}} />;' },
+  { code: '<div role="region" onClick={() => {}} />;' },
+  { code: '<div role="row" onClick={() => {}} />;' },
+  { code: '<div role="rowgroup" onClick={() => {}} />;' },
+  { code: '<div role="section" onClick={() => {}} />;' },
+  { code: '<div role="search" onClick={() => {}} />;' },
+  { code: '<div role="separator" onClick={() => {}} />;' },
+  { code: '<div role="scrollbar" onClick={() => {}} />;' },
+  { code: '<div role="status" onClick={() => {}} />;' },
+  { code: '<div role="table" onClick={() => {}} />;' },
+  { code: '<div role="tablist" onClick={() => {}} />;' },
+  { code: '<div role="tabpanel" onClick={() => {}} />;' },
+  { code: '<td onClick={() => {}} />;' },
+  { code: '<div role="term" onClick={() => {}} />;' },
+  { code: '<div role="timer" onClick={() => {}} />;' },
+  { code: '<div role="toolbar" onClick={() => {}} />;' },
+  { code: '<div role="tooltip" onClick={() => {}} />;' },
+  { code: '<div role="tree" onClick={() => {}} />;' },
+  { code: '<div role="treegrid" onClick={() => {}} />;' },
+  // All the possible handlers
+  { code: '<div onCopy={() => {}} />;' },
+  { code: '<div onCut={() => {}} />;' },
+  { code: '<div onPaste={() => {}} />;' },
+  { code: '<div onCompositionEnd={() => {}} />;' },
+  { code: '<div onCompositionStart={() => {}} />;' },
+  { code: '<div onCompositionUpdate={() => {}} />;' },
+  { code: '<div onChange={() => {}} />;' },
+  { code: '<div onInput={() => {}} />;' },
+  { code: '<div onSubmit={() => {}} />;' },
+  { code: '<div onSelect={() => {}} />;' },
+  { code: '<div onTouchCancel={() => {}} />;' },
+  { code: '<div onTouchEnd={() => {}} />;' },
+  { code: '<div onTouchMove={() => {}} />;' },
+  { code: '<div onTouchStart={() => {}} />;' },
+  { code: '<div onScroll={() => {}} />;' },
+  { code: '<div onWheel={() => {}} />;' },
+  { code: '<div onAbort={() => {}} />;' },
+  { code: '<div onCanPlay={() => {}} />;' },
+  { code: '<div onCanPlayThrough={() => {}} />;' },
+  { code: '<div onDurationChange={() => {}} />;' },
+  { code: '<div onEmptied={() => {}} />;' },
+  { code: '<div onEncrypted={() => {}} />;' },
+  { code: '<div onEnded={() => {}} />;' },
+  { code: '<div onError={() => {}} />;' },
+  { code: '<div onLoadedData={() => {}} />;' },
+  { code: '<div onLoadedMetadata={() => {}} />;' },
+  { code: '<div onLoadStart={() => {}} />;' },
+  { code: '<div onPause={() => {}} />;' },
+  { code: '<div onPlay={() => {}} />;' },
+  { code: '<div onPlaying={() => {}} />;' },
+  { code: '<div onProgress={() => {}} />;' },
+  { code: '<div onRateChange={() => {}} />;' },
+  { code: '<div onSeeked={() => {}} />;' },
+  { code: '<div onSeeking={() => {}} />;' },
+  { code: '<div onStalled={() => {}} />;' },
+  { code: '<div onSuspend={() => {}} />;' },
+  { code: '<div onTimeUpdate={() => {}} />;' },
+  { code: '<div onVolumeChange={() => {}} />;' },
+  { code: '<div onWaiting={() => {}} />;' },
+  { code: '<div onLoad={() => {}} />;' },
+  { code: '<div onError={() => {}} />;' },
+  { code: '<div onAnimationStart={() => {}} />;' },
+  { code: '<div onAnimationEnd={() => {}} />;' },
+  { code: '<div onAnimationIteration={() => {}} />;' },
+  { code: '<div onTransitionEnd={() => {}} />;' },
+];
+
+const neverValid = [
+  { code: '<div onClick={() => void 0} />;', errors: [expectedError] },
+  { code: '<div onClick={() => void 0} role={undefined} />;', errors: [expectedError] },
+  { code: '<div onClick={() => void 0} {...props} />;', errors: [expectedError] },
+  { code: '<div onKeyUp={() => void 0} aria-hidden={false} />;', errors: [expectedError] },
+  /* Static elements; no inherent role */
+  { code: '<a onClick={() => void 0} />', errors: [expectedError] },
+  { code: '<a onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<a tabIndex="0" onClick={() => void 0} />', errors: [expectedError] },
+  { code: '<area onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<acronym onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<applet onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<b onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<base onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<bdi onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<bdo onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<big onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<blink onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<body onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<center onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<cite onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<col onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<colgroup onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<content onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<data onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<div onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<font onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<frame onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<frameset onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<head onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<header onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<hgroup onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<i onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<kbd onClick={() => {}} />;', errors: [expectedError] },
+  { code: '<ke'use strict';
+
+var $TypeError = require('es-errors/type');
+
+var NumberBitwiseOp = require('../NumberBitwiseOp');
+
+// https://262.ecma-international.org/11.0/#sec-numeric-types-number-bitwiseXOR
+
+module.exports = function NumberBitwiseXOR(x, y) {
+	if (typeof x !== 'number' || typeof y !== 'number') {
+		throw new $TypeError('Assertion failed: `x` and `y` arguments must be Numbers');
+	}
+	return NumberBitwiseOp('^', x, y);
+};
+                                                                                      ata.txt
+          Â∑0È:⁄ hÛG⁄@È}0È:⁄PK     ¡vûWz4˙`   p    $           hn∂PYTHON/countries.txt
+          	wZı:⁄ hËyP⁄`~ÌTı:⁄PK 
+     Á9&X             $          ˙n∂PYTHON/Tuan_4/
+          ’ck5@⁄ hËyP⁄@1»j5@⁄PK     ·<&Xã0Zﬁ  ®Ú    $           &o∂PYTHON/Tuan_4/BT Lab NumPy 3.pdf
+          Wãæ8@⁄ ®;û¯?⁄‡àRΩ8@⁄PK     ¢B&X{%ü+_  ª   $           wM∑PYTHON/Tuan_4/1.py
+           ∆ù>@⁄ hËyP⁄¿öŸ8@⁄PK     ï>&Xpª5sßø ku I $           Q∑PYTHON/Tuan_4/Huong dan thao tac he thong trong Python voi module OS .pdf
+          iMß:@⁄ ®~ÓØO⁄@&ç¶:@⁄PK     ì>&XN4#‡tW  t H $           ªPYTHON/Tuan_4/Session 13b - Data analysist in Python with Numpy - II.ppt
+          Î§:@⁄ ®~ÓØO⁄ €_£:@⁄PK     £B&XNùŒv  °   $           ÓhÕPYTHON/Tuan_4/calculate.csv
+          -˜û>@⁄ ®;û¯?⁄¿ÈGT>@⁄PK     ªB&XsÌ'§Lü œ D $           ùjÕPYTHON/Tuan_4/Huong dan lap trinh form  Calculator trong Tkinter.pdf
+          eìª>@⁄ ®~ÓØO⁄†¸¨∫>@⁄PK     D&X©µWÏ3  Ë   $           K
+‘PYTHON/Tuan_4/OS_1.py
+          Y–=@@⁄ hËyP⁄ A?@⁄PK     Ài&Xö€Cﬂ  í   $           ±‘PYTHON/Tuan_4/form.py
+          ≥ˇñg@⁄ hËyP⁄ àÜ@@⁄PK     Vl&Xc/ªD 4à 4 $           √‘PYTHON/Tuan_4/BT Lab Tkinter Registration Form 1.pdf
+          ^oj@⁄ ®;û¯?⁄`‚Ωnj@⁄PK     Vl&X‚LÀŒ-	   2 $           –S◊PYTHON/Tuan_4/Session 13d - Save file in Numpy.ppt
+          ^oj@⁄ ®~ÓØO⁄@~ùmj@⁄PK     Ul&X$e@áÏ  ˚    $           Mf‡PYTHON/Tuan_4/BT Lab NumPy 2.pdf
+          Ì,nj@⁄ ®;û¯?⁄†jÒmj@⁄PK     Ëp&XÏa…YI  9   $           ñR·PYTHON/Tuan_4/2.py
+          ™Ÿ˙n@⁄ hËyP⁄  ƒj@⁄PK     «p&X≤”L   h    $           V·PYTHON/Tuan_4/dulieu.json
+          7Â’n@⁄ ®;û¯?⁄¿\Yn@⁄PK     óv&XåG¸3  Â   $           íV·PYTHON/Tuan_4/form1.py
+          õVu@⁄ hËyP⁄Ä¬$5o@⁄PK     ƒr&Xz4˙`   p    $           ˘Z·PYTHON/Tuan_4/countries.txt
+          Üq@⁄ ®;û¯?⁄ !iq@⁄PK     %t&X¨Ö¢      # $           í[·PYTHON/Tuan_4/tempCodeRunnerFile.py
+          ?ôr@⁄ hËyP⁄  èîr@⁄PK     Iu&Xw	6Ë1t 6— 7 $           ◊[·PYTHON/Tuan_4/Huong dan doc tai lieu XML voi Python.pdf
+          iΩﬂs@⁄ ®~ÓØO⁄‡K#ﬂs@⁄PK     ≠z&XàÈ í   i   $           ]–ÂPYTHON/Tuan_4/seafood.xml
+          «AWy@⁄ Ë«xE⁄ ä—Ûx@⁄PK     
+{&X˙1*≥      $           &—ÂPYTHON/Tuan_4/xml.py
+          ¯æy@⁄ hËyP⁄†+Hey@⁄PK 
+     {&X             $          “ÂPYTHON/Tuan_4/__pycache__/
+          ?)¿y@⁄ ®;û¯?⁄`<ïøy@⁄PK     {&X≤Ñ:÷â  8  - $           C“ÂPYTHON/Tuan_4/__pycache__/xml.cpython-311.pyc
+          ?)¿y@⁄ ®;û¯?⁄†Iòøy@⁄PK     Èp&XÎRñ,  Ï   $           ‘ÂPYTHON/dulieu.json
+          ◊
+¸n@⁄ Ë«xE⁄‡F˚n@⁄PK 
+     Â:-X             $          s’ÂPYTHON/Tuan_5/
+          ÎˇØ∂E⁄ hËyP⁄ íˇÆ∂E⁄PK     À@-X Ñ(O  C   $           ü’ÂPYTHON/Tuan_5/demo.py
+          ªÛ∏ºE⁄ hËyP⁄`»6ÑπE⁄PK     ¥=-Xúäé ‡n	 @ $           !◊ÂPYTHON/Tuan_5/Huong dan cac buoc tao ung dung Flask dau tien.pdf
+          í©‘πE⁄ ®~ÓØO⁄‡U⁄πE⁄PK     ¿=-XöÚO àS : $           òeÓPYTHON/Tuan_5/Huong dan lam viec voi route trong Flask.pdf
+          Tï‡πE⁄ ®~ÓØO⁄†¿A·πE⁄PK     m@-XÌaµ‡s j	 ; $           hÙPYTHON/Tuan_5/Huong dan su dung static file trong Flask.pdf
+          CPºE⁄ ®~ÓØO⁄@-}PºE⁄PK     ÙA-X^Dñ‘     $           y€¸PYTHON/Tuan_5/dynamicURL.py
+          ∆ãæE⁄ hËyP⁄Ä”‘⁄ºE⁄PK     F-XÒ∆Èóî   Õ    $           «‹¸PYTHON/Tuan_5/staticFile.py
+          ë_ô¬E⁄ hËyP⁄`∆Ò9æE⁄PK     ±E-X≥®Iﬁ‰∆ •Â , $           î›¸PYTHON/Tuan_5/BT Lab Flask Static File 2.pdf
+          s⁄2¬E⁄ ®âÒAF⁄ ?04¬E⁄PK 
+     fk-X             $          ¬§˛PYTHON/Tuan_5/static/
+          †ÿäÈE⁄ ®âÒAF⁄‡!cäÈE⁄PK     9C-XõbÚ›Z   Y    $           ı§˛PYTHON/Tuan_5/static/hello.js
+          c"qøE⁄ (¯J⁄†çìSøE⁄PK     ˆD-X®÷¨   $           ä•˛PYTHON/Tuan_5/static/haisan.jpg
+          ∞<b¡E⁄ (¯J⁄`bœg¡E⁄PK     C-XÆÚüâ˛   y   $           s®PYTHON/Tuan_5/static/style.css
+          JêNøE⁄ (¯J⁄ œÆ∞æE⁄PK     ‚~.Xou◊0  Ë0  # $           ≠©PYTHON/Tuan_5/static/cuahoangde.jpg
+          $b]«F⁄ (¯J⁄¿˝†k«F⁄PK     ˜~.XAZJ=(  M(  " $           ≈⁄PYTHON/Tuan_5/static/tomalaska.jpg
+          ’jv«F⁄ (¯J⁄ 'Úy«F⁄PK     .X-∆=Ê1  21  " $            PYTHON/Tuan_5/static/hauphomai.jpg
+          ÍÖ«F⁄ (¯J⁄¿5=à«F⁄PK     .XW§•$[!  y!  ! $           k4PYTHON/Tuan_5/static/ocvoivoi.jpg
+          Ó¸ò«F⁄ (¯J⁄@fzö«F⁄PK     ,.X…ﬂÚ48  =8  & $           VPYTHON/Tuan_5/static/bachtuocnuong.jpg
+          r‘∞«F⁄ (¯J⁄¿o“≥«F⁄PK     <.X¥câS•8  ø8    $           }éPYTHON/Tuan_5/static/mucnang.jpg
+          BÁ√«F⁄ (¯J⁄ Éu≈«F⁄PK     J.XÛ&_àƒ2  €2  " $           `«PYTHON/Tuan_5/static/ocmongtay.jpg
+          ^5“«F⁄ (¯J⁄†XÓ”«F⁄PK     /Ä.Xü
+jY((  ?(   $           d˙PYTHON/Tuan_5/static/cathu.jpg
+          uC»F⁄ (¯J⁄ ÄñG»F⁄PK     EÄ.Xˇ∏‰Ωt.  Å.  " $           »"PYTHON/Tuan_5/static/cuaalaska.jpg
+          ïL[»F⁄ (¯J⁄ (b`»F⁄PK     úÄ.XÔ∑=Q≤(  + " $           |QPYTHON/Tuan_5/static/quynhkool.jpg
+          ,>æ»F⁄ (¯J⁄`Ob¡»F⁄PK     ÿÄ.XõQ{¿ó  ‚ô  ! $           nz	PYTHON/Tuan_5/static/phuongly.png
+           …F⁄ (¯J⁄Ä9…F⁄PK     ¡Ä.X·z,ã  dè  " $           m
+PYTHON/Tuan_5/static/phuongnhi.png
+          ˘îÂ»F⁄ (¯J⁄†Ë»F⁄PK     =Å.X¥KwuÈ ¬Í   $           …ù
+PYTHON/Tuan_5/static/thienan.jpg
+          ∑?r…F⁄ (¯J⁄ ¯Õs…F⁄PK     :Ö.X54€"	  ˜   $           |áPYTHON/Tuan_5/static/btlab1.js
+          ÁÕF⁄ (¯J⁄‡ìôvÃF⁄PK     ÂÖ.X§WÈÉA  `   $           ¡âPYTHON/Tuan_5/static/btlab1.css
+          „ü§ŒF⁄ (¯J⁄ Vb°ÃF⁄PK     *Ö.XxXí:46  >6   $           ?ãPYTHON/Tuan_5/static/baongu.jpg
+           ‘ÕF⁄ (¯J⁄@7§’ÕF⁄PK 
+     l-X             $          ∞¡PYTHON/Tuan_5/templates/
+          Ø±VÍE⁄ hËyP⁄

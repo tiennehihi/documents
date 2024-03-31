@@ -1,0 +1,1352 @@
+ {
+        checkExpression(node.initializer);
+      }
+    }
+    if (node.condition)
+      checkTruthinessExpression(node.condition);
+    if (node.incrementor)
+      checkExpression(node.incrementor);
+    checkSourceElement(node.statement);
+    if (node.locals) {
+      registerForUnusedIdentifiersCheck(node);
+    }
+  }
+  function checkForOfStatement(node) {
+    checkGrammarForInOrForOfStatement(node);
+    const container = getContainingFunctionOrClassStaticBlock(node);
+    if (node.awaitModifier) {
+      if (container && isClassStaticBlockDeclaration(container)) {
+        grammarErrorOnNode(node.awaitModifier, Diagnostics.for_await_loops_cannot_be_used_inside_a_class_static_block);
+      } else {
+        const functionFlags = getFunctionFlags(container);
+        if ((functionFlags & (4 /* Invalid */ | 2 /* Async */)) === 2 /* Async */ && languageVersion < 99 /* ESNext */) {
+          checkExternalEmitHelpers(node, 16384 /* ForAwaitOfIncludes */);
+        }
+      }
+    } else if (compilerOptions.downlevelIteration && languageVersion < 2 /* ES2015 */) {
+      checkExternalEmitHelpers(node, 256 /* ForOfIncludes */);
+    }
+    if (node.initializer.kind === 261 /* VariableDeclarationList */) {
+      checkVariableDeclarationList(node.initializer);
+    } else {
+      const varExpr = node.initializer;
+      const iteratedType = checkRightHandSideOfForOf(node);
+      if (varExpr.kind === 209 /* ArrayLiteralExpression */ || varExpr.kind === 210 /* ObjectLiteralExpression */) {
+        checkDestructuringAssignment(varExpr, iteratedType || errorType);
+      } else {
+        const leftType = checkExpression(varExpr);
+        checkReferenceExpression(
+          varExpr,
+          Diagnostics.The_left_hand_side_of_a_for_of_statement_must_be_a_variable_or_a_property_access,
+          Diagnostics.The_left_hand_side_of_a_for_of_statement_may_not_be_an_optional_property_access
+        );
+        if (iteratedType) {
+          checkTypeAssignableToAndOptionallyElaborate(iteratedType, leftType, varExpr, node.expression);
+        }
+      }
+    }
+    checkSourceElement(node.statement);
+    if (node.locals) {
+      registerForUnusedIdentifiersCheck(node);
+    }
+  }
+  function checkForInStatement(node) {
+    checkGrammarForInOrForOfStatement(node);
+    const rightType = getNonNullableTypeIfNeeded(checkExpression(node.expression));
+    if (node.initializer.kind === 261 /* VariableDeclarationList */) {
+      const variable = node.initializer.declarations[0];
+      if (variable && isBindingPattern(variable.name)) {
+        error2(variable.name, Diagnostics.The_left_hand_side_of_a_for_in_statement_cannot_be_a_destructuring_pattern);
+      }
+      checkVariableDeclarationList(node.initializer);
+    } else {
+      const varExpr = node.initializer;
+      const leftType = checkExpression(varExpr);
+      if (varExpr.kind === 209 /* ArrayLiteralExpression */ || varExpr.kind === 210 /* ObjectLiteralExpression */) {
+        error2(varExpr, Diagnostics.The_left_hand_side_of_a_for_in_statement_cannot_be_a_destructuring_pattern);
+      } else if (!isTypeAssignableTo(getIndexTypeOrString(rightType), leftType)) {
+        error2(varExpr, Diagnostics.The_left_hand_side_of_a_for_in_statement_must_be_of_type_string_or_any);
+      } else {
+        checkReferenceExpression(
+          varExpr,
+          Diagnostics.The_left_hand_side_of_a_for_in_statement_must_be_a_variable_or_a_property_access,
+          Diagnostics.The_left_hand_side_of_a_for_in_statement_may_not_be_an_optional_property_access
+        );
+      }
+    }
+    if (rightType === neverType || !isTypeAssignableToKind(rightType, 67108864 /* NonPrimitive */ | 58982400 /* InstantiableNonPrimitive */)) {
+      error2(node.expression, Diagnostics.The_right_hand_side_of_a_for_in_statement_must_be_of_type_any_an_object_type_or_a_type_parameter_but_here_has_type_0, typeToString(rightType));
+    }
+    checkSourceElement(node.statement);
+    if (node.locals) {
+      registerForUnusedIdentifiersCheck(node);
+    }
+  }
+  function checkRightHandSideOfForOf(statement) {
+    const use = statement.awaitModifier ? 15 /* ForAwaitOf */ : 13 /* ForOf */;
+    return checkIteratedTypeOrElementType(use, checkNonNullExpression(statement.expression), undefinedType, statement.expression);
+  }
+  function checkIteratedTypeOrElementType(use, inputType, sentType, errorNode) {
+    if (isTypeAny(inputType)) {
+      return inputType;
+    }
+    return getIteratedTypeOrElementType(
+      use,
+      inputType,
+      sentType,
+      errorNode,
+      /*checkAssignability*/
+      true
+    ) || anyType;
+  }
+  function getIteratedTypeOrElementType(use, inputType, sentType, errorNode, checkAssignability) {
+    const allowAsyncIterables = (use & 2 /* AllowsAsyncIterablesFlag */) !== 0;
+    if (inputType === neverType) {
+      reportTypeNotIterableError(errorNode, inputType, allowAsyncIterables);
+      return void 0;
+    }
+    const uplevelIteration = languageVersion >= 2 /* ES2015 */;
+    const downlevelIteration = !uplevelIteration && compilerOptions.downlevelIteration;
+    const possibleOutOfBounds = compilerOptions.noUncheckedIndexedAccess && !!(use & 128 /* PossiblyOutOfBounds */);
+    if (uplevelIteration || downlevelIteration || allowAsyncIterables) {
+      const iterationTypes = getIterationTypesOfIterable(inputType, use, uplevelIteration ? errorNode : void 0);
+      if (checkAssignability) {
+        if (iterationTypes) {
+          const diagnostic = use & 8 /* ForOfFlag */ ? Diagnostics.Cannot_iterate_value_because_the_next_method_of_its_iterator_expects_type_1_but_for_of_will_always_send_0 : use & 32 /* SpreadFlag */ ? Diagnostics.Cannot_iterate_value_because_the_next_method_of_its_iterator_expects_type_1_but_array_spread_will_always_send_0 : use & 64 /* DestructuringFlag */ ? Diagnostics.Cannot_iterate_value_because_the_next_method_of_its_iterator_expects_type_1_but_array_destructuring_will_always_send_0 : use & 16 /* YieldStarFlag */ ? Diagnostics.Cannot_delegate_iteration_to_value_because_the_next_method_of_its_iterator_expects_type_1_but_the_containing_generator_will_always_send_0 : void 0;
+          if (diagnostic) {
+            checkTypeAssignableTo(sentType, iterationTypes.nextType, errorNode, diagnostic);
+          }
+        }
+      }
+      if (iterationTypes || uplevelIteration) {
+        return possibleOutOfBounds ? includeUndefinedInIndexSignature(iterationTypes && iterationTypes.yieldType) : iterationTypes && iterationTypes.yieldType;
+      }
+    }
+    let arrayType = inputType;
+    let reportedError = false;
+    let hasStringConstituent = false;
+    if (use & 4 /* AllowsStringInputFlag */) {
+      if (arrayType.flags & 1048576 /* Union */) {
+        const arrayTypes = inputType.types;
+        const filteredTypes = filter(arrayTypes, (t) => !(t.flags & 402653316 /* StringLike */));
+        if (filteredTypes !== arrayTypes) {
+          arrayType = getUnionType(filteredTypes, 2 /* Subtype */);
+        }
+      } else if (arrayType.flags & 402653316 /* StringLike */) {
+        arrayType = neverType;
+      }
+      hasStringConstituent = arrayType !== inputType;
+      if (hasStringConstituent) {
+        if (languageVersion < 1 /* ES5 */) {
+          if (errorNode) {
+            error2(errorNode, Diagnostics.Using_a_string_in_a_for_of_statement_is_only_supported_in_ECMAScript_5_and_higher);
+            reportedError = true;
+          }
+        }
+        if (arrayType.flags & 131072 /* Never */) {
+          return possibleOutOfBounds ? includeUndefinedInIndexSignature(stringType) : stringType;
+        }
+      }
+    }
+    if (!isArrayLikeType(arrayType)) {
+      if (errorNode && !reportedError) {
+        const allowsStrings = !!(use & 4 /* AllowsStringInputFlag */) && !hasStringConstituent;
+        const [defaultDiagnostic, maybeMissingAwait] = getIterationDiagnosticDetails(allowsStrings, downlevelIteration);
+        errorAndMaybeSuggestAwait(
+          errorNode,
+          maybeMissingAwait && !!getAwaitedTypeOfPromise(arrayType),
+          defaultDiagnostic,
+          typeToString(arrayType)
+        );
+      }
+      return hasStringConstituent ? possibleOutOfBounds ? includeUndefinedInIndexSignature(stringType) : stringType : void 0;
+    }
+    const arrayElementType = getIndexTypeOfType(arrayType, numberType);
+    if (hasStringConstituent && arrayElementType) {
+      if (arrayElementType.flags & 402653316 /* StringLike */ && !compilerOptions.noUncheckedIndexedAccess) {
+        return stringType;
+      }
+      return getUnionType(possibleOutOfBounds ? [arrayElementType, stringType, undefinedType] : [arrayElementType, stringType], 2 /* Subtype */);
+    }
+    return use & 128 /* PossiblyOutOfBounds */ ? includeUndefinedInIndexSignature(arrayElementType) : arrayElementType;
+    function getIterationDiagnosticDetails(allowsStrings, downlevelIteration2) {
+      var _a;
+      if (downlevelIteration2) {
+        return allowsStrings ? [Diagnostics.Type_0_is_not_an_array_type_or_a_string_type_or_does_not_have_a_Symbol_iterator_method_that_returns_an_iterator, true] : [Diagnostics.Type_0_is_not_an_array_type_or_does_not_have_a_Symbol_iterator_method_that_returns_an_iterator, true];
+      }
+      const yieldType = getIterationTypeOfIterable(
+        use,
+        0 /* Yield */,
+        inputType,
+        /*errorNode*/
+        void 0
+      );
+      if (yieldType) {
+        return [Diagnostics.Type_0_can_only_be_iterated_through_when_using_the_downlevelIteration_flag_or_with_a_target_of_es2015_or_higher, false];
+      }
+      if (isES2015OrLaterIterable((_a = inputType.symbol) == null ? void 0 : _a.escapedName)) {
+        return [Diagnostics.Type_0_can_only_be_iterated_through_when_using_the_downlevelIteration_flag_or_with_a_target_of_es2015_or_higher, true];
+      }
+      return allowsStrings ? [Diagnostics.Type_0_is_not_an_array_type_or_a_string_type, true] : [Diagnostics.Type_0_is_not_an_array_type, true];
+    }
+  }
+  function isES2015OrLaterIterable(n) {
+    switch (n) {
+      case "Float32Array":
+      case "Float64Array":
+      case "Int16Array":
+      case "Int32Array":
+      case "Int8Array":
+      case "NodeList":
+      case "Uint16Array":
+      case "Uint32Array":
+      case "Uint8Array":
+      case "Uint8ClampedArray":
+        return true;
+    }
+    return false;
+  }
+  function getIterationTypeOfIterable(use, typeKind, inputType, errorNode) {
+    if (isTypeAny(inputType)) {
+      return void 0;
+    }
+    const iterationTypes = getIterationTypesOfIterable(inputType, use, errorNode);
+    return iterationTypes && iterationTypes[getIterationTypesKeyFromIterationTypeKind(typeKind)];
+  }
+  function createIterationTypes(yieldType = neverType, returnType = neverType, nextType = unknownType) {
+    if (yieldType.flags & 67359327 /* Intrinsic */ && returnType.flags & (1 /* Any */ | 131072 /* Never */ | 2 /* Unknown */ | 16384 /* Void */ | 32768 /* Undefined */) && nextType.flags & (1 /* Any */ | 131072 /* Never */ | 2 /* Unknown */ | 16384 /* Void */ | 32768 /* Undefined */)) {
+      const id = getTypeListId([yieldType, returnType, nextType]);
+      let iterationTypes = iterationTypesCache.get(id);
+      if (!iterationTypes) {
+        iterationTypes = { yieldType, returnType, nextType };
+        iterationTypesCache.set(id, iterationTypes);
+      }
+      return iterationTypes;
+    }
+    return { yieldType, returnType, nextType };
+  }
+  function combineIterationTypes(array) {
+    let yieldTypes;
+    let returnTypes;
+    let nextTypes;
+    for (const iterationTypes of array) {
+      if (iterationTypes === void 0 || iterationTypes === noIterationTypes) {
+        continue;
+      }
+      if (iterationTypes === anyIterationTypes) {
+        return anyIterationTypes;
+      }
+      yieldTypes = append(yieldTypes, iterationTypes.yieldType);
+      returnTypes = append(returnTypes, iterationTypes.returnType);
+      nextTypes = append(nextTypes, iterationTypes.nextType);
+    }
+    if (yieldTypes || returnTypes || nextTypes) {
+      return createIterationTypes(
+        yieldTypes && getUnionType(yieldTypes),
+        returnTypes && getUnionType(returnTypes),
+        nextTypes && getIntersectionType(nextTypes)
+      );
+    }
+    return noIterationTypes;
+  }
+  function getCachedIterationTypes(type, cacheKey) {
+    return type[cacheKey];
+  }
+  function setCachedIterationTypes(type, cacheKey, cachedTypes2) {
+    return type[cacheKey] = cachedTypes2;
+  }
+  function getIterationTypesOfIterable(type, use, errorNode) {
+    var _a, _b;
+    if (isTypeAny(type)) {
+      return anyIterationTypes;
+    }
+    if (!(type.flags & 1048576 /* Union */)) {
+      const errorOutputContainer = errorNode ? { errors: void 0 } : void 0;
+      const iterationTypes2 = getIterationTypesOfIterableWorker(type, use, errorNode, errorOutputContainer);
+      if (iterationTypes2 === noIterationTypes) {
+        if (errorNode) {
+          const rootDiag = reportTypeNotIterableError(errorNode, type, !!(use & 2 /* AllowsAsyncIterablesFlag */));
+          if (errorOutputContainer == null ? void 0 : errorOutputContainer.errors) {
+            addRelatedInfo(rootDiag, ...errorOutputContainer.errors);
+          }
+        }
+        return void 0;
+      } else if ((_a = errorOutputContainer == null ? void 0 : errorOutputContainer.errors) == null ? void 0 : _a.length) {
+        for (const diag2 of errorOutputContainer.errors) {
+          diagnostics.add(diag2);
+        }
+      }
+      return iterationTypes2;
+    }
+    const cacheKey = use & 2 /* AllowsAsyncIterablesFlag */ ? "iterationTypesOfAsyncIterable" : "iterationTypesOfIterable";
+    const cachedTypes2 = getCachedIterationTypes(type, cacheKey);
+    if (cachedTypes2)
+      return cachedTypes2 === noIterationTypes ? void 0 : cachedTypes2;
+    let allIterationTypes;
+    for (const constituent of type.types) {
+      const errorOutputContainer = errorNode ? { errors: void 0 } : void 0;
+      const iterationTypes2 = getIterationTypesOfIterableWorker(constituent, use, errorNode, errorOutputContainer);
+      if (iterationTypes2 === noIterationTypes) {
+        if (errorNode) {
+          const rootDiag = reportTypeNotIterableError(errorNode, type, !!(use & 2 /* AllowsAsyncIterablesFlag */));
+          if (errorOutputContainer == null ? void 0 : errorOutputContainer.errors) {
+            addRelatedInfo(rootDiag, ...errorOutputContainer.errors);
+          }
+        }
+        setCachedIterationTypes(type, cacheKey, noIterationTypes);
+        return void 0;
+      } else if ((_b = errorOutputContainer == null ? void 0 : errorOutputContainer.errors) == null ? void 0 : _b.length) {
+        for (const diag2 of errorOutputContainer.errors) {
+          diagnostics.add(diag2);
+        }
+      }
+      allIterationTypes = append(allIterationTypes, iterationTypes2);
+    }
+    const iterationTypes = allIterationTypes ? combineIterationTypes(allIterationTypes) : noIterationTypes;
+    setCachedIterationTypes(type, cacheKey, iterationTypes);
+    return iterationTypes === noIterationTypes ? void 0 : iterationTypes;
+  }
+  function getAsyncFromSyncIterationTypes(iterationTypes, errorNode) {
+    if (iterationTypes === noIterationTypes)
+      return noIterationTypes;
+    if (iterationTypes === anyIterationTypes)
+      return anyIterationTypes;
+    const { yieldType, returnType, nextType } = iterationTypes;
+    if (errorNode) {
+      getGlobalAwaitedSymbol(
+        /*reportErrors*/
+        true
+      );
+    }
+    return createIterationTypes(
+      getAwaitedType(yieldType, errorNode) || anyType,
+      getAwaitedType(returnType, errorNode) || anyType,
+      nextType
+    );
+  }
+  function getIterationTypesOfIterableWorker(type, use, errorNode, errorOutputContainer) {
+    if (isTypeAny(type)) {
+      return anyIterationTypes;
+    }
+    let noCache = false;
+    if (use & 2 /* AllowsAsyncIterablesFlag */) {
+      const iterationTypes = getIterationTypesOfIterableCached(type, asyncIterationTypesResolver) || getIterationTypesOfIterableFast(type, asyncIterationTypesResolver);
+      if (iterationTypes) {
+        if (iterationTypes === noIterationTypes && errorNode) {
+          noCache = true;
+        } else {
+          return use & 8 /* ForOfFlag */ ? getAsyncFromSyncIterationTypes(iterationTypes, errorNode) : iterationTypes;
+        }
+      }
+    }
+    if (use & 1 /* AllowsSyncIterablesFlag */) {
+      let iterationTypes = getIterationTypesOfIterableCached(type, syncIterationTypesResolver) || getIterationTypesOfIterableFast(type, syncIterationTypesResolver);
+      if (iterationTypes) {
+        if (iterationTypes === noIterationTypes && errorNode) {
+          noCache = true;
+        } else {
+          if (use & 2 /* AllowsAsyncIterablesFlag */) {
+            if (iterationTypes !== noIterationTypes) {
+              iterationTypes = getAsyncFromSyncIterationTypes(iterationTypes, errorNode);
+              return noCache ? iterationTypes : setCachedIterationTypes(type, "iterationTypesOfAsyncIterable", iterationTypes);
+            }
+          } else {
+            return iterationTypes;
+          }
+        }
+      }
+    }
+    if (use & 2 /* AllowsAsyncIterablesFlag */) {
+      const iterationTypes = getIterationTypesOfIterableSlow(type, asyncIterationTypesResolver, errorNode, errorOutputContainer, noCache);
+      if (iterationTypes !== noIterationTypes) {
+        return iterationTypes;
+      }
+    }
+    if (use & 1 /* AllowsSyncIterablesFlag */) {
+      let iterationTypes = getIterationTypesOfIterableSlow(type, syncIterationTypesResolver, errorNode, errorOutputContainer, noCache);
+      if (iterationTypes !== noIterationTypes) {
+        if (use & 2 /* AllowsAsyncIterablesFlag */) {
+          iterationTypes = getAsyncFromSyncIterationTypes(iterationTypes, errorNode);
+          return noCache ? iterationTypes : setCachedIterationTypes(type, "iterationTypesOfAsyncIterable", iterationTypes);
+        } else {
+          return iterationTypes;
+        }
+      }
+    }
+    return noIterationTypes;
+  }
+  function getIterationTypesOfIterableCached(type, resolver) {
+    return getCachedIterationTypes(type, resolver.iterableCacheKey);
+  }
+  function getIterationTypesOfGlobalIterableType(globalType, resolver) {
+    const globalIterationTypes = getIterationTypesOfIterableCached(globalType, resolver) || getIterationTypesOfIterableSlow(
+      globalType,
+      resolver,
+      /*errorNode*/
+      void 0,
+      /*errorOutputContainer*/
+      void 0,
+      /*noCache*/
+      false
+    );
+    return globalIterationTypes === noIterationTypes ? defaultIterationTypes : globalIterationTypes;
+  }
+  function getIterationTypesOfIterableFast(type, resolver) {
+    let globalType;
+    if (isReferenceToType2(type, globalType = resolver.getGlobalIterableType(
+      /*reportErrors*/
+      false
+    )) || isReferenceToType2(type, globalType = resolver.getGlobalIterableIteratorType(
+      /*reportErrors*/
+      false
+    ))) {
+      const [yieldType] = getTypeArguments(type);
+      const { returnType, nextType } = getIterationTypesOfGlobalIterableType(globalType, resolver);
+      return setCachedIterationTypes(type, resolver.iterableCacheKey, createIterationTypes(resolver.resolveIterationType(
+        yieldType,
+        /*errorNode*/
+        void 0
+      ) || yieldType, resolver.resolveIterationType(
+        returnType,
+        /*errorNode*/
+        void 0
+      ) || returnType, nextType));
+    }
+    if (isReferenceToType2(type, resolver.getGlobalGeneratorType(
+      /*reportErrors*/
+      false
+    ))) {
+      const [yieldType, returnType, nextType] = getTypeArguments(type);
+      return setCachedIterationTypes(type, resolver.iterableCacheKey, createIterationTypes(resolver.resolveIterationType(
+        yieldType,
+        /*errorNode*/
+        void 0
+      ) || yieldType, resolver.resolveIterationType(
+        returnType,
+        /*errorNode*/
+        void 0
+      ) || returnType, nextType));
+    }
+  }
+  function getPropertyNameForKnownSymbolName(symbolName2) {
+    const ctorType = getGlobalESSymbolConstructorSymbol(
+      /*reportErrors*/
+      false
+    );
+    const uniqueType = ctorType && getTypeOfPropertyOfType(getTypeOfSymbol(ctorType), escapeLeadingUnderscores(symbolName2));
+    return uniqueType && isTypeUsableAsPropertyName(uniqueType) ? getPropertyNameFromType(uniqueType) : `__@${symbolName2}`;
+  }
+  function getIterationTypesOfIterableSlow(type, resolver, errorNode, errorOutputContainer, noCache) {
+    const method = getPropertyOfType(type, getPropertyNameForKnownSymbolName(resolver.iteratorSymbolName));
+    const methodType = method && !(method.flags & 16777216 /* Optional */) ? getTypeOfSymbol(method) : void 0;
+    if (isTypeAny(methodType)) {
+      return noCache ? anyIterationTypes : setCachedIterationTypes(type, resolver.iterableCacheKey, anyIterationTypes);
+    }
+    const signatures = methodType ? getSignaturesOfType(methodType, 0 /* Call */) : void 0;
+    if (!some(signatures)) {
+      return noCache ? noIterationTypes : setCachedIterationTypes(type, resolver.iterableCacheKey, noIterationTypes);
+    }
+    const iteratorType = getIntersectionType(map(signatures, getReturnTypeOfSignature));
+    const iterationTypes = getIterationTypesOfIteratorWorker(iteratorType, resolver, errorNode, errorOutputContainer, noCache) ?? noIterationTypes;
+    return noCache ? iterationTypes : setCachedIterationTypes(type, resolver.iterableCacheKey, iterationTypes);
+  }
+  function reportTypeNotIterableError(errorNode, type, allowAsyncIterables) {
+    const message = allowAsyncIterables ? Diagnostics.Type_0_must_have_a_Symbol_asyncIterator_method_that_returns_an_async_iterator : Diagnostics.Type_0_must_have_a_Symbol_iterator_method_that_returns_an_iterator;
+    const suggestAwait = (
+      // for (const x of Promise<...>) or [...Promise<...>]
+      !!getAwaitedTypeOfPromise(type) || !allowAsyncIterables && isForOfStatement(errorNode.parent) && errorNode.parent.expression === errorNode && getGlobalAsyncIterableType(
+        /*reportErrors*/
+        false
+      ) !== emptyGenericType && isTypeAssignableTo(type, getGlobalAsyncIterableType(
+        /*reportErrors*/
+        false
+      ))
+    );
+    return errorAndMaybeSuggestAwait(errorNode, suggestAwait, message, typeToString(type));
+  }
+  function getIterationTypesOfIterator(type, resolver, errorNode, errorOutputContainer) {
+    return getIterationTypesOfIteratorWorker(
+      type,
+      resolver,
+      errorNode,
+      errorOutputContainer,
+      /*noCache*/
+      false
+    );
+  }
+  function getIterationTypesOfIteratorWorker(type, resolver, errorNode, errorOutputContainer, noCache) {
+    if (isTypeAny(type)) {
+      return anyIterationTypes;
+    }
+    let iterationTypes = getIterationTypesOfIteratorCached(type, resolver) || getIterationTypesOfIteratorFast(type, resolver);
+    if (iterationTypes === noIterationTypes && errorNode) {
+      iterationTypes = void 0;
+      noCache = true;
+    }
+    iterationTypes ?? (iterationTypes = getIterationTypesOfIteratorSlow(type, resolver, errorNode, errorOutputContainer, noCache));
+    return iterationTypes === noIterationTypes ? void 0 : iterationTypes;
+  }
+  function getIterationTypesOfIteratorCached(type, resolver) {
+    return getCachedIterationTypes(type, resolver.iteratorCacheKey);
+  }
+  function getIterationTypesOfIteratorFast(type, resolver) {
+    const globalType = resolver.getGlobalIterableIteratorType(
+      /*reportErrors*/
+      false
+    );
+    if (isReferenceToType2(type, globalType)) {
+      const [yieldType] = getTypeArguments(type);
+      const globalIterationTypes = getIterationTypesOfIteratorCached(globalType, resolver) || getIterationTypesOfIteratorSlow(
+        globalType,
+        resolver,
+        /*errorNode*/
+        void 0,
+        /*errorOutputContainer*/
+        void 0,
+        /*noCache*/
+        false
+      );
+      const { returnType, nextType } = globalIterationTypes === noIterationTypes ? defaultIterationTypes : globalIterationTypes;
+      return setCachedIterationTypes(type, resolver.iteratorCacheKey, createIterationTypes(yieldType, returnType, nextType));
+    }
+    if (isReferenceToType2(type, resolver.getGlobalIteratorType(
+      /*reportErrors*/
+      false
+    )) || isReferenceToType2(type, resolver.getGlobalGeneratorType(
+      /*reportErrors*/
+      false
+    ))) {
+      const [yieldType, returnType, nextType] = getTypeArguments(type);
+      return setCachedIterationTypes(type, resolver.iteratorCacheKey, createIterationTypes(yieldType, returnType, nextType));
+    }
+  }
+  function isIteratorResult(type, kind) {
+    const doneType = getTypeOfPropertyOfType(type, "done") || falseType;
+    return isTypeAssignableTo(kind === 0 /* Yield */ ? falseType : trueType, doneType);
+  }
+  function isYieldIteratorResult(type) {
+    return isIteratorResult(type, 0 /* Yield */);
+  }
+  function isReturnIteratorResult(type) {
+    return isIteratorResult(type, 1 /* Return */);
+  }
+  function getIterationTypesOfIteratorResult(type) {
+    if (isTypeAny(type)) {
+      return anyIterationTypes;
+    }
+    const cachedTypes2 = getCachedIterationTypes(type, "iterationTypesOfIteratorResult");
+    if (cachedTypes2) {
+      return cachedTypes2;
+    }
+    if (isReferenceToType2(type, getGlobalIteratorYieldResultType(
+      /*reportErrors*/
+      false
+    ))) {
+      const yieldType2 = getTypeArguments(type)[0];
+      return setCachedIterationTypes(type, "iterationTypesOfIteratorResult", createIterationTypes(
+        yieldType2,
+        /*returnType*/
+        void 0,
+        /*nextType*/
+        void 0
+      ));
+    }
+    if (isReferenceToType2(type, getGlobalIteratorReturnResultType(
+      /*reportErrors*/
+      false
+    ))) {
+      const returnType2 = getTypeArguments(type)[0];
+      return setCachedIterationTypes(type, "iterationTypesOfIteratorResult", createIterationTypes(
+        /*yieldType*/
+        void 0,
+        returnType2,
+        /*nextType*/
+        void 0
+      ));
+    }
+    const yieldIteratorResult = filterType(type, isYieldIteratorResult);
+    const yieldType = yieldIteratorResult !== neverType ? getTypeOfPropertyOfType(yieldIteratorResult, "value") : void 0;
+    const returnIteratorResult = filterType(type, isReturnIteratorResult);
+    const returnType = returnIteratorResult !== neverType ? getTypeOfPropertyOfType(returnIteratorResult, "value") : void 0;
+    if (!yieldType && !returnType) {
+      return setCachedIterationTypes(type, "iterationTypesOfIteratorResult", noIterationTypes);
+    }
+    return setCachedIterationTypes(type, "iterationTypesOfIteratorResult", createIterationTypes(
+      yieldType,
+      returnType || voidType,
+      /*nextType*/
+      void 0
+    ));
+  }
+  function getIterationTypesOfMethod(type, resolver, methodName, errorNode, errorOutputContainer) {
+    var _a, _b, _c, _d;
+    const method = getPropertyOfType(type, methodName);
+    if (!method && methodName !== "next") {
+      return void 0;
+    }
+    const methodType = method && !(methodName === "next" && method.flags & 16777216 /* Optional */) ? methodName === "next" ? getTypeOfSymbol(method) : getTypeWithFacts(getTypeOfSymbol(method), 2097152 /* NEUndefinedOrNull */) : void 0;
+    if (isTypeAny(methodType)) {
+      return methodName === "next" ? anyIterationTypes : anyIterationTypesExceptNext;
+    }
+    const methodSignatures = methodType ? getSignaturesOfType(methodType, 0 /* Call */) : emptyArray;
+    if (methodSignatures.length === 0) {
+      if (errorNode) {
+        const diagnostic = methodName === "next" ? resolver.mustHaveANextMethodDiagnostic : resolver.mustBeAMethodDiagnostic;
+        if (errorOutputContainer) {
+          errorOutputContainer.errors ?? (errorOutputContainer.errors = []);
+          errorOutputContainer.errors.push(createDiagnosticForNode(errorNode, diagnostic, methodName));
+        } else {
+          error2(errorNode, diagnostic, methodName);
+        }
+      }
+      return methodName === "next" ? noIterationTypes : void 0;
+    }
+    if ((methodType == null ? void 0 : methodType.symbol) && methodSignatures.length === 1) {
+      const globalGeneratorType = resolver.getGlobalGeneratorType(
+        /*reportErrors*/
+        false
+      );
+      const globalIteratorType = resolver.getGlobalIteratorType(
+        /*reportErrors*/
+        false
+      );
+      const isGeneratorMethod = ((_b = (_a = globalGeneratorType.symbol) == null ? void 0 : _a.members) == null ? void 0 : _b.get(methodName)) === methodType.symbol;
+      const isIteratorMethod = !isGeneratorMethod && ((_d = (_c = globalIteratorType.symbol) == null ? void 0 : _c.members) == null ? void 0 : _d.get(methodName)) === methodType.symbol;
+      if (isGeneratorMethod || isIteratorMethod) {
+        const globalType = isGeneratorMethod ? globalGeneratorType : globalIteratorType;
+        const { mapper } = methodType;
+        return createIterationTypes(
+          getMappedType(globalType.typeParameters[0], mapper),
+          getMappedType(globalType.typeParameters[1], mapper),
+          methodName === "next" ? getMappedType(globalType.typeParameters[2], mapper) : void 0
+        );
+      }
+    }
+    let methodParameterTypes;
+    let methodReturnTypes;
+    for (const signature of methodSignatures) {
+      if (methodName !== "throw" && some(signature.parameters)) {
+        methodParameterTypes = append(methodParameterTypes, getTypeAtPosition(signature, 0));
+      }
+      methodReturnTypes = append(methodReturnTypes, getReturnTypeOfSignature(signature));
+    }
+    let returnTypes;
+    let nextType;
+    if (methodName !== "throw") {
+      const methodParameterType = methodParameterTypes ? getUnionType(methodParameterTypes) : unknownType;
+      if (methodName === "next") {
+        nextType = methodParameterType;
+      } else if (methodName === "return") {
+        const resolvedMethodParameterType = resolver.resolveIterationType(methodParameterType, errorNode) || anyType;
+        returnTypes = append(returnTypes, resolvedMethodParameterType);
+      }
+    }
+    let yieldType;
+    const methodReturnType = methodReturnTypes ? getIntersectionType(methodReturnTypes) : neverType;
+    const resolvedMethodReturnType = resolver.resolveIterationType(methodReturnType, errorNode) || anyType;
+    const iterationTypes = getIterationTypesOfIteratorResult(resolvedMethodReturnType);
+    if (iterationTypes === noIterationTypes) {
+      if (errorNode) {
+        if (errorOutputContainer) {
+          errorOutputContainer.errors ?? (errorOutputContainer.errors = []);
+          errorOutputContainer.errors.push(createDiagnosticForNode(errorNode, resolver.mustHaveAValueDiagnostic, methodName));
+        } else {
+          error2(errorNode, resolver.mustHaveAValueDiagnostic, methodName);
+        }
+      }
+      yieldType = anyType;
+      returnTypes = append(returnTypes, anyType);
+    } else {
+      yieldType = iterationTypes.yieldType;
+      returnTypes = append(returnTypes, iterationTypes.returnType);
+    }
+    return createIterationTypes(yieldType, getUnionType(returnTypes), nextType);
+  }
+  function getIterationTypesOfIteratorSlow(type, resolver, errorNode, errorOutputContainer, noCache) {
+    const iterationTypes = combineIterationTypes([
+      getIterationTypesOfMethod(type, resolver, "next", errorNode, errorOutputContainer),
+      getIterationTypesOfMethod(type, resolver, "return", errorNode, errorOutputContainer),
+      getIterationTypesOfMethod(type, resolver, "throw", errorNode, errorOutputContainer)
+    ]);
+    return noCache ? iterationTypes : setCachedIterationTypes(type, resolver.iteratorCacheKey, iterationTypes);
+  }
+  function getIterationTypeOfGeneratorFunctionReturnType(kind, returnType, isAsyncGenerator) {
+    if (isTypeAny(returnType)) {
+      return void 0;
+    }
+    const iterationTypes = getIterationTypesOfGeneratorFunctionReturnType(returnType, isAsyncGenerator);
+    return iterationTypes && iterationTypes[getIterationTypesKeyFromIterationTypeKind(kind)];
+  }
+  function getIterationTypesOfGeneratorFunctionReturnType(type, isAsyncGenerator) {
+    if (isTypeAny(type)) {
+      return anyIterationTypes;
+    }
+    const use = isAsyncGenerator ? 2 /* AsyncGeneratorReturnType */ : 1 /* GeneratorReturnType */;
+    const resolver = isAsyncGenerator ? asyncIterationTypesResolver : syncIterationTypesResolver;
+    return getIterationTypesOfIterable(
+      type,
+      use,
+      /*errorNode*/
+      void 0
+    ) || getIterationTypesOfIterator(
+      type,
+      resolver,
+      /*errorNode*/
+      void 0,
+      /*errorOutputContainer*/
+      void 0
+    );
+  }
+  function checkBreakOrContinueStatement(node) {
+    if (!checkGrammarStatementInAmbientContext(node))
+      checkGrammarBreakOrContinueStatement(node);
+  }
+  function unwrapReturnType(returnType, functionFlags) {
+    const isGenerator = !!(functionFlags & 1 /* Generator */);
+    const isAsync = !!(functionFlags & 2 /* Async */);
+    if (isGenerator) {
+      const returnIterationType = getIterationTypeOfGeneratorFunctionReturnType(1 /* Return */, returnType, isAsync);
+      if (!returnIterationType) {
+        return errorType;
+      }
+      return isAsync ? getAwaitedTypeNoAlias(unwrapAwaitedType(returnIterationType)) : returnIterationType;
+    }
+    return isAsync ? getAwaitedTypeNoAlias(returnType) || errorType : returnType;
+  }
+  function isUnwrappedReturnTypeUndefinedVoidOrAny(func, returnType) {
+    const type = unwrapReturnType(returnType, getFunctionFlags(func));
+    return !!(type && (maybeTypeOfKind(type, 16384 /* Void */) || type.flags & (1 /* Any */ | 32768 /* Undefined */)));
+  }
+  function checkReturnStatement(node) {
+    if (checkGrammarStatementInAmbientContext(node)) {
+      return;
+    }
+    const container = getContainingFunctionOrClassStaticBlock(node);
+    if (container && isClassStaticBlockDeclaration(container)) {
+      grammarErrorOnFirstToken(node, Diagnostics.A_return_statement_cannot_be_used_inside_a_class_static_block);
+      return;
+    }
+    if (!container) {
+      grammarErrorOnFirstToken(node, Diagnostics.A_return_statement_can_only_be_used_within_a_function_body);
+      return;
+    }
+    const signature = getSignatureFromDeclaration(container);
+    const returnType = getReturnTypeOfSignature(signature);
+    const functionFlags = getFunctionFlags(container);
+    if (strictNullChecks || node.expression || returnType.flags & 131072 /* Never */) {
+      const exprType = node.expression ? checkExpressionCached(node.expression) : undefinedType;
+      if (container.kind === 178 /* SetAccessor */) {
+        if (node.expression) {
+          error2(node, Diagnostics.Setters_cannot_return_a_value);
+        }
+      } else if (container.kind === 176 /* Constructor */) {
+        if (node.expression && !checkTypeAssignableToAndOptionallyElaborate(exprType, returnType, node, node.expression)) {
+          error2(node, Diagnostics.Return_type_of_constructor_signature_must_be_assignable_to_the_instance_type_of_the_class);
+        }
+      } else if (getReturnTypeFromAnnotation(container)) {
+        const unwrappedReturnType = unwrapReturnType(returnType, functionFlags) ?? returnType;
+        const unwrappedExprType = functionFlags & 2 /* Async */ ? checkAwaitedType(
+          exprType,
+          /*withAlias*/
+          false,
+          node,
+          Diagnostics.The_return_type_of_an_async_function_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member
+        ) : exprType;
+        if (unwrappedReturnType) {
+          checkTypeAssignableToAndOptionallyElaborate(unwrappedExprType, unwrappedReturnType, node, node.expression);
+        }
+      }
+    } else if (container.kind !== 176 /* Constructor */ && compilerOptions.noImplicitReturns && !isUnwrappedReturnTypeUndefinedVoidOrAny(container, returnType)) {
+      error2(node, Diagnostics.Not_all_code_paths_return_a_value);
+    }
+  }
+  function checkWithStatement(node) {
+    if (!checkGrammarStatementInAmbientContext(node)) {
+      if (node.flags & 65536 /* AwaitContext */) {
+        grammarErrorOnFirstToken(node, Diagnostics.with_statements_are_not_allowed_in_an_async_function_block);
+      }
+    }
+    checkExpression(node.expression);
+    const sourceFile = getSourceFileOfNode(node);
+    if (!hasParseDiagnostics(sourceFile)) {
+      const start2 = getSpanOfTokenAtPosition(sourceFile, node.pos).start;
+      const end = node.statement.pos;
+      grammarErrorAtPos(sourceFile, start2, end - start2, Diagnostics.The_with_statement_is_not_supported_All_symbols_in_a_with_block_will_have_type_any);
+    }
+  }
+  function checkSwitchStatement(node) {
+    checkGrammarStatementInAmbientContext(node);
+    let firstDefaultClause;
+    let hasDuplicateDefaultClause = false;
+    const expressionType = checkExpression(node.expression);
+    forEach(node.caseBlock.clauses, (clause) => {
+      if (clause.kind === 297 /* DefaultClause */ && !hasDuplicateDefaultClause) {
+        if (firstDefaultClause === void 0) {
+          firstDefaultClause = clause;
+        } else {
+          grammarErrorOnNode(clause, Diagnostics.A_default_clause_cannot_appear_more_than_once_in_a_switch_statement);
+          hasDuplicateDefaultClause = true;
+        }
+      }
+      if (clause.kind === 296 /* CaseClause */) {
+        addLazyDiagnostic(createLazyCaseClauseDiagnostics(clause));
+      }
+      forEach(clause.statements, checkSourceElement);
+      if (compilerOptions.noFallthroughCasesInSwitch && clause.fallthroughFlowNode && isReachableFlowNode(clause.fallthroughFlowNode)) {
+        error2(clause, Diagnostics.Fallthrough_case_in_switch);
+      }
+      function createLazyCaseClauseDiagnostics(clause2) {
+        return () => {
+          const caseType = checkExpression(clause2.expression);
+          if (!isTypeEqualityComparableTo(expressionType, caseType)) {
+            checkTypeComparableTo(
+              caseType,
+              expressionType,
+              clause2.expression,
+              /*headMessage*/
+              void 0
+            );
+          }
+        };
+      }
+    });
+    if (node.caseBlock.locals) {
+      registerForUnusedIdentifiersCheck(node.caseBlock);
+    }
+  }
+  function checkLabeledStatement(node) {
+    if (!checkGrammarStatementInAmbientContext(node)) {
+      findAncestor(node.parent, (current) => {
+        if (isFunctionLike(current)) {
+          return "quit";
+        }
+        if (current.kind === 256 /* LabeledStatement */ && current.label.escapedText === node.label.escapedText) {
+          grammarErrorOnNode(node.label, Diagnostics.Duplicate_label_0, getTextOfNode(node.label));
+          return true;
+        }
+        return false;
+      });
+    }
+    checkSourceElement(node.statement);
+  }
+  function checkThrowStatement(node) {
+    if (!checkGrammarStatementInAmbientContext(node)) {
+      if (isIdentifier(node.expression) && !node.expression.escapedText) {
+        grammarErrorAfterFirstToken(node, Diagnostics.Line_break_not_permitted_here);
+      }
+    }
+    if (node.expression) {
+      checkExpression(node.expression);
+    }
+  }
+  function checkTryStatement(node) {
+    checkGrammarStatementInAmbientContext(node);
+    checkBlock(node.tryBlock);
+    const catchClause = node.catchClause;
+    if (catchClause) {
+      if (catchClause.variableDeclaration) {
+        const declaration = catchClause.variableDeclaration;
+        checkVariableLikeDeclaration(declaration);
+        const typeNode = getEffectiveTypeAnnotationNode(declaration);
+        if (typeNode) {
+          const type = getTypeFromTypeNode(typeNode);
+          if (type && !(type.flags & 3 /* AnyOrUnknown */)) {
+            grammarErrorOnFirstToken(typeNode, Diagnostics.Catch_clause_variable_type_annotation_must_be_any_or_unknown_if_specified);
+          }
+        } else if (declaration.initializer) {
+          grammarErrorOnFirstToken(declaration.initializer, Diagnostics.Catch_clause_variable_cannot_have_an_initializer);
+        } else {
+          const blockLocals = catchClause.block.locals;
+          if (blockLocals) {
+            forEachKey(catchClause.locals, (caughtName) => {
+              const blockLocal = blockLocals.get(caughtName);
+              if ((blockLocal == null ? void 0 : blockLocal.valueDeclaration) && (blockLocal.flags & 2 /* BlockScopedVariable */) !== 0) {
+                grammarErrorOnNode(blockLocal.valueDeclaration, Diagnostics.Cannot_redeclare_identifier_0_in_catch_clause, unescapeLeadingUnderscores(caughtName));
+              }
+            });
+          }
+        }
+      }
+      checkBlock(catchClause.block);
+    }
+    if (node.finallyBlock) {
+      checkBlock(node.finallyBlock);
+    }
+  }
+  function checkIndexConstraints(type, symbol, isStaticIndex) {
+    const indexInfos = getIndexInfosOfType(type);
+    if (indexInfos.length === 0) {
+      return;
+    }
+    for (const prop of getPropertiesOfObjectType(type)) {
+      if (!(isStaticIndex && prop.flags & 4194304 /* Prototype */)) {
+        checkIndexConstraintForProperty(type, prop, getLiteralTypeFromProperty(
+          prop,
+          8576 /* StringOrNumberLiteralOrUnique */,
+          /*includeNonPublic*/
+          true
+        ), getNonMissingTypeOfSymbol(prop));
+      }
+    }
+    const typeDeclaration = symbol.valueDeclaration;
+    if (typeDeclaration && isClassLike(typeDeclaration)) {
+      for (const member of typeDeclaration.members) {
+        if (!isStatic(member) && !hasBindableName(member)) {
+          const symbol2 = getSymbolOfDeclaration(member);
+          checkIndexConstraintForProperty(type, symbol2, getTypeOfExpression(member.name.expression), getNonMissingTypeOfSymbol(symbol2));
+        }
+      }
+    }
+    if (indexInfos.length > 1) {
+      for (const info of indexInfos) {
+        checkIndexConstraintForIndexSignature(type, info);
+      }
+    }
+  }
+  function checkIndexConstraintForProperty(type, prop, propNameType, propType) {
+    const declaration = prop.valueDeclaration;
+    const name = getNameOfDeclaration(declaration);
+    if (name && isPrivateIdentifier(name)) {
+      return;
+    }
+    const indexInfos = getApplicableIndexInfos(type, propNameType);
+    const interfaceDeclaration = getObjectFlags(type) & 2 /* Interface */ ? getDeclarationOfKind(type.symbol, 264 /* InterfaceDeclaration */) : void 0;
+    const propDeclaration = declaration && declaration.kind === 226 /* BinaryExpression */ || name && name.kind === 167 /* ComputedPropertyName */ ? declaration : void 0;
+    const localPropDeclaration = getParentOfSymbol(prop) === type.symbol ? declaration : void 0;
+    for (const info of indexInfos) {
+      const localIndexDeclaration = info.declaration && getParentOfSymbol(getSymbolOfDeclaration(info.declaration)) === type.symbol ? info.declaration : void 0;
+      const errorNode = localPropDeclaration || localIndexDeclaration || (interfaceDeclaration && !some(getBaseTypes(type), (base) => !!getPropertyOfObjectType(base, prop.escapedName) && !!getIndexTypeOfType(base, info.keyType)) ? interfaceDeclaration : void 0);
+      if (errorNode && !isTypeAssignableTo(propType, info.type)) {
+        const diagnostic = createError(errorNode, Diagnostics.Property_0_of_type_1_is_not_assignable_to_2_index_type_3, symbolToString(prop), typeToString(propType), typeToString(info.keyType), typeToString(info.type));
+        if (propDeclaration && errorNode !== propDeclaration) {
+          addRelatedInfo(diagnostic, createDiagnosticForNode(propDeclaration, Diagnostics._0_is_declared_here, symbolToString(prop)));
+        }
+        diagnostics.add(diagnostic);
+      }
+    }
+  }
+  function checkIndexConstraintForIndexSignature(type, checkInfo) {
+    const declaration = checkInfo.declaration;
+    const indexInfos = getApplicableIndexInfos(type, checkInfo.keyType);
+    const interfaceDeclaration = getObjectFlags(type) & 2 /* Interface */ ? getDeclarationOfKind(type.symbol, 264 /* InterfaceDeclaration */) : void 0;
+    const localCheckDeclaration = declaration && getParentOfSymbol(getSymbolOfDeclaration(declaration)) === type.symbol ? declaration : void 0;
+    for (const info of indexInfos) {
+      if (info === checkInfo)
+        continue;
+      const localIndexDeclaration = info.declaration && getParentOfSymbol(getSymbolOfDeclaration(info.declaration)) === type.symbol ? info.declaration : void 0;
+      const errorNode = localCheckDeclaration || localIndexDeclaration || (interfaceDeclaration && !some(getBaseTypes(type), (base) => !!getIndexInfoOfType(base, checkInfo.keyType) && !!getIndexTypeOfType(base, info.keyType)) ? interfaceDeclaration : void 0);
+      if (errorNode && !isTypeAssignableTo(checkInfo.type, info.type)) {
+        error2(errorNode, Diagnostics._0_index_type_1_is_not_assignable_to_2_index_type_3, typeToString(checkInfo.keyType), typeToString(checkInfo.type), typeToString(info.keyType), typeToString(info.type));
+      }
+    }
+  }
+  function checkTypeNameIsReserved(name, message) {
+    switch (name.escapedText) {
+      case "any":
+      case "unknown":
+      case "never":
+      case "number":
+      case "bigint":
+      case "boolean":
+      case "string":
+      case "symbol":
+      case "void":
+      case "object":
+        error2(name, message, name.escapedText);
+    }
+  }
+  function checkClassNameCollisionWithObject(name) {
+    if (languageVersion >= 1 /* ES5 */ && name.escapedText === "Object" && (moduleKind < 5 /* ES2015 */ || getSourceFileOfNode(name).impliedNodeFormat === 1 /* CommonJS */)) {
+      error2(name, Diagnostics.Class_name_cannot_be_Object_when_targeting_ES5_with_module_0, ModuleKind[moduleKind]);
+    }
+  }
+  function checkUnmatchedJSDocParameters(node) {
+    const jsdocParameters = filter(getJSDocTags(node), isJSDocParameterTag);
+    if (!length(jsdocParameters))
+      return;
+    const isJs = isInJSFile(node);
+    const parameters = /* @__PURE__ */ new Set();
+    const excludedParameters = /* @__PURE__ */ new Set();
+    forEach(node.parameters, ({ name }, index) => {
+      if (isIdentifier(name)) {
+        parameters.add(name.escapedText);
+      }
+      if (isBindingPattern(name)) {
+        excludedParameters.add(index);
+      }
+    });
+    const containsArguments = containsArgumentsReference(node);
+    if (containsArguments) {
+      const lastJSDocParamIndex = jsdocParameters.length - 1;
+      const lastJSDocParam = jsdocParameters[lastJSDocParamIndex];
+      if (isJs && lastJSDocParam && isIdentifier(lastJSDocParam.name) && lastJSDocParam.typeExpression && lastJSDocParam.typeExpression.type && !parameters.has(lastJSDocParam.name.escapedText) && !excludedParameters.has(lastJSDocParamIndex) && !isArrayType(getTypeFromTypeNode(lastJSDocParam.typeExpression.type))) {
+        error2(lastJSDocParam.name, Diagnostics.JSDoc_param_tag_has_name_0_but_there_is_no_parameter_with_that_name_It_would_match_arguments_if_it_had_an_array_type, idText(lastJSDocParam.name));
+      }
+    } else {
+      forEach(jsdocParameters, ({ name, isNameFirst }, index) => {
+        if (excludedParameters.has(index) || isIdentifier(name) && parameters.has(name.escapedText)) {
+          return;
+        }
+        if (isQualifiedName(name)) {
+          if (isJs) {
+            error2(name, Diagnostics.Qualified_name_0_is_not_allowed_without_a_leading_param_object_1, entityNameToString(name), entityNameToString(name.left));
+          }
+        } else {
+          if (!isNameFirst) {
+            errorOrSuggestion(isJs, name, Diagnostics.JSDoc_param_tag_has_name_0_but_there_is_no_parameter_with_that_name, idText(name));
+          }
+        }
+      });
+    }
+  }
+  function checkTypeParameters(typeParameterDeclarations) {
+    let seenDefault = false;
+    if (typeParameterDeclarations) {
+      for (let i = 0; i < typeParameterDeclarations.length; i++) {
+        const node = typeParameterDeclarations[i];
+        checkTypeParameter(node);
+        addLazyDiagnostic(createCheckTypeParameterDiagnostic(node, i));
+      }
+    }
+    function createCheckTypeParameterDiagnostic(node, i) {
+      return () => {
+        if (node.default) {
+          seenDefault = true;
+          checkTypeParametersNotReferenced(node.default, typeParameterDeclarations, i);
+        } else if (seenDefault) {
+          error2(node, Diagnostics.Required_type_parameters_may_not_follow_optional_type_parameters);
+        }
+        for (let j = 0; j < i; j++) {
+          if (typeParameterDeclarations[j].symbol === node.symbol) {
+            error2(node.name, Diagnostics.Duplicate_identifier_0, declarationNameToString(node.name));
+          }
+        }
+      };
+    }
+  }
+  function checkTypeParametersNotReferenced(root, typeParameters, index) {
+    visit(root);
+    function visit(node) {
+      if (node.kind === 183 /* TypeReference */) {
+        const type = getTypeFromTypeReference(node);
+        if (type.flags & 262144 /* TypeParameter */) {
+          for (let i = index; i < typeParameters.length; i++) {
+            if (type.symbol === getSymbolOfDeclaration(typeParameters[i])) {
+              error2(node, Diagnostics.Type_parameter_defaults_can_only_reference_previously_declared_type_parameters);
+            }
+          }
+        }
+      }
+      forEachChild(node, visit);
+    }
+  }
+  function checkTypeParameterListsIdentical(symbol) {
+    if (symbol.declarations && symbol.declarations.length === 1) {
+      return;
+    }
+    const links = getSymbolLinks(symbol);
+    if (!links.typeParametersChecked) {
+      links.typeParametersChecked = true;
+      const declarations = getClassOrInterfaceDeclarationsOfSymbol(symbol);
+      if (!declarations || declarations.length <= 1) {
+        return;
+      }
+      const type = getDeclaredTypeOfSymbol(symbol);
+      if (!areTypeParametersIdentical(declarations, type.localTypeParameters, getEffectiveTypeParameterDeclarations)) {
+        const name = symbolToString(symbol);
+        for (const declaration of declarations) {
+          error2(declaration.name, Diagnostics.All_declarations_of_0_must_have_identical_type_parameters, name);
+        }
+      }
+    }
+  }
+  function areTypeParametersIdentical(declarations, targetParameters, getTypeParameterDeclarations) {
+    const maxTypeArgumentCount = length(targetParameters);
+    const minTypeArgumentCount = getMinTypeArgumentCount(targetParameters);
+    for (const declaration of declarations) {
+      const sourceParameters = getTypeParameterDeclarations(declaration);
+      const numTypeParameters = sourceParameters.length;
+      if (numTypeParameters < minTypeArgumentCount || numTypeParameters > maxTypeArgumentCount) {
+        return false;
+      }
+      for (let i = 0; i < numTypeParameters; i++) {
+        const source = sourceParameters[i];
+        const target = targetParameters[i];
+        if (source.name.escapedText !== target.symbol.escapedName) {
+          return false;
+        }
+        const constraint = getEffectiveConstraintOfTypeParameter(source);
+        const sourceConstraint = constraint && getTypeFromTypeNode(constraint);
+        const targetConstraint = getConstraintOfTypeParameter(target);
+        if (sourceConstraint && targetConstraint && !isTypeIdenticalTo(sourceConstraint, targetConstraint)) {
+          return false;
+        }
+        const sourceDefault = source.default && getTypeFromTypeNode(source.default);
+        const targetDefault = getDefaultFromTypeParameter(target);
+        if (sourceDefault && targetDefault && !isTypeIdenticalTo(sourceDefault, targetDefault)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  function getFirstTransformableStaticClassElement(node) {
+    const willTransformStaticElementsOfDecoratedClass = !legacyDecorators && languageVersion < 99 /* ESNext */ && classOrConstructorParameterIsDecorated(
+      /*useLegacyDecorators*/
+      false,
+      node
+    );
+    const willTransformPrivateElementsOrClassStaticBlocks = languageVersion <= 9 /* ES2022 */;
+    const willTransformInitializers = !emitStandardClassFields;
+    if (willTransformStaticElementsOfDecoratedClass || willTransformPrivateElementsOrClassStaticBlocks) {
+      for (const member of node.members) {
+        if (willTransformStaticElementsOfDecoratedClass && classElementOrClassElementParameterIsDecorated(
+          /*useLegacyDecorators*/
+          false,
+          member,
+          node
+        )) {
+          return firstOrUndefined(getDecorators(node)) ?? node;
+        } else if (willTransformPrivateElementsOrClassStaticBlocks) {
+          if (isClassStaticBlockDeclaration(member)) {
+            return member;
+          } else if (isStatic(member)) {
+            if (isPrivateIdentifierClassElementDeclaration(member) || willTransformInitializers && isInitializedProperty(member)) {
+              return member;
+            }
+          }
+        }
+      }
+    }
+  }
+  function checkClassExpressionExternalHelpers(node) {
+    if (node.name)
+      return;
+    const parent2 = walkUpOuterExpressions(node);
+    if (!isNamedEvaluationSource(parent2))
+      return;
+    const willTransformESDecorators = !legacyDecorators && languageVersion < 99 /* ESNext */;
+    let location;
+    if (willTransformESDecorators && classOrConstructorParameterIsDecorated(
+      /*useLegacyDecorators*/
+      false,
+      node
+    )) {
+      location = firstOrUndefined(getDecorators(node)) ?? node;
+    } else {
+      location = getFirstTransformableStaticClassElement(node);
+    }
+    if (location) {
+      checkExternalEmitHelpers(location, 8388608 /* SetFunctionName */);
+      if ((isPropertyAssignment(parent2) || isPropertyDeclaration(parent2) || isBindingElement(parent2)) && isComputedPropertyName(parent2.name)) {
+        checkExternalEmitHelpers(location, 16777216 /* PropKey */);
+      }
+    }
+  }
+  function checkClassExpression(node) {
+    checkClassLikeDeclaration(node);
+    checkNodeDeferred(node);
+    checkClassExpressionExternalHelpers(node);
+    return getTypeOfSymbol(getSymbolOfDeclaration(node));
+  }
+  function checkClassExpressionDeferred(node) {
+    forEach(node.members, checkSourceElement);
+    registerForUnusedIdentifiersCheck(node);
+  }
+  function checkClassDeclaration(node) {
+    const firstDecorator = find(node.modifiers, isDecorator);
+    if (legacyDecorators && firstDecorator && some(node.members, (p) => hasStaticModifier(p) && isPrivateIdentifierClassElementDeclaration(p))) {
+      grammarErrorOnNode(firstDecorator, Diagnostics.Class_decorators_can_t_be_used_with_static_private_identifier_Consider_removing_the_experimental_decorator);
+    }
+    if (!node.name && !hasSyntacticModifier(node, 2048 /* Default */)) {
+      grammarErrorOnFirstToken(node, Diagnostics.A_class_declaration_without_the_default_modifier_must_have_a_name);
+    }
+    checkClassLikeDeclaration(node);
+    forEach(node.members, checkSourceElement);
+    registerForUnusedIdentifiersCheck(node);
+  }
+  function checkClassLikeDeclaration(node) {
+    checkGrammarClassLikeDeclaration(node);
+    checkDecorators(node);
+    checkCollisionsForDeclarationName(node, node.name);
+    checkTypeParameters(getEffectiveTypeParameterDeclarations(node));
+    checkExportsOnMergedDeclarations(node);
+    const symbol = getSymbolOfDeclaration(node);
+    const type = getDeclaredTypeOfSymbol(symbol);
+    const typeWithThis = getTypeWithThisArgument(type);
+    const staticType = getTypeOfSymbol(symbol);
+    checkTypeParameterListsIdentical(symbol);
+    checkFunctionOrConstructorSymbol(symbol);
+    checkClassForDuplicateDeclarations(node);
+    const nodeInAmbientContext = !!(node.flags & 33554432 /* Ambient */);
+    if (!nodeInAmbientContext) {
+      checkClassForStaticPropertyNameConflicts(node);
+    }
+    const baseTypeNode = getEffectiveBaseTypeNode(node);
+    if (baseTypeNode) {
+      forEach(baseTypeNode.typeArguments, checkSourceElement);
+      if (languageVersion < 2 /* ES2015 */) {
+        checkExternalEmitHelpers(baseTypeNode.parent, 1 /* Extends */);
+      }
+      const extendsNode = getClassExtendsHeritageElement(node);
+      if (extendsNode && extendsNode !== baseTypeNode) {
+        checkExpression(extendsNode.expression);
+      }
+      const baseTypes = getBaseTypes(type);
+      if (baseTypes.length) {
+        addLazyDiagnostic(() => {
+          const baseType = baseTypes[0];
+          const baseConstructorType = getBaseConstructorTypeOfClass(type);
+          const staticBaseType = getApparentType(baseConstructorType);
+          checkBaseTypeAccessibility(staticBaseType, baseTypeNode);
+          checkSourceElement(baseTypeNode.expression);
+          if (some(baseTypeNode.typeArguments)) {
+            forEach(baseTypeNode.typeArguments, checkSourceElement);
+            for (const constructor of getConstructorsForTypeArguments(staticBaseType, baseTypeNode.typeArguments, baseTypeNode)) {
+              if (!checkTypeArgumentConstraints(baseTypeNode, constructor.typeParameters)) {
+                break;
+              }
+            }
+          }
+          const baseWithThis = getTypeWithThisArgument(baseType, type.thisType);
+          if (!checkTypeAssignableTo(
+            typeWithThis,
+            baseWithThis,
+            /*errorNode*/
+            void 0
+          )) {
+            issueMemberSpecificError(node, typeWithThis, baseWithThis, Diagnostics.Class_0_incorrectly_extends_base_class_1);
+          } else {
+            checkTypeAssignableTo(staticType, getTypeWithoutSignatures(staticBaseType), node.name || node, Diagnostics.Class_static_side_0_incorrectly_extends_base_class_static_side_1);
+          }
+          if (baseConstructorType.flags & 8650752 /* TypeVariable */) {
+            if (!isMixinConstructorType(staticType)) {
+              error2(node.name || node, Diagnostics.A_mixin_class_must_have_a_constructor_with_a_single_rest_parameter_of_type_any);
+            } else {
+              const constructSignatures = getSignaturesOfType(baseConstructorType, 1 /* Construct */);
+              if (constructSignatures.some((signature) => signature.flags & 4 /* Abstract */) && !hasSyntacticModifier(node, 64 /* Abstract */)) {
+                error2(node.name || node, Diagnostics.A_mixin_class_that_extends_from_a_type_variable_containing_an_abstract_construct_signature_must_also_be_declared_abstract);
+              }
+            }
+          }
+          if (!(staticBaseType.symbol && staticBaseType.symbol.flags & 32 /* Class */) && !(baseConstructorType.flags & 8650752 /* TypeVariable */)) {
+            const constructors = getInstantiatedConstructorsForTypeArguments(staticBaseType, baseTypeNode.typeArguments, baseTypeNode);
+            if (forEach(constructors, (sig) => !isJSConstructor(sig.declaration) && !isTypeIdenticalTo(getReturnTypeOfSignature(sig), baseType))) {
+              error2(baseTypeNode.expression, Diagnostics.Base_constructors_must_all_have_the_same_return_type);
+            }
+          }
+          checkKindsOfPropertyMemberOverrides(type, baseType);
+        });
+      }
+    }
+    checkMembersForOverrideModifier(node, type, typeWithThis, staticType);
+    const implementedTypeNodes = getEffectiveImplementsTypeNodes(node);
+    if (implementedTypeNodes) {
+      for (const typeRefNode of implementedTypeNodes) {
+        if (!isEntityNameExpression(typeRefNode.expression) || isOptionalChain(typeRefNode.expression)) {
+          error2(typeRefNode.expression, Diagnostics.A_class_can_only_implement_an_identifier_Slashqualified_name_with_optional_type_arguments);
+        }
+        checkTypeReferenceNode(typeRefNode);
+        addLazyDiagnostic(createImplementsDiagnostics(typeRefNode));
+      }
+    }
+    addLazyDiagnostic(() => {
+      checkIndexConstraints(type, symbol);
+      checkIndexConstraints(
+        staticType,
+        symbol,
+        /*isStaticIndex*/
+        true
+      );
+      checkTypeForDuplicateIndexSignatures(node);
+      checkPropertyInitialization(node);
+    });
+    function createImplementsDiagnostics(typeRefNode) {
+      return () => {
+        const t = getReducedType(getTypeFromTypeNode(typeRefNode));
+        if (!isErrorType(t)) {
+          if (isValidBaseType(t)) {
+            const genericDiag = t.symbol && t.symbol.flags & 32 /* Class */ ? Diagnostics.Class_0_incorrectly_implements_class_1_Did_you_mean_to_extend_1_and_inherit_its_members_as_a_subclass : Diagnostics.Class_0_incorrectly_implements_interface_1;
+            const baseWithThis = getTypeWithThisArgument(t, type.thisType);
+            if (!checkTypeAssignableTo(
+              typeWithThis,
+              baseWithThis,
+              /*errorNode*/
+              void 0
+            )) {
+              issueMemberSpecificError(node, typeWithThis, baseWithThis, genericDiag);
+            }
+          } else {
+            error2(typeRefNode, Diagnostics.A_class_can_only_implement_an_object_type_or_intersection_of_object_types_with_statically_known_members);
+          }
+        }
+      };
+    }
+  }
+  function checkMembersForOverrideModifier(node, type, typeWithThis, staticType) {
+    const baseTypeNode = getEffectiveBaseTypeNode(node);
+    const baseTypes = baseTypeNode && getBaseTypes(type);
+    const baseWithThis = (baseTypes == null ? void 0 : baseTypes.length) ? getTypeWithThisArgument(first(baseTypes), type.thisType) : void 0;
+    const baseStaticType = getBaseConstructorTypeOfClass(type);
+    for (const member of node.members) {
+      if (hasAmbientModifier(member)) {
+        continue;
+      }
+      if (isConstructorDeclaration(member)) {
+        forEach(member.parameters, (param) => {
+          if (isParameterPropertyDeclaration(param, member)) {
+            checkExistingMemberForOverrideModifier(
+              node,
+              staticType,
+              baseStaticType,
+              baseWithThis,
+              type,
+              typeWithThis,
+              param,
+              /*memberIsParameterProperty*/
+              true
+            );
+          }
+        });
+      }
+      checkExistingMemberForOverrideModifier(
+        node,
+        staticType,
+        baseStaticType,
+        baseWithThis,
+        type,
+        typeWithThis,
+        member,
+        /*memberIsParameterProperty*/
+        false
+      );
+    }
+  }
+  function checkExistingMemberForOverrideModifier(node, staticType, baseStaticType, baseWithThis, type, typeWithThis, member, memberIsParameterProperty, reportErrors2 = true) {
+    const declaredProp = member.name && getSymbolAtLocation(member.name) || getSymbolAtLocation(member);
+    if (!declaredProp) {
+      return 0 /* Ok */;
+    }
+    return checkMemberForOverrideModifier(
+      node,
+      staticType,
+      baseStaticType,
+      baseWithThis,
+      type,
+      typeWithThis,
+      hasOverrideModifier(member),
+      hasAbstractModifier(member),
+      isStatic(member),
+      memberIsParameterProperty,
+      symbolName(declaredProp),
+      reportErrors2 ? member : void 0
+    );
+  }
+  function checkMemberForOverrideModifier(node, staticType, baseStaticType, baseWithThis, type, typeWithThis, memberHasOverrideModifier, memberHasAbstractModifier, memberIsStatic, memberIsParameterProperty, memberName, errorNode) {
+    const isJs = isInJSFile(node);
+    const nodeInAmbientContext = !!(node.flags & 33554432 /* Ambient */);
+    if (baseWithThis && (memberHasOverrideModifier || compilerOptions.noImplicitOverride)) {
+      const memberEscapedName = escapeLeadingUnderscores(memberName);
+      const thisType = memberIsStatic ? staticType : typeWithThis;
+      const baseType = memberIsStatic ? baseStaticType : baseWithThis;
+      const prop = getPropertyOfType(this

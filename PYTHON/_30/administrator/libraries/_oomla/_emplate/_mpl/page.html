@@ -1,0 +1,26 @@
+# ASAP
+
+[![Build Status](https://travis-ci.org/kriskowal/asap.png?branch=master)](https://travis-ci.org/kriskowal/asap)
+
+Promise and asynchronous observer libraries, as well as hand-rolled callback
+programs and libraries, often need a mechanism to postpone the execution of a
+callback until the next available event.
+(See [Designing API’s for Asynchrony][Zalgo].)
+The `asap` function executes a task **as soon as possible** but not before it
+returns, waiting only for the completion of the current event and previously
+scheduled tasks.
+
+```javascript
+asap(function () {
+    // ...
+});
+```
+
+[Zalgo]: http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony
+
+This CommonJS package provides an `asap` module that exports a function that
+executes a task function *as soon as possible*.
+
+ASAP strives to schedule events to occur before yielding for IO, reflow,
+or redrawing.
+Each event recei

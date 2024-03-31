@@ -1,0 +1,2 @@
+create(null);
+        postfix = options.async && extensions.async || options

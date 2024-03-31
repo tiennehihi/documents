@@ -1,0 +1,12 @@
+import * as t from "@babel/types";
+
+export interface GeneratorOptions {
+    /**
+     * Optional string to add as a block comment at the start of the output file.
+     */
+    auxiliaryCommentBefore?: string | undefined;
+
+    /**
+     * Optional string to add as a block comment at the end of the output file.
+     */
+    a

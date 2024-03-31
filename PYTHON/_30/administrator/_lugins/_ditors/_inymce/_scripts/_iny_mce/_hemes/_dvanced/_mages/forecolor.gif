@@ -1,0 +1,14 @@
+n packU8(n) {
+        return [ n & 255 ];
+      }
+      function unpackU8(bytes) {
+        return as_unsigned(bytes[0], 8);
+      }
+      function packU8Clamped(n) {
+        n = round(Number(n));
+        return [ n < 0 ? 0 : n > 255 ? 255 : n & 255 ];
+      }
+      function packI16(n) {
+        return [ n >> 8 & 255, n & 255 ];
+      }
+    

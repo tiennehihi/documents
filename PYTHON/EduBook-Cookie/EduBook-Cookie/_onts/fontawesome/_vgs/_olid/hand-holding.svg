@@ -1,0 +1,9 @@
+var Spaces = require('../../options/format').Spaces;
+var Marker = require('../../tokenizer/marker');
+var formatPosition = require('../../utils/format-position');
+
+var CASE_ATTRIBUTE_PATTERN = /[\s"'][iI]\s*\]/;
+var CASE_RESTORE_PATTERN = /([\d\w])([iI])\]/g;
+var DOUBLE_QUOTE_CASE_PATTERN = /="([a-zA-Z][a-zA-Z\d\-_]+)"([iI])/g;
+var DOUBLE_QUOTE_PATTERN = /="([a-zA-Z][a-zA-Z\d\-_]+)"(\s|\])/g;
+va

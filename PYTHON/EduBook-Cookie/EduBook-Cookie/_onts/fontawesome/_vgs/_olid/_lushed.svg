@@ -1,0 +1,3 @@
+ring pattern."),
+  A_binding_pattern_parameter_cannot_be_optional_in_an_implementation_signature: diag(2463, 1 /* Error */, "A_binding_pattern_parameter_cannot_be_optional_in_an_implementation_signature_2463", "A binding pattern parameter cannot be optional in an implementation signature."),
+  A_computed_property_name_must_be_of_type_string_number_symbol_or_any: diag(2464, 1 /* Error */, "A_computed_property_name_must_be_of_type_string_number_symbol_or_any_2464", "A computed property name m

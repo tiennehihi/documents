@@ -1,0 +1,49 @@
+irname(output));
+
+    return writeFile(output, data, 'utf8').catch(error => checkWriteFileError(input, output, data, error));
+}
+
+
+/**
+ * Write a time taken by optimization.
+ * @param {number} time time in milliseconds.
+ */
+function printTimeInfo(time) {
+    console.log(`Done in ${time} ms!`);
+}
+
+/**
+ * Write optimizing information in human readable format.
+ * @param {number} inBytes size before optimization.
+ * @param {number} outBytes size after optimization.
+ */
+function printProfitInfo(inBytes, outBytes) {
+    var profitPercents = 100 - outBytes * 100 / inBytes;
+
+    console.log(
+        (Math.round((inBytes / 1024) * 1000) / 1000) + ' KiB' +
+        (profitPercents < 0 ? ' + ' : ' - ') +
+        chalk.green(Math.abs((Math.round(profitPercents * 10) / 10)) + '%') + ' = ' +
+        (Math.round((outBytes / 1024) * 1000) / 1000) + ' KiB'
+    );
+}
+
+/**
+ * Check for errors, if it's a dir optimize the dir.
+ * @param {Object} config
+ * @param {string} input
+ * @param {string} output
+ * @param {Error} error
+ * @return {Promise}
+ */
+function checkOptimizeFileError(config, input, output, error) {
+    if (error.code == 'EISDIR') {
+        return optimizeFolder(config, input, output);
+    } else if (error.code == 'ENOENT') {
+        return Promise.reject(new Error(`Error: no such file or directory '${error.path}'.`));
+    }
+    return Promise.reject(error);
+}
+
+/**
+ * Check for saving file error. If the ou

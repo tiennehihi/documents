@@ -1,0 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ScopeType = void 0;
+var ScopeType;
+(function (ScopeType) {
+    ScopeType["block"] = "block";
+    ScopeType["catch"] = "catch";
+    ScopeType["class"] = "class";
+    Scope

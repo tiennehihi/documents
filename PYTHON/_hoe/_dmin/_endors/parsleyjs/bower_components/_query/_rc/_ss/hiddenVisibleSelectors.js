@@ -1,0 +1,1 @@
+{"version":3,"file":"convert.js","sourceRoot":"","sources":["../src/convert.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,2DAA2D;AAC3D,oNAAoN;AACpN,+CAAiC;AAEjC,iDAA6D;AAE7D,6CAqBsB;AAOtB,2CAA6C;AAC7C,mDAA6D;AAE7D,MAAM,UAAU,GAAG,EAAE,CAAC,UAAU,CAAC;AAOjC;;;;GAIG;AACH,SAAgB,YAAY,CAC1B,KAA2D;IAE3D,OAAO,IAAA,wBAAW,EAChB,KAAK,CAAC,IAAK,EACX,KAAK,CAAC,KAAM,EACZ,CAAC,SAA

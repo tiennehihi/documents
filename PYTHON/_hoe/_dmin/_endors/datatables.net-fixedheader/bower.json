@@ -1,0 +1,27 @@
+'use strict';var _docsUrl = require('../docsUrl');var _docsUrl2 = _interopRequireDefault(_docsUrl);function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { 'default': obj };}
+
+function getImportValue(node) {
+  return node.type === 'ImportDeclaration' ?
+  node.source.value :
+  node.moduleReference.expression.value;
+}
+
+module.exports = {
+  meta: {
+    type: 'suggestion',
+    docs: {
+      category: 'Style guide',
+      description: 'Ensure all imports appear before other statements.',
+      url: (0, _docsUrl2['default'])('first') },
+
+    fixable: 'code',
+    schema: [
+    {
+      type: 'string',
+      'enum': ['absolute-first', 'disable-absolute-first'] }] },
+
+
+
+
+  create: function () {function create(context) {
+      function isPoss

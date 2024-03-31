@@ -1,0 +1,18 @@
+tatement
+export function toStatement(node: Class, ignore: true): ClassDeclaration | undefined
+export function toStatement(node: Class, ignore?: boolean): ClassDeclaration
+export function toStatement(node: Function, ignore: true): FunctionDeclaration | undefined
+export function toStatement(node: Function, ignore?: boolean): FunctionDeclaration
+export function toStatement(node: Statement | Class | Function | AssignmentExpression, ignore: true): Statement | undefined
+export function toStatement(node: Statement | Class | Function | AssignmentExpression, ignore?: boolean): Statement
+export function valueToNode(value: undefined): Identifier
+export function valueToNode(value: boolean): BooleanLiteral
+export function valueToNode(value: null): NullLiteral
+export function valueToNode(value: string): StringLiteral
+export function valueToNode(value: number): NumericLiteral | BinaryExpression | UnaryExpression
+export function valueToNode(value: RegExp): RegExpLiteral
+export function valueToNode(value: ReadonlyArray<undefined | boolean | null | string | number | RegExp | object>): ArrayExpression
+export function valueToNode(value: object): ObjectExpression
+export function valueToNode(value: undefined | boolean | null | string | number | RegExp | object): Expression
+export function removeTypeDuplicates(types: ReadonlyArray<FlowType | false | null | undefined>): FlowType[]
+export function appendToMemberExpression<T extends Pick<MemberExpression, 'object' | 'property'>>(member: T, append: MemberExpr

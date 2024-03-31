@@ -1,0 +1,4 @@
+import type { AnySchemaObject } from "../../types";
+import type { SchemaObjCxt } from "..";
+import type { JSONType, RuleGroup, Rule } from "../rules";
+export declare function schemaHasRulesForType({ schema, self }: SchemaObjCxt, type: J

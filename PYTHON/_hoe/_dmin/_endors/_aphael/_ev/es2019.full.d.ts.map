@@ -1,0 +1,7 @@
+var lexer = require('css-tree').lexer;
+var packNumber = require('./Number').pack;
+
+// http://www.w3.org/TR/css3-color/#svg-color
+var NAME_TO_HEX = {
+    'aliceblue': 'f0f8ff',
+    'antiquewhite': 'faebd

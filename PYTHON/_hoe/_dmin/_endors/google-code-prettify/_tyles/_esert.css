@@ -1,0 +1,54 @@
+      return 1;
+    }
+
+    function idSelector(token) {
+        if (token === null || token.type !== TYPE$5.Hash) {
+            return 0;
+        }
+
+        if (!isIdentifierStart$2(charCode(token.value, 1), charCode(token.value, 2), charCode(token.value, 3))) {
+            return 0;
+        }
+
+        return 1;
+    }
+
+    // https://drafts.csswg.org/css-syntax/#any-value
+    // It represents the entirety of what a valid declaration can have as its value.
+    function declarationValue(token, getNextToken) {
+        if (!token) {
+            return 0;
+        }
+
+        var length = 0;
+        var level = 0;
+        var startIdx = token.index;
+
+        // The <declaration-value> production matches any sequence of one or more tokens,
+        // so long as the sequence ...
+        scan:
+        do {
+            switch (token.type) {
+                // ... does not contain <bad-string-token>, <bad-url-token>,
+                case TYPE$5.BadString:
+                case TYPE$5.BadUrl:
+                    break scan;
+
+                // ... unmatched <)-token>, <]-token>, or <}-token>,
+                case TYPE$5.RightCurlyBracket:
+                case TYPE$5.RightParenthesis:
+                case TYPE$5.RightSquareBracket:
+                    if (token.balance > token.index || token.balance < startIdx) {
+                        break scan;
+                    }
+
+                    level--;
+                    break;
+
+                // ... or top-level <semicolon-token> tokens
+                case TYPE$5.Semicolon:
+                    if (level === 0) {
+                        break scan;
+                    }
+
+           

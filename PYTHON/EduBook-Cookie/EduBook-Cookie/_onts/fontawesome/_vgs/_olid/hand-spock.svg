@@ -1,0 +1,33 @@
+/**
+ * @fileoverview Ensure handling of errors when we know they exist.
+ * @author Jamund Ferguson
+ * @deprecated in ESLint v7.0.0
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Rule Definition
+//------------------------------------------------------------------------------
+
+/** @type {import('../shared/types').Rule} */
+module.exports = {
+    meta: {
+        deprecated: true,
+
+        replacedBy: [],
+
+        type: "suggestion",
+
+        docs: {
+            description: "Require error handling in callbacks",
+            recommended: false,
+            url: "https://eslint.org/docs/latest/rules/handle-callback-err"
+        },
+
+        schema: [
+            {
+                type: "string"
+            }
+        ],
+        m

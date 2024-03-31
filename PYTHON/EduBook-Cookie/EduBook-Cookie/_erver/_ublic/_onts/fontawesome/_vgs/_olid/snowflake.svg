@@ -1,0 +1,98 @@
+label: Parachute Box
+  unicode: f4cd
+  voted: false
+paragraph:
+  aliases:
+    unicodes:
+      composite:
+        - b6
+      secondary:
+        - 10f1dd
+  changes:
+    - 4.1.0
+    - 5.0.0
+    - 5.9.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: paragraph
+  unicode: f1dd
+  voted: false
+passport:
+  aliases:
+    unicodes:
+      secondary:
+        - 10f5ab
+  changes:
+    - 5.1.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Passport
+  unicode: f5ab
+  voted: false
+paste:
+  aliases:
+    names:
+      - file-clipboard
+    unicodes:
+      secondary:
+        - 10f0ea
+  changes:
+    - 2.0.0
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+    - 6.2.1
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: regular
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+      - family: classic
+        style: regular
+  label: Paste
+  unicode: f0ea
+  voted: false
+patreon:
+  changes:
+    - 5.0.0
+    - 5.0.3
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: Patreon
+  unicode: f3d9
+  voted: false
+pause:
+  aliases:
+    unicodes:
+      composite:
+        - 23f8
+      secondary:
+        - 10f04c
+  changes:
+    - 1.0.0
+    - 5.0.0
+    - 5.10.2
+    - 6.0.0-be

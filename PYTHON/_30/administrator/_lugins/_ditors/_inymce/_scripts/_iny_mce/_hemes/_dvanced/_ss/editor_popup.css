@@ -1,0 +1,196 @@
+  }
+        clock.jobs.push(job);
+    }
+
+    //eslint-disable-next-line jsdoc/require-jsdoc
+    function runJobs(clock) {
+        // runs all microtick-deferred tasks - ecma262/#sec-runjobs
+        if (!clock.jobs) {
+            return;
+        }
+        for (let i = 0; i < clock.jobs.length; i++) {
+            const job = clock.jobs[i];
+            job.func.apply(null, job.args);
+
+            checkIsNearInfiniteLimit(clock, i);
+            if (clock.loopLimit && i > clock.loopLimit) {
+                throw getInfiniteLoopError(clock, job);
+            }
+        }
+        resetIsNearInfiniteLimit();
+        clock.jobs = [];
+    }
+
+    /**
+     * @param {Clock} clock
+     * @param {Timer} timer
+     * @returns {number} id of the created timer
+     */
+    function addTimer(clock, timer) {
+        if (timer.func === undefined) {
+            throw new Error("Callback must be provided to timer calls");
+        }
+
+        if (addTimerReturnsObject) {
+            // Node.js environment
+            if (typeof timer.func !== "function") {
+                throw new TypeError(
+                    `[ERR_INVALID_CALLBACK]: Callback must be a function. Received ${
+                        timer.func
+                    } of type ${typeof timer.func}`
+                );
+            }
+        }
+
+        if (isNearInfiniteLimit) {
+            timer.error = new Error();
+        }
+
+        timer.type = timer.immediate ? "Immediate" : "Timeout";
+
+        if (timer.hasOwnProperty("delay")) {
+            if (typeof timer.delay !== "number") {
+                timer.delay = parseInt(timer.delay, 10);
+            }
+
+            if (!isNumberFinite(timer.delay)) {
+                timer.delay = 0;
+            }
+            timer.delay = timer.delay > maxTimeout ? 1 : timer.delay;
+            timer.delay = Math.max(0, timer.delay);
+        }
+
+        if (timer.hasOwnProperty("interval")) {
+            timer.type = "Interval";
+            timer.interval = timer.interval > maxTimeout ? 1 : timer.interval;
+        }
+
+        if (timer.hasOwnProperty("animation")) {
+            timer.type = "AnimationFrame";
+            timer.animation = true;
+        }
+
+        if (timer.hasOwnProperty("idleCallback")) {
+            timer.type = "IdleCallback";
+            timer.idleCallback = true;
+        }
+
+        if (!clock.timers) {
+            clock.timers = {};
+        }
+
+        timer.id = uniqueTimerId++;
+        timer.createdAt = clock.now;
+        timer.callAt =
+            clock.now + (parseInt(timer.delay) || (clock.duringTick ? 1 : 0));
+
+        clock.timers[timer.id] = timer;
+
+        if (addTimerReturnsObject) {
+            const res = {
+                ref: function () {
+                    return res;
+                },
+                unref: function () {
+                    return res;
+                },
+                refresh: function () {
+                    clearTimeout(timer.id);
+                    const args = [timer.func, timer.delay].concat(timer.args);
+                    return setTimeout.apply(null, args);
+                },
+                [Symbol.toPrimitive]: function () {
+                    return timer.id;
+                },
+            };
+            return res;
+        }
+
+        return timer.id;
+    }
+
+    /* eslint consistent-return: "off" */
+    /**
+     * Timer comparitor
+     *
+     * @param {Timer} a
+     * @param {Timer} b
+     * @returns {number}
+     */
+    function compareTimers(a, b) {
+        // Sort first by absolute timing
+        if (a.callAt < b.callAt) {
+            return -1;
+        }
+        if (a.callAt > b.callAt) {
+            return 1;
+        }
+
+        // Sort next by immediate, immediate timers take precedence
+        if (a.immediate && !b.immediate) {
+            return -1;
+        }
+        if (!a.immediate && b.immediate) {
+            return 1;
+        }
+
+        // Sort next by creation time, earlier-created timers take precedence
+        if (a.createdAt < b.createdAt) {
+            return -1;
+        }
+        if (a.createdAt > b.createdAt) {
+            return 1;
+        }
+
+        // Sort next by id, lower-id timers take precedence
+        if (a.id < b.id) {
+            return -1;
+        }
+        if (a.id > b.id) {
+            return 1;
+        }
+
+        // As timer ids are unique, no fallback `0` is necessary
+    }
+
+    /**
+     * @param {Clock} clock
+     * @param {number} from
+     * @param {number} to
+     *
+     * @returns {Timer}
+     */
+    function firstTimerInRange(clock, from, to) {
+        const timers = clock.timers;
+        let timer = null;
+        let id, isInRange;
+
+        for (id in timers) {
+            if (timers.hasOwnProperty(id)) {
+                isInRange = inRange(from, to, timers[id]);
+
+                if (
+                    isInRange &&
+                    (!timer || compareTimers(timer, timers[id]) === 1)
+                ) {
+                    timer = timers[id];
+                }
+            }
+        }
+
+        return timer;
+    }
+
+    /**
+     * @param {Clock} clock
+     * @returns {Timer}
+     */
+    function firstTimer(clock) {
+        const timers = clock.timers;
+        let timer = null;
+        let id;
+
+        for (id in timers) {
+            if (timers.hasOwnProperty(id)) {
+                if (!timer || compareTimers(timer, timers[id]) === 1) {
+                   

@@ -1,0 +1,23 @@
+import type AjvCore from "../core"
+import type {AnyValidateFunction, SourceCode} from "../types"
+import type {SchemaEnv} from "../compile"
+import {UsedScopeValues, UsedValueState, ValueScopeName, varKinds} from "../compile/codegen/scope"
+import {_, nil, _Code, Code, getProperty, getEsmExportName} from "../compile/codegen/code"
+
+function standaloneCode(
+  ajv: AjvCore,
+  refsOrFunc?: {[K in string]?: string} | AnyValidateFunction
+): string {
+  if (!ajv.opts.code.source) {
+    throw new Error("moduleCode: ajv instance must have code.source option")
+  }
+  const {_n} = ajv.scope.opts
+  return typeof refsOrFunc == "function"
+    ? funcExportCode(refsOrFunc.source)
+    : refsOrFunc !== undefined
+    ? multiExportsCode<string>(refsOrFunc, getValidate)
+    : multiExportsCode<SchemaEnv>(ajv.schemas, (sch) =>
+        sch.meta ? undefined : ajv.compile(sch.schema)
+      )
+
+  function getValidate(id: string): 

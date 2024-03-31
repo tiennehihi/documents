@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+        <title>Document</title>
+    </head>
+    <body>
+        <input type="button" onclick="sayHello()" value="Hiện tên món"/>
+        <h2>Lẩu cá chình tôm hùm cua bể ngao hoa</h2>
+        <h3 class="love">Bề bề hấp sả - Cua hoàng đế sốt BBQ - Cua bể sốt me</h3>
+        <h2 class="teen">Ốc hương nướng - Ốc vòi voi hấp phomai - Sò nướng mỡ hành</h2>
+        <p class="love">Tu hài nướng mỡ hành - Hàu bỏ lò phomai</p>
+        <p id="lol">Cá song hấp xì dầu - Cá thu kho tộ</p>
+        <h3 class="xiec">Hải sản thầy Cường</h3>
+        <img src="{{ url_for('static', filename='haisan.jpg') }}" alt="" width="500px" height="500px">
+    </body>
+    <script src="{{ url_for('static', filename='hello.js') }}"></script>
+</html>

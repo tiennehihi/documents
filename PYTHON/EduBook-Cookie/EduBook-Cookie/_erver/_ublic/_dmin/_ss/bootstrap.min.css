@@ -1,0 +1,2639 @@
+bol.has(getSymbolId(target))) {
+        const inferred = isTransientSymbol(target) ? target : cloneSymbol(target);
+        inferred.exports = inferred.exports || createSymbolTable();
+        inferred.members = inferred.members || createSymbolTable();
+        inferred.flags |= source.flags & 32 /* Class */;
+        if ((_a = source.exports) == null ? void 0 : _a.size) {
+          mergeSymbolTable(inferred.exports, source.exports);
+        }
+        if ((_b = source.members) == null ? void 0 : _b.size) {
+          mergeSymbolTable(inferred.members, source.members);
+        }
+        (links.inferredClassSymbol || (links.inferredClassSymbol = /* @__PURE__ */ new Map())).set(getSymbolId(inferred), inferred);
+        return inferred;
+      }
+      return links.inferredClassSymbol.get(getSymbolId(target));
+    }
+  }
+  function getAssignedClassSymbol(decl) {
+    var _a;
+    const assignmentSymbol = decl && getSymbolOfExpando(
+      decl,
+      /*allowDeclaration*/
+      true
+    );
+    const prototype = (_a = assignmentSymbol == null ? void 0 : assignmentSymbol.exports) == null ? void 0 : _a.get("prototype");
+    const init = (prototype == null ? void 0 : prototype.valueDeclaration) && getAssignedJSPrototype(prototype.valueDeclaration);
+    return init ? getSymbolOfDeclaration(init) : void 0;
+  }
+  function getSymbolOfExpando(node, allowDeclaration) {
+    if (!node.parent) {
+      return void 0;
+    }
+    let name;
+    let decl;
+    if (isVariableDeclaration(node.parent) && node.parent.initializer === node) {
+      if (!isInJSFile(node) && !(isVarConstLike(node.parent) && isFunctionLikeDeclaration(node))) {
+        return void 0;
+      }
+      name = node.parent.name;
+      decl = node.parent;
+    } else if (isBinaryExpression(node.parent)) {
+      const parentNode = node.parent;
+      const parentNodeOperator = node.parent.operatorToken.kind;
+      if (parentNodeOperator === 64 /* EqualsToken */ && (allowDeclaration || parentNode.right === node)) {
+        name = parentNode.left;
+        decl = name;
+      } else if (parentNodeOperator === 57 /* BarBarToken */ || parentNodeOperator === 61 /* QuestionQuestionToken */) {
+        if (isVariableDeclaration(parentNode.parent) && parentNode.parent.initializer === parentNode) {
+          name = parentNode.parent.name;
+          decl = parentNode.parent;
+        } else if (isBinaryExpression(parentNode.parent) && parentNode.parent.operatorToken.kind === 64 /* EqualsToken */ && (allowDeclaration || parentNode.parent.right === parentNode)) {
+          name = parentNode.parent.left;
+          decl = name;
+        }
+        if (!name || !isBindableStaticNameExpression(name) || !isSameEntityName(name, parentNode.left)) {
+          return void 0;
+        }
+      }
+    } else if (allowDeclaration && isFunctionDeclaration(node)) {
+      name = node.name;
+      decl = node;
+    }
+    if (!decl || !name || !allowDeclaration && !getExpandoInitializer(node, isPrototypeAccess(name))) {
+      return void 0;
+    }
+    return getSymbolOfNode(decl);
+  }
+  function getAssignedJSPrototype(node) {
+    if (!node.parent) {
+      return false;
+    }
+    let parent2 = node.parent;
+    while (parent2 && parent2.kind === 211 /* PropertyAccessExpression */) {
+      parent2 = parent2.parent;
+    }
+    if (parent2 && isBinaryExpression(parent2) && isPrototypeAccess(parent2.left) && parent2.operatorToken.kind === 64 /* EqualsToken */) {
+      const right = getInitializerOfBinaryExpression(parent2);
+      return isObjectLiteralExpression(right) && right;
+    }
+  }
+  function checkCallExpression(node, checkMode) {
+    var _a, _b, _c;
+    checkGrammarTypeArguments(node, node.typeArguments);
+    const signature = getResolvedSignature(
+      node,
+      /*candidatesOutArray*/
+      void 0,
+      checkMode
+    );
+    if (signature === resolvingSignature) {
+      return silentNeverType;
+    }
+    checkDeprecatedSignature(signature, node);
+    if (node.expression.kind === 108 /* SuperKeyword */) {
+      return voidType;
+    }
+    if (node.kind === 214 /* NewExpression */) {
+      const declaration = signature.declaration;
+      if (declaration && declaration.kind !== 176 /* Constructor */ && declaration.kind !== 180 /* ConstructSignature */ && declaration.kind !== 185 /* ConstructorType */ && !(isJSDocSignature(declaration) && ((_b = (_a = getJSDocRoot(declaration)) == null ? void 0 : _a.parent) == null ? void 0 : _b.kind) === 176 /* Constructor */) && !isJSDocConstructSignature(declaration) && !isJSConstructor(declaration)) {
+        if (noImplicitAny) {
+          error2(node, Diagnostics.new_expression_whose_target_lacks_a_construct_signature_implicitly_has_an_any_type);
+        }
+        return anyType;
+      }
+    }
+    if (isInJSFile(node) && isCommonJsRequire(node)) {
+      return resolveExternalModuleTypeByLiteral(node.arguments[0]);
+    }
+    const returnType = getReturnTypeOfSignature(signature);
+    if (returnType.flags & 12288 /* ESSymbolLike */ && isSymbolOrSymbolForCall(node)) {
+      return getESSymbolLikeTypeForNode(walkUpParenthesizedExpressions(node.parent));
+    }
+    if (node.kind === 213 /* CallExpression */ && !node.questionDotToken && node.parent.kind === 244 /* ExpressionStatement */ && returnType.flags & 16384 /* Void */ && getTypePredicateOfSignature(signature)) {
+      if (!isDottedName(node.expression)) {
+        error2(node.expression, Diagnostics.Assertions_require_the_call_target_to_be_an_identifier_or_qualified_name);
+      } else if (!getEffectsSignature(node)) {
+        const diagnostic = error2(node.expression, Diagnostics.Assertions_require_every_name_in_the_call_target_to_be_declared_with_an_explicit_type_annotation);
+        getTypeOfDottedName(node.expression, diagnostic);
+      }
+    }
+    if (isInJSFile(node)) {
+      const jsSymbol = getSymbolOfExpando(
+        node,
+        /*allowDeclaration*/
+        false
+      );
+      if ((_c = jsSymbol == null ? void 0 : jsSymbol.exports) == null ? void 0 : _c.size) {
+        const jsAssignmentType = createAnonymousType(jsSymbol, jsSymbol.exports, emptyArray, emptyArray, emptyArray);
+        jsAssignmentType.objectFlags |= 4096 /* JSLiteral */;
+        return getIntersectionType([returnType, jsAssignmentType]);
+      }
+    }
+    return returnType;
+  }
+  function checkDeprecatedSignature(signature, node) {
+    if (signature.flags & 128 /* IsSignatureCandidateForOverloadFailure */)
+      return;
+    if (signature.declaration && signature.declaration.flags & 536870912 /* Deprecated */) {
+      const suggestionNode = getDeprecatedSuggestionNode(node);
+      const name = tryGetPropertyAccessOrIdentifierToString(getInvokedExpression(node));
+      addDeprecatedSuggestionWithSignature(suggestionNode, signature.declaration, name, signatureToString(signature));
+    }
+  }
+  function getDeprecatedSuggestionNode(node) {
+    node = skipParentheses(node);
+    switch (node.kind) {
+      case 213 /* CallExpression */:
+      case 170 /* Decorator */:
+      case 214 /* NewExpression */:
+        return getDeprecatedSuggestionNode(node.expression);
+      case 215 /* TaggedTemplateExpression */:
+        return getDeprecatedSuggestionNode(node.tag);
+      case 286 /* JsxOpeningElement */:
+      case 285 /* JsxSelfClosingElement */:
+        return getDeprecatedSuggestionNode(node.tagName);
+      case 212 /* ElementAccessExpression */:
+        return node.argumentExpression;
+      case 211 /* PropertyAccessExpression */:
+        return node.name;
+      case 183 /* TypeReference */:
+        const typeReference = node;
+        return isQualifiedName(typeReference.typeName) ? typeReference.typeName.right : typeReference;
+      default:
+        return node;
+    }
+  }
+  function isSymbolOrSymbolForCall(node) {
+    if (!isCallExpression(node))
+      return false;
+    let left = node.expression;
+    if (isPropertyAccessExpression(left) && left.name.escapedText === "for") {
+      left = left.expression;
+    }
+    if (!isIdentifier(left) || left.escapedText !== "Symbol") {
+      return false;
+    }
+    const globalESSymbol = getGlobalESSymbolConstructorSymbol(
+      /*reportErrors*/
+      false
+    );
+    if (!globalESSymbol) {
+      return false;
+    }
+    return globalESSymbol === resolveName(
+      left,
+      "Symbol",
+      111551 /* Value */,
+      /*nameNotFoundMessage*/
+      void 0,
+      /*nameArg*/
+      void 0,
+      /*isUse*/
+      false
+    );
+  }
+  function checkImportCallExpression(node) {
+    checkGrammarImportCallExpression(node);
+    if (node.arguments.length === 0) {
+      return createPromiseReturnType(node, anyType);
+    }
+    const specifier = node.arguments[0];
+    const specifierType = checkExpressionCached(specifier);
+    const optionsType = node.arguments.length > 1 ? checkExpressionCached(node.arguments[1]) : void 0;
+    for (let i = 2; i < node.arguments.length; ++i) {
+      checkExpressionCached(node.arguments[i]);
+    }
+    if (specifierType.flags & 32768 /* Undefined */ || specifierType.flags & 65536 /* Null */ || !isTypeAssignableTo(specifierType, stringType)) {
+      error2(specifier, Diagnostics.Dynamic_import_s_specifier_must_be_of_type_string_but_here_has_type_0, typeToString(specifierType));
+    }
+    if (optionsType) {
+      const importCallOptionsType = getGlobalImportCallOptionsType(
+        /*reportErrors*/
+        true
+      );
+      if (importCallOptionsType !== emptyObjectType) {
+        checkTypeAssignableTo(optionsType, getNullableType(importCallOptionsType, 32768 /* Undefined */), node.arguments[1]);
+      }
+    }
+    const moduleSymbol = resolveExternalModuleName(node, specifier);
+    if (moduleSymbol) {
+      const esModuleSymbol = resolveESModuleSymbol(
+        moduleSymbol,
+        specifier,
+        /*dontResolveAlias*/
+        true,
+        /*suppressInteropError*/
+        false
+      );
+      if (esModuleSymbol) {
+        return createPromiseReturnType(
+          node,
+          getTypeWithSyntheticDefaultOnly(getTypeOfSymbol(esModuleSymbol), esModuleSymbol, moduleSymbol, specifier) || getTypeWithSyntheticDefaultImportType(getTypeOfSymbol(esModuleSymbol), esModuleSymbol, moduleSymbol, specifier)
+        );
+      }
+    }
+    return createPromiseReturnType(node, anyType);
+  }
+  function createDefaultPropertyWrapperForModule(symbol, originalSymbol, anonymousSymbol) {
+    const memberTable = createSymbolTable();
+    const newSymbol = createSymbol(2097152 /* Alias */, "default" /* Default */);
+    newSymbol.parent = originalSymbol;
+    newSymbol.links.nameType = getStringLiteralType("default");
+    newSymbol.links.aliasTarget = resolveSymbol(symbol);
+    memberTable.set("default" /* Default */, newSymbol);
+    return createAnonymousType(anonymousSymbol, memberTable, emptyArray, emptyArray, emptyArray);
+  }
+  function getTypeWithSyntheticDefaultOnly(type, symbol, originalSymbol, moduleSpecifier) {
+    const hasDefaultOnly = isOnlyImportedAsDefault(moduleSpecifier);
+    if (hasDefaultOnly && type && !isErrorType(type)) {
+      const synthType = type;
+      if (!synthType.defaultOnlyType) {
+        const type2 = createDefaultPropertyWrapperForModule(symbol, originalSymbol);
+        synthType.defaultOnlyType = type2;
+      }
+      return synthType.defaultOnlyType;
+    }
+    return void 0;
+  }
+  function getTypeWithSyntheticDefaultImportType(type, symbol, originalSymbol, moduleSpecifier) {
+    var _a;
+    if (allowSyntheticDefaultImports && type && !isErrorType(type)) {
+      const synthType = type;
+      if (!synthType.syntheticType) {
+        const file = (_a = originalSymbol.declarations) == null ? void 0 : _a.find(isSourceFile);
+        const hasSyntheticDefault = canHaveSyntheticDefault(
+          file,
+          originalSymbol,
+          /*dontResolveAlias*/
+          false,
+          moduleSpecifier
+        );
+        if (hasSyntheticDefault) {
+          const anonymousSymbol = createSymbol(2048 /* TypeLiteral */, "__type" /* Type */);
+          const defaultContainingObject = createDefaultPropertyWrapperForModule(symbol, originalSymbol, anonymousSymbol);
+          anonymousSymbol.links.type = defaultContainingObject;
+          synthType.syntheticType = isValidSpreadType(type) ? getSpreadType(
+            type,
+            defaultContainingObject,
+            anonymousSymbol,
+            /*objectFlags*/
+            0,
+            /*readonly*/
+            false
+          ) : defaultContainingObject;
+        } else {
+          synthType.syntheticType = type;
+        }
+      }
+      return synthType.syntheticType;
+    }
+    return type;
+  }
+  function isCommonJsRequire(node) {
+    if (!isRequireCall(
+      node,
+      /*requireStringLiteralLikeArgument*/
+      true
+    )) {
+      return false;
+    }
+    if (!isIdentifier(node.expression))
+      return Debug.fail();
+    const resolvedRequire = resolveName(
+      node.expression,
+      node.expression.escapedText,
+      111551 /* Value */,
+      /*nameNotFoundMessage*/
+      void 0,
+      /*nameArg*/
+      void 0,
+      /*isUse*/
+      true
+    );
+    if (resolvedRequire === requireSymbol) {
+      return true;
+    }
+    if (resolvedRequire.flags & 2097152 /* Alias */) {
+      return false;
+    }
+    const targetDeclarationKind = resolvedRequire.flags & 16 /* Function */ ? 262 /* FunctionDeclaration */ : resolvedRequire.flags & 3 /* Variable */ ? 260 /* VariableDeclaration */ : 0 /* Unknown */;
+    if (targetDeclarationKind !== 0 /* Unknown */) {
+      const decl = getDeclarationOfKind(resolvedRequire, targetDeclarationKind);
+      return !!decl && !!(decl.flags & 33554432 /* Ambient */);
+    }
+    return false;
+  }
+  function checkTaggedTemplateExpression(node) {
+    if (!checkGrammarTaggedTemplateChain(node))
+      checkGrammarTypeArguments(node, node.typeArguments);
+    if (languageVersion < 2 /* ES2015 */) {
+      checkExternalEmitHelpers(node, 262144 /* MakeTemplateObject */);
+    }
+    const signature = getResolvedSignature(node);
+    checkDeprecatedSignature(signature, node);
+    return getReturnTypeOfSignature(signature);
+  }
+  function checkAssertion(node, checkMode) {
+    if (node.kind === 216 /* TypeAssertionExpression */) {
+      const file = getSourceFileOfNode(node);
+      if (file && fileExtensionIsOneOf(file.fileName, [".cts" /* Cts */, ".mts" /* Mts */])) {
+        grammarErrorOnNode(node, Diagnostics.This_syntax_is_reserved_in_files_with_the_mts_or_cts_extension_Use_an_as_expression_instead);
+      }
+    }
+    return checkAssertionWorker(node, checkMode);
+  }
+  function isValidConstAssertionArgument(node) {
+    switch (node.kind) {
+      case 11 /* StringLiteral */:
+      case 15 /* NoSubstitutionTemplateLiteral */:
+      case 9 /* NumericLiteral */:
+      case 10 /* BigIntLiteral */:
+      case 112 /* TrueKeyword */:
+      case 97 /* FalseKeyword */:
+      case 209 /* ArrayLiteralExpression */:
+      case 210 /* ObjectLiteralExpression */:
+      case 228 /* TemplateExpression */:
+        return true;
+      case 217 /* ParenthesizedExpression */:
+        return isValidConstAssertionArgument(node.expression);
+      case 224 /* PrefixUnaryExpression */:
+        const op = node.operator;
+        const arg = node.operand;
+        return op === 41 /* MinusToken */ && (arg.kind === 9 /* NumericLiteral */ || arg.kind === 10 /* BigIntLiteral */) || op === 40 /* PlusToken */ && arg.kind === 9 /* NumericLiteral */;
+      case 211 /* PropertyAccessExpression */:
+      case 212 /* ElementAccessExpression */:
+        const expr = skipParentheses(node.expression);
+        const symbol = isEntityNameExpression(expr) ? resolveEntityName(
+          expr,
+          111551 /* Value */,
+          /*ignoreErrors*/
+          true
+        ) : void 0;
+        return !!(symbol && symbol.flags & 384 /* Enum */);
+    }
+    return false;
+  }
+  function checkAssertionWorker(node, checkMode) {
+    const { type, expression } = getAssertionTypeAndExpression(node);
+    const exprType = checkExpression(expression, checkMode);
+    if (isConstTypeReference(type)) {
+      if (!isValidConstAssertionArgument(expression)) {
+        error2(expression, Diagnostics.A_const_assertions_can_only_be_applied_to_references_to_enum_members_or_string_number_boolean_array_or_object_literals);
+      }
+      return getRegularTypeOfLiteralType(exprType);
+    }
+    const links = getNodeLinks(node);
+    links.assertionExpressionType = exprType;
+    checkSourceElement(type);
+    checkNodeDeferred(node);
+    return getTypeFromTypeNode(type);
+  }
+  function getAssertionTypeAndExpression(node) {
+    let type;
+    let expression;
+    switch (node.kind) {
+      case 234 /* AsExpression */:
+      case 216 /* TypeAssertionExpression */:
+        type = node.type;
+        expression = node.expression;
+        break;
+      case 217 /* ParenthesizedExpression */:
+        type = getJSDocTypeAssertionType(node);
+        expression = node.expression;
+        break;
+    }
+    return { type, expression };
+  }
+  function checkAssertionDeferred(node) {
+    const { type } = getAssertionTypeAndExpression(node);
+    const errNode = isParenthesizedExpression(node) ? type : node;
+    const links = getNodeLinks(node);
+    Debug.assertIsDefined(links.assertionExpressionType);
+    const exprType = getRegularTypeOfObjectLiteral(getBaseTypeOfLiteralType(links.assertionExpressionType));
+    const targetType = getTypeFromTypeNode(type);
+    if (!isErrorType(targetType)) {
+      addLazyDiagnostic(() => {
+        const widenedType = getWidenedType(exprType);
+        if (!isTypeComparableTo(targetType, widenedType)) {
+          checkTypeComparableTo(exprType, targetType, errNode, Diagnostics.Conversion_of_type_0_to_type_1_may_be_a_mistake_because_neither_type_sufficiently_overlaps_with_the_other_If_this_was_intentional_convert_the_expression_to_unknown_first);
+        }
+      });
+    }
+  }
+  function checkNonNullChain(node) {
+    const leftType = checkExpression(node.expression);
+    const nonOptionalType = getOptionalExpressionType(leftType, node.expression);
+    return propagateOptionalTypeMarker(getNonNullableType(nonOptionalType), node, nonOptionalType !== leftType);
+  }
+  function checkNonNullAssertion(node) {
+    return node.flags & 64 /* OptionalChain */ ? checkNonNullChain(node) : getNonNullableType(checkExpression(node.expression));
+  }
+  function checkExpressionWithTypeArguments(node) {
+    checkGrammarExpressionWithTypeArguments(node);
+    forEach(node.typeArguments, checkSourceElement);
+    if (node.kind === 233 /* ExpressionWithTypeArguments */) {
+      const parent2 = walkUpParenthesizedExpressions(node.parent);
+      if (parent2.kind === 226 /* BinaryExpression */ && parent2.operatorToken.kind === 104 /* InstanceOfKeyword */ && isNodeDescendantOf(node, parent2.right)) {
+        error2(node, Diagnostics.The_right_hand_side_of_an_instanceof_expression_must_not_be_an_instantiation_expression);
+      }
+    }
+    const exprType = node.kind === 233 /* ExpressionWithTypeArguments */ ? checkExpression(node.expression) : isThisIdentifier(node.exprName) ? checkThisExpression(node.exprName) : checkExpression(node.exprName);
+    return getInstantiationExpressionType(exprType, node);
+  }
+  function getInstantiationExpressionType(exprType, node) {
+    const typeArguments = node.typeArguments;
+    if (exprType === silentNeverType || isErrorType(exprType) || !some(typeArguments)) {
+      return exprType;
+    }
+    let hasSomeApplicableSignature = false;
+    let nonApplicableType;
+    const result = getInstantiatedType(exprType);
+    const errorType2 = hasSomeApplicableSignature ? nonApplicableType : exprType;
+    if (errorType2) {
+      diagnostics.add(createDiagnosticForNodeArray(getSourceFileOfNode(node), typeArguments, Diagnostics.Type_0_has_no_signatures_for_which_the_type_argument_list_is_applicable, typeToString(errorType2)));
+    }
+    return result;
+    function getInstantiatedType(type) {
+      let hasSignatures = false;
+      let hasApplicableSignature = false;
+      const result2 = getInstantiatedTypePart(type);
+      hasSomeApplicableSignature || (hasSomeApplicableSignature = hasApplicableSignature);
+      if (hasSignatures && !hasApplicableSignature) {
+        nonApplicableType ?? (nonApplicableType = type);
+      }
+      return result2;
+      function getInstantiatedTypePart(type2) {
+        if (type2.flags & 524288 /* Object */) {
+          const resolved = resolveStructuredTypeMembers(type2);
+          const callSignatures = getInstantiatedSignatures(resolved.callSignatures);
+          const constructSignatures = getInstantiatedSignatures(resolved.constructSignatures);
+          hasSignatures || (hasSignatures = resolved.callSignatures.length !== 0 || resolved.constructSignatures.length !== 0);
+          hasApplicableSignature || (hasApplicableSignature = callSignatures.length !== 0 || constructSignatures.length !== 0);
+          if (callSignatures !== resolved.callSignatures || constructSignatures !== resolved.constructSignatures) {
+            const result3 = createAnonymousType(createSymbol(0 /* None */, "__instantiationExpression" /* InstantiationExpression */), resolved.members, callSignatures, constructSignatures, resolved.indexInfos);
+            result3.objectFlags |= 8388608 /* InstantiationExpressionType */;
+            result3.node = node;
+            return result3;
+          }
+        } else if (type2.flags & 58982400 /* InstantiableNonPrimitive */) {
+          const constraint = getBaseConstraintOfType(type2);
+          if (constraint) {
+            const instantiated = getInstantiatedTypePart(constraint);
+            if (instantiated !== constraint) {
+              return instantiated;
+            }
+          }
+        } else if (type2.flags & 1048576 /* Union */) {
+          return mapType(type2, getInstantiatedType);
+        } else if (type2.flags & 2097152 /* Intersection */) {
+          return getIntersectionType(sameMap(type2.types, getInstantiatedTypePart));
+        }
+        return type2;
+      }
+    }
+    function getInstantiatedSignatures(signatures) {
+      const applicableSignatures = filter(signatures, (sig) => !!sig.typeParameters && hasCorrectTypeArgumentArity(sig, typeArguments));
+      return sameMap(applicableSignatures, (sig) => {
+        const typeArgumentTypes = checkTypeArguments(
+          sig,
+          typeArguments,
+          /*reportErrors*/
+          true
+        );
+        return typeArgumentTypes ? getSignatureInstantiation(sig, typeArgumentTypes, isInJSFile(sig.declaration)) : sig;
+      });
+    }
+  }
+  function checkSatisfiesExpression(node) {
+    checkSourceElement(node.type);
+    return checkSatisfiesExpressionWorker(node.expression, node.type);
+  }
+  function checkSatisfiesExpressionWorker(expression, target, checkMode) {
+    const exprType = checkExpression(expression, checkMode);
+    const targetType = getTypeFromTypeNode(target);
+    if (isErrorType(targetType)) {
+      return targetType;
+    }
+    const errorNode = findAncestor(target.parent, (n) => n.kind === 238 /* SatisfiesExpression */ || n.kind === 357 /* JSDocSatisfiesTag */);
+    checkTypeAssignableToAndOptionallyElaborate(exprType, targetType, errorNode, expression, Diagnostics.Type_0_does_not_satisfy_the_expected_type_1);
+    return exprType;
+  }
+  function checkMetaProperty(node) {
+    checkGrammarMetaProperty(node);
+    if (node.keywordToken === 105 /* NewKeyword */) {
+      return checkNewTargetMetaProperty(node);
+    }
+    if (node.keywordToken === 102 /* ImportKeyword */) {
+      return checkImportMetaProperty(node);
+    }
+    return Debug.assertNever(node.keywordToken);
+  }
+  function checkMetaPropertyKeyword(node) {
+    switch (node.keywordToken) {
+      case 102 /* ImportKeyword */:
+        return getGlobalImportMetaExpressionType();
+      case 105 /* NewKeyword */:
+        const type = checkNewTargetMetaProperty(node);
+        return isErrorType(type) ? errorType : createNewTargetExpressionType(type);
+      default:
+        Debug.assertNever(node.keywordToken);
+    }
+  }
+  function checkNewTargetMetaProperty(node) {
+    const container = getNewTargetContainer(node);
+    if (!container) {
+      error2(node, Diagnostics.Meta_property_0_is_only_allowed_in_the_body_of_a_function_declaration_function_expression_or_constructor, "new.target");
+      return errorType;
+    } else if (container.kind === 176 /* Constructor */) {
+      const symbol = getSymbolOfDeclaration(container.parent);
+      return getTypeOfSymbol(symbol);
+    } else {
+      const symbol = getSymbolOfDeclaration(container);
+      return getTypeOfSymbol(symbol);
+    }
+  }
+  function checkImportMetaProperty(node) {
+    if (moduleKind === 100 /* Node16 */ || moduleKind === 199 /* NodeNext */) {
+      if (getSourceFileOfNode(node).impliedNodeFormat !== 99 /* ESNext */) {
+        error2(node, Diagnostics.The_import_meta_meta_property_is_not_allowed_in_files_which_will_build_into_CommonJS_output);
+      }
+    } else if (moduleKind < 6 /* ES2020 */ && moduleKind !== 4 /* System */) {
+      error2(node, Diagnostics.The_import_meta_meta_property_is_only_allowed_when_the_module_option_is_es2020_es2022_esnext_system_node16_or_nodenext);
+    }
+    const file = getSourceFileOfNode(node);
+    Debug.assert(!!(file.flags & 8388608 /* PossiblyContainsImportMeta */), "Containing file is missing import meta node flag.");
+    return node.name.escapedText === "meta" ? getGlobalImportMetaType() : errorType;
+  }
+  function getTypeOfParameter(symbol) {
+    const declaration = symbol.valueDeclaration;
+    return addOptionality(
+      getTypeOfSymbol(symbol),
+      /*isProperty*/
+      false,
+      /*isOptional*/
+      !!declaration && (hasInitializer(declaration) || isOptionalDeclaration(declaration))
+    );
+  }
+  function getTupleElementLabel(d, index, restParameterName = "arg") {
+    if (!d) {
+      return `${restParameterName}_${index}`;
+    }
+    Debug.assert(isIdentifier(d.name));
+    return d.name.escapedText;
+  }
+  function getParameterNameAtPosition(signature, pos, overrideRestType) {
+    const paramCount = signature.parameters.length - (signatureHasRestParameter(signature) ? 1 : 0);
+    if (pos < paramCount) {
+      return signature.parameters[pos].escapedName;
+    }
+    const restParameter = signature.parameters[paramCount] || unknownSymbol;
+    const restType = overrideRestType || getTypeOfSymbol(restParameter);
+    if (isTupleType(restType)) {
+      const associatedNames = restType.target.labeledElementDeclarations;
+      const index = pos - paramCount;
+      return getTupleElementLabel(associatedNames == null ? void 0 : associatedNames[index], index, restParameter.escapedName);
+    }
+    return restParameter.escapedName;
+  }
+  function getParameterIdentifierInfoAtPosition(signature, pos) {
+    var _a;
+    if (((_a = signature.declaration) == null ? void 0 : _a.kind) === 324 /* JSDocFunctionType */) {
+      return void 0;
+    }
+    const paramCount = signature.parameters.length - (signatureHasRestParameter(signature) ? 1 : 0);
+    if (pos < paramCount) {
+      const param = signature.parameters[pos];
+      const paramIdent = getParameterDeclarationIdentifier(param);
+      return paramIdent ? {
+        parameter: paramIdent,
+        parameterName: param.escapedName,
+        isRestParameter: false
+      } : void 0;
+    }
+    const restParameter = signature.parameters[paramCount] || unknownSymbol;
+    const restIdent = getParameterDeclarationIdentifier(restParameter);
+    if (!restIdent) {
+      return void 0;
+    }
+    const restType = getTypeOfSymbol(restParameter);
+    if (isTupleType(restType)) {
+      const associatedNames = restType.target.labeledElementDeclarations;
+      const index = pos - paramCount;
+      const associatedName = associatedNames == null ? void 0 : associatedNames[index];
+      const isRestTupleElement = !!(associatedName == null ? void 0 : associatedName.dotDotDotToken);
+      if (associatedName) {
+        Debug.assert(isIdentifier(associatedName.name));
+        return { parameter: associatedName.name, parameterName: associatedName.name.escapedText, isRestParameter: isRestTupleElement };
+      }
+      return void 0;
+    }
+    if (pos === paramCount) {
+      return { parameter: restIdent, parameterName: restParameter.escapedName, isRestParameter: true };
+    }
+    return void 0;
+  }
+  function getParameterDeclarationIdentifier(symbol) {
+    return symbol.valueDeclaration && isParameter(symbol.valueDeclaration) && isIdentifier(symbol.valueDeclaration.name) && symbol.valueDeclaration.name;
+  }
+  function isValidDeclarationForTupleLabel(d) {
+    return d.kind === 202 /* NamedTupleMember */ || isParameter(d) && d.name && isIdentifier(d.name);
+  }
+  function getNameableDeclarationAtPosition(signature, pos) {
+    const paramCount = signature.parameters.length - (signatureHasRestParameter(signature) ? 1 : 0);
+    if (pos < paramCount) {
+      const decl = signature.parameters[pos].valueDeclaration;
+      return decl && isValidDeclarationForTupleLabel(decl) ? decl : void 0;
+    }
+    const restParameter = signature.parameters[paramCount] || unknownSymbol;
+    const restType = getTypeOfSymbol(restParameter);
+    if (isTupleType(restType)) {
+      const associatedNames = restType.target.labeledElementDeclarations;
+      const index = pos - paramCount;
+      return associatedNames && associatedNames[index];
+    }
+    return restParameter.valueDeclaration && isValidDeclarationForTupleLabel(restParameter.valueDeclaration) ? restParameter.valueDeclaration : void 0;
+  }
+  function getTypeAtPosition(signature, pos) {
+    return tryGetTypeAtPosition(signature, pos) || anyType;
+  }
+  function tryGetTypeAtPosition(signature, pos) {
+    const paramCount = signature.parameters.length - (signatureHasRestParameter(signature) ? 1 : 0);
+    if (pos < paramCount) {
+      return getTypeOfParameter(signature.parameters[pos]);
+    }
+    if (signatureHasRestParameter(signature)) {
+      const restType = getTypeOfSymbol(signature.parameters[paramCount]);
+      const index = pos - paramCount;
+      if (!isTupleType(restType) || restType.target.hasRestElement || index < restType.target.fixedLength) {
+        return getIndexedAccessType(restType, getNumberLiteralType(index));
+      }
+    }
+    return void 0;
+  }
+  function getRestTypeAtPosition(source, pos, readonly) {
+    const parameterCount = getParameterCount(source);
+    const minArgumentCount = getMinArgumentCount(source);
+    const restType = getEffectiveRestType(source);
+    if (restType && pos >= parameterCount - 1) {
+      return pos === parameterCount - 1 ? restType : createArrayType(getIndexedAccessType(restType, numberType));
+    }
+    const types = [];
+    const flags = [];
+    const names = [];
+    for (let i = pos; i < parameterCount; i++) {
+      if (!restType || i < parameterCount - 1) {
+        types.push(getTypeAtPosition(source, i));
+        flags.push(i < minArgumentCount ? 1 /* Required */ : 2 /* Optional */);
+      } else {
+        types.push(restType);
+        flags.push(8 /* Variadic */);
+      }
+      names.push(getNameableDeclarationAtPosition(source, i));
+    }
+    return createTupleType(types, flags, readonly, names);
+  }
+  function getRestOrAnyTypeAtPosition(source, pos) {
+    const restType = getRestTypeAtPosition(source, pos);
+    const elementType = restType && getElementTypeOfArrayType(restType);
+    return elementType && isTypeAny(elementType) ? anyType : restType;
+  }
+  function getParameterCount(signature) {
+    const length2 = signature.parameters.length;
+    if (signatureHasRestParameter(signature)) {
+      const restType = getTypeOfSymbol(signature.parameters[length2 - 1]);
+      if (isTupleType(restType)) {
+        return length2 + restType.target.fixedLength - (restType.target.hasRestElement ? 0 : 1);
+      }
+    }
+    return length2;
+  }
+  function getMinArgumentCount(signature, flags) {
+    const strongArityForUntypedJS = flags & 1 /* StrongArityForUntypedJS */;
+    const voidIsNonOptional = flags & 2 /* VoidIsNonOptional */;
+    if (voidIsNonOptional || signature.resolvedMinArgumentCount === void 0) {
+      let minArgumentCount;
+      if (signatureHasRestParameter(signature)) {
+        const restType = getTypeOfSymbol(signature.parameters[signature.parameters.length - 1]);
+        if (isTupleType(restType)) {
+          const firstOptionalIndex = findIndex(restType.target.elementFlags, (f) => !(f & 1 /* Required */));
+          const requiredCount = firstOptionalIndex < 0 ? restType.target.fixedLength : firstOptionalIndex;
+          if (requiredCount > 0) {
+            minArgumentCount = signature.parameters.length - 1 + requiredCount;
+          }
+        }
+      }
+      if (minArgumentCount === void 0) {
+        if (!strongArityForUntypedJS && signature.flags & 32 /* IsUntypedSignatureInJSFile */) {
+          return 0;
+        }
+        minArgumentCount = signature.minArgumentCount;
+      }
+      if (voidIsNonOptional) {
+        return minArgumentCount;
+      }
+      for (let i = minArgumentCount - 1; i >= 0; i--) {
+        const type = getTypeAtPosition(signature, i);
+        if (filterType(type, acceptsVoid).flags & 131072 /* Never */) {
+          break;
+        }
+        minArgumentCount = i;
+      }
+      signature.resolvedMinArgumentCount = minArgumentCount;
+    }
+    return signature.resolvedMinArgumentCount;
+  }
+  function hasEffectiveRestParameter(signature) {
+    if (signatureHasRestParameter(signature)) {
+      const restType = getTypeOfSymbol(signature.parameters[signature.parameters.length - 1]);
+      return !isTupleType(restType) || restType.target.hasRestElement;
+    }
+    return false;
+  }
+  function getEffectiveRestType(signature) {
+    if (signatureHasRestParameter(signature)) {
+      const restType = getTypeOfSymbol(signature.parameters[signature.parameters.length - 1]);
+      if (!isTupleType(restType)) {
+        return isTypeAny(restType) ? anyArrayType : restType;
+      }
+      if (restType.target.hasRestElement) {
+        return sliceTupleType(restType, restType.target.fixedLength);
+      }
+    }
+    return void 0;
+  }
+  function getNonArrayRestType(signature) {
+    const restType = getEffectiveRestType(signature);
+    return restType && !isArrayType(restType) && !isTypeAny(restType) ? restType : void 0;
+  }
+  function getTypeOfFirstParameterOfSignature(signature) {
+    return getTypeOfFirstParameterOfSignatureWithFallback(signature, neverType);
+  }
+  function getTypeOfFirstParameterOfSignatureWithFallback(signature, fallbackType) {
+    return signature.parameters.length > 0 ? getTypeAtPosition(signature, 0) : fallbackType;
+  }
+  function inferFromAnnotatedParameters(signature, context, inferenceContext) {
+    const len = signature.parameters.length - (signatureHasRestParameter(signature) ? 1 : 0);
+    for (let i = 0; i < len; i++) {
+      const declaration = signature.parameters[i].valueDeclaration;
+      const typeNode = getEffectiveTypeAnnotationNode(declaration);
+      if (typeNode) {
+        const source = addOptionality(
+          getTypeFromTypeNode(typeNode),
+          /*isProperty*/
+          false,
+          isOptionalDeclaration(declaration)
+        );
+        const target = getTypeAtPosition(context, i);
+        inferTypes(inferenceContext.inferences, source, target);
+      }
+    }
+  }
+  function assignContextualParameterTypes(signature, context) {
+    if (context.typeParameters) {
+      if (!signature.typeParameters) {
+        signature.typeParameters = context.typeParameters;
+      } else {
+        return;
+      }
+    }
+    if (context.thisParameter) {
+      const parameter = signature.thisParameter;
+      if (!parameter || parameter.valueDeclaration && !parameter.valueDeclaration.type) {
+        if (!parameter) {
+          signature.thisParameter = createSymbolWithType(
+            context.thisParameter,
+            /*type*/
+            void 0
+          );
+        }
+        assignParameterType(signature.thisParameter, getTypeOfSymbol(context.thisParameter));
+      }
+    }
+    const len = signature.parameters.length - (signatureHasRestParameter(signature) ? 1 : 0);
+    for (let i = 0; i < len; i++) {
+      const parameter = signature.parameters[i];
+      const declaration = parameter.valueDeclaration;
+      if (!getEffectiveTypeAnnotationNode(declaration)) {
+        let type = tryGetTypeAtPosition(context, i);
+        if (type && declaration.initializer) {
+          let initializerType = checkDeclarationInitializer(declaration, 0 /* Normal */);
+          if (!isTypeAssignableTo(initializerType, type) && isTypeAssignableTo(type, initializerType = widenTypeInferredFromInitializer(declaration, initializerType))) {
+            type = initializerType;
+          }
+        }
+        assignParameterType(parameter, type);
+      }
+    }
+    if (signatureHasRestParameter(signature)) {
+      const parameter = last(signature.parameters);
+      if (parameter.valueDeclaration ? !getEffectiveTypeAnnotationNode(parameter.valueDeclaration) : !!(getCheckFlags(parameter) & 65536 /* DeferredType */)) {
+        const contextualParameterType = getRestTypeAtPosition(context, len);
+        assignParameterType(parameter, contextualParameterType);
+      }
+    }
+  }
+  function assignNonContextualParameterTypes(signature) {
+    if (signature.thisParameter) {
+      assignParameterType(signature.thisParameter);
+    }
+    for (const parameter of signature.parameters) {
+      assignParameterType(parameter);
+    }
+  }
+  function assignParameterType(parameter, contextualType) {
+    const links = getSymbolLinks(parameter);
+    if (!links.type) {
+      const declaration = parameter.valueDeclaration;
+      links.type = addOptionality(
+        contextualType || (declaration ? getWidenedTypeForVariableLikeDeclaration(
+          declaration,
+          /*reportErrors*/
+          true
+        ) : getTypeOfSymbol(parameter)),
+        /*isProperty*/
+        false,
+        /*isOptional*/
+        !!declaration && !declaration.initializer && isOptionalDeclaration(declaration)
+      );
+      if (declaration && declaration.name.kind !== 80 /* Identifier */) {
+        if (links.type === unknownType) {
+          links.type = getTypeFromBindingPattern(declaration.name);
+        }
+        assignBindingElementTypes(declaration.name, links.type);
+      }
+    } else if (contextualType) {
+      Debug.assertEqual(links.type, contextualType, "Parameter symbol already has a cached type which differs from newly assigned type");
+    }
+  }
+  function assignBindingElementTypes(pattern, parentType) {
+    for (const element of pattern.elements) {
+      if (!isOmittedExpression(element)) {
+        const type = getBindingElementTypeFromParentType(
+          element,
+          parentType,
+          /*noTupleBoundsCheck*/
+          false
+        );
+        if (element.name.kind === 80 /* Identifier */) {
+          getSymbolLinks(getSymbolOfDeclaration(element)).type = type;
+        } else {
+          assignBindingElementTypes(element.name, type);
+        }
+      }
+    }
+  }
+  function createClassDecoratorContextType(classType) {
+    return tryCreateTypeReference(getGlobalClassDecoratorContextType(
+      /*reportErrors*/
+      true
+    ), [classType]);
+  }
+  function createClassMethodDecoratorContextType(thisType, valueType) {
+    return tryCreateTypeReference(getGlobalClassMethodDecoratorContextType(
+      /*reportErrors*/
+      true
+    ), [thisType, valueType]);
+  }
+  function createClassGetterDecoratorContextType(thisType, valueType) {
+    return tryCreateTypeReference(getGlobalClassGetterDecoratorContextType(
+      /*reportErrors*/
+      true
+    ), [thisType, valueType]);
+  }
+  function createClassSetterDecoratorContextType(thisType, valueType) {
+    return tryCreateTypeReference(getGlobalClassSetterDecoratorContextType(
+      /*reportErrors*/
+      true
+    ), [thisType, valueType]);
+  }
+  function createClassAccessorDecoratorContextType(thisType, valueType) {
+    return tryCreateTypeReference(getGlobalClassAccessorDecoratorContextType(
+      /*reportErrors*/
+      true
+    ), [thisType, valueType]);
+  }
+  function createClassFieldDecoratorContextType(thisType, valueType) {
+    return tryCreateTypeReference(getGlobalClassFieldDecoratorContextType(
+      /*reportErrors*/
+      true
+    ), [thisType, valueType]);
+  }
+  function getClassMemberDecoratorContextOverrideType(nameType, isPrivate, isStatic2) {
+    const key = `${isPrivate ? "p" : "P"}${isStatic2 ? "s" : "S"}${nameType.id}`;
+    let overrideType = decoratorContextOverrideTypeCache.get(key);
+    if (!overrideType) {
+      const members = createSymbolTable();
+      members.set("name", createProperty("name", nameType));
+      members.set("private", createProperty("private", isPrivate ? trueType : falseType));
+      members.set("static", createProperty("static", isStatic2 ? trueType : falseType));
+      overrideType = createAnonymousType(
+        /*symbol*/
+        void 0,
+        members,
+        emptyArray,
+        emptyArray,
+        emptyArray
+      );
+      decoratorContextOverrideTypeCache.set(key, overrideType);
+    }
+    return overrideType;
+  }
+  function createClassMemberDecoratorContextTypeForNode(node, thisType, valueType) {
+    const isStatic2 = hasStaticModifier(node);
+    const isPrivate = isPrivateIdentifier(node.name);
+    const nameType = isPrivate ? getStringLiteralType(idText(node.name)) : getLiteralTypeFromPropertyName(node.name);
+    const contextType = isMethodDeclaration(node) ? createClassMethodDecoratorContextType(thisType, valueType) : isGetAccessorDeclaration(node) ? createClassGetterDecoratorContextType(thisType, valueType) : isSetAccessorDeclaration(node) ? createClassSetterDecoratorContextType(thisType, valueType) : isAutoAccessorPropertyDeclaration(node) ? createClassAccessorDecoratorContextType(thisType, valueType) : isPropertyDeclaration(node) ? createClassFieldDecoratorContextType(thisType, valueType) : Debug.failBadSyntaxKind(node);
+    const overrideType = getClassMemberDecoratorContextOverrideType(nameType, isPrivate, isStatic2);
+    return getIntersectionType([contextType, overrideType]);
+  }
+  function createClassAccessorDecoratorTargetType(thisType, valueType) {
+    return tryCreateTypeReference(getGlobalClassAccessorDecoratorTargetType(
+      /*reportErrors*/
+      true
+    ), [thisType, valueType]);
+  }
+  function createClassAccessorDecoratorResultType(thisType, valueType) {
+    return tryCreateTypeReference(getGlobalClassAccessorDecoratorResultType(
+      /*reportErrors*/
+      true
+    ), [thisType, valueType]);
+  }
+  function createClassFieldDecoratorInitializerMutatorType(thisType, valueType) {
+    const thisParam = createParameter2("this", thisType);
+    const valueParam = createParameter2("value", valueType);
+    return createFunctionType(
+      /*typeParameters*/
+      void 0,
+      thisParam,
+      [valueParam],
+      valueType,
+      /*typePredicate*/
+      void 0,
+      1
+    );
+  }
+  function createESDecoratorCallSignature(targetType, contextType, nonOptionalReturnType) {
+    const targetParam = createParameter2("target", targetType);
+    const contextParam = createParameter2("context", contextType);
+    const returnType = getUnionType([nonOptionalReturnType, voidType]);
+    return createCallSignature(
+      /*typeParameters*/
+      void 0,
+      /*thisParameter*/
+      void 0,
+      [targetParam, contextParam],
+      returnType
+    );
+  }
+  function getESDecoratorCallSignature(decorator) {
+    const { parent: parent2 } = decorator;
+    const links = getNodeLinks(parent2);
+    if (!links.decoratorSignature) {
+      links.decoratorSignature = anySignature;
+      switch (parent2.kind) {
+        case 263 /* ClassDeclaration */:
+        case 231 /* ClassExpression */: {
+          const node = parent2;
+          const targetType = getTypeOfSymbol(getSymbolOfDeclaration(node));
+          const contextType = createClassDecoratorContextType(targetType);
+          links.decoratorSignature = createESDecoratorCallSignature(targetType, contextType, targetType);
+          break;
+        }
+        case 174 /* MethodDeclaration */:
+        case 177 /* GetAccessor */:
+        case 178 /* SetAccessor */: {
+          const node = parent2;
+          if (!isClassLike(node.parent))
+            break;
+          const valueType = isMethodDeclaration(node) ? getOrCreateTypeFromSignature(getSignatureFromDeclaration(node)) : getTypeOfNode(node);
+          const thisType = hasStaticModifier(node) ? getTypeOfSymbol(getSymbolOfDeclaration(node.parent)) : getDeclaredTypeOfClassOrInterface(getSymbolOfDeclaration(node.parent));
+          const targetType = isGetAccessorDeclaration(node) ? createGetterFunctionType(valueType) : isSetAccessorDeclaration(node) ? createSetterFunctionType(valueType) : valueType;
+          const contextType = createClassMemberDecoratorContextTypeForNode(node, thisType, valueType);
+          const returnType = isGetAccessorDeclaration(node) ? createGetterFunctionType(valueType) : isSetAccessorDeclaration(node) ? createSetterFunctionType(valueType) : valueType;
+          links.decoratorSignature = createESDecoratorCallSignature(targetType, contextType, returnType);
+          break;
+        }
+        case 172 /* PropertyDeclaration */: {
+          const node = parent2;
+          if (!isClassLike(node.parent))
+            break;
+          const valueType = getTypeOfNode(node);
+          const thisType = hasStaticModifier(node) ? getTypeOfSymbol(getSymbolOfDeclaration(node.parent)) : getDeclaredTypeOfClassOrInterface(getSymbolOfDeclaration(node.parent));
+          const targetType = hasAccessorModifier(node) ? createClassAccessorDecoratorTargetType(thisType, valueType) : undefinedType;
+          const contextType = createClassMemberDecoratorContextTypeForNode(node, thisType, valueType);
+          const returnType = hasAccessorModifier(node) ? createClassAccessorDecoratorResultType(thisType, valueType) : createClassFieldDecoratorInitializerMutatorType(thisType, valueType);
+          links.decoratorSignature = createESDecoratorCallSignature(targetType, contextType, returnType);
+          break;
+        }
+      }
+    }
+    return links.decoratorSignature === anySignature ? void 0 : links.decoratorSignature;
+  }
+  function getLegacyDecoratorCallSignature(decorator) {
+    const { parent: parent2 } = decorator;
+    const links = getNodeLinks(parent2);
+    if (!links.decoratorSignature) {
+      links.decoratorSignature = anySignature;
+      switch (parent2.kind) {
+        case 263 /* ClassDeclaration */:
+        case 231 /* ClassExpression */: {
+          const node = parent2;
+          const targetType = getTypeOfSymbol(getSymbolOfDeclaration(node));
+          const targetParam = createParameter2("target", targetType);
+          links.decoratorSignature = createCallSignature(
+            /*typeParameters*/
+            void 0,
+            /*thisParameter*/
+            void 0,
+            [targetParam],
+            getUnionType([targetType, voidType])
+          );
+          break;
+        }
+        case 169 /* Parameter */: {
+          const node = parent2;
+          if (!isConstructorDeclaration(node.parent) && !(isMethodDeclaration(node.parent) || isSetAccessorDeclaration(node.parent) && isClassLike(node.parent.parent))) {
+            break;
+          }
+          if (getThisParameter(node.parent) === node) {
+            break;
+          }
+          const index = getThisParameter(node.parent) ? node.parent.parameters.indexOf(node) - 1 : node.parent.parameters.indexOf(node);
+          Debug.assert(index >= 0);
+          const targetType = isConstructorDeclaration(node.parent) ? getTypeOfSymbol(getSymbolOfDeclaration(node.parent.parent)) : getParentTypeOfClassElement(node.parent);
+          const keyType = isConstructorDeclaration(node.parent) ? undefinedType : getClassElementPropertyKeyType(node.parent);
+          const indexType = getNumberLiteralType(index);
+          const targetParam = createParameter2("target", targetType);
+          const keyParam = createParameter2("propertyKey", keyType);
+          const indexParam = createParameter2("parameterIndex", indexType);
+          links.decoratorSignature = createCallSignature(
+            /*typeParameters*/
+            void 0,
+            /*thisParameter*/
+            void 0,
+            [targetParam, keyParam, indexParam],
+            voidType
+          );
+          break;
+        }
+        case 174 /* MethodDeclaration */:
+        case 177 /* GetAccessor */:
+        case 178 /* SetAccessor */:
+        case 172 /* PropertyDeclaration */: {
+          const node = parent2;
+          if (!isClassLike(node.parent))
+            break;
+          const targetType = getParentTypeOfClassElement(node);
+          const targetParam = createParameter2("target", targetType);
+          const keyType = getClassElementPropertyKeyType(node);
+          const keyParam = createParameter2("propertyKey", keyType);
+          const returnType = isPropertyDeclaration(node) ? voidType : createTypedPropertyDescriptorType(getTypeOfNode(node));
+          const hasPropDesc = languageVersion !== 0 /* ES3 */ && (!isPropertyDeclaration(parent2) || hasAccessorModifier(parent2));
+          if (hasPropDesc) {
+            const descriptorType = createTypedPropertyDescriptorType(getTypeOfNode(node));
+            const descriptorParam = createParameter2("descriptor", descriptorType);
+            links.decoratorSignature = createCallSignature(
+              /*typeParameters*/
+              void 0,
+              /*thisParameter*/
+              void 0,
+              [targetParam, keyParam, descriptorParam],
+              getUnionType([returnType, voidType])
+            );
+          } else {
+            links.decoratorSignature = createCallSignature(
+              /*typeParameters*/
+              void 0,
+              /*thisParameter*/
+              void 0,
+              [targetParam, keyParam],
+              getUnionType([returnType, voidType])
+            );
+          }
+          break;
+        }
+      }
+    }
+    return links.decoratorSignature === anySignature ? void 0 : links.decoratorSignature;
+  }
+  function getDecoratorCallSignature(decorator) {
+    return legacyDecorators ? getLegacyDecoratorCallSignature(decorator) : getESDecoratorCallSignature(decorator);
+  }
+  function createPromiseType(promisedType) {
+    const globalPromiseType = getGlobalPromiseType(
+      /*reportErrors*/
+      true
+    );
+    if (globalPromiseType !== emptyGenericType) {
+      promisedType = getAwaitedTypeNoAlias(unwrapAwaitedType(promisedType)) || unknownType;
+      return createTypeReference(globalPromiseType, [promisedType]);
+    }
+    return unknownType;
+  }
+  function createPromiseLikeType(promisedType) {
+    const globalPromiseLikeType = getGlobalPromiseLikeType(
+      /*reportErrors*/
+      true
+    );
+    if (globalPromiseLikeType !== emptyGenericType) {
+      promisedType = getAwaitedTypeNoAlias(unwrapAwaitedType(promisedType)) || unknownType;
+      return createTypeReference(globalPromiseLikeType, [promisedType]);
+    }
+    return unknownType;
+  }
+  function createPromiseReturnType(func, promisedType) {
+    const promiseType = createPromiseType(promisedType);
+    if (promiseType === unknownType) {
+      error2(
+        func,
+        isImportCall(func) ? Diagnostics.A_dynamic_import_call_returns_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option : Diagnostics.An_async_function_or_method_must_return_a_Promise_Make_sure_you_have_a_declaration_for_Promise_or_include_ES2015_in_your_lib_option
+      );
+      return errorType;
+    } else if (!getGlobalPromiseConstructorSymbol(
+      /*reportErrors*/
+      true
+    )) {
+      error2(
+        func,
+        isImportCall(func) ? Diagnostics.A_dynamic_import_call_in_ES5_SlashES3_requires_the_Promise_constructor_Make_sure_you_have_a_declaration_for_the_Promise_constructor_or_include_ES2015_in_your_lib_option : Diagnostics.An_async_function_or_method_in_ES5_SlashES3_requires_the_Promise_constructor_Make_sure_you_have_a_declaration_for_the_Promise_constructor_or_include_ES2015_in_your_lib_option
+      );
+    }
+    return promiseType;
+  }
+  function createNewTargetExpressionType(targetType) {
+    const symbol = createSymbol(0 /* None */, "NewTargetExpression");
+    const targetPropertySymbol = createSymbol(4 /* Property */, "target", 8 /* Readonly */);
+    targetPropertySymbol.parent = symbol;
+    targetPropertySymbol.links.type = targetType;
+    const members = createSymbolTable([targetPropertySymbol]);
+    symbol.members = members;
+    return createAnonymousType(symbol, members, emptyArray, emptyArray, emptyArray);
+  }
+  function getReturnTypeFromBody(func, checkMode) {
+    if (!func.body) {
+      return errorType;
+    }
+    const functionFlags = getFunctionFlags(func);
+    const isAsync = (functionFlags & 2 /* Async */) !== 0;
+    const isGenerator = (functionFlags & 1 /* Generator */) !== 0;
+    let returnType;
+    let yieldType;
+    let nextType;
+    let fallbackReturnType = voidType;
+    if (func.body.kind !== 241 /* Block */) {
+      returnType = checkExpressionCached(func.body, checkMode && checkMode & ~8 /* SkipGenericFunctions */);
+      if (isAsync) {
+        returnType = unwrapAwaitedType(checkAwaitedType(
+          returnType,
+          /*withAlias*/
+          false,
+          /*errorNode*/
+          func,
+          Diagnostics.The_return_type_of_an_async_function_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member
+        ));
+      }
+    } else if (isGenerator) {
+      const returnTypes = checkAndAggregateReturnExpressionTypes(func, checkMode);
+      if (!returnTypes) {
+        fallbackReturnType = neverType;
+      } else if (returnTypes.length > 0) {
+        returnType = getUnionType(returnTypes, 2 /* Subtype */);
+      }
+      const { yieldTypes, nextTypes } = checkAndAggregateYieldOperandTypes(func, checkMode);
+      yieldType = some(yieldTypes) ? getUnionType(yieldTypes, 2 /* Subtype */) : void 0;
+      nextType = some(nextTypes) ? getIntersectionType(nextTypes) : void 0;
+    } else {
+      const types = checkAndAggregateReturnExpressionTypes(func, checkMode);
+      if (!types) {
+        return functionFlags & 2 /* Async */ ? createPromiseReturnType(func, neverType) : neverType;
+      }
+      if (types.length === 0) {
+        const contextualReturnType = getContextualReturnType(
+          func,
+          /*contextFlags*/
+          void 0
+        );
+        const returnType2 = contextualReturnType && (unwrapReturnType(contextualReturnType, functionFlags) || voidType).flags & 32768 /* Undefined */ ? undefinedType : voidType;
+        return functionFlags & 2 /* Async */ ? createPromiseReturnType(func, returnType2) : (
+          // Async function
+          returnType2
+        );
+      }
+      returnType = getUnionType(types, 2 /* Subtype */);
+    }
+    if (returnType || yieldType || nextType) {
+      if (yieldType)
+        reportErrorsFromWidening(func, yieldType, 3 /* GeneratorYield */);
+      if (returnType)
+        reportErrorsFromWidening(func, returnType, 1 /* FunctionReturn */);
+      if (nextType)
+        reportErrorsFromWidening(func, nextType, 2 /* GeneratorNext */);
+      if (returnType && isUnitType(returnType) || yieldType && isUnitType(yieldType) || nextType && isUnitType(nextType)) {
+        const contextualSignature = getContextualSignatureForFunctionLikeDeclaration(func);
+        const contextualType = !contextualSignature ? void 0 : contextualSignature === getSignatureFromDeclaration(func) ? isGenerator ? void 0 : returnType : instantiateContextualType(
+          getReturnTypeOfSignature(contextualSignature),
+          func,
+          /*contextFlags*/
+          void 0
+        );
+        if (isGenerator) {
+          yieldType = getWidenedLiteralLikeTypeForContextualIterationTypeIfNeeded(yieldType, contextualType, 0 /* Yield */, isAsync);
+          returnType = getWidenedLiteralLikeTypeForContextualIterationTypeIfNeeded(returnType, contextualType, 1 /* Return */, isAsync);
+          nextType = getWidenedLiteralLikeTypeForContextualIterationTypeIfNeeded(nextType, contextualType, 2 /* Next */, isAsync);
+        } else {
+          returnType = getWidenedLiteralLikeTypeForContextualReturnTypeIfNeeded(returnType, contextualType, isAsync);
+        }
+      }
+      if (yieldType)
+        yieldType = getWidenedType(yieldType);
+      if (returnType)
+        returnType = getWidenedType(returnType);
+      if (nextType)
+        nextType = getWidenedType(nextType);
+    }
+    if (isGenerator) {
+      return createGeneratorReturnType(
+        yieldType || neverType,
+        returnType || fallbackReturnType,
+        nextType || getContextualIterationType(2 /* Next */, func) || unknownType,
+        isAsync
+      );
+    } else {
+      return isAsync ? createPromiseType(returnType || fallbackReturnType) : returnType || fallbackReturnType;
+    }
+  }
+  function createGeneratorReturnType(yieldType, returnType, nextType, isAsyncGenerator) {
+    const resolver = isAsyncGenerator ? asyncIterationTypesResolver : syncIterationTypesResolver;
+    const globalGeneratorType = resolver.getGlobalGeneratorType(
+      /*reportErrors*/
+      false
+    );
+    yieldType = resolver.resolveIterationType(
+      yieldType,
+      /*errorNode*/
+      void 0
+    ) || unknownType;
+    returnType = resolver.resolveIterationType(
+      returnType,
+      /*errorNode*/
+      void 0
+    ) || unknownType;
+    nextType = resolver.resolveIterationType(
+      nextType,
+      /*errorNode*/
+      void 0
+    ) || unknownType;
+    if (globalGeneratorType === emptyGenericType) {
+      const globalType = resolver.getGlobalIterableIteratorType(
+        /*reportErrors*/
+        false
+      );
+      const iterationTypes = globalType !== emptyGenericType ? getIterationTypesOfGlobalIterableType(globalType, resolver) : void 0;
+      const iterableIteratorReturnType = iterationTypes ? iterationTypes.returnType : anyType;
+      const iterableIteratorNextType = iterationTypes ? iterationTypes.nextType : undefinedType;
+      if (isTypeAssignableTo(returnType, iterableIteratorReturnType) && isTypeAssignableTo(iterableIteratorNextType, nextType)) {
+        if (globalType !== emptyGenericType) {
+          return createTypeFromGenericGlobalType(globalType, [yieldType]);
+        }
+        resolver.getGlobalIterableIteratorType(
+          /*reportErrors*/
+          true
+        );
+        return emptyObjectType;
+      }
+      resolver.getGlobalGeneratorType(
+        /*reportErrors*/
+        true
+      );
+      return emptyObjectType;
+    }
+    return createTypeFromGenericGlobalType(globalGeneratorType, [yieldType, returnType, nextType]);
+  }
+  function checkAndAggregateYieldOperandTypes(func, checkMode) {
+    const yieldTypes = [];
+    const nextTypes = [];
+    const isAsync = (getFunctionFlags(func) & 2 /* Async */) !== 0;
+    forEachYieldExpression(func.body, (yieldExpression) => {
+      const yieldExpressionType = yieldExpression.expression ? checkExpression(yieldExpression.expression, checkMode) : undefinedWideningType;
+      pushIfUnique(yieldTypes, getYieldedTypeOfYieldExpression(yieldExpression, yieldExpressionType, anyType, isAsync));
+      let nextType;
+      if (yieldExpression.asteriskToken) {
+        const iterationTypes = getIterationTypesOfIterable(
+          yieldExpressionType,
+          isAsync ? 19 /* AsyncYieldStar */ : 17 /* YieldStar */,
+          yieldExpression.expression
+        );
+        nextType = iterationTypes && iterationTypes.nextType;
+      } else {
+        nextType = getContextualType2(
+          yieldExpression,
+          /*contextFlags*/
+          void 0
+        );
+      }
+      if (nextType)
+        pushIfUnique(nextTypes, nextType);
+    });
+    return { yieldTypes, nextTypes };
+  }
+  function getYieldedTypeOfYieldExpression(node, expressionType, sentType, isAsync) {
+    const errorNode = node.expression || node;
+    const yieldedType = node.asteriskToken ? checkIteratedTypeOrElementType(isAsync ? 19 /* AsyncYieldStar */ : 17 /* YieldStar */, expressionType, sentType, errorNode) : expressionType;
+    return !isAsync ? yieldedType : getAwaitedType(
+      yieldedType,
+      errorNode,
+      node.asteriskToken ? Diagnostics.Type_of_iterated_elements_of_a_yield_Asterisk_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member : Diagnostics.Type_of_yield_operand_in_an_async_generator_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member
+    );
+  }
+  function getNotEqualFactsFromTypeofSwitch(start2, end, witnesses) {
+    let facts = 0 /* None */;
+    for (let i = 0; i < witnesses.length; i++) {
+      const witness = i < start2 || i >= end ? witnesses[i] : void 0;
+      facts |= witness !== void 0 ? typeofNEFacts.get(witness) || 32768 /* TypeofNEHostObject */ : 0;
+    }
+    return facts;
+  }
+  function isExhaustiveSwitchStatement(node) {
+    const links = getNodeLinks(node);
+    if (links.isExhaustive === void 0) {
+      links.isExhaustive = 0;
+      const exhaustive = computeExhaustiveSwitchStatement(node);
+      if (links.isExhaustive === 0) {
+        links.isExhaustive = exhaustive;
+      }
+    } else if (links.isExhaustive === 0) {
+      links.isExhaustive = false;
+    }
+    return links.isExhaustive;
+  }
+  function computeExhaustiveSwitchStatement(node) {
+    if (node.expression.kind === 221 /* TypeOfExpression */) {
+      const witnesses = getSwitchClauseTypeOfWitnesses(node);
+      if (!witnesses) {
+        return false;
+      }
+      const operandConstraint = getBaseConstraintOrType(checkExpressionCached(node.expression.expression));
+      const notEqualFacts = getNotEqualFactsFromTypeofSwitch(0, 0, witnesses);
+      if (operandConstraint.flags & 3 /* AnyOrUnknown */) {
+        return (556800 /* AllTypeofNE */ & notEqualFacts) === 556800 /* AllTypeofNE */;
+      }
+      return !someType(operandConstraint, (t) => getTypeFacts(t, notEqualFacts) === notEqualFacts);
+    }
+    const type = checkExpressionCached(node.expression);
+    if (!isLiteralType(type)) {
+      return false;
+    }
+    const switchTypes = getSwitchClauseTypes(node);
+    if (!switchTypes.length || some(switchTypes, isNeitherUnitTypeNorNever)) {
+      return false;
+    }
+    return eachTypeContainedIn(mapType(type, getRegularTypeOfLiteralType), switchTypes);
+  }
+  function functionHasImplicitReturn(func) {
+    return func.endFlowNode && isReachableFlowNode(func.endFlowNode);
+  }
+  function checkAndAggregateReturnExpressionTypes(func, checkMode) {
+    const functionFlags = getFunctionFlags(func);
+    const aggregatedTypes = [];
+    let hasReturnWithNoExpression = functionHasImplicitReturn(func);
+    let hasReturnOfTypeNever = false;
+    forEachReturnStatement(func.body, (returnStatement) => {
+      let expr = returnStatement.expression;
+      if (expr) {
+        expr = skipParentheses(
+          expr,
+          /*excludeJSDocTypeAssertions*/
+          true
+        );
+        if (functionFlags & 2 /* Async */ && expr.kind === 223 /* AwaitExpression */) {
+          expr = skipParentheses(
+            expr.expression,
+            /*excludeJSDocTypeAssertions*/
+            true
+          );
+        }
+        if (expr.kind === 213 /* CallExpression */ && expr.expression.kind === 80 /* Identifier */ && checkExpressionCached(expr.expression).symbol === func.symbol) {
+          hasReturnOfTypeNever = true;
+          return;
+        }
+        let type = checkExpressionCached(expr, checkMode && checkMode & ~8 /* SkipGenericFunctions */);
+        if (functionFlags & 2 /* Async */) {
+          type = unwrapAwaitedType(checkAwaitedType(
+            type,
+            /*withAlias*/
+            false,
+            func,
+            Diagnostics.The_return_type_of_an_async_function_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member
+          ));
+        }
+        if (type.flags & 131072 /* Never */) {
+          hasReturnOfTypeNever = true;
+        }
+        pushIfUnique(aggregatedTypes, type);
+      } else {
+        hasReturnWithNoExpression = true;
+      }
+    });
+    if (aggregatedTypes.length === 0 && !hasReturnWithNoExpression && (hasReturnOfTypeNever || mayReturnNever(func))) {
+      return void 0;
+    }
+    if (strictNullChecks && aggregatedTypes.length && hasReturnWithNoExpression && !(isJSConstructor(func) && aggregatedTypes.some((t) => t.symbol === func.symbol))) {
+      pushIfUnique(aggregatedTypes, undefinedType);
+    }
+    return aggregatedTypes;
+  }
+  function mayReturnNever(func) {
+    switch (func.kind) {
+      case 218 /* FunctionExpression */:
+      case 219 /* ArrowFunction */:
+        return true;
+      case 174 /* MethodDeclaration */:
+        return func.parent.kind === 210 /* ObjectLiteralExpression */;
+      default:
+        return false;
+    }
+  }
+  function checkAllCodePathsInNonVoidFunctionReturnOrThrow(func, returnType) {
+    addLazyDiagnostic(checkAllCodePathsInNonVoidFunctionReturnOrThrowDiagnostics);
+    return;
+    function checkAllCodePathsInNonVoidFunctionReturnOrThrowDiagnostics() {
+      const functionFlags = getFunctionFlags(func);
+      const type = returnType && unwrapReturnType(returnType, functionFlags);
+      if (type && (maybeTypeOfKind(type, 16384 /* Void */) || type.flags & (1 /* Any */ | 32768 /* Undefined */))) {
+        return;
+      }
+      if (func.kind === 173 /* MethodSignature */ || nodeIsMissing(func.body) || func.body.kind !== 241 /* Block */ || !functionHasImplicitReturn(func)) {
+        return;
+      }
+      const hasExplicitReturn = func.flags & 1024 /* HasExplicitReturn */;
+      const errorNode = getEffectiveReturnTypeNode(func) || func;
+      if (type && type.flags & 131072 /* Never */) {
+        error2(errorNode, Diagnostics.A_function_returning_never_cannot_have_a_reachable_end_point);
+      } else if (type && !hasExplicitReturn) {
+        error2(errorNode, Diagnostics.A_function_whose_declared_type_is_neither_undefined_void_nor_any_must_return_a_value);
+      } else if (type && strictNullChecks && !isTypeAssignableTo(undefinedType, type)) {
+        error2(errorNode, Diagnostics.Function_lacks_ending_return_statement_and_return_type_does_not_include_undefined);
+      } else if (compilerOptions.noImplicitReturns) {
+        if (!type) {
+          if (!hasExplicitReturn) {
+            return;
+          }
+          const inferredReturnType = getReturnTypeOfSignature(getSignatureFromDeclaration(func));
+          if (isUnwrappedReturnTypeUndefinedVoidOrAny(func, inferredReturnType)) {
+            return;
+          }
+        }
+        error2(errorNode, Diagnostics.Not_all_code_paths_return_a_value);
+      }
+    }
+  }
+  function checkFunctionExpressionOrObjectLiteralMethod(node, checkMode) {
+    Debug.assert(node.kind !== 174 /* MethodDeclaration */ || isObjectLiteralMethod(node));
+    checkNodeDeferred(node);
+    if (isFunctionExpression(node)) {
+      checkCollisionsForDeclarationName(node, node.name);
+    }
+    if (checkMode && checkMode & 4 /* SkipContextSensitive */ && isContextSensitive(node)) {
+      if (!getEffectiveReturnTypeNode(node) && !hasContextSensitiveParameters(node)) {
+        const contextualSignature = getContextualSignature(node);
+        if (contextualSignature && couldContainTypeVariables(getReturnTypeOfSignature(contextualSignature))) {
+          const links = getNodeLinks(node);
+          if (links.contextFreeType) {
+            return links.contextFreeType;
+          }
+          const returnType = getReturnTypeFromBody(node, checkMode);
+          const returnOnlySignature = createSignature(
+            /*declaration*/
+            void 0,
+            /*typeParameters*/
+            void 0,
+            /*thisParameter*/
+            void 0,
+            emptyArray,
+            returnType,
+            /*resolvedTypePredicate*/
+            void 0,
+            0,
+            64 /* IsNonInferrable */
+          );
+          const returnOnlyType = createAnonymousType(node.symbol, emptySymbols, [returnOnlySignature], emptyArray, emptyArray);
+          returnOnlyType.objectFlags |= 262144 /* NonInferrableType */;
+          return links.contextFreeType = returnOnlyType;
+        }
+      }
+      return anyFunctionType;
+    }
+    const hasGrammarError = checkGrammarFunctionLikeDeclaration(node);
+    if (!hasGrammarError && node.kind === 218 /* FunctionExpression */) {
+      checkGrammarForGenerator(node);
+    }
+    contextuallyCheckFunctionExpressionOrObjectLiteralMethod(node, checkMode);
+    return getTypeOfSymbol(getSymbolOfDeclaration(node));
+  }
+  function contextuallyCheckFunctionExpressionOrObjectLiteralMethod(node, checkMode) {
+    const links = getNodeLinks(node);
+    if (!(links.flags & 64 /* ContextChecked */)) {
+      const contextualSignature = getContextualSignature(node);
+      if (!(links.flags & 64 /* ContextChecked */)) {
+        links.flags |= 64 /* ContextChecked */;
+        const signature = firstOrUndefined(getSignaturesOfType(getTypeOfSymbol(getSymbolOfDeclaration(node)), 0 /* Call */));
+        if (!signature) {
+          return;
+        }
+        if (isContextSensitive(node)) {
+          if (contextualSignature) {
+            const inferenceContext = getInferenceContext(node);
+            let instantiatedContextualSignature;
+            if (checkMode && checkMode & 2 /* Inferential */) {
+              inferFromAnnotatedParameters(signature, contextualSignature, inferenceContext);
+              const restType = getEffectiveRestType(contextualSignature);
+              if (restType && restType.flags & 262144 /* TypeParameter */) {
+                instantiatedContextualSignature = instantiateSignature(contextualSignature, inferenceContext.nonFixingMapper);
+              }
+            }
+            instantiatedContextualSignature || (instantiatedContextualSignature = inferenceContext ? instantiateSignature(contextualSignature, inferenceContext.mapper) : contextualSignature);
+            assignContextualParameterTypes(signature, instantiatedContextualSignature);
+          } else {
+            assignNonContextualParameterTypes(signature);
+          }
+        } else if (contextualSignature && !node.typeParameters && contextualSignature.parameters.length > node.parameters.length) {
+          const inferenceContext = getInferenceContext(node);
+          if (checkMode && checkMode & 2 /* Inferential */) {
+            inferFromAnnotatedParameters(signature, contextualSignature, inferenceContext);
+          }
+        }
+        if (contextualSignature && !getReturnTypeFromAnnotation(node) && !signature.resolvedReturnType) {
+          const returnType = getReturnTypeFromBody(node, checkMode);
+          if (!signature.resolvedReturnType) {
+            signature.resolvedReturnType = returnType;
+          }
+        }
+        checkSignatureDeclaration(node);
+      }
+    }
+  }
+  function checkFunctionExpressionOrObjectLiteralMethodDeferred(node) {
+    Debug.assert(node.kind !== 174 /* MethodDeclaration */ || isObjectLiteralMethod(node));
+    const functionFlags = getFunctionFlags(node);
+    const returnType = getReturnTypeFromAnnotation(node);
+    checkAllCodePathsInNonVoidFunctionReturnOrThrow(node, returnType);
+    if (node.body) {
+      if (!getEffectiveReturnTypeNode(node)) {
+        getReturnTypeOfSignature(getSignatureFromDeclaration(node));
+      }
+      if (node.body.kind === 241 /* Block */) {
+        checkSourceElement(node.body);
+      } else {
+        const exprType = checkExpression(node.body);
+        const returnOrPromisedType = returnType && unwrapReturnType(returnType, functionFlags);
+        if (returnOrPromisedType) {
+          const effectiveCheckNode = getEffectiveCheckNode(node.body);
+          if ((functionFlags & 3 /* AsyncGenerator */) === 2 /* Async */) {
+            const awaitedType = checkAwaitedType(
+              exprType,
+              /*withAlias*/
+              false,
+              effectiveCheckNode,
+              Diagnostics.The_return_type_of_an_async_function_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member
+            );
+            checkTypeAssignableToAndOptionallyElaborate(awaitedType, returnOrPromisedType, effectiveCheckNode, effectiveCheckNode);
+          } else {
+            checkTypeAssignableToAndOptionallyElaborate(exprType, returnOrPromisedType, effectiveCheckNode, effectiveCheckNode);
+          }
+        }
+      }
+    }
+  }
+  function checkArithmeticOperandType(operand, type, diagnostic, isAwaitValid = false) {
+    if (!isTypeAssignableTo(type, numberOrBigIntType)) {
+      const awaitedType = isAwaitValid && getAwaitedTypeOfPromise(type);
+      errorAndMaybeSuggestAwait(
+        operand,
+        !!awaitedType && isTypeAssignableTo(awaitedType, numberOrBigIntType),
+        diagnostic
+      );
+      return false;
+    }
+    return true;
+  }
+  function isReadonlyAssignmentDeclaration(d) {
+    if (!isCallExpression(d)) {
+      return false;
+    }
+    if (!isBindableObjectDefinePropertyCall(d)) {
+      return false;
+    }
+    const objectLitType = checkExpressionCached(d.arguments[2]);
+    const valueType = getTypeOfPropertyOfType(objectLitType, "value");
+    if (valueType) {
+      const writableProp = getPropertyOfType(objectLitType, "writable");
+      const writableType = writableProp && getTypeOfSymbol(writableProp);
+      if (!writableType || writableType === falseType || writableType === regularFalseType) {
+        return true;
+      }
+      if (writableProp && writableProp.valueDeclaration && isPropertyAssignment(writableProp.valueDeclaration)) {
+        const initializer = writableProp.valueDeclaration.initializer;
+        const rawOriginalType = checkExpression(initializer);
+        if (rawOriginalType === falseType || rawOriginalType === regularFalseType) {
+          return true;
+        }
+      }
+      return false;
+    }
+    const setProp = getPropertyOfType(objectLitType, "set");
+    return !setProp;
+  }
+  function isReadonlySymbol(symbol) {
+    return !!(getCheckFlags(symbol) & 8 /* Readonly */ || symbol.flags & 4 /* Property */ && getDeclarationModifierFlagsFromSymbol(symbol) & 8 /* Readonly */ || symbol.flags & 3 /* Variable */ && getDeclarationNodeFlagsFromSymbol(symbol) & 6 /* Constant */ || symbol.flags & 98304 /* Accessor */ && !(symbol.flags & 65536 /* SetAccessor */) || symbol.flags & 8 /* EnumMember */ || some(symbol.declarations, isReadonlyAssignmentDeclaration));
+  }
+  function isAssignmentToReadonlyEntity(expr, symbol, assignmentKind) {
+    var _a, _b;
+    if (assignmentKind === 0 /* None */) {
+      return false;
+    }
+    if (isReadonlySymbol(symbol)) {
+      if (symbol.flags & 4 /* Property */ && isAccessExpression(expr) && expr.expression.kind === 110 /* ThisKeyword */) {
+        const ctor = getContainingFunction(expr);
+        if (!(ctor && (ctor.kind === 176 /* Constructor */ || isJSConstructor(ctor)))) {
+          return true;
+        }
+        if (symbol.valueDeclaration) {
+          const isAssignmentDeclaration2 = isBinaryExpression(symbol.valueDeclaration);
+          const isLocalPropertyDeclaration = ctor.parent === symbol.valueDeclaration.parent;
+          const isLocalParameterProperty = ctor === symbol.valueDeclaration.parent;
+          const isLocalThisPropertyAssignment = isAssignmentDeclaration2 && ((_a = symbol.parent) == null ? void 0 : _a.valueDeclaration) === ctor.parent;
+          const isLocalThisPropertyAssignmentConstructorFunction = isAssignmentDeclaration2 && ((_b = symbol.parent) == null ? void 0 : _b.valueDeclaration) === ctor;
+          const isWriteableSymbol = isLocalPropertyDeclaration || isLocalParameterProperty || isLocalThisPropertyAssignment || isLocalThisPropertyAssignmentConstructorFunction;
+          return !isWriteableSymbol;
+        }
+      }
+      return true;
+    }
+    if (isAccessExpression(expr)) {
+      const node = skipParentheses(expr.expression);
+      if (node.kind === 80 /* Identifier */) {
+        const symbol2 = getNodeLinks(node).resolvedSymbol;
+        if (symbol2.flags & 2097152 /* Alias */) {
+          const declaration = getDeclarationOfAliasSymbol(symbol2);
+          return !!declaration && declaration.kind === 274 /* NamespaceImport */;
+        }
+      }
+    }
+    return false;
+  }
+  function checkReferenceExpression(expr, invalidReferenceMessage, invalidOptionalChainMessage) {
+    const node = skipOuterExpressions(expr, 6 /* Assertions */ | 1 /* Parentheses */);
+    if (node.kind !== 80 /* Identifier */ && !isAccessExpression(node)) {
+      error2(expr, invalidReferenceMessage);
+      return false;
+    }
+    if (node.flags & 64 /* OptionalChain */) {
+      error2(expr, invalidOptionalChainMessage);
+      return false;
+    }
+    return true;
+  }
+  function checkDeleteExpression(node) {
+    checkExpression(node.expression);
+    const expr = skipParentheses(node.expression);
+    if (!isAccessExpression(expr)) {
+      error2(expr, Diagnostics.The_operand_of_a_delete_operator_must_be_a_property_reference);
+      return booleanType;
+    }
+    if (isPropertyAccessExpression(expr) && isPrivateIdentifier(expr.name)) {
+      error2(expr, Diagnostics.The_operand_of_a_delete_operator_cannot_be_a_private_identifier);
+    }
+    const links = getNodeLinks(expr);
+    const symbol = getExportSymbolOfValueSymbolIfExported(links.resolvedSymbol);
+    if (symbol) {
+      if (isReadonlySymbol(symbol)) {
+        error2(expr, Diagnostics.The_operand_of_a_delete_operator_cannot_be_a_read_only_property);
+      } else {
+        checkDeleteExpressionMustBeOptional(expr, symbol);
+      }
+    }
+    return booleanType;
+  }
+  function checkDeleteExpressionMustBeOptional(expr, symbol) {
+    const type = getTypeOfSymbol(symbol);
+    if (strictNullChecks && !(type.flags & (3 /* AnyOrUnknown */ | 131072 /* Never */)) && !(exactOptionalPropertyTypes ? symbol.flags & 16777216 /* Optional */ : hasTypeFacts(type, 16777216 /* IsUndefined */))) {
+      error2(expr, Diagnostics.The_operand_of_a_delete_operator_must_be_optional);
+    }
+  }
+  function checkTypeOfExpression(node) {
+    checkExpression(node.expression);
+    return typeofType;
+  }
+  function checkVoidExpression(node) {
+    checkNodeDeferred(node);
+    return undefinedWideningType;
+  }
+  function checkAwaitGrammar(node) {
+    let hasError = false;
+    const container = getContainingFunctionOrClassStaticBlock(node);
+    if (container && isClassStaticBlockDeclaration(container)) {
+      const message = isAwaitExpression(node) ? Diagnostics.await_expression_cannot_be_used_inside_a_class_static_block : Diagnostics.await_using_statements_cannot_be_used_inside_a_class_static_block;
+      error2(node, message);
+      hasError = true;
+    } else if (!(node.flags & 65536 /* AwaitContext */)) {
+      if (isInTopLevelContext(node)) {
+        const sourceFile = getSourceFileOfNode(node);
+        if (!hasParseDiagnostics(sourceFile)) {
+          let span;
+          if (!isEffectiveExternalModule(sourceFile, compilerOptions)) {
+            span ?? (span = getSpanOfTokenAtPosition(sourceFile, node.pos));
+            const message = isAwaitExpression(node) ? Diagnostics.await_expressions_are_only_allowed_at_the_top_level_of_a_file_when_that_file_is_a_module_but_this_file_has_no_imports_or_exports_Consider_adding_an_empty_export_to_make_this_file_a_module : Diagnostics.await_using_statements_are_only_allowed_at_the_top_level_of_a_file_when_that_file_is_a_module_but_this_file_has_no_imports_or_exports_Consider_adding_an_empty_export_to_make_this_file_a_module;
+            const diagnostic = createFileDiagnostic(sourceFile, span.start, span.length, message);
+            diagnostics.add(diagnostic);
+            hasError = true;
+          }
+          switch (moduleKind) {
+            case 100 /* Node16 */:
+            case 199 /* NodeNext */:
+              if (sourceFile.impliedNodeFormat === 1 /* CommonJS */) {
+                span ?? (span = getSpanOfTokenAtPosition(sourceFile, node.pos));
+                diagnostics.add(
+                  createFileDiagnostic(sourceFile, span.start, span.length, Diagnostics.The_current_file_is_a_CommonJS_module_and_cannot_use_await_at_the_top_level)
+                );
+                hasError = true;
+                break;
+              }
+            case 7 /* ES2022 */:
+            case 99 /* ESNext */:
+            case 200 /* Preserve */:
+            case 4 /* System */:
+              if (languageVersion >= 4 /* ES2017 */) {
+                break;
+              }
+            default:
+              span ?? (span = getSpanOfTokenAtPosition(sourceFile, node.pos));
+              const message = isAwaitExpression(node) ? Diagnostics.Top_level_await_expressions_are_only_allowed_when_the_module_option_is_set_to_es2022_esnext_system_node16_nodenext_or_preserve_and_the_target_option_is_set_to_es2017_or_higher : Diagnostics.Top_level_await_using_statements_are_only_allowed_when_the_module_option_is_set_to_es2022_esnext_system_node16_nodenext_or_preserve_and_the_target_option_is_set_to_es2017_or_higher;
+              diagnostics.add(createFileDiagnostic(sourceFile, span.start, span.length, message));
+              hasError = true;
+              break;
+          }
+        }
+      } else {
+        const sourceFile = getSourceFileOfNode(node);
+        if (!hasParseDiagnostics(sourceFile)) {
+          const span = getSpanOfTokenAtPosition(sourceFile, node.pos);
+          const message = isAwaitExpression(node) ? Diagnostics.await_expressions_are_only_allowed_within_async_functions_and_at_the_top_levels_of_modules : Diagnostics.await_using_statements_are_only_allowed_within_async_functions_and_at_the_top_levels_of_modules;
+          const diagnostic = createFileDiagnostic(sourceFile, span.start, span.length, message);
+          if (container && container.kind !== 176 /* Constructor */ && (getFunctionFlags(container) & 2 /* Async */) === 0) {
+            const relatedInfo = createDiagnosticForNode(container, Diagnostics.Did_you_mean_to_mark_this_function_as_async);
+            addRelatedInfo(diagnostic, relatedInfo);
+          }
+          diagnostics.add(diagnostic);
+          hasError = true;
+        }
+      }
+    }
+    if (isAwaitExpression(node) && isInParameterInitializerBeforeContainingFunction(node)) {
+      error2(node, Diagnostics.await_expressions_cannot_be_used_in_a_parameter_initializer);
+      hasError = true;
+    }
+    return hasError;
+  }
+  function checkAwaitExpression(node) {
+    addLazyDiagnostic(() => checkAwaitGrammar(node));
+    const operandType = checkExpression(node.expression);
+    const awaitedType = checkAwaitedType(
+      operandType,
+      /*withAlias*/
+      true,
+      node,
+      Diagnostics.Type_of_await_operand_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member
+    );
+    if (awaitedType === operandType && !isErrorType(awaitedType) && !(operandType.flags & 3 /* AnyOrUnknown */)) {
+      addErrorOrSuggestion(
+        /*isError*/
+        false,
+        createDiagnosticForNode(node, Diagnostics.await_has_no_effect_on_the_type_of_this_expression)
+      );
+    }
+    return awaitedType;
+  }
+  function checkPrefixUnaryExpression(node) {
+    const operandType = checkExpression(node.operand);
+    if (operandType === silentNeverType) {
+      return silentNeverType;
+    }
+    switch (node.operand.kind) {
+      case 9 /* NumericLiteral */:
+        switch (node.operator) {
+          case 41 /* MinusToken */:
+            return getFreshTypeOfLiteralType(getNumberLiteralType(-node.operand.text));
+          case 40 /* PlusToken */:
+            return getFreshTypeOfLiteralType(getNumberLiteralType(+node.operand.text));
+        }
+        break;
+      case 10 /* BigIntLiteral */:
+        if (node.operator === 41 /* MinusToken */) {
+          return getFreshTypeOfLiteralType(getBigIntLiteralType({
+            negative: true,
+            base10Value: parsePseudoBigInt(node.operand.text)
+          }));
+        }
+    }
+    switch (node.operator) {
+      case 40 /* PlusToken */:
+      case 41 /* MinusToken */:
+      case 55 /* TildeToken */:
+        checkNonNullType(operandType, node.operand);
+        if (maybeTypeOfKindConsideringBaseConstraint(operandType, 12288 /* ESSymbolLike */)) {
+          error2(node.operand, Diagnostics.The_0_operator_cannot_be_applied_to_type_symbol, tokenToString(node.operator));
+        }
+        if (node.operator === 40 /* PlusToken */) {
+          if (maybeTypeOfKindConsideringBaseConstraint(operandType, 2112 /* BigIntLike */)) {
+            error2(node.operand, Diagnostics.Operator_0_cannot_be_applied_to_type_1, tokenToString(node.operator), typeToString(getBaseTypeOfLiteralType(operandType)));
+          }
+          return numberType;
+        }
+        return getUnaryResultType(operandType);
+      case 54 /* ExclamationToken */:
+        checkTruthinessOfType(operandType, node.operand);
+        const facts = getTypeFacts(operandType, 4194304 /* Truthy */ | 8388608 /* Falsy */);
+        return facts === 4194304 /* Truthy */ ? falseType : facts === 8388608 /* Falsy */ ? trueType : booleanType;
+      case 46 /* PlusPlusToken */:
+      case 47 /* MinusMinusToken */:
+        const ok = checkArithmeticOperandType(node.operand, checkNonNullType(operandType, node.operand), Diagnostics.An_arithmetic_operand_must_be_of_type_any_number_bigint_or_an_enum_type);
+        if (ok) {
+          checkReferenceExpression(
+            node.operand,
+            Diagnostics.The_operand_of_an_increment_or_decrement_operator_must_be_a_variable_or_a_property_access,
+            Diagnostics.The_operand_of_an_increment_or_decrement_operator_may_not_be_an_optional_property_access
+          );
+        }
+        return getUnaryResultType(operandType);
+    }
+    return errorType;
+  }
+  function checkPostfixUnaryExpression(node) {
+    const operandType = checkExpression(node.operand);
+    if (operandType === silentNeverType) {
+      return silentNeverType;
+    }
+    const ok = checkArithmeticOperandType(
+      node.operand,
+      checkNonNullType(operandType, node.operand),
+      Diagnostics.An_arithmetic_operand_must_be_of_type_any_number_bigint_or_an_enum_type
+    );
+    if (ok) {
+      checkReferenceExpression(
+        node.operand,
+        Diagnostics.The_operand_of_an_increment_or_decrement_operator_must_be_a_variable_or_a_property_access,
+        Diagnostics.The_operand_of_an_increment_or_decrement_operator_may_not_be_an_optional_property_access
+      );
+    }
+    return getUnaryResultType(operandType);
+  }
+  function getUnaryResultType(operandType) {
+    if (maybeTypeOfKind(operandType, 2112 /* BigIntLike */)) {
+      return isTypeAssignableToKind(operandType, 3 /* AnyOrUnknown */) || maybeTypeOfKind(operandType, 296 /* NumberLike */) ? numberOrBigIntType : bigintType;
+    }
+    return numberType;
+  }
+  function maybeTypeOfKindConsideringBaseConstraint(type, kind) {
+    if (maybeTypeOfKind(type, kind)) {
+      return true;
+    }
+    const baseConstraint = getBaseConstraintOrType(type);
+    return !!baseConstraint && maybeTypeOfKind(baseConstraint, kind);
+  }
+  function maybeTypeOfKind(type, kind) {
+    if (type.flags & kind) {
+      return true;
+    }
+    if (type.flags & 3145728 /* UnionOrIntersection */) {
+      const types = type.types;
+      for (const t of types) {
+        if (maybeTypeOfKind(t, kind)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  function isTypeAssignableToKind(source, kind, strict) {
+    if (source.flags & kind) {
+      return true;
+    }
+    if (strict && source.flags & (3 /* AnyOrUnknown */ | 16384 /* Void */ | 32768 /* Undefined */ | 65536 /* Null */)) {
+      return false;
+    }
+    return !!(kind & 296 /* NumberLike */) && isTypeAssignableTo(source, numberType) || !!(kind & 2112 /* BigIntLike */) && isTypeAssignableTo(source, bigintType) || !!(kind & 402653316 /* StringLike */) && isTypeAssignableTo(source, stringType) || !!(kind & 528 /* BooleanLike */) && isTypeAssignableTo(source, booleanType) || !!(kind & 16384 /* Void */) && isTypeAssignableTo(source, voidType) || !!(kind & 131072 /* Never */) && isTypeAssignableTo(source, neverType) || !!(kind & 65536 /* Null */) && isTypeAssignableTo(source, nullType) || !!(kind & 32768 /* Undefined */) && isTypeAssignableTo(source, undefinedType) || !!(kind & 4096 /* ESSymbol */) && isTypeAssignableTo(source, esSymbolType) || !!(kind & 67108864 /* NonPrimitive */) && isTypeAssignableTo(source, nonPrimitiveType);
+  }
+  function allTypesAssignableToKind(source, kind, strict) {
+    return source.flags & 1048576 /* Union */ ? every(source.types, (subType) => allTypesAssignableToKind(subType, kind, strict)) : isTypeAssignableToKind(source, kind, strict);
+  }
+  function isConstEnumObjectType(type) {
+    return !!(getObjectFlags(type) & 16 /* Anonymous */) && !!type.symbol && isConstEnumSymbol(type.symbol);
+  }
+  function isConstEnumSymbol(symbol) {
+    return (symbol.flags & 128 /* ConstEnum */) !== 0;
+  }
+  function getSymbolHasInstanceMethodOfObjectType(type) {
+    const hasInstancePropertyName = getPropertyNameForKnownSymbolName("hasInstance");
+    const hasInstanceProperty = getPropertyOfObjectType(type, hasInstancePropertyName);
+    if (hasInstanceProperty) {
+      const hasInstancePropertyType = getTypeOfSymbol(hasInstanceProperty);
+      if (hasInstancePropertyType && getSignaturesOfType(hasInstancePropertyType, 0 /* Call */).length !== 0) {
+        return hasInstancePropertyType;
+      }
+    }
+  }
+  function checkInstanceOfExpression(left, right, leftType, rightType, checkMode) {
+    if (leftType === silentNeverType || rightType === silentNeverType) {
+      return silentNeverType;
+    }
+    if (!isTypeAny(leftType) && allTypesAssignableToKind(leftType, 402784252 /* Primitive */)) {
+      error2(left, Diagnostics.The_left_hand_side_of_an_instanceof_expression_must_be_of_type_any_an_object_type_or_a_type_parameter);
+    }
+    Debug.assert(isInstanceOfExpression(left.parent));
+    const signature = getResolvedSignature(
+      left.parent,
+      /*candidatesOutArray*/
+      void 0,
+      checkMode
+    );
+    if (signature === resolvingSignature) {
+      return silentNeverType;
+    }
+    const returnType = getReturnTypeOfSignature(signature);
+    checkTypeAssignableTo(returnType, booleanType, right, Diagnostics.An_object_s_Symbol_hasInstance_method_must_return_a_boolean_value_for_it_to_be_used_on_the_right_hand_side_of_an_instanceof_expression);
+    return booleanType;
+  }
+  function hasEmptyObjectIntersection(type) {
+    return someType(type, (t) => t === unknownEmptyObjectType || !!(t.flags & 2097152 /* Intersection */) && isEmptyAnonymousObjectType(getBaseConstraintOrType(t)));
+  }
+  function checkInExpression(left, right, leftType, rightType) {
+    if (leftType === silentNeverType || rightType === silentNeverType) {
+      return silentNeverType;
+    }
+    if (isPrivateIdentifier(left)) {
+      if (languageVersion < 99 /* ESNext */) {
+        checkExternalEmitHelpers(left, 2097152 /* ClassPrivateFieldIn */);
+      }
+      if (!getNodeLinks(left).resolvedSymbol && getContainingClass(left)) {
+        const isUncheckedJS = isUncheckedJSSuggestion(
+          left,
+          rightType.symbol,
+          /*excludeClasses*/
+          true
+        );
+        reportNonexistentProperty(left, rightType, isUncheckedJS);
+      }
+    } else {
+      checkTypeAssignableTo(checkNonNullType(leftType, left), stringNumberSymbolType, left);
+    }
+    if (checkTypeAssignableTo(checkNonNullType(rightType, right), nonPrimitiveType, right)) {
+      if (hasEmptyObjectIntersection(rightType)) {
+        error2(right, Diagnostics.Type_0_may_represent_a_primitive_value_which_is_not_permitted_as_the_right_operand_of_the_in_operator, typeToString(rightType));
+      }
+    }
+    return booleanType;
+  }
+  function checkObjectLiteralAssignment(node, sourceType, rightIsThis) {
+    const properties = node.properties;
+    if (strictNullChecks && properties.length === 0) {
+      return checkNonNullType(sourceType, node);
+    }
+    for (let i = 0; i < properties.length; i++) {
+      checkObjectLiteralDestructuringPropertyAssignment(node, sourceType, i, properties, rightIsThis);
+    }
+    return sourceType;
+  }
+  function checkObjectLiteralDestructuringPropertyAssignment(node, objectLiteralType, propertyIndex, allProperties, rightIsThis = false) {
+    const properties = node.properties;
+    const property = properties[propertyIndex];
+    if (property.kind === 303 /* PropertyAssignment */ || property.kind === 304 /* ShorthandPropertyAssignment */) {
+      const name = property.name;
+      const exprType = getLiteralTypeFromPropertyName(name);
+      if (isTypeUsableAsPropertyName(exprType)) {
+        const text = getPropertyNameFromType(exprType);
+        const prop = getPropertyOfType(objectLiteralType, text);
+        if (prop) {
+          markPropertyAsReferenced(prop, property, rightIsThis);
+          checkPropertyAccessibility(
+            property,
+            /*isSuper*/
+            false,
+            /*writing*/
+            true,
+            objectLiteralType,
+            prop
+          );
+        }
+      }
+      const elementType = getIndexedAccessType(objectLiteralType, exprType, 32 /* ExpressionPosition */, name);
+      const type = getFlowTypeOfDestructuring(property, elementType);
+      return checkDestructuringAssignment(property.kind === 304 /* ShorthandPropertyAssignment */ ? property : property.initializer, type);
+    } else if (property.kind === 305 /* SpreadAssignment */) {
+      if (propertyIndex < properties.length - 1) {
+        error2(property, Diagnostics.A_rest_element_must_be_last_in_a_destructuring_pattern);
+      } else {
+        if (languageVersion < 99 /* ESNext */) {
+          checkExternalEmitHelpers(property, 4 /* Rest */);
+        }
+        const nonRestNames = [];
+        if (allProperties) {
+          for (const otherProperty of allProperties) {
+            if (!isSpreadAssignment(otherProperty)) {
+              nonRestNames.push(otherProperty.name);
+            }
+          }
+        }
+        const type = getRestType(objectLiteralType, nonRestNames, objectLiteralType.symbol);
+        checkGrammarForDisallowedTrailingComma(allProperties, Diagnostics.A_rest_parameter_or_binding_pattern_may_not_have_a_trailing_comma);
+        return checkDestructuringAssignment(property.expression, type);
+      }
+    } else {
+      error2(property, Diagnostics.Property_assignment_expected);
+    }
+  }
+  function checkArrayLiteralAssignment(node, sourceType, checkMode) {
+    const elements = node.elements;
+    if (languageVersion < 2 /* ES2015 */ && compilerOptions.downlevelIteration) {
+      checkExternalEmitHelpers(node, 512 /* Read */);
+    }
+    const possiblyOutOfBoundsType = checkIteratedTypeOrElementType(65 /* Destructuring */ | 128 /* PossiblyOutOfBounds */, sourceType, undefinedType, node) || errorType;
+    let inBoundsType = compilerOptions.noUncheckedIndexedAccess ? void 0 : possiblyOutOfBoundsType;
+    for (let i = 0; i < elements.length; i++) {
+      let type = possiblyOutOfBoundsType;
+      if (node.elements[i].kind === 230 /* SpreadElement */) {
+        type = inBoundsType = inBoundsType ?? (checkIteratedTypeOrElementType(65 /* Destructuring */, sourceType, undefinedType, node) || errorType);
+      }
+      checkArrayLiteralDestructuringElementAssignment(node, sourceType, i, type, checkMode);
+    }
+    return sourceType;
+  }
+  function checkArrayLiteralDestructuringElementAssignment(node, sourceType, elementIndex, elementType, checkMode) {
+    const elements = node.elements;
+    const element = elements[elementIndex];
+    if (element.kind !== 232 /* OmittedExpression */) {
+      if (element.kind !== 230 /* SpreadElement */) {
+        const indexType = getNumberLiteralType(elementIndex);
+        if (isArrayLikeType(sourceType)) {
+          const accessFlags = 32 /* ExpressionPosition */ | (hasDefaultValue(element) ? 16 /* NoTupleBoundsCheck */ : 0);
+          const elementType2 = getIndexedAccessTypeOrUndefined(sourceType, indexType, accessFlags, createSyntheticExpression(element, indexType)) || errorType;
+          const assignedType = hasDefaultValue(element) ? getTypeWithFacts(elementType2, 524288 /* NEUndefined */) : elementType2;
+          const type = getFlowTypeOfDestructuring(element, assignedType);
+          return checkDestructuringAssignment(element, type, checkMode);
+        }
+        return checkDestructuringAssignment(element, elementType, checkMode);
+      }
+      if (elementIndex < elements.length - 1) {
+        error2(element, Diagnostics.A_rest_element_must_be_last_in_a_destructuring_pattern);
+      } else {
+        const restExpression = element.expression;
+        if (restExpression.kind === 226 /* BinaryExpression */ && restExpression.operatorToken.kind === 64 /* EqualsToken */) {
+          error2(restExpression.operatorToken, Diagnostics.A_rest_element_cannot_have_an_initializer);
+        } else {
+          checkGrammarForDisallowedTrailingComma(node.elements, Diagnostics.A_rest_parameter_or_binding_pattern_may_not_have_a_trailing_comma);
+          const type = everyType(sourceType, isTupleType) ? mapType(sourceType, (t) => sliceTupleType(t, elementIndex)) : createArrayType(elementType);
+          return checkDestructuringAssignment(restExpression, type, checkMode);
+        }
+      }
+    }
+    return void 0;
+  }
+  function checkDestructuringAssignment(exprOrAssignment, sourceType, checkMode, rightIsThis) {
+    let target;
+    if (exprOrAssignment.kind === 304 /* ShorthandPropertyAssignment */) {
+      const prop = exprOrAssignment;
+      if (prop.objectAssignmentInitializer) {
+        if (strictNullChecks && !hasTypeFacts(checkExpression(prop.objectAssignmentInitializer), 16777216 /* IsUndefined */)) {
+          sourceType = getTypeWithFacts(sourceType, 524288 /* NEUndefined */);
+        }
+        checkBinaryLikeExpression(prop.name, prop.equalsToken, prop.objectAssignmentInitializer, checkMode);
+      }
+      target = exprOrAssignment.name;
+    } else {
+      target = exprOrAssignment;
+    }
+    if (target.kind === 226 /* BinaryExpression */ && target.operatorToken.kind === 64 /* EqualsToken */) {
+      checkBinaryExpression(target, checkMode);
+      target = target.left;
+      if (strictNullChecks) {
+        sourceType = getTypeWithFacts(sourceType, 524288 /* NEUndefined */);
+      }
+    }
+    if (target.kind === 210 /* ObjectLiteralExpression */) {
+      return checkObjectLiteralAssignment(target, sourceType, rightIsThis);
+    }
+    if (target.kind === 209 /* ArrayLiteralExpression */) {
+      return checkArrayLiteralAssignment(target, sourceType, checkMode);
+    }
+    return checkReferenceAssignment(target, sourceType, checkMode);
+  }
+  function checkReferenceAssignment(target, sourceType, checkMode) {
+    const targetType = checkExpression(target, checkMode);
+    const error3 = target.parent.kind === 305 /* SpreadAssignment */ ? Diagnostics.The_target_of_an_object_rest_assignment_must_be_a_variable_or_a_property_access : Diagnostics.The_left_hand_side_of_an_assignment_expression_must_be_a_variable_or_a_property_access;
+    const optionalError = target.parent.kind === 305 /* SpreadAssignment */ ? Diagnostics.The_target_of_an_object_rest_assignment_may_not_be_an_optional_property_access : Diagnostics.The_left_hand_side_of_an_assignment_expression_may_not_be_an_optional_property_access;
+    if (checkReferenceExpression(target, error3, optionalError)) {
+      checkTypeAssignableToAndOptionallyElaborate(sourceType, targetType, target, target);
+    }
+    if (isPrivateIdentifierPropertyAccessExpression(target)) {
+      checkExternalEmitHelpers(target.parent, 1048576 /* ClassPrivateFieldSet */);
+    }
+    return sourceType;
+  }
+  function isSideEffectFree(node) {
+    node = skipParentheses(node);
+    switch (node.kind) {
+      case 80 /* Identifier */:
+      case 11 /* StringLiteral */:
+      case 14 /* RegularExpressionLiteral */:
+      case 215 /* TaggedTemplateExpression */:
+      case 228 /* TemplateExpression */:
+      case 15 /* NoSubstitutionTemplateLiteral */:
+      case 9 /* NumericLiteral */:
+      case 10 /* BigIntLiteral */:
+      case 112 /* TrueKeyword */:
+      case 97 /* FalseKeyword */:
+      case 106 /* NullKeyword */:
+      case 157 /* UndefinedKeyword */:
+      case 218 /* FunctionExpression */:
+      case 231 /* ClassExpression */:
+      case 219 /* ArrowFunction */:
+      case 209 /* ArrayLiteralExpression */:
+      case 210 /* ObjectLiteralExpression */:
+      case 221 /* TypeOfExpression */:
+      case 235 /* NonNullExpression */:
+      case 285 /* JsxSelfClosingElement */:
+      case 284 /* JsxElement */:
+        return true;
+      case 227 /* ConditionalExpression */:
+        return isSideEffectFree(node.whenTrue) && isSideEffectFree(node.whenFalse);
+      case 226 /* BinaryExpression */:
+        if (isAssignmentOperator(node.operatorToken.kind)) {
+          return false;
+        }
+        return isSideEffectFree(node.left) && isSideEffectFree(node.right);
+      case 224 /* PrefixUnaryExpression */:
+      case 225 /* PostfixUnaryExpression */:
+        switch (node.operator) {
+          case 54 /* ExclamationToken */:
+          case 40 /* PlusToken */:
+          case 41 /* MinusToken */:
+          case 55 /* TildeToken */:
+            return true;
+        }
+        return false;
+      case 222 /* VoidExpression */:
+      case 216 /* TypeAssertionExpression */:
+      case 234 /* AsExpression */:
+      default:
+        return false;
+    }
+  }
+  function isTypeEqualityComparableTo(source, target) {
+    return (target.flags & 98304 /* Nullable */) !== 0 || isTypeComparableTo(source, target);
+  }
+  function createCheckBinaryExpression() {
+    const trampoline = createBinaryExpressionTrampoline(onEnter, onLeft, onOperator, onRight, onExit, foldState);
+    return (node, checkMode) => {
+      const result = trampoline(node, checkMode);
+      Debug.assertIsDefined(result);
+      return result;
+    };
+    function onEnter(node, state, checkMode) {
+      if (state) {
+        state.stackIndex++;
+        state.skip = false;
+        setLeftType(
+          state,
+          /*type*/
+          void 0
+        );
+        setLastResult(
+          state,
+          /*type*/
+          void 0
+        );
+      } else {
+        state = {
+          checkMode,
+          skip: false,
+          stackIndex: 0,
+          typeStack: [void 0, void 0]
+        };
+      }
+      if (isInJSFile(node) && getAssignedExpandoInitializer(node)) {
+        state.skip = true;
+        setLastResult(state, checkExpression(node.right, checkMode));
+        return state;
+      }
+      checkGrammarNullishCoalesceWithLogicalExpression(node);
+      const operator = node.operatorToken.kind;
+      if (operator === 64 /* EqualsToken */ && (node.left.kind === 210 /* ObjectLiteralExpression */ || node.left.kind === 209 /* ArrayLiteralExpression */)) {
+        state.skip = true;
+        setLastResult(state, checkDestructuringAssignment(node.left, checkExpression(node.right, checkMode), checkMode, node.right.kind === 110 /* ThisKeyword */));
+        return state;
+      }
+      return state;
+    }
+    function onLeft(left, state, _node) {
+      if (!state.skip) {
+        return maybeCheckExpression(state, left);
+      }
+    }
+    function onOperator(operatorToken, state, node) {
+      if (!state.skip) {
+        const leftType = getLastResult(state);
+        Debug.assertIsDefined(leftType);
+        setLeftType(state, leftType);
+        setLastResult(
+          state,
+          /*type*/
+          void 0
+        );
+        const operator = operatorToken.kind;
+        if (isLogicalOrCoalescingBinaryOperator(operator)) {
+          let parent2 = node.parent;
+          while (parent2.kind === 217 /* ParenthesizedExpression */ || isLogicalOrCoalescingBinaryExpression(parent2)) {
+            parent2 = parent2.parent;
+          }
+          if (operator === 56 /* AmpersandAmpersandToken */ || isIfStatement(parent2)) {
+            checkTestingKnownTruthyCallableOrAwaitableType(node.left, leftType, isIfStatement(parent2) ? parent2.thenStatement : void 0);
+          }
+          checkTruthinessOfType(leftType, node.left);
+        }
+      }
+    }
+    function onRight(right, state, _node) {
+      if (!state.skip) {
+        return maybeCheckExpression(state, right);
+      }
+    }
+    function onExit(node, state) {
+      let result;
+      if (state.skip) {
+        result = getLastResult(state);
+      } else {
+        const leftType = getLeftType(state);
+        Debug.assertIsDefined(leftType);
+        const rightType = getLastResult(state);
+        Debug.assertIsDefined(rightType);
+        result = checkBinaryLikeExpressionWorker(node.left, node.operatorToken, node.right, leftType, rightType, state.checkMode, node);
+      }
+      state.skip = false;
+      setLeftType(
+        state,
+        /*type*/
+        void 0
+      );
+      setLastResult(
+        state,
+        /*type*/
+        void 0
+      );
+      state.stackIndex--;
+      return result;
+    }
+    function foldState(state, result, _side) {
+      setLastResult(state, result);
+      return state;
+    }
+    function maybeCheckExpression(state, node) {
+      if (isBinaryExpression(node)) {
+        return node;
+      }
+      setLastResult(state, checkExpression(node, state.checkMode));
+    }
+    function getLeftType(state) {
+      return state.typeStack[state.stackIndex];
+    }
+    function setLeftType(state, type) {
+      state.typeStack[state.stackIndex] = type;
+    }
+    function getLastResult(state) {
+      return state.typeStack[state.stackIndex + 1];
+    }
+    function setLastResult(state, type) {
+      state.typeStack[state.stackIndex + 1] = type;
+    }
+  }
+  function checkGrammarNullishCoalesceWithLogicalExpression(node) {
+    const { left, operatorToken, right } = node;
+    if (operatorToken.kind === 61 /* QuestionQuestionToken */) {
+      if (isBinaryExpression(left) && (left.operatorToken.kind === 57 /* BarBarToken */ || left.operatorToken.kind === 56 /* AmpersandAmpersandToken */)) {
+        grammarErrorOnNode(left, Diagnostics._0_and_1_operations_cannot_be_mixed_without_parentheses, tokenToString(left.operatorToken.kind), tokenToString(operatorToken.kind));
+      }
+      if (isBinaryExpression(right) && (right.operatorToken.kind === 57 /* BarBarToken */ || right.operatorToken.kind === 56 /* AmpersandAmpersandToken */)) {
+        grammarErrorOnNode(right, Diagnostics._0_and_1_operations_cannot_be_mixed_without_parentheses, tokenToString(right.operatorToken.kind), tokenToString(operatorToken.kind));
+      }
+    }
+  }
+  function checkBinaryLikeExpression(left, operatorToken, right, checkMode, errorNode) {
+    const operator = operatorToken.kind;
+    if (operator === 64 /* EqualsToken */ && (left.kind === 210 /* ObjectLiteralExpression */ || left.kind === 209 /* ArrayLiteralExpression */)) {
+      return checkDestructuringAssignment(left, checkExpression(right, checkMode), checkMode, right.kind === 110 /* ThisKeyword */);
+    }
+    let leftType;
+    if (isLogicalOrCoalescingBinaryOperator(operator)) {
+      leftType = checkTruthinessExpression(left, checkMode);
+    } else {
+      leftType = checkExpression(left, checkMode);
+    }
+    const rightType = checkExpression(right, checkMode);
+    return checkBinaryLikeExpressionWorker(left, operatorToken, right, leftType, rightType, checkMode, errorNode);
+  }
+  function checkBinaryLikeExpressionWorker(left, operatorToken, right, leftType, rightType, checkMode, errorNode) {
+    const operator = operatorToken.kind;
+    switch (operator) {
+      case 42 /* AsteriskToken */:
+      case 43 /* AsteriskAsteriskToken */:
+      case 67 /* AsteriskEqualsToken */:
+      case 68 /* AsteriskAsteriskEqualsToken */:
+      case 44 /* SlashToken */:
+      case 69 /* SlashEqualsToken */:
+      case 45 /* PercentToken */:
+      case 70 /* PercentEqualsToken */:
+      case 41 /* MinusToken */:
+      case 66 /* MinusEqualsToken */:
+      case 48 /* LessThanLessThanToken */:
+      case 71 /* LessThanLessThanEqualsToken */:
+      case 49 /* GreaterThanGreaterThanToken */:
+      case 72 /* GreaterThanGreaterThanEqualsToken */:
+      case 50 /* GreaterThanGreaterThanGreaterThanToken */:
+      case 73 /* GreaterThanGreaterThanGreaterThanEqualsToken */:
+      case 52 /* BarToken */:
+      case 75 /* BarEqualsToken */:
+      case 53 /* CaretToken */:
+      case 79 /* CaretEqualsToken */:
+      case 51 /* AmpersandToken */:
+      case 74 /* AmpersandEqualsToken */:
+        if (leftType === silentNeverType || rightType === silentNeverType) {
+          return silentNeverType;
+        }
+        leftType = checkNonNullType(leftType, left);
+        rightType = checkNonNullType(rightType, right);
+        let suggestedOperator;
+        if (leftType.flags & 528 /* BooleanLike */ && rightType.flags & 528 /* BooleanLike */ && (suggestedOperator = getSuggestedBooleanOperator(operatorToken.kind)) !== void 0) {
+          error2(errorNode || operatorToken, Diagnostics.The_0_operator_is_not_allowed_for_boolean_types_Consider_using_1_instead, tokenToString(operatorToken.kind), tokenToString(suggestedOperator));
+          return numberType;
+        } else {
+          const leftOk = checkArithmeticOperandType(
+            left,
+            leftType,
+            Diagnostics.The_left_hand_side_of_an_arithmetic_operation_must_be_of_type_any_number_bigint_or_an_enum_type,
+            /*isAwaitValid*/
+            true
+          );
+          const rightOk = checkArithmeticOperandType(
+            right,
+            rightType,
+            Diagnostics.The_right_hand_side_of_an_arithmetic_operation_must_be_of_type_any_number_bigint_or_an_enum_type,
+            /*isAwaitValid*/
+            true
+          );
+          let resultType2;
+          if (isTypeAssignableToKind(leftType, 3 /* AnyOrUnknown */) && isTypeAssignableToKind(rightType, 3 /* AnyOrUnknown */) || // Or, if neither could be bigint, implicit coercion results in a number result
+          !(maybeTypeOfKind(leftType, 2112 /* BigIntLike */) || maybeTypeOfKind(rightType, 2112 /* BigIntLike */))) {
+            resultType2 = numberType;
+          } else if (bothAreBigIntLike(leftType, rightType)) {
+            switch (operator) {
+              case 50 /* GreaterThanGreaterThanGreaterThanToken */:
+              case 73 /* GreaterThanGreaterThanGreaterThanEqualsToken */:
+                reportOperatorError();
+                break;
+              case 43 /* AsteriskAsteriskToken */:
+              case 68 /* AsteriskAsteriskEqualsToken */:
+                if (languageVersion < 3 /* ES2016 */) {
+                  error2(errorNode, Diagnostics.Exponentiation_cannot_be_performed_on_bigint_values_unless_the_target_option_is_set_to_es2016_or_later);
+                }
+            }
+            resultType2 = bigintType;
+          } else {
+            reportOperatorError(bothAreBigIntLike);
+            resultType2 = errorType;
+          }
+          if (leftOk && rightOk) {
+            checkAssignmentOperator(resultType2);
+          }
+          return resultType2;
+        }
+      case 40 /* PlusToken */:
+      case 65 /* PlusEqualsToken */:
+        if (leftType === silentNeverType || rightType === silentNeverType) {
+          return silentNeverType;
+        }
+        if (!isTypeAssignableToKind(leftType, 402653316 /* StringLike */) && !isTypeAssignableToKind(rightType, 402653316 /* StringLike */)) {
+          leftType = checkNonNullType(leftType, left);
+          rightType = checkNonNullType(rightType, right);
+        }
+        let resultType;
+        if (isTypeAssignableToKind(
+          leftType,
+          296 /* NumberLike */,
+          /*strict*/
+          true
+        ) && isTypeAssignableToKind(
+          rightType,
+          296 /* NumberLike */,
+          /*strict*/
+          true
+        )) {
+          resultType = numberType;
+        } else if (isTypeAssignableToKind(
+          leftType,
+          2112 /* BigIntLike */,
+          /*strict*/
+          true
+        ) && isTypeAssignableToKind(
+          rightType,
+          2112 /* BigIntLike */,
+          /*strict*/
+          true
+        )) {
+          resultType = bigintType;
+        } else if (isTypeAssignableToKind(
+          leftType,
+          402653316 /* StringLike */,
+          /*strict*/
+          true
+        ) || isTypeAssignableToKind(
+          rightType,
+          402653316 /* StringLike */,
+          /*strict*/
+          true
+        )) {
+          resultType = stringType;
+        } else if (isTypeAny(leftType) || isTypeAny(rightType)) {
+          resultType = isErrorType(leftType) || isErrorType(rightType) ? errorType : anyType;
+        }
+        if (resultType && !checkForDisallowedESSymbolOperand(operator)) {
+          return resultType;
+        }
+        if (!resultType) {
+          const closeEnoughKind = 296 /* NumberLike */ | 2112 /* BigIntLike */ | 402653316 /* StringLike */ | 3 /* AnyOrUnknown */;
+          reportOperatorError(
+            (left2, right2) => isTypeAssignableToKind(left2, closeEnoughKind) && isTypeAssignableToKind(right2, closeEnoughKind)
+          );
+          return anyType;
+        }
+        if (operator === 65 /* PlusEqualsToken */) {
+          checkAssignmentOperator(resultType);
+        }
+        return resultType;
+      case 30 /* LessThanToken */:
+      case 32 /* GreaterThanToken */:
+      case 33 /* LessThanEqualsToken */:
+      case 34 /* GreaterThanEqualsToken */:
+        if (checkForDisallowedESSymbolOperand(operator)) {
+          leftType = getBaseTypeOfLiteralTypeForComparison(checkNonNullType(leftType, left));
+          rightType = getBaseTypeOfLiteralTypeForComparison(checkNonNullType(rightType, right));
+          reportOperatorErrorUnless((left2, right2) => {
+            if (isTypeAny(left2) || isTypeAny(right2)) {
+              return true;
+            }
+            const leftAssignableToNumber = isTypeAssignableTo(left2, numberOrBigIntType);
+            const rightAssignableToNumber = isTypeAssignableTo(right2, numberOrBigIntType);
+            return leftAssignableToNumber && rightAssignableToNumber || !leftAssignableToNumber && !rightAssignableToNumber && areTypesComparable(left2, right2);
+          });
+        }
+        return booleanType;
+      case 35 /* EqualsEqualsToken */:
+      case 36 /* ExclamationEqualsToken */:
+      case 37 /* EqualsEqualsEqualsToken */:
+      case 38 /* ExclamationEqualsEqualsToken */:
+        if (!(checkMode && checkMode & 64 /* TypeOnly */)) {
+          if ((isLiteralExpressionOfObject(left) || isLiteralExpressionOfObject(right)) && // only report for === and !== in JS, not == or !=
+          (!isInJSFile(left) || (operator === 37 /* EqualsEqualsEqualsToken */ || operator === 38 /* ExclamationEqualsEqualsToken */))) {
+            const eqType = operator === 35 /* EqualsEqualsToken */ || operator === 37 /* EqualsEqualsEqualsToken */;
+            error2(errorNode, Diagnostics.This_condition_will_always_return_0_since_JavaScript_compares_objects_by_reference_not_value, eqType ? "false" : "true");
+          }
+          checkNaNEquality(errorNode, operator, left, right);
+          reportOperatorErrorUnless((left2, right2) => isTypeEqualityComparableTo(left2, right2) || isTypeEqualityComparableTo(right2, left2));
+        }
+        return booleanType;
+      case 104 /* InstanceOfKeyword */:
+        return checkInstanceOfExpression(left, right, leftType, rightType, checkMode);
+      case 103 /* InKeyword */:
+        return checkInExpression(left, right, leftType, rightType);
+      case 56 /* AmpersandAmpersandToken */:
+      case 77 /* AmpersandAmpersandEqualsToken */: {
+        const resultType2 = hasTypeFacts(leftType, 4194304 /* Truthy */) ? getUnionType([extractDefinitelyFalsyTypes(strictNullChecks ? leftType : getBaseTypeOfLiteralType(rightType)), rightType]) : leftType;
+        if (operator === 77 /* AmpersandAmpersandEqualsToken */) {
+          checkAssignmentOperator(rightType);
+        }
+        return resultType2;
+      }
+      case 57 /* BarBarToken */:
+      case 76 /* BarBarEqualsToken */: {
+        const resultType2 = hasTypeFacts(leftType, 8388608 /* Falsy */) ? getUnionType([getNonNullableType(removeDefinitelyFalsyTypes(leftType)), rightType], 2 /* Subtype */) : leftType;
+        if (operator === 76 /* BarBarEqualsToken */) {
+          checkAssignmentOperator(rightType);
+        }
+        return resultType2;
+      }
+      case 61 /* QuestionQuestionToken */:
+      case 78 /* QuestionQuestionEqualsToken */: {
+        const resultType2 = hasTypeFacts(leftType, 262144 /* EQUndefinedOrNull */) ? getUnionType([getNonNullableType(leftType), rightType], 2 /* Subtype */) : leftType;
+        if (operator === 78 /* QuestionQuestionEqualsToken */) {
+          checkAssignmentOperator(rightType);
+        }
+        return resultType2;
+      }
+      case 64 /* EqualsToken */:
+        const declKind = isBinaryExpression(left.parent) ? getAssignmentDeclarationKind(left.parent) : 0 /* None */;
+        checkAssignmentDeclaration(declKind, rightType);
+        if (isAssignmentDeclaration2(declKind)) {
+          if (!(rightType.flags & 524288 /* Object */) || declKind !== 2 /* ModuleExports */ && declKind !== 6 /* Prototype */ && !isEmptyObjectType(rightType) && !isFunctionObjectType(rightType) && !(getObjectFlags(rightType) & 1 /* Class */)) {
+            checkAssignmentOperator(rightType);
+          }
+          return leftType;
+        } else {
+          checkAssignmentOperator(rightType);
+          return rightType;
+        }
+      case 28 /* CommaToken */:
+        if (!compilerOptions.allowUnreachableCode && isSideEffectFree(left) && !isIndirectCall(left.parent)) {
+          const sf = getSourceFileOfNode(left);
+          const sourceText = sf.text;
+          const start2 = skipTrivia(sourceText, left.pos);
+          const isInDiag2657 = sf.parseDiagnostics.some((diag2) => {
+            if (diag2.code !== Diagnostics.JSX_expressions_must_have_one_parent_element.code)
+              return false;
+            return textSpanContainsPosition(diag2, start2);
+          });
+          if (!isInDiag2657)
+            error2(left, Diagnostics.Left_side_of_comma_operator_is_unused_and_has_no_side_effects);
+        }
+        return rightType;
+      default:
+        return Debug.fail();
+    }
+    function bothAreBigIntLike(left2, right2) {
+      return isTypeAssignableToKind(left2, 2112 /* BigIntLike */) && isTypeAssignableToKind(right2, 2112 /* BigIntLike */);
+    }
+    function checkAssignmentDeclaration(kind, rightType2) {
+      if (kind === 2 /* ModuleExports */) {
+        for (const prop of getPropertiesOfObjectType(rightType2)) {
+          const propType = getTypeOfSymbol(prop);
+          if (propType.symbol && propType.symbol.flags & 32 /* Class */) {
+            const name = prop.escapedName;
+            const symbol = resolveName(
+              prop.valueDeclaration,
+              name,
+              788968 /* Type */,
+              /*nameNotFoundMessage*/
+              void 0,
+              name,
+              /*isUse*/
+              false
+            );
+            if ((symbol == null ? void 0 : symbol.declarations) && symbol.declarations.some(isJSDocTypedefTag)) {
+              addDuplicateDeclarationErrorsForSymbols(symbol, Diagnostics.Duplicate_identifier_0, unescapeLeadingUnderscores(name), prop);
+              addDuplicateDeclarationErrorsForSymbols(prop, Diagnostics.Duplicate_identifier_0, unescapeLeadingUnderscores(name), symbol);
+            }
+          }
+        }
+      }
+    }
+    function isIndirectCall(node) {
+      return node.parent.kind === 217 /* ParenthesizedExpression */ && isNumericLiteral(node.left) && node.left.text === "0" && (isCallExpression(node.parent.parent) && node.parent.parent.expression === node.parent || node.parent.parent.kind === 215 /* TaggedTemplateExpression */) && // special-case for "eval" because it's the only non-access case where an indirect call actually affects behavior.
+      (isAccessExpression(node.right) || isIdentifier(node.right) && node.right.escapedText === "eval");
+    }
+    function checkForDisallowedESSymbolOperand(operator2) {
+      const offendingSymbolOperand = maybeTypeOfKindConsideringBaseConstraint(leftType, 12288 /* ESSymbolLike */) ? left : maybeTypeOfKindConsideringBaseConstraint(rightType, 12288 /* ESSymbolLike */) ? right : void 0;
+      if (offendingSymbolOperand) {
+        error2(offendingSymbolOperand, Diagnostics.The_0_operator_cannot_be_applied_to_type_symbol, tokenToString(operator2));
+        return false;
+      }
+      return true;
+    }
+    function getSuggestedBooleanOperator(operator2) {
+      switch (operator2) {
+        case 52 /* BarToken */:
+        case 75 /* BarEqualsToken */:
+          return 57 /* BarBarToken */;
+        case 53 /* CaretToken */:
+        case 79 /* CaretEqualsToken */:
+          return 38 /* ExclamationEqualsEqualsToken */;
+        case 51 /* AmpersandToken */:
+        case 74 /* AmpersandEqualsToken */:
+          return 56 /* AmpersandAmpersandToken */;
+        default:
+          return void 0;
+      }
+    }
+    function checkAssignmentOperator(valueType) {
+      if (isAssignmentOperator(operator)) {
+        addLazyDiagnostic(checkAssignmentOperatorWorker);
+      }
+      function checkAssignmentOperatorWorker() {
+        let assigneeType = leftType;
+        if (isCompoundAssignment(operatorToken.kind) && left.kind === 211 /* PropertyAccessExpression */) {
+          assigneeType = checkPropertyAccessExpression(
+            left,
+            /*checkMode*/
+            void 0,
+            /*writeOnly*/
+            true
+          );
+        }
+        if (checkReferenceExpression(left, Diagnostics.The_left_hand_side_of_an_assignment_expression_must_be_a_variable_or_a_property_access, Diagnostics.The_left_hand_side_of_an_assignment_expression_may_not_be_an_optional_property_access)) {
+         

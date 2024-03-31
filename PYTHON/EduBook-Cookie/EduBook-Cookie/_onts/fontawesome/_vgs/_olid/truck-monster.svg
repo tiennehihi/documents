@@ -1,0 +1,59 @@
+n */) {
+    rawTextScanner.setText(void 0);
+    return invalidValueSentinel;
+  }
+  rawTextScanner.setText(void 0);
+  return tokenValue;
+}
+function propagateNameFlags(node) {
+  return node && isIdentifier(node) ? propagateIdentifierNameFlags(node) : propagateChildFlags(node);
+}
+function propagateIdentifierNameFlags(node) {
+  return propagateChildFlags(node) & ~67108864 /* ContainsPossibleTopLevelAwait */;
+}
+function propagatePropertyNameFlagsOfChild(node, transformFlags) {
+  return transformFlags | node.transformFlags & 134234112 /* PropertyNamePropagatingFlags */;
+}
+function propagateChildFlags(child) {
+  if (!child)
+    return 0 /* None */;
+  const childFlags = child.transformFlags & ~getTransformFlagsSubtreeExclusions(child.kind);
+  return isNamedDeclaration(child) && isPropertyName(child.name) ? propagatePropertyNameFlagsOfChild(child.name, childFlags) : childFlags;
+}
+function propagateChildrenFlags(children) {
+  return children ? children.transformFlags : 0 /* None */;
+}
+function aggregateChildrenFlags(children) {
+  let subtreeFlags = 0 /* None */;
+  for (const child of children) {
+    subtreeFlags |= propagateChildFlags(child);
+  }
+  children.transformFlags = subtreeFlags;
+}
+function getTransformFlagsSubtreeExclusions(kind) {
+  if (kind >= 182 /* FirstTypeNode */ && kind <= 205 /* LastTypeNode */) {
+    return -2 /* TypeExcludes */;
+  }
+  switch (kind) {
+    case 213 /* CallExpression */:
+    case 214 /* NewExpression */:
+    case 209 /* ArrayLiteralExpression */:
+      return -2147450880 /* ArrayLiteralOrCallOrNewExcludes */;
+    case 267 /* ModuleDeclaration */:
+      return -1941676032 /* ModuleExcludes */;
+    case 169 /* Parameter */:
+      return -2147483648 /* ParameterExcludes */;
+    case 219 /* ArrowFunction */:
+      return -2072174592 /* ArrowFunctionExcludes */;
+    case 218 /* FunctionExpression */:
+    case 262 /* FunctionDeclaration */:
+      return -1937940480 /* FunctionExcludes */;
+    case 261 /* VariableDeclarationList */:
+      return -2146893824 /* VariableDeclarationListExcludes */;
+    case 263 /* ClassDeclaration */:
+    case 231 /* ClassExpression */:
+      return -2147344384 /* ClassExcludes */;
+    case 176 /* Constructor */:
+      return -1937948672 /* ConstructorExcludes */;
+    case 172 /* PropertyDeclaration */:
+      return -2013249536 /* PropertyExcl

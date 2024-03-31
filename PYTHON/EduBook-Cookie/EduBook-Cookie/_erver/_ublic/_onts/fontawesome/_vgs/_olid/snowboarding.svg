@@ -1,0 +1,62 @@
+ee:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Mound
+  unicode: e52d
+  voted: false
+mountain:
+  aliases:
+    unicodes:
+      composite:
+        - 1f3d4
+      secondary:
+        - 10f6fc
+  changes:
+    - 5.4.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Mountain
+  unicode: f6fc
+  voted: false
+mountain-city:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Mountain City
+  unicode: e52e
+  voted: false
+mountain-sun:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Mountain Sun
+  unicode: e52f
+  voted: false
+mug-hot:
+  aliases:
+    unicodes:
+      co

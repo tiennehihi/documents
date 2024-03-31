@@ -1,0 +1,5 @@
+1, 3), colorFunc = _ref42[1], colorValStr = _ref42[2];
+          if (!colorFunc || !colorValStr) {
+            return;
+          }
+          var colorVals = colorValStr.s

@@ -1,0 +1,59 @@
+b
+  voted: false
+plug-circle-check:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Plug Circle-check
+  unicode: e55c
+  voted: false
+plug-circle-exclamation:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Plug Circle-exclamation
+  unicode: e55d
+  voted: false
+plug-circle-minus:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Plug Circle-minus
+  unicode: e55e
+  voted: false
+plug-circle-plus:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Plug Circle-plus
+  unicode: e55f
+  voted: false
+plug-circle-xmark:

@@ -1,0 +1,42 @@
+// These types are not exported, and are only used internally
+
+/**
+ * Take in an unknown value and return one that is of type T
+ */
+type Converter<T> = (object: unknown) => T
+
+type SequenceConverter<T> = (object: unknown) => T[]
+
+type RecordConverter<K extends string, V> = (object: unknown) => Record<K, V>
+
+interface ConvertToIntOpts {
+  clamp?: boolean
+  enforceRange?: boolean
+}
+
+interface WebidlErrors {
+  exception (opts: { header: string, message: string }): TypeError
+  /**
+   * @description Throw an error when conversion from one type to another has failed
+   */
+  conversionFailed (opts: {
+    prefix: string
+    argument: string
+    types: string[]
+  }): TypeError
+  /**
+   * @description Throw an error when an invalid argument is provided
+   */
+  invalidArgument (opts: {
+    prefix: string
+    value: string
+    type: string
+  }): TypeError
+}
+
+interface WebidlUtil {
+  /**
+   * @see https://tc39.es/ecma262/#sec-ecmascript-data-types-and-values
+   */
+  Type (object: unknown):
+  

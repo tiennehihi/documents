@@ -1,0 +1,40 @@
+var Marker = require('./marker');
+var Token = require('./token');
+
+var formatPosition = require('../utils/format-position');
+
+var Level = {
+  BLOCK: 'block',
+  COMMENT: 'comment',
+  DOUBLE_QUOTE: 'double-quote',
+  RULE: 'rule',
+  SINGLE_QUOTE: 'single-quote'
+};
+
+var AT_RULES = [
+  '@charset',
+  '@import'
+];
+
+var BLOCK_RULES = [
+  '@-moz-document',
+  '@document',
+  '@-moz-keyframes',
+  '@-ms-keyframes',
+  '@-o-keyframes',
+  '@-webkit-keyframes',
+  '@keyframes',
+  '@media',
+  '@supports',
+  '@container',
+  '@layer'
+];
+
+var IGNORE_END_COMMENT_PATTERN = /\/\* clean-css ignore:end \*\/$/;
+var IGNORE_START_COMMENT_PATTERN = /^\/\* clean-css ignore:start \*\//;
+
+var PAGE_MARGIN_BOXES = [
+  '@bottom-center',
+  '@bottom-left',
+  '@bottom-left-corner',
+  '@bottom-righ

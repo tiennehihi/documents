@@ -1,0 +1,17 @@
+import type {KeywordDefinition, KeywordErrorDefinition, KeywordCxt, ErrorObject} from "ajv"
+import {_, str, nil, Name} from "ajv/dist/compile/codegen"
+import type {DefinitionOptions} from "./_types"
+import {metaSchemaRef} from "./_util"
+
+export type SelectError = ErrorObject<"select", {failingCase?: string; failingDefault?: true}>
+
+const error: KeywordErrorDefinition = {
+  message: ({params: {schemaProp}}) =>
+    schemaProp
+      ? str`should match case "${schemaProp}" schema`
+      : str`should match default case schema`,
+  params: ({params: {schemaProp}}) =>
+    schemaProp ? _`{failingCase: ${schemaProp}}` : _`{failingDefault: true}`,
+}
+
+export default function getDef(opts?: DefinitionOptions): Keywo

@@ -1,0 +1,452 @@
+keyboard",
+      "help": "Scrollable region must have keyboard access"
+    },
+    "select-name": {
+      "description": "Ensures select element has an accessible name",
+      "help": "Select element must have an accessible name"
+    },
+    "server-side-image-map": {
+      "description": "Ensures that server-side image maps are not used",
+      "help": "Server-side image maps must not be used"
+    },
+    "skip-link": {
+      "description": "Ensure all skip links have a focusable target",
+      "help": "The skip-link target should exist and be focusable"
+    },
+    "svg-img-alt": {
+      "description": "Ensures <svg> elements with an img, graphics-document or graphics-symbol role have an accessible text",
+      "help": "<svg> elements with an img role must have an alternative text"
+    },
+    "tabindex": {
+      "description": "Ensures tabindex attribute values are not greater than 0",
+      "help": "Elements should not have tabindex greater than zero"
+    },
+    "table-duplicate-name": {
+      "description": "Ensure the <caption> element does not contain the same text as the summary attribute",
+      "help": "tables should not have the same summary and caption"
+    },
+    "table-fake-caption": {
+      "description": "Ensure that tables with a caption use the <caption> element.",
+      "help": "Data or header cells must not be used to give caption to a data table."
+    },
+    "target-size": {
+      "description": "Ensure touch target have sufficient size and space",
+      "help": "All touch targets must be 24px large, or leave sufficient space"
+    },
+    "td-has-header": {
+      "description": "Ensure that each non-empty data cell in a <table> larger than 3 by 3  has one or more table headers",
+      "help": "Non-empty <td> elements in larger <table> must have an associated table header"
+    },
+    "td-headers-attr": {
+      "description": "Ensure that each cell in a table that uses the headers attribute refers only to other cells in that table",
+      "help": "Table cells that use the headers attribute must only refer to cells in the same table"
+    },
+    "th-has-data-cells": {
+      "description": "Ensure that <th> elements and elements with role=columnheader/rowheader have data cells they describe",
+      "help": "Table headers in a data table must refer to data cells"
+    },
+    "valid-lang": {
+      "description": "Ensures lang attributes have valid values",
+      "help": "lang attribute must have a valid value"
+    },
+    "video-caption": {
+      "description": "Ensures <video> elements have captions",
+      "help": "<video> elements must have captions"
+    }
+  },
+  "checks": {
+    "abstractrole": {
+      "pass": "Abstract roles are not used",
+      "fail": {
+        "singular": "Abstract role cannot be directly used: ${data.values}",
+        "plural": "Abstract roles cannot be directly used: ${data.values}"
+      }
+    },
+    "aria-allowed-attr": {
+      "pass": "ARIA attributes are used correctly for the defined role",
+      "fail": {
+        "singular": "ARIA attribute is not allowed: ${data.values}",
+        "plural": "ARIA attributes are not allowed: ${data.values}"
+      },
+      "incomplete": "Check that there is no problem if the ARIA attribute is ignored on this element: ${data.values}"
+    },
+    "aria-allowed-role": {
+      "pass": "ARIA role is allowed for given element",
+      "fail": {
+        "singular": "ARIA role ${data.values} is not allowed for given element",
+        "plural": "ARIA roles ${data.values} are not allowed for given element"
+      },
+      "incomplete": {
+        "singular": "ARIA role ${data.values} must be removed when the element is made visible, as it is not allowed for the element",
+        "plural": "ARIA roles ${data.values} must be removed when the element is made visible, as they are not allowed for the element"
+      }
+    },
+    "aria-busy": {
+      "pass": "Element has an aria-busy attribute",
+      "fail": "Element uses aria-busy=\"true\" while showing a loader"
+    },
+    "aria-errormessage": {
+      "pass": "aria-errormessage exists and references elements visible to screen readers that use a supported aria-errormessage technique",
+      "fail": {
+        "singular": "aria-errormessage value `${data.values}` must use a technique to announce the message (e.g., aria-live, aria-describedby, role=alert, etc.)",
+        "plural": "aria-errormessage values `${data.values}` must use a technique to announce the message (e.g., aria-live, aria-describedby, role=alert, etc.)",
+        "hidden": "aria-errormessage value `${data.values}` cannot reference a hidden element"
+      },
+      "incomplete": {
+        "singular": "ensure aria-errormessage value `${data.values}` references an existing element",
+        "plural": "ensure aria-errormessage values `${data.values}` reference existing elements",
+        "idrefs": "unable to determine if aria-errormessage element exists on the page: ${data.values}"
+      }
+    },
+    "aria-hidden-body": {
+      "pass": "No aria-hidden attribute is present on document body",
+      "fail": "aria-hidden=true should not be present on the document body"
+    },
+    "aria-level": {
+      "pass": "aria-level values are valid",
+      "incomplete": "aria-level values greater than 6 are not supported in all screenreader and browser combinations"
+    },
+    "aria-prohibited-attr": {
+      "pass": "ARIA attribute is allowed",
+      "fail": {
+        "hasRolePlural": "${data.prohibited} attributes cannot be used with role \"${data.role}\".",
+        "hasRoleSingular": "${data.prohibited} attribute cannot be used with role \"${data.role}\".",
+        "noRolePlural": "${data.prohibited} attributes cannot be used on a ${data.nodeName} with no valid role attribute.",
+        "noRoleSingular": "${data.prohibited} attribute cannot be used on a ${data.nodeName} with no valid role attribute."
+      },
+      "incomplete": {
+        "hasRoleSingular": "${data.prohibited} attribute is not well supported with role \"${data.role}\".",
+        "hasRolePlural": "${data.prohibited} attributes are not well supported with role \"${data.role}\".",
+        "noRoleSingular": "${data.prohibited} attribute is not well supported on a ${data.nodeName} with no valid role attribute.",
+        "noRolePlural": "${data.prohibited} attributes are not well supported on a ${data.nodeName} with no valid role attribute."
+      }
+    },
+    "aria-required-attr": {
+      "pass": "All required ARIA attributes are present",
+      "fail": {
+        "singular": "Required ARIA attribute not present: ${data.values}",
+        "plural": "Required ARIA attributes not present: ${data.values}"
+      }
+    },
+    "aria-required-children": {
+      "pass": "Required ARIA children are present",
+      "fail": {
+        "singular": "Required ARIA child role not present: ${data.values}",
+        "plural": "Required ARIA children role not present: ${data.values}",
+        "unallowed": "Element has children which are not allowed: ${data.values}"
+      },
+      "incomplete": {
+        "singular": "Expecting ARIA child role to be added: ${data.values}",
+        "plural": "Expecting ARIA children role to be added: ${data.values}"
+      }
+    },
+    "aria-required-parent": {
+      "pass": "Required ARIA parent role present",
+      "fail": {
+        "singular": "Required ARIA parent role not present: ${data.values}",
+        "plural": "Required ARIA parents role not present: ${data.values}"
+      }
+    },
+    "aria-roledescription": {
+      "pass": "aria-roledescription used on a supported semantic role",
+      "incomplete": "Check that the aria-roledescription is announced by supported screen readers",
+      "fail": "Give the element a role that supports aria-roledescription"
+    },
+    "aria-unsupported-attr": {
+      "pass": "ARIA attribute is supported",
+      "fail": "ARIA attribute is not widely supported in screen readers and assistive technologies: ${data.values}"
+    },
+    "aria-valid-attr-value": {
+      "pass": "ARIA attribute values are valid",
+      "fail": {
+        "singular": "Invalid ARIA attribute value: ${data.values}",
+        "plural": "Invalid ARIA attribute values: ${data.values}"
+      },
+      "incomplete": {
+        "noId": "ARIA attribute element ID does not exist on the page: ${data.needsReview}",
+        "noIdShadow": "ARIA attribute element ID does not exist on the page or is a descendant of a different shadow DOM tree: ${data.needsReview}",
+        "ariaCurrent": "ARIA attribute value is invalid and will be treated as \"aria-current=true\": ${data.needsReview}",
+        "idrefs": "Unable to determine if ARIA attribute element ID exists on the page: ${data.needsReview}",
+        "empty": "ARIA attribute value is ignored while empty: ${data.needsReview}"
+      }
+    },
+    "aria-valid-attr": {
+      "pass": "ARIA attribute name is valid",
+      "fail": {
+        "singular": "Invalid ARIA attribute name: ${data.values}",
+        "plural": "Invalid ARIA attribute names: ${data.values}"
+      }
+    },
+    "deprecatedrole": {
+      "pass": "ARIA role is not deprecated",
+      "fail": "The role used is deprecated: ${data}"
+    },
+    "fallbackrole": {
+      "pass": "Only one role value used",
+      "fail": "Use only one role value, since fallback roles are not supported in older browsers",
+      "incomplete": "Use only role 'presentation' or 'none' since they are synonymous."
+    },
+    "has-global-aria-attribute": {
+      "pass": {
+        "singular": "Element has global ARIA attribute: ${data.values}",
+        "plural": "Element has global ARIA attributes: ${data.values}"
+      },
+      "fail": "Element does not have global ARIA attribute"
+    },
+    "has-widget-role": {
+      "pass": "Element has a widget role.",
+      "fail": "Element does not have a widget role."
+    },
+    "invalidrole": {
+      "pass": "ARIA role is valid",
+      "fail": {
+        "singular": "Role must be one of the valid ARIA roles: ${data.values}",
+        "plural": "Roles must be one of the valid ARIA roles: ${data.values}"
+      }
+    },
+    "is-element-focusable": {
+      "pass": "Element is focusable.",
+      "fail": "Element is not focusable."
+    },
+    "no-implicit-explicit-label": {
+      "pass": "There is no mismatch between a <label> and accessible name",
+      "incomplete": "Check that the <label> does not need be part of the ARIA ${data} field's name"
+    },
+    "unsupportedrole": {
+      "pass": "ARIA role is supported",
+      "fail": "The role used is not widely supported in screen readers and assistive technologies: ${data}"
+    },
+    "valid-scrollable-semantics": {
+      "pass": "Element has valid semantics for an element in the focus order.",
+      "fail": "Element has invalid semantics for an element in the focus order."
+    },
+    "color-contrast-enhanced": {
+      "pass": "Element has sufficient color contrast of ${data.contrastRatio}",
+      "fail": {
+        "default": "Element has insufficient color contrast of ${data.contrastRatio} (foreground color: ${data.fgColor}, background color: ${data.bgColor}, font size: ${data.fontSize}, font weight: ${data.fontWeight}). Expected contrast ratio of ${data.expectedContrastRatio}",
+        "fgOnShadowColor": "Element has insufficient color contrast of ${data.contrastRatio} between the foreground and shadow color (foreground color: ${data.fgColor}, text-shadow color: ${data.shadowColor}, font size: ${data.fontSize}, font weight: ${data.fontWeight}). Expected contrast ratio of ${data.expectedContrastRatio}",
+        "shadowOnBgColor": "Element has insufficient color contrast of ${data.contrastRatio} between the shadow color and background color (text-shadow color: ${data.shadowColor}, background color: ${data.bgColor}, font size: ${data.fontSize}, font weight: ${data.fontWeight}). Expected contrast ratio of ${data.expectedContrastRatio}"
+      },
+      "incomplete": {
+        "default": "Unable to determine contrast ratio",
+        "bgImage": "Element's background color could not be determined due to a background image",
+        "bgGradient": "Element's background color could not be determined due to a background gradient",
+        "imgNode": "Element's background color could not be determined because element contains an image node",
+        "bgOverlap": "Element's background color could not be determined because it is overlapped by another element",
+        "fgAlpha": "Element's foreground color could not be determined because of alpha transparency",
+        "elmPartiallyObscured": "Element's background color could not be determined because it's partially obscured by another element",
+        "elmPartiallyObscuring": "Element's background color could not be determined because it partially overlaps other elements",
+        "outsideViewport": "Element's background color could not be determined because it's outside the viewport",
+        "equalRatio": "Element has a 1:1 contrast ratio with the background",
+        "shortTextContent": "Element content is too short to determine if it is actual text content",
+        "nonBmp": "Element content contains only non-text characters",
+        "pseudoContent": "Element's background color could not be determined due to a pseudo element"
+      }
+    },
+    "color-contrast": {
+      "pass": {
+        "default": "Element has sufficient color contrast of ${data.contrastRatio}",
+        "hidden": "Element is hidden"
+      },
+      "fail": {
+        "default": "Element has insufficient color contrast of ${data.contrastRatio} (foreground color: ${data.fgColor}, background color: ${data.bgColor}, font size: ${data.fontSize}, font weight: ${data.fontWeight}). Expected contrast ratio of ${data.expectedContrastRatio}",
+        "fgOnShadowColor": "Element has insufficient color contrast of ${data.contrastRatio} between the foreground and shadow color (foreground color: ${data.fgColor}, text-shadow color: ${data.shadowColor}, font size: ${data.fontSize}, font weight: ${data.fontWeight}). Expected contrast ratio of ${data.expectedContrastRatio}",
+        "shadowOnBgColor": "Element has insufficient color contrast of ${data.contrastRatio} between the shadow color and background color (text-shadow color: ${data.shadowColor}, background color: ${data.bgColor}, font size: ${data.fontSize}, font weight: ${data.fontWeight}). Expected contrast ratio of ${data.expectedContrastRatio}"
+      },
+      "incomplete": {
+        "default": "Unable to determine contrast ratio",
+        "bgImage": "Element's background color could not be determined due to a background image",
+        "bgGradient": "Element's background color could not be determined due to a background gradient",
+        "imgNode": "Element's background color could not be determined because element contains an image node",
+        "bgOverlap": "Element's background color could not be determined because it is overlapped by another element",
+        "fgAlpha": "Element's foreground color could not be determined because of alpha transparency",
+        "elmPartiallyObscured": "Element's background color could not be determined because it's partially obscured by another element",
+        "elmPartiallyObscuring": "Element's background color could not be determined because it partially overlaps other elements",
+        "outsideViewport": "Element's background color could not be determined because it's outside the viewport",
+        "equalRatio": "Element has a 1:1 contrast ratio with the background",
+        "shortTextContent": "Element content is too short to determine if it is actual text content",
+        "nonBmp": "Element content contains only non-text characters",
+        "pseudoContent": "Element's background color could not be determined due to a pseudo element"
+      }
+    },
+    "link-in-text-block-style": {
+      "pass": "Links can be distinguished from surrounding text by visual styling",
+      "fail": "The link has no styling (such as underline) to distinguish it from the surrounding text"
+    },
+    "link-in-text-block": {
+      "pass": "Links can be distinguished from surrounding text in some way other than by color",
+      "fail": {
+        "fgContrast": "The link has insufficient color contrast of ${data.contrastRatio}:1 with the surrounding text. (Minimum contrast is ${data.requiredContrastRatio}:1, link text: ${data.nodeColor}, surrounding text: ${data.parentColor})",
+        "bgContrast": "The link background has insuf.           {¨mXmX  ¨mX=Ÿ    ..          {¨mXmX  ¨mXüO    INDEX   JS  ‚¨mXmX  ¨mXàŸ-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ons() },
+      ];
+    } else if (
+      typeof options.watchFiles === "object" &&
+      options.watchFiles !== null &&
+      !Array.isArray(options.watchFiles)
+    ) {
+      options.watchFiles = [
+        {
+          paths: options.watchFiles.paths,
+          options: getWatchOptions(options.watchFiles.options || {}),
+        },
+      ];
+    } else if (Array.isArray(options.watchFiles)) {
+      options.watchFiles = options.watchFiles.map((item) => {
+        if (typeof item === "string") {
+          return { paths: item, options: getWatchOptions() };
+        }
+
+        return {
+          paths: item.paths,
+          options: getWatchOptions(item.options || {}),
+        };
+      });
+    } else {
+      options.watchFiles = [];
+    }
+
+    const defaultWebSocketServerType = "ws";
+    const defaultWebSocketServerOptions = { path: "/ws" };
+
+    if (typeof options.webSocketServer === "undefined") {
+      options.webSocketServer = {
+        type: defaultWebSocketServerType,
+        options: defaultWebSocketServerOptions,
+      };
+    } else if (
+      typeof options.webSocketServer === "boolean" &&
+      !options.webSocketServer
+    ) {
+      options.webSocketServer = false;
+    } else if (
+      typeof options.webSocketServer === "string" ||
+      typeof options.webSocketServer === "function"
+    ) {
+      options.webSocketServer = {
+        type: options.webSocketServer,
+        options: defaultWebSocketServerOptions,
+      };
+    } else {
+      options.webSocketServer = {
+        type:
+          /** @type {WebSocketServerConfiguration} */
+          (options.webSocketServer).type || defaultWebSocketServerType,
+        options: {
+          ...defaultWebSocketServerOptions,
+          .../** @type {WebSocketServerConfiguration} */
+          (options.webSocketServer).options,
+        },
+      };
+
+      const webSocketServer =
+        /** @type {{ type: WebSocketServerConfiguration["type"], options: NonNullable<WebSocketServerConfiguration["options"]> }} */
+        (options.webSocketServer);
+
+      if (typeof webSocketServer.options.port === "string") {
+        webSocketServer.options.port = Number(webSocketServer.options.port);
+      }
+    }
+  }
+
+  /**
+   * @private
+   * @returns {string}
+   */
+  getClientTransport() {
+    let clientImplementation;
+    let clientImplementationFound = true;
+
+    const isKnownWebSocketServerImplementation =
+      this.options.webSocketServer &&
+      typeof (
+        /** @type {WebSocketServerConfiguration} */
+        (this.options.webSocketServer).type
+      ) === "string" &&
+      // @ts-ignore
+      (this.options.webSocketServer.type === "ws" ||
+        /** @type {WebSocketServerConfiguration} */
+        (this.options.webSocketServer).type === "sockjs");
+
+    let clientTransport;
+
+    if (this.options.client) {
+      if (
+        typeof (
+          /** @type {ClientConfiguration} */
+          (this.options.client).webSocketTransport
+        ) !== "undefined"
+      ) {
+        clientTransport =
+          /** @type {ClientConfiguration} */
+          (this.options.client).webSocketTransport;
+      } else if (isKnownWebSocketServerImplementation) {
+        clientTransport =
+          /** @type {WebSocketServerConfiguration} */
+          (this.options.webSocketServer).type;
+      } else {
+        clientTransport = "ws";
+      }
+    } else {
+      clientTransport = "ws";
+    }
+
+    switch (typeof clientTransport) {
+      case "string":
+        // could be 'sockjs', 'ws', or a path that should be required
+        if (clientTransport === "sockjs") {
+          clientImplementation = require.resolve(
+            "../client/clients/SockJSClient"
+          );
+        } else if (clientTransport === "ws") {
+          clientImplementation = require.resolve(
+            "../client/clients/WebSocketClient"
+          );
+        } else {
+          try {
+            clientImplementation = require.resolve(clientTransport);
+          } catch (e) {
+            clientImplementationFound = false;
+          }
+        }
+        break;
+      default:
+        clientImplementationFound = false;
+    }
+
+    if (!clientImplementationFound) {
+      throw new Error(
+        `${
+          !isKnownWebSocketServerImplementation
+            ? "When you use custom web socket implementation you must explicitly specify client.webSocketTransport. "
+            : ""
+        }client.webSocketTransport must be a string denoting a default implementation (e.g. 'sockjs', 'ws') or a full path to a JS file via require.resolve(...) which exports a class `
+      );
+    }
+
+    return /** @type {string} */ (clientImplementation);
+  }
+
+  /**
+   * @private
+   * @returns {string}
+   */
+  getServerTransport() {
+    let implementation;
+    let implementationFound = true;
+
+    switch (
+      typeof (
+        /** @type {WebSocketServerConfiguration} */
+        (this.options.webSocketServer).type
+      )
+    ) {
+      case "string":
+        // Could be 'sockjs', in the future 'ws', or a path that should be required
+        if (
+          /** @type {WebSocketServerConfiguration} */ (
+            this.options.webSocketServer
+          ).type === "sockjs"
+        ) {
+          implementation = require("./servers/SockJSServer");
+        } else if (
+          /** @typ

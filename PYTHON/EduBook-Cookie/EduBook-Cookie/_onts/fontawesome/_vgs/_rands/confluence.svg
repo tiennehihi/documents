@@ -1,0 +1,21 @@
+"use strict";
+
+const idlUtils = require("../generated/utils");
+const EventInit = require("../generated/EventInit");
+
+class EventImpl {
+  constructor(globalObject, args, privateData) {
+    const [type, eventInitDict = this.constructor.defaultInit] = args;
+
+    this.type = type;
+
+    this.bubbles = false;
+    this.cancelable = false;
+    for (const key in eventInitDict) {
+      if (key in this.constructor.defaultInit) {
+        this[key] = eventInitDict[key];
+      }
+    }
+    for (const key in this.constructor.defaultInit) {
+      if (!(key in this)) {
+        this[key] = this.construct

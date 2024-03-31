@@ -1,0 +1,31 @@
+# import/no-unused-modules
+
+<!-- end auto-generated rule header -->
+
+Reports:
+
+ - modules without any exports
+ - individual exports not being statically `import`ed or `require`ed from other modules in the same project
+ - dynamic imports are supported if argument is a literal string
+
+## Rule Details
+
+### Usage
+
+In order for this plugin to work, at least one of the options `missingExports` or `unusedExports` must be enabled (see "Options" section below). In the future, these options will be enabled by default (see <https://github.com/import-js/eslint-plugin-import/issues/1324>)
+
+Example:
+
+```json
+"rules: {
+  ...otherRules,
+  "import/no-unused-modules": [1, {"unusedExports": true}]
+}
+```
+
+### Options
+
+This rule takes the following option:
+
+ - **`missingExports`**: if `true`, files without any exports are reported (defaults to `false`)
+ - **`unusedExports`**: if `true`, exports

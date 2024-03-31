@@ -1,0 +1,44 @@
+# Changes to PostCSS Custom Selectors
+
+### 6.0.3 (June 4, 2022)
+
+- Fixed: allow any valid ident in custom media (`@custom-selector :--🧑🏾‍🎤 .singer`)
+
+### 6.0.2 (June 3, 2022)
+
+- Fixed: prevent duplicate rules when custom selectors are not defined
+- Fixed: selectors not resolving when using with other features like nesting
+
+### 6.0.1 (June 3, 2022)
+
+- Fixed: invalid whitespace (https://github.com/csstools/postcss-custom-selectors/pull/55)
+
+### 6.0.0 (January 12, 2021)
+
+- Added: Support for PostCSS v8
+- Added: Support for Node v10+
+- Fixed: importing from multiple sources (https://github.com/postcss/postcss-custom-selectors/pull/42)
+
+### 5.1.2 (September 20, 2018)
+
+- Fixed: Do not break on an empty `importFrom` object
+
+### 5.1.1 (September 18, 2018)
+
+- Fixed: Selectors like `.foo:--h1` become `h1.foo` instead of `.fooh1`
+
+### 5.1.0 (September 12, 2018)
+
+- Added: New `exportTo` function to specify where to export custom selectors
+- Updated: `importFrom` option to support passing it a function
+
+### 5.0.0 (September 7, 2018)
+
+- Added: New `preserve` option to preserve custom selectors and rules using them
+- Added: New `importFrom` option to specify where to import custom selectors
+- Added: Support for PostCSS v7
+- Added: Support for Node v6+
+
+### 4.0.1 (May 15, 2017)
+
+- Fixed: incorrect expo

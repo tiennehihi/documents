@@ -1,0 +1,5 @@
+# @babel/plugin-transform-export-namespace-from
+
+> Compile export namespace to ES2015
+
+See our website [@babel/plugin-transform-export-na

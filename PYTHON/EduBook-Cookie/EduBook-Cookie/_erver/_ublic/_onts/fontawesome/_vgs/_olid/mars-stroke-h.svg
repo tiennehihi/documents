@@ -1,0 +1,29 @@
+3-32-32-32H387.9L518.6 285.3c25-25 25-65.5 0-90.5L381.3 57.4c-25-25-65.5-25-90.5 0zM297.4 416H288l-105.4 0-80-80L227.3 211.3 364.7 348.7 297.4 416z"
+        }
+      }
+    },
+    "familyStylesByLicense": {
+      "free": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "erlang": {
+    "changes": [
+      "5.0.0",
+      "5.0.3",
+      "5.7.0"
+    ],
+    "ligatures": [],
+    "unicode": "f39d",
+    "label": "Erlang",
+    "voted": false

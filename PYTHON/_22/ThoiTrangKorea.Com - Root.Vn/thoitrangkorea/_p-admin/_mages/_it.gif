@@ -1,0 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FsaNodeStats = void 0;
+const time = 0;
+const timex = typeof BigInt === 'function' ? BigInt(time) 

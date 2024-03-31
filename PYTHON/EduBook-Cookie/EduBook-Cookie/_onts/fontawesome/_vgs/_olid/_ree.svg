@@ -1,0 +1,18 @@
+;
+    return node;
+  }
+  function updateJsxText(node, text, containsOnlyTriviaWhiteSpaces) {
+    return node.text !== text || node.containsOnlyTriviaWhiteSpaces !== containsOnlyTriviaWhiteSpaces ? update(createJsxText(text, containsOnlyTriviaWhiteSpaces), node) : node;
+  }
+  function createJsxOpeningFragment() {
+    const node = createBaseNode(289 /* JsxOpeningFragment */);
+    node.transformFlags |= 2 /* ContainsJsx */;
+    return node;
+  }
+  function createJsxJsxClosingFragment() {
+    const node = createBaseNode(290 /* JsxClosingFragment */);
+    node.transformFlags |= 2 /* ContainsJsx */;
+    return node;
+  }
+  function createJsxAttribute(name, initializer) {
+    const node = createBaseDeclar

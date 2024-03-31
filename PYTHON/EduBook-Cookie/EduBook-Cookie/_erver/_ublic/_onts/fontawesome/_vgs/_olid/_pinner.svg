@@ -1,0 +1,26 @@
+32.8 0 45.3s32.8 12.5 45.3 0z"
+      }
+    },
+    "free": [
+      "solid"
+    ]
+  },
+  "arrows-left-right-to-line": {
+    "changes": [
+      "6.1.0",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid"
+    ],
+    "unicode": "e4ba",
+    "label": "Arrows Left-right-to-line",
+    "voted": false,
+    "svg": {
+      "solid": {
+        "last_modified": 1660321781,
+        "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 512\"><path d=\"M32 64c17.7 0 32 14.3 32 32l0 320c0 17.7-14.3 32-32 32s-32-14.3-32-32V96C0 78.3 14.3 64 32 64zm214.6 73.4c12.5 12.5 12.5 32.8 0 45.3L205.3 224l2

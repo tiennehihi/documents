@@ -1,0 +1,3 @@
+so luong: 7
+tong: 307
+trung binh: 43.8571

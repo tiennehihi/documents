@@ -1,0 +1,9 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * Replaces tabs, newlines and spaces with the chosen value when they occur in sequences
+ * @param  {(String|RegExp)} replaceWhat - the value or pattern that should be replaced
+ * @param  {*}               replaceWit

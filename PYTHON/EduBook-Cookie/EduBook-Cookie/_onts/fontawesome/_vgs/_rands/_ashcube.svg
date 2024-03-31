@@ -1,0 +1,16 @@
+# Enforce valid titles (`valid-title`)
+
+Checks that the title of Jest blocks are valid by ensuring that titles are:
+
+- not empty,
+- is a string,
+- not prefixed with their block name,
+- have no leading or trailing spaces
+
+## Rule Details
+
+**emptyTitle**
+
+An empty title is not informative, and serves little purpose.
+
+Exa

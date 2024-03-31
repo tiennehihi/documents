@@ -1,0 +1,13 @@
+'use strict';
+
+var identity = require('../nodes/identity.js');
+var Pair = require('../nodes/Pair.js');
+var YAMLMap = require('../nodes/YAMLMap.js');
+var YAMLSeq = require('../nodes/YAMLSeq.js');
+var resolveEnd = require('./resolve-end.js');
+var resolveProps = require('./resolve-props.js');
+var utilContainsNewline = require('./util-contains-newline.js');
+var utilMapIncludes = require('./util-map-includes.js');
+
+const blockMsg = 'Block collections are not allowed within flow collections';
+const isBlock = (token) => token && (token.type === 'block

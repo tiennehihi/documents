@@ -1,0 +1,25 @@
+/* eslint-env mocha */
+/* eslint no-template-curly-in-string: 0 */
+import assert from 'assert';
+import {
+  extractProp,
+  describeIfNotBabylon,
+  changePlugins,
+  setParserName,
+  setIsESM,
+} from '../helper';
+import { getLiteralPropValue } from '../../src/getPropValue';
+
+describe('getLiteralPropValue', () => {
+  beforeEach(() => {
+    setParserName('babel');
+  });
+  it('should export a function', () => {
+    const expected = 'function';
+    const actual = typeof getLiteralPropValue;
+
+    assert.equal(actual, expected);
+  });
+
+  it('should return undefined when not provided with a JSXAttribute', () => {
+    const 

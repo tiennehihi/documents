@@ -1,0 +1,5 @@
+/**
+Create a type that represents either the value or the value wrapped in `PromiseLike`.
+
+Use-cases:
+- A function accepts a callback that may either retu

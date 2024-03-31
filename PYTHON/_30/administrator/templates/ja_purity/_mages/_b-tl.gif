@@ -1,0 +1,5 @@
+# isexe
+
+Minimal module to check if a file is executable, and a normal file.
+
+Uses `fs.stat` and tests against 

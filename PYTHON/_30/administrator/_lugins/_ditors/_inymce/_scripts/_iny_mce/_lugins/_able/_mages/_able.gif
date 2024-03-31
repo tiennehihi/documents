@@ -1,0 +1,14 @@
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.replacePathSepForRegex =
+  exports.escapeStrForRegex =
+  exports.escapePathForRegex =
+    void 0;
+
+var _path = require('path');
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates. All Rights Res

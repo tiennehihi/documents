@@ -1,0 +1,6 @@
+n(byteOffset, value, littleEndian) {
+            byteOffset = ECMAScript.ToUint32(byteOffset);
+            if (byteOffset + arrayType.BYTES_PER_ELEMENT > this.byteLength) {
+              throw new RangeError('Array index out of range');
+            }
+            var typeArray = new arrayType([ 

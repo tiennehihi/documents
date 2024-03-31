@@ -1,0 +1,151 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>Visualizer</title>
+  <style>
+    #audioVisualizer {
+      width: 100%;
+      height: 200px;
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="audioVisualizer"></canvas>
+  <audio id="audioPlayer" src="./makingmywayNess.mp3" controls></audio>
+
+  <script>
+    const audioPlayer = document.getElementById('audioPlayer');
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const audioSource = audioContext.createMediaElementSource(audioPlayer);
+    const canvas = document.getElementById('audioVisualizer');
+    const canvasContext = canvas.getContext('2d');
+
+    audioSource.connect(audioContext.destination);
+
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    audioSource.connect(analyser);
+
+    function draw() {
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteTimeDomainData(dataArray);
+
+      canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+      canvasContext.lineWidth = 2;
+      canvasContext.strokeStyle = 'green';
+      canvasContext.beginPath();
+
+      const sliceWidth = canvas.width * 1.0 / bufferLength;
+      let x = 0;
+
+      for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i] / 128.0;
+        const y = v * canvas.height / 2;
+
+        if (i === 0) {
+          canvasContext.moveTo(x, y);
+        } else {
+          canvasContext.lineTo(x, y);
+        }
+
+        x += sliceWidth;
+      }
+
+      canvasContext.lineTo(canvas.width, canvas.height / 2);
+      canvasContext.stroke();
+
+      requestAnimationFrame(draw);
+    }
+
+    audioPlayer.oncanplay = function() {
+      audioContext.resume().then(() => {
+        audioPlayer.play();
+        draw();
+      });
+    };
+  </script>
+</body>
+</html> -->
+
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>Heartbeat Visualizer</title>
+  <style>
+    #audioVisualizer {
+      width: 100%;
+      height: 400px;
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="audioVisualizer"></canvas>
+  <audio id="audioPlayer" src="./makingmywayNess.mp3" controls></audio>
+
+  <script>
+    const audioPlayer = document.getElementById('audioPlayer');
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const audioSource = audioContext.createMediaElementSource(audioPlayer);
+    const canvas = document.getElementById('audioVisualizer');
+    const canvasContext = canvas.getContext('2d');
+
+    audioSource.connect(audioContext.destination);
+
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    audioSource.connect(analyser);
+
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    function draw() {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = canvas.height / 4;
+
+      analyser.getByteFrequencyData(dataArray);
+
+      canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+      canvasContext.beginPath();
+      canvasContext.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+
+      for (let i = 0; i < bufferLength; i++) {
+        const angle = i * (2 * Math.PI / bufferLength);
+        const amplitude = dataArray[i] / 128.0;
+        const x = centerX + (radius + amplitude * radius) * Math.cos(angle);
+        const y = centerY + (radius + amplitude * radius) * Math.sin(angle);
+
+        if (i === 0) {
+          canvasContext.moveTo(x, y);
+        } else {
+          canvasContext.lineTo(x, y);
+        }
+      }
+
+      canvasContext.closePath();
+      canvasContext.lineWidth = 2;
+      canvasContext.strokeStyle = '#fff';
+      canvasContext.stroke();
+
+      requestAnimationFrame(draw);
+    }
+
+    audioPlayer.oncanplay = function() {
+      audioContext.resume().then(() => {
+        audioPlayer.play();
+        draw();
+      });
+    };
+  </script>
+</body>
+</html> -->
+
+
+
+
+

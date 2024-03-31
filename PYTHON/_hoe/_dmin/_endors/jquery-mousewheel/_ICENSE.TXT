@@ -1,0 +1,59 @@
+(e, r) => {
+			err = e;
+			result = r;
+			sync = true;
+		});
+		if (!sync) {
+			throw new Error(
+				"Cannot 'resolveSync' because the fileSystem is not sync. Use 'resolve'!"
+			);
+		}
+		if (err) throw err;
+		if (result === undefined) throw new Error("No result");
+		return result;
+	}
+
+	/**
+	 * @param {object} context context information object
+	 * @param {string} path context path
+	 * @param {string} request request string
+	 * @param {ResolveContext} resolveContext resolve context
+	 * @param {ResolveCallback} callback callback function
+	 * @returns {void}
+	 */
+	resolve(context, path, request, resolveContext, callback) {
+		if (!context || typeof context !== "object")
+			return callback(new Error("context argument is not an object"));
+		if (typeof path !== "string")
+			return callback(new Error("path argument is not a string"));
+		if (typeof request !== "string")
+			return callback(new Error("request argument is not a string"));
+		if (!resolveContext)
+			return callback(new Error("resolveContext argument is not set"));
+
+		/** @type {ResolveRequest} */
+		const obj = {
+			context: context,
+			path: path,
+			request: request
+		};
+
+		/** @type {ResolveContextYield | undefined} */
+		let yield_;
+		let yieldCalled = false;
+		/** @type {ResolveContextYield | undefined} */
+		let finishYield;
+		if (typeof resolveContext.yield === "function") {
+			const old = resolveContext.yield;
+			/**
+			 * @param {ResolveRequest} obj object
+			 */
+			yield_ = obj => {
+				old(obj);
+				yieldCalled = true;
+			};
+			/**
+			 * @param {ResolveRequest} result result
+			 * @returns {void}
+			 */
+			finishYield = result =>

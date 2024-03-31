@@ -1,0 +1,6 @@
+const { SourceMapGenerator } = require('source-map');
+
+/**
+ * Generates an identity source map from a source file.
+ * @param {string} source The content of the source file.
+ * @param {stri

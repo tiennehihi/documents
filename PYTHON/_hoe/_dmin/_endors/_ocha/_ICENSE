@@ -1,0 +1,32 @@
+onst resolutionFromCache = tryFindNonRelativeModuleNameInCache(
+          cache,
+          moduleName,
+          /*mode*/
+          void 0,
+          directory,
+          redirectedReference,
+          state
+        );
+        if (resolutionFromCache) {
+          return resolutionFromCache;
+        }
+        const searchName = normalizePath(combinePaths(directory, moduleName));
+        return toSearchResult(loadModuleFromFileNoPackageId(
+          extensions,
+          searchName,
+          /*onlyRecordFailures*/
+          false,
+          state
+        ));
+      });
+      if (resolved2)
+        return resolved2;
+      if (extensions & (1 /* TypeScript */ | 4 /* Declaration */)) {
+        let resolved3 = loadModuleFromNearestNodeModulesDirectoryTypesScope(moduleName, containingDirectory, state);
+        if (extensions & 4 /* Declaration */)
+          resolved3 ?? (resolved3 = resolveFromTypeRoot(moduleName, state));
+        return resolved3;
+      }
+    } else {
+      const candidate = normalizePath(combinePaths(containingDirectory, moduleName));
+      return toSearchResult(loadModuleFr

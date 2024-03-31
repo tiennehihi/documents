@@ -1,0 +1,10 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+const RuntimeGlobals = require("../RuntimeGlobals");
+const formatLocation = require("../formatLocation");
+const { evaluateToString } = require("../java

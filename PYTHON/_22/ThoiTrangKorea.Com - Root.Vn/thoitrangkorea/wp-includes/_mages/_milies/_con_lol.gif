@@ -1,0 +1,10 @@
+import type {CodeKeywordDefinition, AnySchema} from "../../types"
+import type {KeywordCxt} from "../../compile/validate"
+import {alwaysValidSchema} from "../../compile/util"
+
+const def: CodeKeywordDefinition = {
+  keyword: "allOf",
+  schemaType: "array",
+  code(cxt: KeywordCxt) {
+    const {gen, schema, it} = cxt
+    /* istanbul ignor

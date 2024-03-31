@@ -1,0 +1,7 @@
+: 'title',
+        attributes: {
+          id: content.attributes['aria-labelledby'] || "title-".concat(titleId || nextUniqueId())
+        },
+        children: [title]
+      });
+      delete content.

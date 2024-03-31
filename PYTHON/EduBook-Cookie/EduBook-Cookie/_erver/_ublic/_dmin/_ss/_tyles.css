@@ -1,0 +1,363 @@
+(awaitedSymbol, [unwrapAwaitedType(type)]);
+    }
+    return void 0;
+  }
+  function createAwaitedTypeIfNeeded(type) {
+    if (isAwaitedTypeNeeded(type)) {
+      const awaitedType = tryCreateAwaitedType(type);
+      if (awaitedType) {
+        return awaitedType;
+      }
+    }
+    Debug.assert(isAwaitedTypeInstantiation(type) || getPromisedTypeOfPromise(type) === void 0, "type provided should not be a non-generic 'promise'-like.");
+    return type;
+  }
+  function getAwaitedType(type, errorNode, diagnosticMessage, ...args) {
+    const awaitedType = getAwaitedTypeNoAlias(type, errorNode, diagnosticMessage, ...args);
+    return awaitedType && createAwaitedTypeIfNeeded(awaitedType);
+  }
+  function getAwaitedTypeNoAlias(type, errorNode, diagnosticMessage, ...args) {
+    if (isTypeAny(type)) {
+      return type;
+    }
+    if (isAwaitedTypeInstantiation(type)) {
+      return type;
+    }
+    const typeAsAwaitable = type;
+    if (typeAsAwaitable.awaitedTypeOfType) {
+      return typeAsAwaitable.awaitedTypeOfType;
+    }
+    if (type.flags & 1048576 /* Union */) {
+      if (awaitedTypeStack.lastIndexOf(type.id) >= 0) {
+        if (errorNode) {
+          error2(errorNode, Diagnostics.Type_is_referenced_directly_or_indirectly_in_the_fulfillment_callback_of_its_own_then_method);
+        }
+        return void 0;
+      }
+      const mapper = errorNode ? (constituentType) => getAwaitedTypeNoAlias(constituentType, errorNode, diagnosticMessage, ...args) : getAwaitedTypeNoAlias;
+      awaitedTypeStack.push(type.id);
+      const mapped = mapType(type, mapper);
+      awaitedTypeStack.pop();
+      return typeAsAwaitable.awaitedTypeOfType = mapped;
+    }
+    if (isAwaitedTypeNeeded(type)) {
+      return typeAsAwaitable.awaitedTypeOfType = type;
+    }
+    const thisTypeForErrorOut = { value: void 0 };
+    const promisedType = getPromisedTypeOfPromise(
+      type,
+      /*errorNode*/
+      void 0,
+      thisTypeForErrorOut
+    );
+    if (promisedType) {
+      if (type.id === promisedType.id || awaitedTypeStack.lastIndexOf(promisedType.id) >= 0) {
+        if (errorNode) {
+          error2(errorNode, Diagnostics.Type_is_referenced_directly_or_indirectly_in_the_fulfillment_callback_of_its_own_then_method);
+        }
+        return void 0;
+      }
+      awaitedTypeStack.push(type.id);
+      const awaitedType = getAwaitedTypeNoAlias(promisedType, errorNode, diagnosticMessage, ...args);
+      awaitedTypeStack.pop();
+      if (!awaitedType) {
+        return void 0;
+      }
+      return typeAsAwaitable.awaitedTypeOfType = awaitedType;
+    }
+    if (isThenableType(type)) {
+      if (errorNode) {
+        Debug.assertIsDefined(diagnosticMessage);
+        let chain;
+        if (thisTypeForErrorOut.value) {
+          chain = chainDiagnosticMessages(chain, Diagnostics.The_this_context_of_type_0_is_not_assignable_to_method_s_this_of_type_1, typeToString(type), typeToString(thisTypeForErrorOut.value));
+        }
+        chain = chainDiagnosticMessages(chain, diagnosticMessage, ...args);
+        diagnostics.add(createDiagnosticForNodeFromMessageChain(getSourceFileOfNode(errorNode), errorNode, chain));
+      }
+      return void 0;
+    }
+    return typeAsAwaitable.awaitedTypeOfType = type;
+  }
+  function checkAsyncFunctionReturnType(node, returnTypeNode, returnTypeErrorLocation) {
+    const returnType = getTypeFromTypeNode(returnTypeNode);
+    if (languageVersion >= 2 /* ES2015 */) {
+      if (isErrorType(returnType)) {
+        return;
+      }
+      const globalPromiseType = getGlobalPromiseType(
+        /*reportErrors*/
+        true
+      );
+      if (globalPromiseType !== emptyGenericType && !isReferenceToType2(returnType, globalPromiseType)) {
+        reportErrorForInvalidReturnType(Diagnostics.The_return_type_of_an_async_function_or_method_must_be_the_global_Promise_T_type_Did_you_mean_to_write_Promise_0, returnTypeNode, returnTypeErrorLocation, typeToString(getAwaitedTypeNoAlias(returnType) || voidType));
+        return;
+      }
+    } else {
+      markTypeNodeAsReferenced(returnTypeNode);
+      if (isErrorType(returnType)) {
+        return;
+      }
+      const promiseConstructorName = getEntityNameFromTypeNode(returnTypeNode);
+      if (promiseConstructorName === void 0) {
+        reportErrorForInvalidReturnType(Diagnostics.Type_0_is_not_a_valid_async_function_return_type_in_ES5_SlashES3_because_it_does_not_refer_to_a_Promise_compatible_constructor_value, returnTypeNode, returnTypeErrorLocation, typeToString(returnType));
+        return;
+      }
+      const promiseConstructorSymbol = resolveEntityName(
+        promiseConstructorName,
+        111551 /* Value */,
+        /*ignoreErrors*/
+        true
+      );
+      const promiseConstructorType = promiseConstructorSymbol ? getTypeOfSymbol(promiseConstructorSymbol) : errorType;
+      if (isErrorType(promiseConstructorType)) {
+        if (promiseConstructorName.kind === 80 /* Identifier */ && promiseConstructorName.escapedText === "Promise" && getTargetType(returnType) === getGlobalPromiseType(
+          /*reportErrors*/
+          false
+        )) {
+          error2(returnTypeErrorLocation, Diagnostics.An_async_function_or_method_in_ES5_SlashES3_requires_the_Promise_constructor_Make_sure_you_have_a_declaration_for_the_Promise_constructor_or_include_ES2015_in_your_lib_option);
+        } else {
+          reportErrorForInvalidReturnType(Diagnostics.Type_0_is_not_a_valid_async_function_return_type_in_ES5_SlashES3_because_it_does_not_refer_to_a_Promise_compatible_constructor_value, returnTypeNode, returnTypeErrorLocation, entityNameToString(promiseConstructorName));
+        }
+        return;
+      }
+      const globalPromiseConstructorLikeType = getGlobalPromiseConstructorLikeType(
+        /*reportErrors*/
+        true
+      );
+      if (globalPromiseConstructorLikeType === emptyObjectType) {
+        reportErrorForInvalidReturnType(Diagnostics.Type_0_is_not_a_valid_async_function_return_type_in_ES5_SlashES3_because_it_does_not_refer_to_a_Promise_compatible_constructor_value, returnTypeNode, returnTypeErrorLocation, entityNameToString(promiseConstructorName));
+        return;
+      }
+      const headMessage = Diagnostics.Type_0_is_not_a_valid_async_function_return_type_in_ES5_SlashES3_because_it_does_not_refer_to_a_Promise_compatible_constructor_value;
+      const errorInfo = () => returnTypeNode === returnTypeErrorLocation ? void 0 : chainDiagnosticMessages(
+        /*details*/
+        void 0,
+        Diagnostics.The_return_type_of_an_async_function_or_method_must_be_the_global_Promise_T_type
+      );
+      if (!checkTypeAssignableTo(promiseConstructorType, globalPromiseConstructorLikeType, returnTypeErrorLocation, headMessage, errorInfo)) {
+        return;
+      }
+      const rootName = promiseConstructorName && getFirstIdentifier(promiseConstructorName);
+      const collidingSymbol = getSymbol2(node.locals, rootName.escapedText, 111551 /* Value */);
+      if (collidingSymbol) {
+        error2(collidingSymbol.valueDeclaration, Diagnostics.Duplicate_identifier_0_Compiler_uses_declaration_1_to_support_async_functions, idText(rootName), entityNameToString(promiseConstructorName));
+        return;
+      }
+    }
+    checkAwaitedType(
+      returnType,
+      /*withAlias*/
+      false,
+      node,
+      Diagnostics.The_return_type_of_an_async_function_must_either_be_a_valid_promise_or_must_not_contain_a_callable_then_member
+    );
+    function reportErrorForInvalidReturnType(message, returnTypeNode2, returnTypeErrorLocation2, typeName) {
+      if (returnTypeNode2 === returnTypeErrorLocation2) {
+        error2(returnTypeErrorLocation2, message, typeName);
+      } else {
+        const diag2 = error2(returnTypeErrorLocation2, Diagnostics.The_return_type_of_an_async_function_or_method_must_be_the_global_Promise_T_type);
+        addRelatedInfo(diag2, createDiagnosticForNode(returnTypeNode2, message, typeName));
+      }
+    }
+  }
+  function checkDecorator(node) {
+    const signature = getResolvedSignature(node);
+    checkDeprecatedSignature(signature, node);
+    const returnType = getReturnTypeOfSignature(signature);
+    if (returnType.flags & 1 /* Any */) {
+      return;
+    }
+    const decoratorSignature = getDecoratorCallSignature(node);
+    if (!(decoratorSignature == null ? void 0 : decoratorSignature.resolvedReturnType))
+      return;
+    let headMessage;
+    const expectedReturnType = decoratorSignature.resolvedReturnType;
+    switch (node.parent.kind) {
+      case 263 /* ClassDeclaration */:
+      case 231 /* ClassExpression */:
+        headMessage = Diagnostics.Decorator_function_return_type_0_is_not_assignable_to_type_1;
+        break;
+      case 172 /* PropertyDeclaration */:
+        if (!legacyDecorators) {
+          headMessage = Diagnostics.Decorator_function_return_type_0_is_not_assignable_to_type_1;
+          break;
+        }
+      case 169 /* Parameter */:
+        headMessage = Diagnostics.Decorator_function_return_type_is_0_but_is_expected_to_be_void_or_any;
+        break;
+      case 174 /* MethodDeclaration */:
+      case 177 /* GetAccessor */:
+      case 178 /* SetAccessor */:
+        headMessage = Diagnostics.Decorator_function_return_type_0_is_not_assignable_to_type_1;
+        break;
+      default:
+        return Debug.failBadSyntaxKind(node.parent);
+    }
+    checkTypeAssignableTo(returnType, expectedReturnType, node.expression, headMessage);
+  }
+  function createCallSignature(typeParameters, thisParameter, parameters, returnType, typePredicate, minArgumentCount = parameters.length, flags = 0 /* None */) {
+    const decl = factory.createFunctionTypeNode(
+      /*typeParameters*/
+      void 0,
+      emptyArray,
+      factory.createKeywordTypeNode(133 /* AnyKeyword */)
+    );
+    return createSignature(decl, typeParameters, thisParameter, parameters, returnType, typePredicate, minArgumentCount, flags);
+  }
+  function createFunctionType(typeParameters, thisParameter, parameters, returnType, typePredicate, minArgumentCount, flags) {
+    const signature = createCallSignature(typeParameters, thisParameter, parameters, returnType, typePredicate, minArgumentCount, flags);
+    return getOrCreateTypeFromSignature(signature);
+  }
+  function createGetterFunctionType(type) {
+    return createFunctionType(
+      /*typeParameters*/
+      void 0,
+      /*thisParameter*/
+      void 0,
+      emptyArray,
+      type
+    );
+  }
+  function createSetterFunctionType(type) {
+    const valueParam = createParameter2("value", type);
+    return createFunctionType(
+      /*typeParameters*/
+      void 0,
+      /*thisParameter*/
+      void 0,
+      [valueParam],
+      voidType
+    );
+  }
+  function markTypeNodeAsReferenced(node) {
+    markEntityNameOrEntityExpressionAsReference(
+      node && getEntityNameFromTypeNode(node),
+      /*forDecoratorMetadata*/
+      false
+    );
+  }
+  function markEntityNameOrEntityExpressionAsReference(typeName, forDecoratorMetadata) {
+    if (!typeName)
+      return;
+    const rootName = getFirstIdentifier(typeName);
+    const meaning = (typeName.kind === 80 /* Identifier */ ? 788968 /* Type */ : 1920 /* Namespace */) | 2097152 /* Alias */;
+    const rootSymbol = resolveName(
+      rootName,
+      rootName.escapedText,
+      meaning,
+      /*nameNotFoundMessage*/
+      void 0,
+      /*nameArg*/
+      void 0,
+      /*isUse*/
+      true
+    );
+    if (rootSymbol && rootSymbol.flags & 2097152 /* Alias */) {
+      if (canCollectSymbolAliasAccessabilityData && symbolIsValue(rootSymbol) && !isConstEnumOrConstEnumOnlyModule(resolveAlias(rootSymbol)) && !getTypeOnlyAliasDeclaration(rootSymbol)) {
+        markAliasSymbolAsReferenced(rootSymbol);
+      } else if (forDecoratorMetadata && getIsolatedModules(compilerOptions) && getEmitModuleKind(compilerOptions) >= 5 /* ES2015 */ && !symbolIsValue(rootSymbol) && !some(rootSymbol.declarations, isTypeOnlyImportOrExportDeclaration)) {
+        const diag2 = error2(typeName, Diagnostics.A_type_referenced_in_a_decorated_signature_must_be_imported_with_import_type_or_a_namespace_import_when_isolatedModules_and_emitDecoratorMetadata_are_enabled);
+        const aliasDeclaration = find(rootSymbol.declarations || emptyArray, isAliasSymbolDeclaration2);
+        if (aliasDeclaration) {
+          addRelatedInfo(diag2, createDiagnosticForNode(aliasDeclaration, Diagnostics._0_was_imported_here, idText(rootName)));
+        }
+      }
+    }
+  }
+  function markDecoratorMedataDataTypeNodeAsReferenced(node) {
+    const entityName = getEntityNameForDecoratorMetadata(node);
+    if (entityName && isEntityName(entityName)) {
+      markEntityNameOrEntityExpressionAsReference(
+        entityName,
+        /*forDecoratorMetadata*/
+        true
+      );
+    }
+  }
+  function getEntityNameForDecoratorMetadata(node) {
+    if (node) {
+      switch (node.kind) {
+        case 193 /* IntersectionType */:
+        case 192 /* UnionType */:
+          return getEntityNameForDecoratorMetadataFromTypeList(node.types);
+        case 194 /* ConditionalType */:
+          return getEntityNameForDecoratorMetadataFromTypeList([node.trueType, node.falseType]);
+        case 196 /* ParenthesizedType */:
+        case 202 /* NamedTupleMember */:
+          return getEntityNameForDecoratorMetadata(node.type);
+        case 183 /* TypeReference */:
+          return node.typeName;
+      }
+    }
+  }
+  function getEntityNameForDecoratorMetadataFromTypeList(types) {
+    let commonEntityName;
+    for (let typeNode of types) {
+      while (typeNode.kind === 196 /* ParenthesizedType */ || typeNode.kind === 202 /* NamedTupleMember */) {
+        typeNode = typeNode.type;
+      }
+      if (typeNode.kind === 146 /* NeverKeyword */) {
+        continue;
+      }
+      if (!strictNullChecks && (typeNode.kind === 201 /* LiteralType */ && typeNode.literal.kind === 106 /* NullKeyword */ || typeNode.kind === 157 /* UndefinedKeyword */)) {
+        continue;
+      }
+      const individualEntityName = getEntityNameForDecoratorMetadata(typeNode);
+      if (!individualEntityName) {
+        return void 0;
+      }
+      if (commonEntityName) {
+        if (!isIdentifier(commonEntityName) || !isIdentifier(individualEntityName) || commonEntityName.escapedText !== individualEntityName.escapedText) {
+          return void 0;
+        }
+      } else {
+        commonEntityName = individualEntityName;
+      }
+    }
+    return commonEntityName;
+  }
+  function getParameterTypeNodeForDecoratorCheck(node) {
+    const typeNode = getEffectiveTypeAnnotationNode(node);
+    return isRestParameter(node) ? getRestParameterElementType(typeNode) : typeNode;
+  }
+  function checkDecorators(node) {
+    if (!canHaveDecorators(node) || !hasDecorators(node) || !node.modifiers || !nodeCanBeDecorated(legacyDecorators, node, node.parent, node.parent.parent)) {
+      return;
+    }
+    const firstDecorator = find(node.modifiers, isDecorator);
+    if (!firstDecorator) {
+      return;
+    }
+    if (legacyDecorators) {
+      checkExternalEmitHelpers(firstDecorator, 8 /* Decorate */);
+      if (node.kind === 169 /* Parameter */) {
+        checkExternalEmitHelpers(firstDecorator, 32 /* Param */);
+      }
+    } else if (languageVersion < 99 /* ESNext */) {
+      checkExternalEmitHelpers(firstDecorator, 8 /* ESDecorateAndRunInitializers */);
+      if (isClassDeclaration(node)) {
+        if (!node.name) {
+          checkExternalEmitHelpers(firstDecorator, 8388608 /* SetFunctionName */);
+        } else {
+          const member = getFirstTransformableStaticClassElement(node);
+          if (member) {
+            checkExternalEmitHelpers(firstDecorator, 8388608 /* SetFunctionName */);
+          }
+        }
+      } else if (!isClassExpression(node)) {
+        if (isPrivateIdentifier(node.name) && (isMethodDeclaration(node) || isAccessor(node) || isAutoAccessorPropertyDeclaration(node))) {
+          checkExternalEmitHelpers(firstDecorator, 8388608 /* SetFunctionName */);
+        }
+        if (isComputedPropertyName(node.name)) {
+          checkExternalEmitHelpers(firstDecorator, 16777216 /* PropKey */);
+        }
+      }
+    }
+    if (compilerOptions.emitDecoratorMetadata) {
+      checkExternalEmitHelpers(firstDecorator, 16 /* Metadata */);
+      switch (node.kind) {
+        case 263 /* ClassDeclaration */:
+          const constructor = getFirstConstructorWithBody(node);
+          if (constructor) {
+            for (const parameter of constructor.paramet

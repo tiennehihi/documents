@@ -1,0 +1,1 @@
+e=t.size+n;break;case"shrink":t.size=t.size-n;break;case"left":t.x=t.x-n;break;case"right":t.x=t.x+n;break;case"up":t.y=t.y-n;break;case"down":t.y=t.y+n;break;case"rotate":t.rotate=t.rotate+n}return t},{size:16,x:0,y:0,flipX:!1,flipY:!1,rotate:0})}var Ra=!1,Ta={x:0,y:0,width:"100%",height:"100%"};function Da(t){return t.attributes&&(t.attributes.f

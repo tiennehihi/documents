@@ -1,0 +1,23 @@
+      "style": "brands"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "brands"
+        }
+      ]
+    }
+  },
+  "itunes": {
+    "changes": [
+      "5.0.0"
+    ],
+    "ligatures": [],
+    "unicode": "f3b4",
+    "label": "iTunes",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "brands": {
+          "

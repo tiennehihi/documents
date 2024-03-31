@@ -1,0 +1,6 @@
+{
+  "name": "merge-descriptors",
+  "description": "Merge objects using descriptors",
+  "version": "1.0.1",
+  "author": {
+    "name": "Jonathan Ong",

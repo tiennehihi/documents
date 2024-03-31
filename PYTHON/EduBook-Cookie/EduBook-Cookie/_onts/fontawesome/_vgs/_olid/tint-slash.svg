@@ -1,0 +1,8 @@
+
+);
+var GetLiteralTextFlags = /* @__PURE__ */ ((GetLiteralTextFlags2) => {
+  GetLiteralTextFlags2[GetLiteralTextFlags2["None"] = 0] = "None";
+  GetLiteralTextFlags2[GetLiteralTextFlags2["NeverAsciiEscape"] = 1] = "NeverAsciiEscape";
+  GetLiteralTextFlags2[GetLiteralTextFlags2["JsxAttributeEscape"] = 2] = "JsxAttributeEscape";
+  GetLiteralTextFlags2[GetLiteralTextFlags2["TerminateUnterminatedLiterals"] = 4] = "TerminateUnterminatedLiterals";
+  GetLiteralTextFlags2[GetLiteralTextFlags2["AllowNumericSeparator"] = 8] = "AllowNumericSepara

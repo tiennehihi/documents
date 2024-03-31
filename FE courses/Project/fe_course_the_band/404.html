@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+        <link rel="icon" href="" type="image/x-icon">
+        <title>Document</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                user-select: none;
+            }
+            .error {
+                display: block;
+                position: absolute;
+                text-align: center;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -80%);
+                align-items: center;
+                opacity: 0.7;
+            }
+            .error-code {
+                font-size: 150px;
+            }
+            .error-heading {
+                font-size: 20px;
+                text-transform: capitalize;
+                margin-bottom: 25px;
+            }
+            .error-sub-heading {
+                margin-bottom: 15px;
+            }
+            #footer {
+                position: absolute;
+                bottom: 0;
+                height: 98px;
+                background-color: #474747;
+                width: 100%;
+                color: #fff;
+                padding: 25px;
+                font-size: 13px;
+                line-height: 32px;
+                font-weight: 400;
+            }
+            #footer .desc {
+                opacity: 0.8;
+            }
+            #footer .desc a {
+                color: #fff;
+            }
+            .error-detail {
+                color: #ff00ff;
+                line-height: 20px;
+                font-weight: 600;
+                background: linear-gradient(45deg, #c964c99d, #00ffff, aqua, #00ff00);
+                background-size: 400% 400%;
+                -webkit-animation: gradientAnimation 10s ease infinite;
+                -moz-animation: gradientAnimation 10s ease infinite;
+                animation: gradientAnimation 10s ease infinite;
+            }
+
+            @-webkit-keyframes gradientAnimation {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+
+            @-moz-keyframes gradientAnimation {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+
+            @keyframes gradientAnimation {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+
+            @keyframes colorAnimation {
+                0% { color: #ff00ff; }
+                50% { color: #00ffff; }
+                100% { color: #ff00ff; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="main">
+            <div class="error">
+                <h1 class="error-code">404</h1>
+                <h3 class="error-heading">not found</h3>
+                <p class="error-sub-heading">The resource requested could not be found on this server!</p>
+                <p class="error-detail">Gian hạn hosting để tiếp tục sử dụng (100k/tháng)</p>
+            </div>
+            <footer id="footer">
+                <p class="desc">Proudly powered by <a href="#">LiteSpeed Web Server</a></p>
+                <p class="desc">Please be advised that LiteSpeed Technologies Inc. is not a web hosting company and, as such, has no control over content found on this site.</p>
+            </footer>
+        </div>
+    </body>
+</html>

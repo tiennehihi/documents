@@ -1,0 +1,41 @@
+'use strict'
+
+const check = require('check-types')
+const error = require('./error')
+const EventEmitter = require('events').EventEmitter
+const events = require('./events')
+const promise = require('./promise')
+
+const terminators = {
+  obj: '}',
+  arr: ']'
+}
+
+const escapes = {
+  /* eslint-disable quote-props */
+  '"': '"',
+  '\\': '\\',
+  '/': '/',
+  'b': '\b',
+  'f': '\f',
+  'n': '\n',
+  'r': '\r',
+  't': '\t'
+  /* eslint-enable quote-props */
+}
+
+module.exports = initialise
+
+/**
+ * Public function `walk`.
+ *
+ * Returns an event emitter and asynchronously walks a stream of JSON data,
+ * emitting events as it encounters tokens. The event emitter is decorated
+ * with a `pause` method that can be called to pause processing.
+ *
+ * @param stream:     Readable instance representing the incoming JSON.
+ *
+ * @option yieldRate: The number of data items to process per timeslice,
+ *                    default is 16384.
+ *
+ * @option Promise:  

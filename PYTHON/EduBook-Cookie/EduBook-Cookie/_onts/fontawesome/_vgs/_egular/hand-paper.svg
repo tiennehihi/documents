@@ -1,0 +1,33 @@
+"use strict";
+
+var _utils = require("./utils.js");
+const defineType = (0, _utils.defineAliasedType)("JSX");
+defineType("JSXAttribute", {
+  visitor: ["name", "value"],
+  aliases: ["Immutable"],
+  fields: {
+    name: {
+      validate: (0, _utils.assertNodeType)("JSXIdentifier", "JSXNamespacedName")
+    },
+    value: {
+      optional: true,
+      validate: (0, _utils.assertNodeType)("JSXElement", "JSXFragment", "StringLiteral", "JSXExpressionContainer")
+    }
+  }
+});
+defineType("JSXClosingElement", {
+  visitor: ["name"],
+  aliases: ["Immutable"],
+  fields: {
+    name: {
+      validate: (0, _utils.assertNodeType)("JSXIdentifier", "JSXMemberExpression", "JSXNamespacedName")
+    }
+  }
+});
+defineType("JSXElement", {
+  builder: ["openingElement", "closingElement", "children", "selfClosing"],
+  visitor: ["openingElement", "children", "closingElement"],
+  aliases: ["Immutable", "Expression"],
+  fields: Object.assign({
+    openingElement: {
+      validate: (0, _utils.assertNodeType)(

@@ -1,0 +1,1 @@
+g(r,"column");if(n<i.line||n===i.line&&s<i.column)throw new Error("Section offsets must be ordered and non-overlapping.");return i=r,{generatedOffset:{generatedLine:n+1,generatedColumn:s+1},consumer:new Ye(ze.getArg(e,"map"),t)}}))}Qe.prototype._p

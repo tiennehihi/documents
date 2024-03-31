@@ -1,0 +1,14 @@
+declare namespace yargsParser {
+    interface Arguments {
+        /** Non-option arguments */
+        _: Array<string | number>;
+        /** Arguments after the end-of-options flag `--` */
+        "--"?: Array<string | number>;
+        /** All remaining options */
+        [argName: string]: any;
+    }
+
+    interface DetailedArguments {
+        /** An object representing the parsed value of `args` */
+        argv: Arguments;
+        /** Populated with an error object if an exception occu

@@ -1,0 +1,186 @@
+import type Ajv from "../../core"
+import type {SchemaObject} from "../../types"
+import {jtdForms, JTDForm, SchemaObjectMap} from "./types"
+import {SchemaEnv, getCompilingSchema} from ".."
+import {_, str, and, or, nil, not, CodeGen, Code, Name, SafeExpr} from "../codegen"
+import MissingRefError from "../ref_error"
+import N from "../names"
+import {hasPropFunc} from "../../vocabularies/code"
+import {hasRef} from "../../vocabularies/jtd/ref"
+import {intRange, IntType} from "../../vocabularies/jtd/type"
+import {parseJson, parseJsonNumber, parseJsonString} from "../../runtime/parseJson"
+import {useFunc} from "../util"
+import validTimestamp from "../../runtime/timestamp"
+
+type GenParse = (cxt: ParseCxt) => void
+
+const genParse: {[F in JTDForm]: GenParse} = {
+  elements: parseElements,
+  values: parseValues,
+  discriminator: parseDiscriminator,
+  properties: parseProperties,
+  optionalProperties: parseProperties,
+  enum: parseEnum,
+  type: parseType,
+  ref: parseRef,
+}
+
+interface ParseCxt {
+  readonly gen: CodeGen
+  readonly self: Ajv // current Ajv instance
+  readonly schemaEnv: SchemaEnv
+  readonly definitions: SchemaObjectMap
+  schema: SchemaObject
+  data: Code
+  parseName: Name
+  char: Name
+}
+
+export default function compileParser(
+  this: Ajv,
+  sch: SchemaEnv,
+  definitions: SchemaObjectMap
+): SchemaEnv {
+  const _sch = getCompilingSchema.call(this, sch)
+  if (_sch) return _sch
+  const {es5, lines} = this.opts.code
+  const {ownProperties} = this.opts
+  const gen = new CodeGen(this.scope, {es5, lines, ownProperties})
+  const parseName = gen.scopeName("parse")
+  const cxt: ParseCxt = {
+    self: this,
+    gen,
+    schema: sch.schema as SchemaObject,
+    schemaEnv: sch,
+    definitions,
+    data: N.data,
+    parseName,
+    char: gen.name("c"),
+  }
+
+  let sourceCode: string | undefined
+  try {
+    this._compilations.add(sch)
+    sch.parseName = parseName
+    parserFunction(cxt)
+    gen.optimize(this.opts.code.optimize)
+    const parseFuncCode = gen.toString()
+    sourceCode = `${gen.scopeRefs(N.scope)}return ${parseFuncCode}`
+    const makeParse = new Function(`${N.scope}`, sourceCode)
+    const parse: (json: string) => unknown = makeParse(this.scope.get())
+    this.scope.value(parseName, {ref: parse})
+    sch.parse = parse
+  } catch (e) {
+    if (sourceCode) this.logger.error("Error compiling parser, function code:", sourceCode)
+    delete sch.parse
+    delete sch.parseName
+    throw e
+  } finally {
+    this._compilations.delete(sch)
+  }
+  return sch
+}
+
+const undef = _`undefined`
+
+function parserFunction(cxt: ParseCxt): void {
+  const {gen, parseName, char} = cxt
+  gen.func(parseName, _`${N.json}, ${N.jsonPos}, ${N.jsonPart}`, false, () => {
+    gen.let(N.data)
+    gen.let(char)
+    gen.assign(_`${parseName}.message`, undef)
+    gen.assign(_`${parseName}.position`, undef)
+    gen.assign(N.jsonPos, _`${N.jsonPos} || 0`)
+    gen.const(N.jsonLen, _`${N.json}.length`)
+    parseCode(cxt)
+    skipWhitespace(cxt)
+    gen.if(N.jsonPart, () => {
+      gen.assign(_`${parseName}.position`, N.jsonPos)
+      gen.return(N.data)
+    })
+    gen.if(_`${N.jsonPos} === ${N.jsonLen}`, () => gen.return(N.data))
+    jsonSyntaxError(cxt)
+  })
+}
+
+function parseCode(cxt: ParseCxt): void {
+  let form: JTDForm | undefined
+  for (const key of jtdForms) {
+    if (key in cxt.schema) {
+      form = key
+      break
+    }
+  }
+  if (form) parseNullable(cxt, genParse[form])
+  else parseEmpty(cxt)
+}
+
+const parseBoolean = parseBooleanToken(true, parseBooleanToken(false, jsonSyntaxError))
+
+function parseNullable(cxt: ParseCxt, parseForm: GenParse): void {
+  const {gen, schema, data} = cxt
+  if (!schema.nullable) return parseForm(cxt)
+  tryParseToken(cxt, "null", parseForm, () => gen.assign(data, null))
+}
+
+function parseElements(cxt: ParseCxt): void {
+  const {gen, schema, data} = cxt
+  parseToken(cxt, "[")
+  const ix = gen.let("i", 0)
+  gen.assign(data, _`[]`)
+  parseItems(cxt, "]", () => {
+    const el = gen.let("el")
+    parseCode({...cxt, schema: schema.elements, data: el})
+    gen.assign(_`${data}[${ix}++]`, el)
+  })
+}
+
+function parseValues(cxt: ParseCxt): void {
+  const {gen, schema, data} = cxt
+  parseToken(cxt, "{")
+  gen.assign(data, _`{}`)
+  parseItems(cxt, "}", () => parseKeyValue(cxt, schema.values))
+}
+
+function parseItems(cxt: ParseCxt, endToken: string, block: () => void): void {
+  tryParseItems(cxt, endToken, block)
+  parseToken(cxt, endToken)
+}
+
+function tryParseItems(cxt: ParseCxt, endToken: string, block: () => void): void {
+  const {gen} = cxt
+  gen.for(_`;${N.jsonPos}<${N.jsonLen} && ${jsonSlice(1)}!==${endToken};`, () => {
+    block()
+    tryParseToken(cxt, ",", () => gen.break(), hasItem)
+  })
+
+  function hasItem(): void {
+    tryParseToken(cxt, endToken, () => {}, jsonSyntaxError)
+  }
+}
+
+function parseKeyValue(cxt: ParseCxt, schema: SchemaObject): void {
+  const {gen} = cxt
+  const key = gen.let("key")
+  parseString({...cxt, data: key})
+  parseToken(cxt, ":")
+  parsePropertyValue(cxt, key, schema)
+}
+
+function parseDiscriminator(cxt: ParseCxt): void {
+  const {gen, data, schema} = cxt
+  const {discriminator, mapping} = schema
+  parseToken(cxt, "{")
+  gen.assign(data, _`{}`)
+  const startPos = gen.const("pos", N.jsonPos)
+  const value = gen.let("value")
+  const tag = gen.let("tag")
+  tryParseItems(cxt, "}", () => {
+    const key = gen.let("key")
+    parseString({...cxt, data: key})
+    parseToken(cxt, ":")
+    gen.if(
+      _`${key} === ${discriminator}`,
+      () => {
+        parseString({...cxt, data: tag})
+        g

@@ -1,0 +1,26 @@
+
+      ]
+    }
+  },
+  "pallet": {
+    "aliases": {
+      "unicodes": {
+        "secondary": [
+          "10f482"
+        ]
+      }
+    },
+    "changes": [
+      "5.0.7",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f482",
+    "label": "Pallet",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321849,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 640 512\"><path d=\"M32 320c-1

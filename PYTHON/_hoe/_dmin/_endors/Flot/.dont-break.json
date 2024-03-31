@@ -1,0 +1,7 @@
+import { AnyColor, RgbaColor, HslaColor, HsvaColor } from "./types";
+export declare class Colord {
+    private readonly parsed;
+    readonly rgba: RgbaColor;
+    constructor(input: AnyColor);
+    /**
+     * Returns a boolean indicating whether or not an input has been pars

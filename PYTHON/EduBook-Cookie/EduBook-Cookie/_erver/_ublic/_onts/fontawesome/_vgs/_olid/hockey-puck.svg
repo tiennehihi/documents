@@ -1,0 +1,13 @@
+// stacking icons
+// -------------------------
+
+.@{fa-css-prefix}-stack {
+  display: inline-block;
+  height: 2em;
+  line-height: 2em;
+  position: relative;
+  vertical-align: @fa-stack-vertical-align;
+  width: @fa-stack-width;
+}
+
+.@{

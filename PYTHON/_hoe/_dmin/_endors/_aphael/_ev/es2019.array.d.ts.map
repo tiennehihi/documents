@@ -1,0 +1,1 @@
+ensions):c.extensions=[],c.publicKey=i.publicKeyFromAsn1(r.subjectPublicKeyInfo),c},i.certificateExtensionsFromAsn1=function(e){for(var t=[],r=0;r<e.value.length;++r)for(var n=e.value[r],a=0;a<n.value.len

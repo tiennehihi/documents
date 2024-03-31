@@ -1,0 +1,4 @@
+sPseudos(vNode, expression);
+    }
+    var escapeRegExp = function() {
+      var from = /(?=[\-\[\]{}()*+?.\\\^$

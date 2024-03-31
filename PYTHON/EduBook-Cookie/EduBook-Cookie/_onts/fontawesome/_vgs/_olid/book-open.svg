@@ -1,0 +1,17 @@
+/**
+ * @fileoverview HTML special characters should be escaped.
+ * @author Patrick Hayes
+ */
+
+'use strict';
+
+const docsUrl = require('../util/docsUrl');
+const jsxUtil = require('../util/jsx');
+const report = require('../util/report');
+
+// ------------------------------------------------------------------------------
+// Rule Definition
+// ------------------------------------------------------------------------------
+
+// NOTE: '<' and '{' are also problematic characters, but they do not need
+// to be included here because it is a

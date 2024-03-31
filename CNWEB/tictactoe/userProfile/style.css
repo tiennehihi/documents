@@ -1,0 +1,41 @@
+.user-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    /* position: relative; */
+}
+
+.user-profile {
+    position: relative;
+}
+
+.active {
+    box-shadow: 0 0 4px 2px rgb(158, 158, 5);
+    border: 3px solid rgb(158, 158, 5);
+}
+
+.winner {
+    border: 6px solid greenyellow;
+    box-shadow: 0 0 10px 2px greenyellow;
+}
+
+.notwin {
+    border: none !important;
+}
+
+.icon-crown {
+    /* background-color: yellow !important; */
+    /* box-shadow: 0 0 10px 2px greenyellow; */
+    color: yellow;
+    position: absolute;
+    transform: rotate(44deg);
+    top: -6px;
+    right: 0;
+    font-size: 18px;
+    display: none;
+}
+
+.show {
+    display: block !important;
+}

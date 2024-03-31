@@ -1,0 +1,16 @@
+ags2["Partial"] = 48] = "Partial";
+  return CheckFlags2;
+})(CheckFlags || {});
+var InternalSymbolName = /* @__PURE__ */ ((InternalSymbolName2) => {
+  InternalSymbolName2["Call"] = "__call";
+  InternalSymbolName2["Constructor"] = "__constructor";
+  InternalSymbolName2["New"] = "__new";
+  InternalSymbolName2["Index"] = "__index";
+  InternalSymbolName2["ExportStar"] = "__export";
+  InternalSymbolName2["Global"] = "__global";
+  InternalSymbolName2["Missing"] = "__missing";
+  InternalSymbolName2["Type"] = "__type";
+  InternalSymbolName2["Object"] = "__object";
+  InternalSymbolName2["JSXAttributes"] = "__jsxAttributes";
+  InternalSymbolName2["Class"] = "__class";
+  InternalSymbolNa

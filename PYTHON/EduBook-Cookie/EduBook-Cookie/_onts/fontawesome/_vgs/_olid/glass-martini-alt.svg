@@ -1,0 +1,7 @@
+2;
+  const lowerLine = computeLineOfPosition(lineStarts, lower);
+  const upperLine = computeLineOfPosition(lineStarts, upper, lowerLine);
+  return isNegative ? lowerLine - upperLine : upperLine - lowerLine;
+}
+function getLineAndCharacterOfPosition(sourceFile, position) {
+  return computeLineAndCharacterOfPosition(getLineS

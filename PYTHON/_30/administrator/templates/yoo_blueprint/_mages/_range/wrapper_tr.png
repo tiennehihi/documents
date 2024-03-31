@@ -1,0 +1,49 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+const forEachBail = require("./forEachBail");
+const { PathType, getType } = require("./util/path");
+
+/** @typedef {import("./Resolver")} Resolver */
+/** @typedef {import("./Resolver").ResolveRequest} ResolveRequest */
+/** @typedef {import("./Resolver").ResolveStepHook} ResolveStepHook */
+/** @typedef {string | Array<string> | false} Alias */
+/** @typedef {{alias: Alias, name: string, onlyModule?: boolean}} AliasOption */
+
+module.exports = class AliasPlugin {
+	/**
+	 * @param {string | ResolveStepHook} source source
+	 * @param {AliasOption | Array<AliasOption>} options options
+	 * @param {string | ResolveStepHook} target target
+	 */
+	constructor(source, options, target) {
+		this.source = source;
+		this.options = Array.isArray(options) ? options : [options];
+		this.target = target;
+	}
+
+	/**
+	 * @param {Resolver} resolver the resolver
+	 * @returns {void}
+	 */
+	apply(resolver) {
+		const target = resolver.ensureHook(this.target);
+		/**
+		 * @param {string} maybeAbsolutePath path
+		 * @returns {null|string} absolute path with slash ending
+		 */
+		const getAbsolutePathWithSlashEnding = maybeAbsolutePath => {
+			const type = getType(maybeAbsolutePath);
+			if (type === PathType.AbsolutePosix || type === PathType.AbsoluteWin) {
+				return resolver.join(maybeAbsolutePath, "_").slice(0, -1);
+			}
+			return null;
+		};
+		/**
+		 * @param {string} path path
+		 * @param {string} maybeSubPath sub path
+		 * @returns {boolean} true, i

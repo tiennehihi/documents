@@ -1,0 +1,23 @@
+  "aliases": {
+      "unicodes": {
+        "composite": [
+          "1f3b2"
+        ],
+        "secondary": [
+          "10f522"
+        ]
+      }
+    },
+    "changes": [
+      "5.0.13",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f522",
+    "label": "Dice",
+    "voted": true,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastMod

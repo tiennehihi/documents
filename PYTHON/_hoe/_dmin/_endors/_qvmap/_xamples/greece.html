@@ -1,0 +1,36 @@
+.substrToCursor(i + 1);
+                    }
+                }
+            } else {
+                this.error();
+            }
+
+            if (a !== null && a.charCodeAt(0) === PLUSSIGN$3) {
+                a = a.substr(1);
+            }
+
+            if (b !== null && b.charCodeAt(0) === PLUSSIGN$3) {
+                b = b.substr(1);
+            }
+
+            return {
+                type: 'AnPlusB',
+                loc: this.getLocation(start, this.scanner.tokenStart),
+                a: a,
+                b: b
+            };
+        },
+        generate: function(node) {
+            var a = node.a !== null && node.a !== undefined;
+            var b = node.b !== null && node.b !== undefined;
+
+            if (a) {
+                this.chunk(
+                    node.a === '+1' ? '+n' : // eslint-disable-line operator-linebreak, indent
+                    node.a ===  '1' ?  'n' : // eslint-disable-line operator-linebreak, indent
+                    node.a === '-1' ? '-n' : // eslint-disable-line operator-linebreak, indent
+                    node.a + 'n'             // eslint-disable-line operator-linebreak, indent
+                );
+
+                if (b) {
+             

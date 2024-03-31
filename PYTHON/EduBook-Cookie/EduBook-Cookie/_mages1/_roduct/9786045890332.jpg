@@ -1,0 +1,1559 @@
+|| node.name) === "default" /* Default */) {
+      const specifier = getModuleSpecifierForImportOrExport(node);
+      const moduleSymbol = specifier && resolveExternalModuleName(node, specifier);
+      if (moduleSymbol) {
+        return getTargetofModuleDefault(moduleSymbol, node, !!dontResolveAlias);
+      }
+    }
+    const resolved = node.parent.parent.moduleSpecifier ? getExternalModuleMember(node.parent.parent, node, dontResolveAlias) : resolveEntityName(
+      node.propertyName || node.name,
+      meaning,
+      /*ignoreErrors*/
+      false,
+      dontResolveAlias
+    );
+    markSymbolOfAliasDeclarationIfTypeOnly(
+      node,
+      /*immediateTarget*/
+      void 0,
+      resolved,
+      /*overwriteEmpty*/
+      false
+    );
+    return resolved;
+  }
+  function getTargetOfExportAssignment(node, dontResolveAlias) {
+    const expression = isExportAssignment(node) ? node.expression : node.right;
+    const resolved = getTargetOfAliasLikeExpression(expression, dontResolveAlias);
+    markSymbolOfAliasDeclarationIfTypeOnly(
+      node,
+      /*immediateTarget*/
+      void 0,
+      resolved,
+      /*overwriteEmpty*/
+      false
+    );
+    return resolved;
+  }
+  function getTargetOfAliasLikeExpression(expression, dontResolveAlias) {
+    if (isClassExpression(expression)) {
+      return checkExpressionCached(expression).symbol;
+    }
+    if (!isEntityName(expression) && !isEntityNameExpression(expression)) {
+      return void 0;
+    }
+    const aliasLike = resolveEntityName(
+      expression,
+      111551 /* Value */ | 788968 /* Type */ | 1920 /* Namespace */,
+      /*ignoreErrors*/
+      true,
+      dontResolveAlias
+    );
+    if (aliasLike) {
+      return aliasLike;
+    }
+    checkExpressionCached(expression);
+    return getNodeLinks(expression).resolvedSymbol;
+  }
+  function getTargetOfAccessExpression(node, dontRecursivelyResolve) {
+    if (!(isBinaryExpression(node.parent) && node.parent.left === node && node.parent.operatorToken.kind === 64 /* EqualsToken */)) {
+      return void 0;
+    }
+    return getTargetOfAliasLikeExpression(node.parent.right, dontRecursivelyResolve);
+  }
+  function getTargetOfAliasDeclaration(node, dontRecursivelyResolve = false) {
+    switch (node.kind) {
+      case 271 /* ImportEqualsDeclaration */:
+      case 260 /* VariableDeclaration */:
+        return getTargetOfImportEqualsDeclaration(node, dontRecursivelyResolve);
+      case 273 /* ImportClause */:
+        return getTargetOfImportClause(node, dontRecursivelyResolve);
+      case 274 /* NamespaceImport */:
+        return getTargetOfNamespaceImport(node, dontRecursivelyResolve);
+      case 280 /* NamespaceExport */:
+        return getTargetOfNamespaceExport(node, dontRecursivelyResolve);
+      case 276 /* ImportSpecifier */:
+      case 208 /* BindingElement */:
+        return getTargetOfImportSpecifier(node, dontRecursivelyResolve);
+      case 281 /* ExportSpecifier */:
+        return getTargetOfExportSpecifier(node, 111551 /* Value */ | 788968 /* Type */ | 1920 /* Namespace */, dontRecursivelyResolve);
+      case 277 /* ExportAssignment */:
+      case 226 /* BinaryExpression */:
+        return getTargetOfExportAssignment(node, dontRecursivelyResolve);
+      case 270 /* NamespaceExportDeclaration */:
+        return getTargetOfNamespaceExportDeclaration(node, dontRecursivelyResolve);
+      case 304 /* ShorthandPropertyAssignment */:
+        return resolveEntityName(
+          node.name,
+          111551 /* Value */ | 788968 /* Type */ | 1920 /* Namespace */,
+          /*ignoreErrors*/
+          true,
+          dontRecursivelyResolve
+        );
+      case 303 /* PropertyAssignment */:
+        return getTargetOfAliasLikeExpression(node.initializer, dontRecursivelyResolve);
+      case 212 /* ElementAccessExpression */:
+      case 211 /* PropertyAccessExpression */:
+        return getTargetOfAccessExpression(node, dontRecursivelyResolve);
+      default:
+        return Debug.fail();
+    }
+  }
+  function isNonLocalAlias(symbol, excludes = 111551 /* Value */ | 788968 /* Type */ | 1920 /* Namespace */) {
+    if (!symbol)
+      return false;
+    return (symbol.flags & (2097152 /* Alias */ | excludes)) === 2097152 /* Alias */ || !!(symbol.flags & 2097152 /* Alias */ && symbol.flags & 67108864 /* Assignment */);
+  }
+  function resolveSymbol(symbol, dontResolveAlias) {
+    return !dontResolveAlias && isNonLocalAlias(symbol) ? resolveAlias(symbol) : symbol;
+  }
+  function resolveAlias(symbol) {
+    Debug.assert((symbol.flags & 2097152 /* Alias */) !== 0, "Should only get Alias here.");
+    const links = getSymbolLinks(symbol);
+    if (!links.aliasTarget) {
+      links.aliasTarget = resolvingSymbol;
+      const node = getDeclarationOfAliasSymbol(symbol);
+      if (!node)
+        return Debug.fail();
+      const target = getTargetOfAliasDeclaration(node);
+      if (links.aliasTarget === resolvingSymbol) {
+        links.aliasTarget = target || unknownSymbol;
+      } else {
+        error2(node, Diagnostics.Circular_definition_of_import_alias_0, symbolToString(symbol));
+      }
+    } else if (links.aliasTarget === resolvingSymbol) {
+      links.aliasTarget = unknownSymbol;
+    }
+    return links.aliasTarget;
+  }
+  function tryResolveAlias(symbol) {
+    const links = getSymbolLinks(symbol);
+    if (links.aliasTarget !== resolvingSymbol) {
+      return resolveAlias(symbol);
+    }
+    return void 0;
+  }
+  function getSymbolFlags(symbol, excludeTypeOnlyMeanings, excludeLocalMeanings) {
+    const typeOnlyDeclaration = excludeTypeOnlyMeanings && getTypeOnlyAliasDeclaration(symbol);
+    const typeOnlyDeclarationIsExportStar = typeOnlyDeclaration && isExportDeclaration(typeOnlyDeclaration);
+    const typeOnlyResolution = typeOnlyDeclaration && (typeOnlyDeclarationIsExportStar ? resolveExternalModuleName(
+      typeOnlyDeclaration.moduleSpecifier,
+      typeOnlyDeclaration.moduleSpecifier,
+      /*ignoreErrors*/
+      true
+    ) : resolveAlias(typeOnlyDeclaration.symbol));
+    const typeOnlyExportStarTargets = typeOnlyDeclarationIsExportStar && typeOnlyResolution ? getExportsOfModule(typeOnlyResolution) : void 0;
+    let flags = excludeLocalMeanings ? 0 /* None */ : symbol.flags;
+    let seenSymbols;
+    while (symbol.flags & 2097152 /* Alias */) {
+      const target = getExportSymbolOfValueSymbolIfExported(resolveAlias(symbol));
+      if (!typeOnlyDeclarationIsExportStar && target === typeOnlyResolution || (typeOnlyExportStarTargets == null ? void 0 : typeOnlyExportStarTargets.get(target.escapedName)) === target) {
+        break;
+      }
+      if (target === unknownSymbol) {
+        return -1 /* All */;
+      }
+      if (target === symbol || (seenSymbols == null ? void 0 : seenSymbols.has(target))) {
+        break;
+      }
+      if (target.flags & 2097152 /* Alias */) {
+        if (seenSymbols) {
+          seenSymbols.add(target);
+        } else {
+          seenSymbols = /* @__PURE__ */ new Set([symbol, target]);
+        }
+      }
+      flags |= target.flags;
+      symbol = target;
+    }
+    return flags;
+  }
+  function markSymbolOfAliasDeclarationIfTypeOnly(aliasDeclaration, immediateTarget, finalTarget, overwriteEmpty, exportStarDeclaration, exportStarName) {
+    if (!aliasDeclaration || isPropertyAccessExpression(aliasDeclaration))
+      return false;
+    const sourceSymbol = getSymbolOfDeclaration(aliasDeclaration);
+    if (isTypeOnlyImportOrExportDeclaration(aliasDeclaration)) {
+      const links2 = getSymbolLinks(sourceSymbol);
+      links2.typeOnlyDeclaration = aliasDeclaration;
+      return true;
+    }
+    if (exportStarDeclaration) {
+      const links2 = getSymbolLinks(sourceSymbol);
+      links2.typeOnlyDeclaration = exportStarDeclaration;
+      if (sourceSymbol.escapedName !== exportStarName) {
+        links2.typeOnlyExportStarName = exportStarName;
+      }
+      return true;
+    }
+    const links = getSymbolLinks(sourceSymbol);
+    return markSymbolOfAliasDeclarationIfTypeOnlyWorker(links, immediateTarget, overwriteEmpty) || markSymbolOfAliasDeclarationIfTypeOnlyWorker(links, finalTarget, overwriteEmpty);
+  }
+  function markSymbolOfAliasDeclarationIfTypeOnlyWorker(aliasDeclarationLinks, target, overwriteEmpty) {
+    var _a;
+    if (target && (aliasDeclarationLinks.typeOnlyDeclaration === void 0 || overwriteEmpty && aliasDeclarationLinks.typeOnlyDeclaration === false)) {
+      const exportSymbol = ((_a = target.exports) == null ? void 0 : _a.get("export=" /* ExportEquals */)) ?? target;
+      const typeOnly = exportSymbol.declarations && find(exportSymbol.declarations, isTypeOnlyImportOrExportDeclaration);
+      aliasDeclarationLinks.typeOnlyDeclaration = typeOnly ?? getSymbolLinks(exportSymbol).typeOnlyDeclaration ?? false;
+    }
+    return !!aliasDeclarationLinks.typeOnlyDeclaration;
+  }
+  function getTypeOnlyAliasDeclaration(symbol, include) {
+    if (!(symbol.flags & 2097152 /* Alias */)) {
+      return void 0;
+    }
+    const links = getSymbolLinks(symbol);
+    if (include === void 0) {
+      return links.typeOnlyDeclaration || void 0;
+    }
+    if (links.typeOnlyDeclaration) {
+      const resolved = links.typeOnlyDeclaration.kind === 278 /* ExportDeclaration */ ? resolveSymbol(getExportsOfModule(links.typeOnlyDeclaration.symbol.parent).get(links.typeOnlyExportStarName || symbol.escapedName)) : resolveAlias(links.typeOnlyDeclaration.symbol);
+      return getSymbolFlags(resolved) & include ? links.typeOnlyDeclaration : void 0;
+    }
+    return void 0;
+  }
+  function markExportAsReferenced(node) {
+    if (!canCollectSymbolAliasAccessabilityData) {
+      return;
+    }
+    const symbol = getSymbolOfDeclaration(node);
+    const target = resolveAlias(symbol);
+    if (target) {
+      const markAlias = target === unknownSymbol || getSymbolFlags(
+        symbol,
+        /*excludeTypeOnlyMeanings*/
+        true
+      ) & 111551 /* Value */ && !isConstEnumOrConstEnumOnlyModule(target);
+      if (markAlias) {
+        markAliasSymbolAsReferenced(symbol);
+      }
+    }
+  }
+  function markAliasSymbolAsReferenced(symbol) {
+    Debug.assert(canCollectSymbolAliasAccessabilityData);
+    const links = getSymbolLinks(symbol);
+    if (!links.referenced) {
+      links.referenced = true;
+      const node = getDeclarationOfAliasSymbol(symbol);
+      if (!node)
+        return Debug.fail();
+      if (isInternalModuleImportEqualsDeclaration(node)) {
+        if (getSymbolFlags(resolveSymbol(symbol)) & 111551 /* Value */) {
+          checkExpressionCached(node.moduleReference);
+        }
+      }
+    }
+  }
+  function markConstEnumAliasAsReferenced(symbol) {
+    const links = getSymbolLinks(symbol);
+    if (!links.constEnumReferenced) {
+      links.constEnumReferenced = true;
+    }
+  }
+  function getSymbolOfPartOfRightHandSideOfImportEquals(entityName, dontResolveAlias) {
+    if (entityName.kind === 80 /* Identifier */ && isRightSideOfQualifiedNameOrPropertyAccess(entityName)) {
+      entityName = entityName.parent;
+    }
+    if (entityName.kind === 80 /* Identifier */ || entityName.parent.kind === 166 /* QualifiedName */) {
+      return resolveEntityName(
+        entityName,
+        1920 /* Namespace */,
+        /*ignoreErrors*/
+        false,
+        dontResolveAlias
+      );
+    } else {
+      Debug.assert(entityName.parent.kind === 271 /* ImportEqualsDeclaration */);
+      return resolveEntityName(
+        entityName,
+        111551 /* Value */ | 788968 /* Type */ | 1920 /* Namespace */,
+        /*ignoreErrors*/
+        false,
+        dontResolveAlias
+      );
+    }
+  }
+  function getFullyQualifiedName(symbol, containingLocation) {
+    return symbol.parent ? getFullyQualifiedName(symbol.parent, containingLocation) + "." + symbolToString(symbol) : symbolToString(
+      symbol,
+      containingLocation,
+      /*meaning*/
+      void 0,
+      32 /* DoNotIncludeSymbolChain */ | 4 /* AllowAnyNodeKind */
+    );
+  }
+  function getContainingQualifiedNameNode(node) {
+    while (isQualifiedName(node.parent)) {
+      node = node.parent;
+    }
+    return node;
+  }
+  function tryGetQualifiedNameAsValue(node) {
+    let left = getFirstIdentifier(node);
+    let symbol = resolveName(
+      left,
+      left.escapedText,
+      111551 /* Value */,
+      /*nameNotFoundMessage*/
+      void 0,
+      left,
+      /*isUse*/
+      true
+    );
+    if (!symbol) {
+      return void 0;
+    }
+    while (isQualifiedName(left.parent)) {
+      const type = getTypeOfSymbol(symbol);
+      symbol = getPropertyOfType(type, left.parent.right.escapedText);
+      if (!symbol) {
+        return void 0;
+      }
+      left = left.parent;
+    }
+    return symbol;
+  }
+  function resolveEntityName(name, meaning, ignoreErrors, dontResolveAlias, location) {
+    if (nodeIsMissing(name)) {
+      return void 0;
+    }
+    const namespaceMeaning = 1920 /* Namespace */ | (isInJSFile(name) ? meaning & 111551 /* Value */ : 0);
+    let symbol;
+    if (name.kind === 80 /* Identifier */) {
+      const message = meaning === namespaceMeaning || nodeIsSynthesized(name) ? Diagnostics.Cannot_find_namespace_0 : getCannotFindNameDiagnosticForName(getFirstIdentifier(name));
+      const symbolFromJSPrototype = isInJSFile(name) && !nodeIsSynthesized(name) ? resolveEntityNameFromAssignmentDeclaration(name, meaning) : void 0;
+      symbol = getMergedSymbol(resolveName(
+        location || name,
+        name.escapedText,
+        meaning,
+        ignoreErrors || symbolFromJSPrototype ? void 0 : message,
+        name,
+        /*isUse*/
+        true,
+        /*excludeGlobals*/
+        false
+      ));
+      if (!symbol) {
+        return getMergedSymbol(symbolFromJSPrototype);
+      }
+    } else if (name.kind === 166 /* QualifiedName */ || name.kind === 211 /* PropertyAccessExpression */) {
+      const left = name.kind === 166 /* QualifiedName */ ? name.left : name.expression;
+      const right = name.kind === 166 /* QualifiedName */ ? name.right : name.name;
+      let namespace = resolveEntityName(
+        left,
+        namespaceMeaning,
+        ignoreErrors,
+        /*dontResolveAlias*/
+        false,
+        location
+      );
+      if (!namespace || nodeIsMissing(right)) {
+        return void 0;
+      } else if (namespace === unknownSymbol) {
+        return namespace;
+      }
+      if (namespace.valueDeclaration && isInJSFile(namespace.valueDeclaration) && getEmitModuleResolutionKind(compilerOptions) !== 100 /* Bundler */ && isVariableDeclaration(namespace.valueDeclaration) && namespace.valueDeclaration.initializer && isCommonJsRequire(namespace.valueDeclaration.initializer)) {
+        const moduleName = namespace.valueDeclaration.initializer.arguments[0];
+        const moduleSym = resolveExternalModuleName(moduleName, moduleName);
+        if (moduleSym) {
+          const resolvedModuleSymbol = resolveExternalModuleSymbol(moduleSym);
+          if (resolvedModuleSymbol) {
+            namespace = resolvedModuleSymbol;
+          }
+        }
+      }
+      symbol = getMergedSymbol(getSymbol2(getExportsOfSymbol(namespace), right.escapedText, meaning));
+      if (!symbol && namespace.flags & 2097152 /* Alias */) {
+        symbol = getMergedSymbol(getSymbol2(getExportsOfSymbol(resolveAlias(namespace)), right.escapedText, meaning));
+      }
+      if (!symbol) {
+        if (!ignoreErrors) {
+          const namespaceName = getFullyQualifiedName(namespace);
+          const declarationName = declarationNameToString(right);
+          const suggestionForNonexistentModule = getSuggestedSymbolForNonexistentModule(right, namespace);
+          if (suggestionForNonexistentModule) {
+            error2(right, Diagnostics._0_has_no_exported_member_named_1_Did_you_mean_2, namespaceName, declarationName, symbolToString(suggestionForNonexistentModule));
+            return void 0;
+          }
+          const containingQualifiedName = isQualifiedName(name) && getContainingQualifiedNameNode(name);
+          const canSuggestTypeof = globalObjectType && meaning & 788968 /* Type */ && containingQualifiedName && !isTypeOfExpression(containingQualifiedName.parent) && tryGetQualifiedNameAsValue(containingQualifiedName);
+          if (canSuggestTypeof) {
+            error2(
+              containingQualifiedName,
+              Diagnostics._0_refers_to_a_value_but_is_being_used_as_a_type_here_Did_you_mean_typeof_0,
+              entityNameToString(containingQualifiedName)
+            );
+            return void 0;
+          }
+          if (meaning & 1920 /* Namespace */ && isQualifiedName(name.parent)) {
+            const exportedTypeSymbol = getMergedSymbol(getSymbol2(getExportsOfSymbol(namespace), right.escapedText, 788968 /* Type */));
+            if (exportedTypeSymbol) {
+              error2(
+                name.parent.right,
+                Diagnostics.Cannot_access_0_1_because_0_is_a_type_but_not_a_namespace_Did_you_mean_to_retrieve_the_type_of_the_property_1_in_0_with_0_1,
+                symbolToString(exportedTypeSymbol),
+                unescapeLeadingUnderscores(name.parent.right.escapedText)
+              );
+              return void 0;
+            }
+          }
+          error2(right, Diagnostics.Namespace_0_has_no_exported_member_1, namespaceName, declarationName);
+        }
+        return void 0;
+      }
+    } else {
+      Debug.assertNever(name, "Unknown entity name kind.");
+    }
+    Debug.assert((getCheckFlags(symbol) & 1 /* Instantiated */) === 0, "Should never get an instantiated symbol here.");
+    if (!nodeIsSynthesized(name) && isEntityName(name) && (symbol.flags & 2097152 /* Alias */ || name.parent.kind === 277 /* ExportAssignment */)) {
+      markSymbolOfAliasDeclarationIfTypeOnly(
+        getAliasDeclarationFromName(name),
+        symbol,
+        /*finalTarget*/
+        void 0,
+        /*overwriteEmpty*/
+        true
+      );
+    }
+    return symbol.flags & meaning || dontResolveAlias ? symbol : resolveAlias(symbol);
+  }
+  function resolveEntityNameFromAssignmentDeclaration(name, meaning) {
+    if (isJSDocTypeReference(name.parent)) {
+      const secondaryLocation = getAssignmentDeclarationLocation(name.parent);
+      if (secondaryLocation) {
+        return resolveName(
+          secondaryLocation,
+          name.escapedText,
+          meaning,
+          /*nameNotFoundMessage*/
+          void 0,
+          name,
+          /*isUse*/
+          true
+        );
+      }
+    }
+  }
+  function getAssignmentDeclarationLocation(node) {
+    const typeAlias = findAncestor(node, (node2) => !(isJSDocNode(node2) || node2.flags & 16777216 /* JSDoc */) ? "quit" : isJSDocTypeAlias(node2));
+    if (typeAlias) {
+      return;
+    }
+    const host2 = getJSDocHost(node);
+    if (host2 && isExpressionStatement(host2) && isPrototypePropertyAssignment(host2.expression)) {
+      const symbol = getSymbolOfDeclaration(host2.expression.left);
+      if (symbol) {
+        return getDeclarationOfJSPrototypeContainer(symbol);
+      }
+    }
+    if (host2 && isFunctionExpression(host2) && isPrototypePropertyAssignment(host2.parent) && isExpressionStatement(host2.parent.parent)) {
+      const symbol = getSymbolOfDeclaration(host2.parent.left);
+      if (symbol) {
+        return getDeclarationOfJSPrototypeContainer(symbol);
+      }
+    }
+    if (host2 && (isObjectLiteralMethod(host2) || isPropertyAssignment(host2)) && isBinaryExpression(host2.parent.parent) && getAssignmentDeclarationKind(host2.parent.parent) === 6 /* Prototype */) {
+      const symbol = getSymbolOfDeclaration(host2.parent.parent.left);
+      if (symbol) {
+        return getDeclarationOfJSPrototypeContainer(symbol);
+      }
+    }
+    const sig = getEffectiveJSDocHost(node);
+    if (sig && isFunctionLike(sig)) {
+      const symbol = getSymbolOfDeclaration(sig);
+      return symbol && symbol.valueDeclaration;
+    }
+  }
+  function getDeclarationOfJSPrototypeContainer(symbol) {
+    const decl = symbol.parent.valueDeclaration;
+    if (!decl) {
+      return void 0;
+    }
+    const initializer = isAssignmentDeclaration(decl) ? getAssignedExpandoInitializer(decl) : hasOnlyExpressionInitializer(decl) ? getDeclaredExpandoInitializer(decl) : void 0;
+    return initializer || decl;
+  }
+  function getExpandoSymbol(symbol) {
+    const decl = symbol.valueDeclaration;
+    if (!decl || !isInJSFile(decl) || symbol.flags & 524288 /* TypeAlias */ || getExpandoInitializer(
+      decl,
+      /*isPrototypeAssignment*/
+      false
+    )) {
+      return void 0;
+    }
+    const init = isVariableDeclaration(decl) ? getDeclaredExpandoInitializer(decl) : getAssignedExpandoInitializer(decl);
+    if (init) {
+      const initSymbol = getSymbolOfNode(init);
+      if (initSymbol) {
+        return mergeJSSymbols(initSymbol, symbol);
+      }
+    }
+  }
+  function resolveExternalModuleName(location, moduleReferenceExpression, ignoreErrors) {
+    const isClassic = getEmitModuleResolutionKind(compilerOptions) === 1 /* Classic */;
+    const errorMessage = isClassic ? Diagnostics.Cannot_find_module_0_Did_you_mean_to_set_the_moduleResolution_option_to_nodenext_or_to_add_aliases_to_the_paths_option : Diagnostics.Cannot_find_module_0_or_its_corresponding_type_declarations;
+    return resolveExternalModuleNameWorker(location, moduleReferenceExpression, ignoreErrors ? void 0 : errorMessage);
+  }
+  function resolveExternalModuleNameWorker(location, moduleReferenceExpression, moduleNotFoundError, isForAugmentation = false) {
+    return isStringLiteralLike(moduleReferenceExpression) ? resolveExternalModule(location, moduleReferenceExpression.text, moduleNotFoundError, moduleReferenceExpression, isForAugmentation) : void 0;
+  }
+  function resolveExternalModule(location, moduleReference, moduleNotFoundError, errorNode, isForAugmentation = false) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
+    if (startsWith(moduleReference, "@types/")) {
+      const diag2 = Diagnostics.Cannot_import_type_declaration_files_Consider_importing_0_instead_of_1;
+      const withoutAtTypePrefix = removePrefix(moduleReference, "@types/");
+      error2(errorNode, diag2, withoutAtTypePrefix, moduleReference);
+    }
+    const ambientModule = tryFindAmbientModule(
+      moduleReference,
+      /*withAugmentations*/
+      true
+    );
+    if (ambientModule) {
+      return ambientModule;
+    }
+    const currentSourceFile = getSourceFileOfNode(location);
+    const contextSpecifier = isStringLiteralLike(location) ? location : ((_a = isModuleDeclaration(location) ? location : location.parent && isModuleDeclaration(location.parent) && location.parent.name === location ? location.parent : void 0) == null ? void 0 : _a.name) || ((_b = isLiteralImportTypeNode(location) ? location : void 0) == null ? void 0 : _b.argument.literal) || (isVariableDeclaration(location) && location.initializer && isRequireCall(
+      location.initializer,
+      /*requireStringLiteralLikeArgument*/
+      true
+    ) ? location.initializer.arguments[0] : void 0) || ((_c = findAncestor(location, isImportCall)) == null ? void 0 : _c.arguments[0]) || ((_d = findAncestor(location, isImportDeclaration)) == null ? void 0 : _d.moduleSpecifier) || ((_e = findAncestor(location, isExternalModuleImportEqualsDeclaration)) == null ? void 0 : _e.moduleReference.expression) || ((_f = findAncestor(location, isExportDeclaration)) == null ? void 0 : _f.moduleSpecifier);
+    const mode = contextSpecifier && isStringLiteralLike(contextSpecifier) ? host.getModeForUsageLocation(currentSourceFile, contextSpecifier) : currentSourceFile.impliedNodeFormat;
+    const moduleResolutionKind = getEmitModuleResolutionKind(compilerOptions);
+    const resolvedModule = (_g = host.getResolvedModule(currentSourceFile, moduleReference, mode)) == null ? void 0 : _g.resolvedModule;
+    const resolutionDiagnostic = resolvedModule && getResolutionDiagnostic(compilerOptions, resolvedModule, currentSourceFile);
+    const sourceFile = resolvedModule && (!resolutionDiagnostic || resolutionDiagnostic === Diagnostics.Module_0_was_resolved_to_1_but_jsx_is_not_set) && host.getSourceFile(resolvedModule.resolvedFileName);
+    if (sourceFile) {
+      if (resolutionDiagnostic) {
+        error2(errorNode, resolutionDiagnostic, moduleReference, resolvedModule.resolvedFileName);
+      }
+      if (resolvedModule.resolvedUsingTsExtension && isDeclarationFileName(moduleReference)) {
+        const importOrExport = ((_h = findAncestor(location, isImportDeclaration)) == null ? void 0 : _h.importClause) || findAncestor(location, or(isImportEqualsDeclaration, isExportDeclaration));
+        if (importOrExport && !importOrExport.isTypeOnly || findAncestor(location, isImportCall)) {
+          error2(
+            errorNode,
+            Diagnostics.A_declaration_file_cannot_be_imported_without_import_type_Did_you_mean_to_import_an_implementation_file_0_instead,
+            getSuggestedImportSource(Debug.checkDefined(tryExtractTSExtension(moduleReference)))
+          );
+        }
+      } else if (resolvedModule.resolvedUsingTsExtension && !shouldAllowImportingTsExtension(compilerOptions, currentSourceFile.fileName)) {
+        const importOrExport = ((_i = findAncestor(location, isImportDeclaration)) == null ? void 0 : _i.importClause) || findAncestor(location, or(isImportEqualsDeclaration, isExportDeclaration));
+        if (!((importOrExport == null ? void 0 : importOrExport.isTypeOnly) || findAncestor(location, isImportTypeNode))) {
+          const tsExtension = Debug.checkDefined(tryExtractTSExtension(moduleReference));
+          error2(errorNode, Diagnostics.An_import_path_can_only_end_with_a_0_extension_when_allowImportingTsExtensions_is_enabled, tsExtension);
+        }
+      }
+      if (sourceFile.symbol) {
+        if (resolvedModule.isExternalLibraryImport && !resolutionExtensionIsTSOrJson(resolvedModule.extension)) {
+          errorOnImplicitAnyModule(
+            /*isError*/
+            false,
+            errorNode,
+            currentSourceFile,
+            mode,
+            resolvedModule,
+            moduleReference
+          );
+        }
+        if (moduleResolutionKind === 3 /* Node16 */ || moduleResolutionKind === 99 /* NodeNext */) {
+          const isSyncImport = currentSourceFile.impliedNodeFormat === 1 /* CommonJS */ && !findAncestor(location, isImportCall) || !!findAncestor(location, isImportEqualsDeclaration);
+          const overrideHost = findAncestor(location, (l) => isImportTypeNode(l) || isExportDeclaration(l) || isImportDeclaration(l));
+          if (isSyncImport && sourceFile.impliedNodeFormat === 99 /* ESNext */ && !hasResolutionModeOverride(overrideHost)) {
+            if (findAncestor(location, isImportEqualsDeclaration)) {
+              error2(errorNode, Diagnostics.Module_0_cannot_be_imported_using_this_construct_The_specifier_only_resolves_to_an_ES_module_which_cannot_be_imported_with_require_Use_an_ECMAScript_import_instead, moduleReference);
+            } else {
+              let diagnosticDetails;
+              const ext = tryGetExtensionFromPath2(currentSourceFile.fileName);
+              if (ext === ".ts" /* Ts */ || ext === ".js" /* Js */ || ext === ".tsx" /* Tsx */ || ext === ".jsx" /* Jsx */) {
+                const scope = currentSourceFile.packageJsonScope;
+                const targetExt = ext === ".ts" /* Ts */ ? ".mts" /* Mts */ : ext === ".js" /* Js */ ? ".mjs" /* Mjs */ : void 0;
+                if (scope && !scope.contents.packageJsonContent.type) {
+                  if (targetExt) {
+                    diagnosticDetails = chainDiagnosticMessages(
+                      /*details*/
+                      void 0,
+                      Diagnostics.To_convert_this_file_to_an_ECMAScript_module_change_its_file_extension_to_0_or_add_the_field_type_Colon_module_to_1,
+                      targetExt,
+                      combinePaths(scope.packageDirectory, "package.json")
+                    );
+                  } else {
+                    diagnosticDetails = chainDiagnosticMessages(
+                      /*details*/
+                      void 0,
+                      Diagnostics.To_convert_this_file_to_an_ECMAScript_module_add_the_field_type_Colon_module_to_0,
+                      combinePaths(scope.packageDirectory, "package.json")
+                    );
+                  }
+                } else {
+                  if (targetExt) {
+                    diagnosticDetails = chainDiagnosticMessages(
+                      /*details*/
+                      void 0,
+                      Diagnostics.To_convert_this_file_to_an_ECMAScript_module_change_its_file_extension_to_0_or_create_a_local_package_json_file_with_type_Colon_module,
+                      targetExt
+                    );
+                  } else {
+                    diagnosticDetails = chainDiagnosticMessages(
+                      /*details*/
+                      void 0,
+                      Diagnostics.To_convert_this_file_to_an_ECMAScript_module_create_a_local_package_json_file_with_type_Colon_module
+                    );
+                  }
+                }
+              }
+              diagnostics.add(createDiagnosticForNodeFromMessageChain(
+                getSourceFileOfNode(errorNode),
+                errorNode,
+                chainDiagnosticMessages(
+                  diagnosticDetails,
+                  Diagnostics.The_current_file_is_a_CommonJS_module_whose_imports_will_produce_require_calls_however_the_referenced_file_is_an_ECMAScript_module_and_cannot_be_imported_with_require_Consider_writing_a_dynamic_import_0_call_instead,
+                  moduleReference
+                )
+              ));
+            }
+          }
+        }
+        return getMergedSymbol(sourceFile.symbol);
+      }
+      if (moduleNotFoundError) {
+        error2(errorNode, Diagnostics.File_0_is_not_a_module, sourceFile.fileName);
+      }
+      return void 0;
+    }
+    if (patternAmbientModules) {
+      const pattern = findBestPatternMatch(patternAmbientModules, (_) => _.pattern, moduleReference);
+      if (pattern) {
+        const augmentation = patternAmbientModuleAugmentations && patternAmbientModuleAugmentations.get(moduleReference);
+        if (augmentation) {
+          return getMergedSymbol(augmentation);
+        }
+        return getMergedSymbol(pattern.symbol);
+      }
+    }
+    if (resolvedModule && !resolutionExtensionIsTSOrJson(resolvedModule.extension) && resolutionDiagnostic === void 0 || resolutionDiagnostic === Diagnostics.Could_not_find_a_declaration_file_for_module_0_1_implicitly_has_an_any_type) {
+      if (isForAugmentation) {
+        const diag2 = Diagnostics.Invalid_module_name_in_augmentation_Module_0_resolves_to_an_untyped_module_at_1_which_cannot_be_augmented;
+        error2(errorNode, diag2, moduleReference, resolvedModule.resolvedFileName);
+      } else {
+        errorOnImplicitAnyModule(
+          /*isError*/
+          noImplicitAny && !!moduleNotFoundError,
+          errorNode,
+          currentSourceFile,
+          mode,
+          resolvedModule,
+          moduleReference
+        );
+      }
+      return void 0;
+    }
+    if (moduleNotFoundError) {
+      if (resolvedModule) {
+        const redirect = host.getProjectReferenceRedirect(resolvedModule.resolvedFileName);
+        if (redirect) {
+          error2(errorNode, Diagnostics.Output_file_0_has_not_been_built_from_source_file_1, redirect, resolvedModule.resolvedFileName);
+          return void 0;
+        }
+      }
+      if (resolutionDiagnostic) {
+        error2(errorNode, resolutionDiagnostic, moduleReference, resolvedModule.resolvedFileName);
+      } else {
+        const isExtensionlessRelativePathImport = pathIsRelative(moduleReference) && !hasExtension(moduleReference);
+        const resolutionIsNode16OrNext = moduleResolutionKind === 3 /* Node16 */ || moduleResolutionKind === 99 /* NodeNext */;
+        if (!getResolveJsonModule(compilerOptions) && fileExtensionIs(moduleReference, ".json" /* Json */) && moduleResolutionKind !== 1 /* Classic */ && hasJsonModuleEmitEnabled(compilerOptions)) {
+          error2(errorNode, Diagnostics.Cannot_find_module_0_Consider_using_resolveJsonModule_to_import_module_with_json_extension, moduleReference);
+        } else if (mode === 99 /* ESNext */ && resolutionIsNode16OrNext && isExtensionlessRelativePathImport) {
+          const absoluteRef = getNormalizedAbsolutePath(moduleReference, getDirectoryPath(currentSourceFile.path));
+          const suggestedExt = (_j = suggestedExtensions.find(([actualExt, _importExt]) => host.fileExists(absoluteRef + actualExt))) == null ? void 0 : _j[1];
+          if (suggestedExt) {
+            error2(errorNode, Diagnostics.Relative_import_paths_need_explicit_file_extensions_in_ECMAScript_imports_when_moduleResolution_is_node16_or_nodenext_Did_you_mean_0, moduleReference + suggestedExt);
+          } else {
+            error2(errorNode, Diagnostics.Relative_import_paths_need_explicit_file_extensions_in_ECMAScript_imports_when_moduleResolution_is_node16_or_nodenext_Consider_adding_an_extension_to_the_import_path);
+          }
+        } else {
+          if ((_k = host.getResolvedModule(currentSourceFile, moduleReference, mode)) == null ? void 0 : _k.alternateResult) {
+            const errorInfo = createModuleNotFoundChain(currentSourceFile, host, moduleReference, mode, moduleReference);
+            errorOrSuggestion(
+              /*isError*/
+              true,
+              errorNode,
+              chainDiagnosticMessages(errorInfo, moduleNotFoundError, moduleReference)
+            );
+          } else {
+            error2(errorNode, moduleNotFoundError, moduleReference);
+          }
+        }
+      }
+    }
+    return void 0;
+    function getSuggestedImportSource(tsExtension) {
+      const importSourceWithoutExtension = removeExtension(moduleReference, tsExtension);
+      if (emitModuleKindIsNonNodeESM(moduleKind) || mode === 99 /* ESNext */) {
+        const preferTs = isDeclarationFileName(moduleReference) && shouldAllowImportingTsExtension(compilerOptions);
+        const ext = tsExtension === ".mts" /* Mts */ || tsExtension === ".d.mts" /* Dmts */ ? preferTs ? ".mts" : ".mjs" : tsExtension === ".cts" /* Cts */ || tsExtension === ".d.mts" /* Dmts */ ? preferTs ? ".cts" : ".cjs" : preferTs ? ".ts" : ".js";
+        return importSourceWithoutExtension + ext;
+      }
+      return importSourceWithoutExtension;
+    }
+  }
+  function errorOnImplicitAnyModule(isError, errorNode, sourceFile, mode, { packageId, resolvedFileName }, moduleReference) {
+    let errorInfo;
+    if (!isExternalModuleNameRelative(moduleReference) && packageId) {
+      errorInfo = createModuleNotFoundChain(sourceFile, host, moduleReference, mode, packageId.name);
+    }
+    errorOrSuggestion(
+      isError,
+      errorNode,
+      chainDiagnosticMessages(
+        errorInfo,
+        Diagnostics.Could_not_find_a_declaration_file_for_module_0_1_implicitly_has_an_any_type,
+        moduleReference,
+        resolvedFileName
+      )
+    );
+  }
+  function resolveExternalModuleSymbol(moduleSymbol, dontResolveAlias) {
+    if (moduleSymbol == null ? void 0 : moduleSymbol.exports) {
+      const exportEquals = resolveSymbol(moduleSymbol.exports.get("export=" /* ExportEquals */), dontResolveAlias);
+      const exported = getCommonJsExportEquals(getMergedSymbol(exportEquals), getMergedSymbol(moduleSymbol));
+      return getMergedSymbol(exported) || moduleSymbol;
+    }
+    return void 0;
+  }
+  function getCommonJsExportEquals(exported, moduleSymbol) {
+    if (!exported || exported === unknownSymbol || exported === moduleSymbol || moduleSymbol.exports.size === 1 || exported.flags & 2097152 /* Alias */) {
+      return exported;
+    }
+    const links = getSymbolLinks(exported);
+    if (links.cjsExportMerged) {
+      return links.cjsExportMerged;
+    }
+    const merged = exported.flags & 33554432 /* Transient */ ? exported : cloneSymbol(exported);
+    merged.flags = merged.flags | 512 /* ValueModule */;
+    if (merged.exports === void 0) {
+      merged.exports = createSymbolTable();
+    }
+    moduleSymbol.exports.forEach((s, name) => {
+      if (name === "export=" /* ExportEquals */)
+        return;
+      merged.exports.set(name, merged.exports.has(name) ? mergeSymbol(merged.exports.get(name), s) : s);
+    });
+    if (merged === exported) {
+      getSymbolLinks(merged).resolvedExports = void 0;
+      getSymbolLinks(merged).resolvedMembers = void 0;
+    }
+    getSymbolLinks(merged).cjsExportMerged = merged;
+    return links.cjsExportMerged = merged;
+  }
+  function resolveESModuleSymbol(moduleSymbol, referencingLocation, dontResolveAlias, suppressInteropError) {
+    var _a;
+    const symbol = resolveExternalModuleSymbol(moduleSymbol, dontResolveAlias);
+    if (!dontResolveAlias && symbol) {
+      if (!suppressInteropError && !(symbol.flags & (1536 /* Module */ | 3 /* Variable */)) && !getDeclarationOfKind(symbol, 312 /* SourceFile */)) {
+        const compilerOptionName = moduleKind >= 5 /* ES2015 */ ? "allowSyntheticDefaultImports" : "esModuleInterop";
+        error2(referencingLocation, Diagnostics.This_module_can_only_be_referenced_with_ECMAScript_imports_Slashexports_by_turning_on_the_0_flag_and_referencing_its_default_export, compilerOptionName);
+        return symbol;
+      }
+      const referenceParent = referencingLocation.parent;
+      if (isImportDeclaration(referenceParent) && getNamespaceDeclarationNode(referenceParent) || isImportCall(referenceParent)) {
+        const reference = isImportCall(referenceParent) ? referenceParent.arguments[0] : referenceParent.moduleSpecifier;
+        const type = getTypeOfSymbol(symbol);
+        const defaultOnlyType = getTypeWithSyntheticDefaultOnly(type, symbol, moduleSymbol, reference);
+        if (defaultOnlyType) {
+          return cloneTypeAsModuleType(symbol, defaultOnlyType, referenceParent);
+        }
+        const targetFile = (_a = moduleSymbol == null ? void 0 : moduleSymbol.declarations) == null ? void 0 : _a.find(isSourceFile);
+        const isEsmCjsRef = targetFile && isESMFormatImportImportingCommonjsFormatFile(getUsageModeForExpression(reference), targetFile.impliedNodeFormat);
+        if (getESModuleInterop(compilerOptions) || isEsmCjsRef) {
+          let sigs = getSignaturesOfStructuredType(type, 0 /* Call */);
+          if (!sigs || !sigs.length) {
+            sigs = getSignaturesOfStructuredType(type, 1 /* Construct */);
+          }
+          if (sigs && sigs.length || getPropertyOfType(
+            type,
+            "default" /* Default */,
+            /*skipObjectFunctionPropertyAugment*/
+            true
+          ) || isEsmCjsRef) {
+            const moduleType = type.flags & 3670016 /* StructuredType */ ? getTypeWithSyntheticDefaultImportType(type, symbol, moduleSymbol, reference) : createDefaultPropertyWrapperForModule(symbol, symbol.parent);
+            return cloneTypeAsModuleType(symbol, moduleType, referenceParent);
+          }
+        }
+      }
+    }
+    return symbol;
+  }
+  function cloneTypeAsModuleType(symbol, moduleType, referenceParent) {
+    const result = createSymbol(symbol.flags, symbol.escapedName);
+    result.declarations = symbol.declarations ? symbol.declarations.slice() : [];
+    result.parent = symbol.parent;
+    result.links.target = symbol;
+    result.links.originatingImport = referenceParent;
+    if (symbol.valueDeclaration)
+      result.valueDeclaration = symbol.valueDeclaration;
+    if (symbol.constEnumOnlyModule)
+      result.constEnumOnlyModule = true;
+    if (symbol.members)
+      result.members = new Map(symbol.members);
+    if (symbol.exports)
+      result.exports = new Map(symbol.exports);
+    const resolvedModuleType = resolveStructuredTypeMembers(moduleType);
+    result.links.type = createAnonymousType(result, resolvedModuleType.members, emptyArray, emptyArray, resolvedModuleType.indexInfos);
+    return result;
+  }
+  function hasExportAssignmentSymbol(moduleSymbol) {
+    return moduleSymbol.exports.get("export=" /* ExportEquals */) !== void 0;
+  }
+  function getExportsOfModuleAsArray(moduleSymbol) {
+    return symbolsToArray(getExportsOfModule(moduleSymbol));
+  }
+  function getExportsAndPropertiesOfModule(moduleSymbol) {
+    const exports2 = getExportsOfModuleAsArray(moduleSymbol);
+    const exportEquals = resolveExternalModuleSymbol(moduleSymbol);
+    if (exportEquals !== moduleSymbol) {
+      const type = getTypeOfSymbol(exportEquals);
+      if (shouldTreatPropertiesOfExternalModuleAsExports(type)) {
+        addRange(exports2, getPropertiesOfType(type));
+      }
+    }
+    return exports2;
+  }
+  function forEachExportAndPropertyOfModule(moduleSymbol, cb) {
+    const exports2 = getExportsOfModule(moduleSymbol);
+    exports2.forEach((symbol, key) => {
+      if (!isReservedMemberName(key)) {
+        cb(symbol, key);
+      }
+    });
+    const exportEquals = resolveExternalModuleSymbol(moduleSymbol);
+    if (exportEquals !== moduleSymbol) {
+      const type = getTypeOfSymbol(exportEquals);
+      if (shouldTreatPropertiesOfExternalModuleAsExports(type)) {
+        forEachPropertyOfType(type, (symbol, escapedName) => {
+          cb(symbol, escapedName);
+        });
+      }
+    }
+  }
+  function tryGetMemberInModuleExports(memberName, moduleSymbol) {
+    const symbolTable = getExportsOfModule(moduleSymbol);
+    if (symbolTable) {
+      return symbolTable.get(memberName);
+    }
+  }
+  function tryGetMemberInModuleExportsAndProperties(memberName, moduleSymbol) {
+    const symbol = tryGetMemberInModuleExports(memberName, moduleSymbol);
+    if (symbol) {
+      return symbol;
+    }
+    const exportEquals = resolveExternalModuleSymbol(moduleSymbol);
+    if (exportEquals === moduleSymbol) {
+      return void 0;
+    }
+    const type = getTypeOfSymbol(exportEquals);
+    return shouldTreatPropertiesOfExternalModuleAsExports(type) ? getPropertyOfType(type, memberName) : void 0;
+  }
+  function shouldTreatPropertiesOfExternalModuleAsExports(resolvedExternalModuleType) {
+    return !(resolvedExternalModuleType.flags & 402784252 /* Primitive */ || getObjectFlags(resolvedExternalModuleType) & 1 /* Class */ || // `isArrayOrTupleLikeType` is too expensive to use in this auto-imports hot path
+    isArrayType(resolvedExternalModuleType) || isTupleType(resolvedExternalModuleType));
+  }
+  function getExportsOfSymbol(symbol) {
+    return symbol.flags & 6256 /* LateBindingContainer */ ? getResolvedMembersOrExportsOfSymbol(symbol, "resolvedExports" /* resolvedExports */) : symbol.flags & 1536 /* Module */ ? getExportsOfModule(symbol) : symbol.exports || emptySymbols;
+  }
+  function getExportsOfModule(moduleSymbol) {
+    const links = getSymbolLinks(moduleSymbol);
+    if (!links.resolvedExports) {
+      const { exports: exports2, typeOnlyExportStarMap } = getExportsOfModuleWorker(moduleSymbol);
+      links.resolvedExports = exports2;
+      links.typeOnlyExportStarMap = typeOnlyExportStarMap;
+    }
+    return links.resolvedExports;
+  }
+  function extendExportSymbols(target, source, lookupTable, exportNode) {
+    if (!source)
+      return;
+    source.forEach((sourceSymbol, id) => {
+      if (id === "default" /* Default */)
+        return;
+      const targetSymbol = target.get(id);
+      if (!targetSymbol) {
+        target.set(id, sourceSymbol);
+        if (lookupTable && exportNode) {
+          lookupTable.set(id, {
+            specifierText: getTextOfNode(exportNode.moduleSpecifier)
+          });
+        }
+      } else if (lookupTable && exportNode && targetSymbol && resolveSymbol(targetSymbol) !== resolveSymbol(sourceSymbol)) {
+        const collisionTracker = lookupTable.get(id);
+        if (!collisionTracker.exportsWithDuplicate) {
+          collisionTracker.exportsWithDuplicate = [exportNode];
+        } else {
+          collisionTracker.exportsWithDuplicate.push(exportNode);
+        }
+      }
+    });
+  }
+  function getExportsOfModuleWorker(moduleSymbol) {
+    const visitedSymbols = [];
+    let typeOnlyExportStarMap;
+    const nonTypeOnlyNames = /* @__PURE__ */ new Set();
+    moduleSymbol = resolveExternalModuleSymbol(moduleSymbol);
+    const exports2 = visit(moduleSymbol) || emptySymbols;
+    if (typeOnlyExportStarMap) {
+      nonTypeOnlyNames.forEach((name) => typeOnlyExportStarMap.delete(name));
+    }
+    return {
+      exports: exports2,
+      typeOnlyExportStarMap
+    };
+    function visit(symbol, exportStar, isTypeOnly) {
+      if (!isTypeOnly && (symbol == null ? void 0 : symbol.exports)) {
+        symbol.exports.forEach((_, name) => nonTypeOnlyNames.add(name));
+      }
+      if (!(symbol && symbol.exports && pushIfUnique(visitedSymbols, symbol))) {
+        return;
+      }
+      const symbols = new Map(symbol.exports);
+      const exportStars = symbol.exports.get("__export" /* ExportStar */);
+      if (exportStars) {
+        const nestedSymbols = createSymbolTable();
+        const lookupTable = /* @__PURE__ */ new Map();
+        if (exportStars.declarations) {
+          for (const node of exportStars.declarations) {
+            const resolvedModule = resolveExternalModuleName(node, node.moduleSpecifier);
+            const exportedSymbols = visit(resolvedModule, node, isTypeOnly || node.isTypeOnly);
+            extendExportSymbols(
+              nestedSymbols,
+              exportedSymbols,
+              lookupTable,
+              node
+            );
+          }
+        }
+        lookupTable.forEach(({ exportsWithDuplicate }, id) => {
+          if (id === "export=" || !(exportsWithDuplicate && exportsWithDuplicate.length) || symbols.has(id)) {
+            return;
+          }
+          for (const node of exportsWithDuplicate) {
+            diagnostics.add(createDiagnosticForNode(
+              node,
+              Diagnostics.Module_0_has_already_exported_a_member_named_1_Consider_explicitly_re_exporting_to_resolve_the_ambiguity,
+              lookupTable.get(id).specifierText,
+              unescapeLeadingUnderscores(id)
+            ));
+          }
+        });
+        extendExportSymbols(symbols, nestedSymbols);
+      }
+      if (exportStar == null ? void 0 : exportStar.isTypeOnly) {
+        typeOnlyExportStarMap ?? (typeOnlyExportStarMap = /* @__PURE__ */ new Map());
+        symbols.forEach(
+          (_, escapedName) => typeOnlyExportStarMap.set(
+            escapedName,
+            exportStar
+          )
+        );
+      }
+      return symbols;
+    }
+  }
+  function getMergedSymbol(symbol) {
+    let merged;
+    return symbol && symbol.mergeId && (merged = mergedSymbols[symbol.mergeId]) ? merged : symbol;
+  }
+  function getSymbolOfDeclaration(node) {
+    return getMergedSymbol(node.symbol && getLateBoundSymbol(node.symbol));
+  }
+  function getSymbolOfNode(node) {
+    return canHaveSymbol(node) ? getSymbolOfDeclaration(node) : void 0;
+  }
+  function getParentOfSymbol(symbol) {
+    return getMergedSymbol(symbol.parent && getLateBoundSymbol(symbol.parent));
+  }
+  function getFunctionExpressionParentSymbolOrSymbol(symbol) {
+    var _a, _b;
+    return ((_a = symbol.valueDeclaration) == null ? void 0 : _a.kind) === 219 /* ArrowFunction */ || ((_b = symbol.valueDeclaration) == null ? void 0 : _b.kind) === 218 /* FunctionExpression */ ? getSymbolOfNode(symbol.valueDeclaration.parent) || symbol : symbol;
+  }
+  function getAlternativeContainingModules(symbol, enclosingDeclaration) {
+    const containingFile = getSourceFileOfNode(enclosingDeclaration);
+    const id = getNodeId(containingFile);
+    const links = getSymbolLinks(symbol);
+    let results;
+    if (links.extendedContainersByFile && (results = links.extendedContainersByFile.get(id))) {
+      return results;
+    }
+    if (containingFile && containingFile.imports) {
+      for (const importRef of containingFile.imports) {
+        if (nodeIsSynthesized(importRef))
+          continue;
+        const resolvedModule = resolveExternalModuleName(
+          enclosingDeclaration,
+          importRef,
+          /*ignoreErrors*/
+          true
+        );
+        if (!resolvedModule)
+          continue;
+        const ref = getAliasForSymbolInContainer(resolvedModule, symbol);
+        if (!ref)
+          continue;
+        results = append(results, resolvedModule);
+      }
+      if (length(results)) {
+        (links.extendedContainersByFile || (links.extendedContainersByFile = /* @__PURE__ */ new Map())).set(id, results);
+        return results;
+      }
+    }
+    if (links.extendedContainers) {
+      return links.extendedContainers;
+    }
+    const otherFiles = host.getSourceFiles();
+    for (const file of otherFiles) {
+      if (!isExternalModule(file))
+        continue;
+      const sym = getSymbolOfDeclaration(file);
+      const ref = getAliasForSymbolInContainer(sym, symbol);
+      if (!ref)
+        continue;
+      results = append(results, sym);
+    }
+    return links.extendedContainers = results || emptyArray;
+  }
+  function getContainersOfSymbol(symbol, enclosingDeclaration, meaning) {
+    const container = getParentOfSymbol(symbol);
+    if (container && !(symbol.flags & 262144 /* TypeParameter */)) {
+      return getWithAlternativeContainers(container);
+    }
+    const candidates = mapDefined(symbol.declarations, (d) => {
+      if (!isAmbientModule(d) && d.parent) {
+        if (hasNonGlobalAugmentationExternalModuleSymbol(d.parent)) {
+          return getSymbolOfDeclaration(d.parent);
+        }
+        if (isModuleBlock(d.parent) && d.parent.parent && resolveExternalModuleSymbol(getSymbolOfDeclaration(d.parent.parent)) === symbol) {
+          return getSymbolOfDeclaration(d.parent.parent);
+        }
+      }
+      if (isClassExpression(d) && isBinaryExpression(d.parent) && d.parent.operatorToken.kind === 64 /* EqualsToken */ && isAccessExpression(d.parent.left) && isEntityNameExpression(d.parent.left.expression)) {
+        if (isModuleExportsAccessExpression(d.parent.left) || isExportsIdentifier(d.parent.left.expression)) {
+          return getSymbolOfDeclaration(getSourceFileOfNode(d));
+        }
+        checkExpressionCached(d.parent.left.expression);
+        return getNodeLinks(d.parent.left.expression).resolvedSymbol;
+      }
+    });
+    if (!length(candidates)) {
+      return void 0;
+    }
+    const containers = mapDefined(candidates, (candidate) => getAliasForSymbolInContainer(candidate, symbol) ? candidate : void 0);
+    let bestContainers = [];
+    let alternativeContainers = [];
+    for (const container2 of containers) {
+      const [bestMatch, ...rest] = getWithAlternativeContainers(container2);
+      bestContainers = append(bestContainers, bestMatch);
+      alternativeContainers = addRange(alternativeContainers, rest);
+    }
+    return concatenate(bestContainers, alternativeContainers);
+    function getWithAlternativeContainers(container2) {
+      const additionalContainers = mapDefined(container2.declarations, fileSymbolIfFileSymbolExportEqualsContainer);
+      const reexportContainers = enclosingDeclaration && getAlternativeContainingModules(symbol, enclosingDeclaration);
+      const objectLiteralContainer = getVariableDeclarationOfObjectLiteral(container2, meaning);
+      if (enclosingDeclaration && container2.flags & getQualifiedLeftMeaning(meaning) && getAccessibleSymbolChain(
+        container2,
+        enclosingDeclaration,
+        1920 /* Namespace */,
+        /*useOnlyExternalAliasing*/
+        false
+      )) {
+        return append(concatenate(concatenate([container2], additionalContainers), reexportContainers), objectLiteralContainer);
+      }
+      const firstVariableMatch = !(container2.flags & getQualifiedLeftMeaning(meaning)) && container2.flags & 788968 /* Type */ && getDeclaredTypeOfSymbol(container2).flags & 524288 /* Object */ && meaning === 111551 /* Value */ ? forEachSymbolTableInScope(enclosingDeclaration, (t) => {
+        return forEachEntry(t, (s) => {
+          if (s.flags & getQualifiedLeftMeaning(meaning) && getTypeOfSymbol(s) === getDeclaredTypeOfSymbol(container2)) {
+            return s;
+          }
+        });
+      }) : void 0;
+      let res = firstVariableMatch ? [firstVariableMatch, ...additionalContainers, container2] : [...additionalContainers, container2];
+      res = append(res, objectLiteralContainer);
+      res = addRange(res, reexportContainers);
+      return res;
+    }
+    function fileSymbolIfFileSymbolExportEqualsContainer(d) {
+      return container && getFileSymbolIfFileSymbolExportEqualsContainer(d, container);
+    }
+  }
+  function getVariableDeclarationOfObjectLiteral(symbol, meaning) {
+    const firstDecl = !!length(symbol.declarations) && first(symbol.declarations);
+    if (meaning & 111551 /* Value */ && firstDecl && firstDecl.parent && isVariableDeclaration(firstDecl.parent)) {
+      if (isObjectLiteralExpression(firstDecl) && firstDecl === firstDecl.parent.initializer || isTypeLiteralNode(firstDecl) && firstDecl === firstDecl.parent.type) {
+        return getSymbolOfDeclaration(firstDecl.parent);
+      }
+    }
+  }
+  function getFileSymbolIfFileSymbolExportEqualsContainer(d, container) {
+    const fileSymbol = getExternalModuleContainer(d);
+    const exported = fileSymbol && fileSymbol.exports && fileSymbol.exports.get("export=" /* ExportEquals */);
+    return exported && getSymbolIfSameReference(exported, container) ? fileSymbol : void 0;
+  }
+  function getAliasForSymbolInContainer(container, symbol) {
+    if (container === getParentOfSymbol(symbol)) {
+      return symbol;
+    }
+    const exportEquals = container.exports && container.exports.get("export=" /* ExportEquals */);
+    if (exportEquals && getSymbolIfSameReference(exportEquals, symbol)) {
+      return container;
+    }
+    const exports2 = getExportsOfSymbol(container);
+    const quick = exports2.get(symbol.escapedName);
+    if (quick && getSymbolIfSameReference(quick, symbol)) {
+      return quick;
+    }
+    return forEachEntry(exports2, (exported) => {
+      if (getSymbolIfSameReference(exported, symbol)) {
+        return exported;
+      }
+    });
+  }
+  function getSymbolIfSameReference(s1, s2) {
+    var _a, _b;
+    if (s1.flags & 524288 /* TypeAlias */ && ((_a = s2.declarations) == null ? void 0 : _a.find(isTypeAlias))) {
+      s2 = getDeclaredTypeOfTypeAlias(s2).aliasSymbol || s2;
+    }
+    if (s2.flags & 524288 /* TypeAlias */ && ((_b = s1.declarations) == null ? void 0 : _b.find(isTypeAlias))) {
+      s1 = getDeclaredTypeOfTypeAlias(s1).aliasSymbol || s1;
+    }
+    if (getMergedSymbol(resolveSymbol(getMergedSymbol(s1))) === getMergedSymbol(resolveSymbol(getMergedSymbol(s2)))) {
+      return s1;
+    }
+  }
+  function getExportSymbolOfValueSymbolIfExported(symbol) {
+    return getMergedSymbol(symbol && (symbol.flags & 1048576 /* ExportValue */) !== 0 && symbol.exportSymbol || symbol);
+  }
+  function symbolIsValue(symbol, includeTypeOnlyMembers) {
+    return !!(symbol.flags & 111551 /* Value */ || symbol.flags & 2097152 /* Alias */ && getSymbolFlags(symbol, !includeTypeOnlyMembers) & 111551 /* Value */);
+  }
+  function findConstructorDeclaration(node) {
+    const members = node.members;
+    for (const member of members) {
+      if (member.kind === 176 /* Constructor */ && nodeIsPresent(member.body)) {
+        return member;
+      }
+    }
+  }
+  function createType(flags) {
+    var _a;
+    const result = new Type28(checker, flags);
+    typeCount++;
+    result.id = typeCount;
+    (_a = tracing) == null ? void 0 : _a.recordType(result);
+    return result;
+  }
+  function createTypeWithSymbol(flags, symbol) {
+    const result = createType(flags);
+    result.symbol = symbol;
+    return result;
+  }
+  function createOriginType(flags) {
+    return new Type28(checker, flags);
+  }
+  function createIntrinsicType(kind, intrinsicName, objectFlags = 0 /* None */, debugIntrinsicName) {
+    checkIntrinsicName(intrinsicName, debugIntrinsicName);
+    const type = createType(kind);
+    type.intrinsicName = intrinsicName;
+    type.debugIntrinsicName = debugIntrinsicName;
+    type.objectFlags = objectFlags | 524288 /* CouldContainTypeVariablesComputed */ | 2097152 /* IsGenericTypeComputed */ | 33554432 /* IsUnknownLikeUnionComputed */ | 16777216 /* IsNeverIntersectionComputed */;
+    return type;
+  }
+  function checkIntrinsicName(name, debug) {
+    const key = `${name},${debug ?? ""}`;
+    if (seenIntrinsicNames.has(key)) {
+      Debug.fail(`Duplicate intrinsic type name ${name}${debug ? ` (${debug})` : ""}; you may need to pass a name to createIntrinsicType.`);
+    }
+    seenIntrinsicNames.add(key);
+  }
+  function createObjectType(objectFlags, symbol) {
+    const type = createTypeWithSymbol(524288 /* Object */, symbol);
+    type.objectFlags = objectFlags;
+    type.members = void 0;
+    type.properties = void 0;
+    type.callSignatures = void 0;
+    type.constructSignatures = void 0;
+    type.indexInfos = void 0;
+    return type;
+  }
+  function createTypeofType() {
+    return getUnionType(arrayFrom(typeofNEFacts.keys(), getStringLiteralType));
+  }
+  function createTypeParameter(symbol) {
+    return createTypeWithSymbol(262144 /* TypeParameter */, symbol);
+  }
+  function isReservedMemberName(name) {
+    return name.charCodeAt(0) === 95 /* _ */ && name.charCodeAt(1) === 95 /* _ */ && name.charCodeAt(2) !== 95 /* _ */ && name.charCodeAt(2) !== 64 /* at */ && name.charCodeAt(2) !== 35 /* hash */;
+  }
+  function getNamedMembers(members) {
+    let result;
+    members.forEach((symbol, id) => {
+      if (isNamedMember(symbol, id)) {
+        (result || (result = [])).push(symbol);
+      }
+    });
+    return result || emptyArray;
+  }
+  function isNamedMember(member, escapedName) {
+    return !isReservedMemberName(escapedName) && symbolIsValue(member);
+  }
+  function getNamedOrIndexSignatureMembers(members) {
+    const result = getNamedMembers(members);
+    const index = getIndexSymbolFromSymbolTable(members);
+    return index ? concatenate(result, [index]) : result;
+  }
+  function setStructuredTypeMembers(type, members, callSignatures, constructSignatures, indexInfos) {
+    const resolved = type;
+    resolved.members = members;
+    resolved.properties = emptyArray;
+    resolved.callSignatures = callSignatures;
+    resolved.constructSignatures = constructSignatures;
+    resolved.indexInfos = indexInfos;
+    if (members !== emptySymbols)
+      resolved.properties = getNamedMembers(members);
+    return resolved;
+  }
+  function createAnonymousType(symbol, members, callSignatures, constructSignatures, indexInfos) {
+    return setStructuredTypeMembers(createObjectType(16 /* Anonymous */, symbol), members, callSignatures, constructSignatures, indexInfos);
+  }
+  function getResolvedTypeWithoutAbstractConstructSignatures(type) {
+    if (type.constructSignatures.length === 0)
+      return type;
+    if (type.objectTypeWithoutAbstractConstructSignatures)
+      return type.objectTypeWithoutAbstractConstructSignatures;
+    const constructSignatures = filter(type.constructSignatures, (signature) => !(signature.flags & 4 /* Abstract */));
+    if (type.constructSignatures === constructSignatures)
+      return type;
+    const typeCopy = createAnonymousType(
+      type.symbol,
+      type.members,
+      type.callSignatures,
+      some(constructSignatures) ? constructSignatures : emptyArray,
+      type.indexInfos
+    );
+    type.objectTypeWithoutAbstractConstructSignatures = typeCopy;
+    typeCopy.objectTypeWithoutAbstractConstructSignatures = typeCopy;
+    return typeCopy;
+  }
+  function forEachSymbolTableInScope(enclosingDeclaration, callback) {
+    let result;
+    for (let location = enclosingDeclaration; location; location = location.parent) {
+      if (canHaveLocals(location) && location.locals && !isGlobalSourceFile(location)) {
+        if (result = callback(
+          location.locals,
+          /*ignoreQualification*/
+          void 0,
+          /*isLocalNameLookup*/
+          true,
+          location
+        )) {
+          return result;
+        }
+      }
+      switch (location.kind) {
+        case 312 /* SourceFile */:
+          if (!isExternalOrCommonJsModule(location)) {
+            break;
+          }
+        case 267 /* ModuleDeclaration */:
+          const sym = getSymbolOfDeclaration(location);
+          if (result = callback(
+            (sym == null ? void 0 : sym.exports) || emptySymbols,
+            /*ignoreQualification*/
+            void 0,
+            /*isLocalNameLookup*/
+            true,
+            location
+          )) {
+            return result;
+          }
+          break;
+        case 263 /* ClassDeclaration */:
+        case 231 /* ClassExpression */:
+        case 264 /* InterfaceDeclaration */:
+          let table;
+          (getSymbolOfDeclaration(location).members || emptySymbols).forEach((memberSymbol, key) => {
+            if (memberSymbol.flags & (788968 /* Type */ & ~67108864 /* Assignment */)) {
+              (table || (table = createSymbolTable())).set(key, memberSymbol);
+            }
+          });
+          if (table && (result = callback(
+            table,
+            /*ignoreQualification*/
+            void 0,
+            /*isLocalNameLookup*/
+            false,
+            location
+          ))) {
+            return result;
+          }
+          break;
+      }
+    }
+    return callback(
+      globals,
+      /*ignoreQualification*/
+      void 0,
+      /*isLocalNameLookup*/
+      true
+    );
+  }
+  function getQualifiedLeftMeaning(rightMeaning) {
+    return rightMeaning === 111551 /* Value */ ? 111551 /* Value */ : 1920 /* Namespace */;
+  }
+  function getAccessibleSymbolChain(symbol, enclosingDeclaration, meaning, useOnlyExternalAliasing, visitedSymbolTablesMap = /* @__PURE__ */ new Map()) {
+    if (!(symbol && !isPropertyOrMethodDeclarationSymbol(symbol))) {
+      return void 0;
+    }
+    const links = getSymbolLinks(symbol);
+    const cache = links.accessibleChainCache || (links.accessibleChainCache = /* @__PURE__ */ new Map());
+    const firstRelevantLocation = forEachSymbolTableInScope(enclosingDeclaration, (_, __, ___, node) => node);
+    const key = `${useOnlyExternalAliasing ? 0 : 1}|${firstRelevantLocation && getNodeId(firstRelevantLocation)}|${meaning}`;
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    const id = getSymbolId(symbol);
+    let visitedSymbolTables = visitedSymbolTablesMap.get(id);
+    if (!visitedSymbolTables) {
+      visitedSymbolTablesMap.set(id, visitedSymbolTables = []);
+    }
+    const result = forEachSymbolTableInScope(enclosingDeclaration, getAccessibleSymbolChainFromSymbolTable);
+    cache.set(key, result);
+    return result;
+    function getAccessibleSymbolChainFromSymbolTable(symbols, ignoreQualification, isLocalNameLookup) {
+      if (!pushIfUnique(visitedSymbolTables, symbols)) {
+        return void 0;
+      }
+      const result2 = trySymbolTable(symbols, ignoreQualification, isLocalNameLookup);
+      visitedSymbolTables.pop();
+      return result2;
+    }
+    function canQualifySymbol(symbolFromSymbolTable, meaning2) {
+      return !needsQualification(symbolFromSymbolTable, enclosingDeclaration, meaning2) || // If symbol needs qualification, make sure that parent is accessible, if it is then this symbol is accessible too
+      !!getAccessibleSymbolChain(symbolFromSymbolTable.parent, enclosingDeclaration, getQualifiedLeftMeaning(meaning2), useOnlyExternalAliasing, visitedSymbolTablesMap);
+    }
+    function isAccessible(symbolFromSymbolTable, resolvedAliasSymbol, ignoreQualification) {
+      return (symbol === (resolvedAliasSymbol || symbolFromSymbolTable) || getMergedSymbol(symbol) === getMergedSymbol(resolvedAliasSymbol || symbolFromSymbolTable)) && // if the symbolFromSymbolTable is not external module (it could be if it was determined as ambient external module and would be in globals table)
+      // and if symbolFromSymbolTable or alias resolution matches the symbol,
+      // check the symbol can be qualified, it is only then this symbol is accessible
+      !some(symbolFromSymbolTable.declarations, hasNonGlobalAugmentationExternalModuleSymbol) && (ignoreQualification || canQualifySymbol(getMergedSymbol(symbolFromSymbolTable), meaning));
+    }
+    function trySymbolTable(symbols, ignoreQualification, isLocalNameLookup) {
+      if (isAccessible(
+        symbols.get(symbol.escapedName),
+        /*resolvedAliasSymbol*/
+        void 0,
+        ignoreQualification
+      )) {
+        return [symbol];
+      }
+      const result2 = forEachEntry(symbols, (symbolFromSymbolTable) => {
+        if (symbolFromSymbolTable.flags & 2097152 /* Alias */ && symbolFromSymbolTable.escapedName !== "export=" /* ExportEquals */ && symbolFromSymbolTable.escapedName !== "default" /* Default */ && !(isUMDExportSymbol(symbolFromSymbolTable) && enclosingDeclaration && isExternalModule(getSourceFileOfNode(enclosingDeclaration))) && (!useOnlyExternalAliasing || some(symbolFromSymbolTable.declarations, isExternalModuleImportEqualsDeclaration)) && (isLocalNameLookup ? !some(symbolFromSymbolTable.declarations, isNamespaceReexportDeclaration) : true) && (ignoreQualification || !getDeclarationOfKind(symbolFromSymbolTable, 281 /* ExportSpecifier */))) {
+          const resolvedImportedSymbol = resolveAlias(symbolFromSymbolTable);
+          const candidate = getCandidateListForSymbol(symbolFromSymbolTable, resolvedImportedSymbol, ignoreQualification);
+          if (candidate) {
+            return candidate;
+          }
+        }
+        if (symbolFromSymbolTable.escapedName === symbol.escapedName && symbolFromSymbolTable.exportSymbol) {
+          if (isAccessible(
+            getMergedSymbol(symbolFromSymbolTable.exportSymbol),
+            /*resolvedAliasSymbol*/
+            void 0,
+            ignoreQualification
+          )) {
+            return [symbol];
+          }
+        }
+      });
+      return result2 || (symbols === globals ? getCandidateListForSymbol(globalThisSymbol, globalThisSymbol, ignoreQualification) : void 0);
+    }
+    function getCandidateListForSymbol(symbolFromSymbolTable, resolvedImportedSymbol, ignoreQualification) {
+      if (isAccessible(symbolFromSymbolTable, resolvedImportedSymbol, ignoreQualification)) {
+        return [symbolFromSymbolTable];
+      }
+      const candidateTable = getExportsOfSymbol(resolvedImportedSymbol);
+      const accessibleSymbolsFromExports = candidateTable && getAccessibleSymbolChainFromSymbolTable(
+        candidateTable,
+        /*ignoreQualification*/
+        true
+      );
+      if (accessibleSymbolsFromExports && canQualifySymbol(symbolFromSymbolTable, getQualifiedLeftMeaning(meaning))) {
+        return [symbolFromSymbolTable].concat(accessibleSymbolsFromExports);
+      }
+    }
+  }
+  function needsQualification(symbol, enclosingDeclaration, meaning) {
+    let qualify = false;
+    forEachSymbolTableInScope(enclosingDeclaration, (symbolTable) => {
+      let symbolFromSymbolTable = getMergedSymbol(symbolTable.get(symbol.escapedName));
+      if (!symbolFromSymbolTable) {
+        return false;
+      }
+      if (symbolFromSymbolTable === symbol) {
+        return true;
+      }
+      const shouldResolveAlias = symbolFromSymbolTable.flags & 2097152 /* Alias */ && !getDeclarationOfKind(symbolFromSymbolTable, 281 /* ExportSpecifier */);
+      symbolFromSymbolTable = shouldResolveAlias ? resolveAlias(symbolFromSymbolTable) : symbolFromSymbolTable;
+      const flags = shouldResolveAlias ? getSymbolFlags(symbolFromSymbolTable) : symbolFromSymbolTable.flags;
+      if (flags & meaning) {
+        qualify = true;
+        return true;
+      }
+      return false;
+    });
+    return qualify;
+  }
+  function isPropertyOrMethodDeclarationSymbol(symbol) {
+    if (symbol.declarations && symbol.declarations.length) {
+      for (const declaration of symbol.declarations) {
+        switch (declaration.kind) {
+          case 172 /* PropertyDeclaration */:
+          case 174 /* MethodDeclaration */:
+          case 177 /* GetAccessor */:
+          case 178 /* SetAccessor */:
+            continue;
+          default:
+            return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+  function isTypeSymbolAccessible(typeSymbol, enclosingDeclaration) {
+    const access = isSymbolAccessibleWorker(
+      typeSymbol,
+      enclosingDeclaration,
+      788968 /* Type */,
+      /*shouldComputeAliasesToMakeVisible*/
+      false,
+      /*allowModules*/
+      true
+    );
+    return access.accessibility === 0 /* Accessible */;
+  }
+  function isValueSymbolAccessible(typeSymbol, enclosingDeclaration) {
+    const access = isSymbolAccessibleWorker(
+      typeSymbol,
+      enclosingDeclaration,
+      111551 /* Value */,
+      /*shouldComputeAliasesToMakeVisible*/
+      false,
+      /*allowModules*/
+      true
+    );
+    return access.accessibility === 0 /* Accessible */;
+  }
+  function isSymbolAccessibleByFlags(typeSymbol, enclosingDeclaration, flags) {
+    const access = isSymbolAccessibleWorker(
+      typeSymbol,
+      enclosingDeclaration,
+      flags,
+      /*shouldComputeAliasesToMakeVisible*/
+      false,
+      /*allowModules*/
+      false
+    );
+    return access.accessibility === 0 /* Accessible */;
+  }
+  function isAnySymbolAccessible(symbols, enclosingDeclaration, initialSymbol, meaning, shouldComputeAliasesToMakeVisible, allowModules) {
+    if (!length(symbols))
+      return;
+    let hadAccessibleChain;
+    let earlyModuleBail = false;
+    for (const symbol of symbols) {
+      const accessibleSymbolChain = getAccessibleSymbolChain(
+        symbol,
+        enclosingDeclaration,
+        meaning,
+        /*useOnlyExternalAliasing*/
+        false
+      );
+      if (accessibleSymbolChain) {
+        hadAccessibleChain = symbol;
+        const hasAccessibleDeclarations = hasVisibleDeclarations(accessibleSymbolChain[0], shouldComputeAliasesToMakeVisible);
+        if (hasAccessibleDeclarations) {
+          return hasAccessibleDeclarations;
+        }
+      }
+      if (allowModules) {
+        if (some(symbol.declarations, hasNonGlobalAugmentationExternalModuleSymbol)) {
+          if (shouldComputeAliasesToMakeVisible) {
+            earlyModuleBail = true;
+            continue;
+          }
+          return {
+            accessibility: 0 /* Accessible */
+          };
+        }
+      }
+      const containers = getContainersOfSymbol(symbol, enclosingDeclaration, meaning);
+      const parentResult = isAnySymbolAccessible(containers, enclosingDeclaration, initialSymbol, initialSymbol === symbol ? getQualifiedLeftMeaning(meaning) : meaning, shouldComputeAliasesToMakeVisible, allowModules);
+      if (parentResult) {
+        return parentResult;
+      }
+    }
+    if (earlyModuleBail) {
+      return {
+        accessibility: 0 /* Accessible */
+      };
+    }
+    if (hadAccessibleChain) {
+      return {
+        accessibility: 1 /* NotAccessible */,
+        errorSymbolName: symbolToString(initialSymbol, enclosingDeclaration, meaning),
+        errorModuleName: hadAccessibleChain !== initialSymbol ? symbolToString(hadAccessibleChain, enclosingDeclaration, 1920 /* Namespace */) : void 0
+      };
+    }
+  }
+  function isSymbolAccessible(symbol, enclosingDeclaration, meaning, shouldComputeAliasesToMakeVisible) {
+    return isSymbolAccessibleWorker(
+      symbol,
+      enclosingDeclaration,
+      meaning,
+      shouldComputeAliasesToMakeVisible,
+      /*allowModules*/
+      true
+    );
+  }
+  function isSymbolAccessibleWorker(symbol, enclosingDeclaration, meaning, shouldComputeAliasesToMakeVisible, allowModules) {
+    if (symbol && enclosingDeclaration) {
+      const result = isAnySymbolAccessible([symbol], enclosingDeclaration, symbol, meaning, shouldComputeAliasesToMakeVisible, allowModules);
+      if (result) {
+        return result;
+      }
+      const symbolExternalModule = forEach(symbol.declarations, getExternalModuleContainer);
+      if (symbolExternalModule) {
+        const enclosingExternalModule = getExternalModuleContainer(enclosingDeclaration);
+        if (symbolExternalModule !== enclosingExternalModule) {
+          return {
+            accessibility: 2 /* CannotBeNamed */,
+            errorSymbolName: symbolToString(symbol, enclosingDeclaration, meaning),
+            errorModuleName: symbolToString(symbolExternalModule),
+            errorNode: isInJSFile(enclosingDeclaration) ? enclosingDeclaration : void 0
+          };
+        }
+      }
+      return {
+        accessibility: 1 /* NotAccessible */,
+        errorSymbolName: symbolToString(symbol, enclosingDeclaration, meaning)
+      };
+    }
+    return { accessibility: 0 /* Accessible */ };
+  }
+  function getExternalModuleContainer(declaration) {
+    const node = findAncestor(declaration, hasExternalModuleSymbol);
+    return node && getSymbolOfDeclaration(node);
+  }
+  function hasExternalModuleSymbol(declaration) {
+    return isAmbientModule(declaration) || declaration.kind === 312 /* SourceFile */ && isExternalOrCommonJsModule(declaration);
+  }
+  function hasNonGlobalAugmentationExternalModuleSymbol(declaration) {
+    return isModuleWithStringLiteralName(declaration) || declaration.kind === 312 /* SourceFile */ && isExternalOrCommonJsModule(declaration);
+  }
+  function hasVisibl

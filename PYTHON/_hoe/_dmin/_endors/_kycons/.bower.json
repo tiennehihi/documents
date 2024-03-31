@@ -1,0 +1,11 @@
+var isHexDigit = require('../tokenizer').isHexDigit;
+var cmpChar = require('../tokenizer').cmpChar;
+var TYPE = require('../tokenizer').TYPE;
+
+var IDENT = TYPE.Ident;
+var DELIM = TYPE.Delim;
+var NUMBER = TYPE.Number;
+var DIMENSION = TYPE.Dimension;
+var PLUSSIGN = 0x002B;     // U+002B PLUS SIGN (+)
+var HYPHENMINUS = 0x002D;  // U+002D HYPHEN-MINUS (-)
+var QUESTIONMARK = 0x0

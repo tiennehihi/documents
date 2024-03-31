@@ -1,0 +1,43 @@
+
+  aliases:
+    names:
+      - ping-pong-paddle-ball
+      - table-tennis
+    unicodes:
+      composite:
+        - 1f3d3
+      secondary:
+        - 10f45d
+  changes:
+    - 5.0.5
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Table tennis paddle ball
+  unicode: f45d
+  voted: false
+tablet:
+  aliases:
+    names:
+      - tablet-android
+    unicodes:
+      secondary:
+        - 10f3fb
+  changes:
+    - 5.0.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  

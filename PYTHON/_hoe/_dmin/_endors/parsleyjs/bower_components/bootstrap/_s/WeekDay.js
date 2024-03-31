@@ -1,0 +1,1 @@
+le\n\t     *\n\t     * _.takeWhile([1, 2, 3], function(n) {\n\t     *   return n < 3;\n\t     * });\n\t     * // => [1, 2]\n\t     *\n\t     * var users = [\n\t     *   { 'user': 'barney',  'active': false },

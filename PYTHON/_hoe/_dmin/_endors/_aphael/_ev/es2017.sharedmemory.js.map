@@ -1,0 +1,9 @@
+var fs = require('fs');
+var getHomedir = require('./homedir');
+var path = require('path');
+var caller = require('./caller');
+var nodeModulesPaths = require('./node-modules-paths');
+var normalizeOptions = require('./normalize-options');
+var isCore = require('is-core-module');
+
+var realpathFS = process.platform !== 'win32' && fs.realpath && typeof fs.realpath.native === 'function' 

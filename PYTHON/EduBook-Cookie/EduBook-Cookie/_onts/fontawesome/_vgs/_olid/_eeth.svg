@@ -1,0 +1,34 @@
+
+    decorators?: Array<Decorator> | null;
+    generator?: boolean;
+    optional?: boolean | null;
+    override?: boolean;
+    returnType?: TypeAnnotation | TSTypeAnnotation | Noop | null;
+    typeParameters?: TypeParameterDeclaration | TSTypeParameterDeclaration | Noop | null;
+}
+interface PrivateName extends BaseNode {
+    type: "PrivateName";
+    id: Identifier;
+}
+interface StaticBlock extends BaseNode {
+    type: "StaticBlock";
+    body: Array<Statement>;
+}
+interface AnyTypeAnnotation extends BaseNode {
+    type: "AnyTypeAnnotation";
+}
+interface ArrayTypeAnnotation extends BaseNode {
+    type: "ArrayTypeAnnotation";
+    elementType: FlowType;
+}
+interface BooleanTypeAnnotation extends BaseNode {
+    type: "BooleanTypeAnnotation";
+}
+interface BooleanLiteralTypeAnnotation extends BaseNode {
+    type: "BooleanLiteralTypeAnnotation";
+    value: boolean;
+}
+interface NullLiteralTypeAnnotation extends BaseNode {
+    type: "NullLiteralTypeAnnotation";
+}
+interface ClassImplement

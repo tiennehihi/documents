@@ -1,0 +1,17 @@
+up/rollup/pull/4391): chore: remove acorn-walk ambient type definitions (@dnalborczyk)
+- [#4397](https://github.com/rollup/rollup/pull/4397): Sort manual chunks generated via a function by name (@lukastaegert)
+
+## 2.67.1
+
+_2022-02-07_
+
+### Bug Fixes
+
+- Make chunk file and variable names more deterministic when emitting chunks (#4386)
+- Improve default module resolver performance by using non-blocking IO (#4386)
+
+### Pull Requests
+
+- [#4373](https://github.com/rollup/rollup/pull/4373): fix: even more types (@dnalborczyk)
+- [#4382](https://github.com/rollup/rollup/pull/4382): Update contribution tut link desc (@lemredd)
+- [#4383](https://github.com/rollup/rollup/pull/4383): chore

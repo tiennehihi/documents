@@ -1,0 +1,58 @@
+import {
+	each,
+	has,
+	is,
+	isDraftable,
+	shallowCopy,
+	latest,
+	ImmerBaseState,
+	ImmerState,
+	Drafted,
+	AnyObject,
+	AnyArray,
+	Objectish,
+	getCurrentScope,
+	DRAFT_STATE,
+	die,
+	createProxy,
+	ProxyType
+} from "../internal"
+
+interface ProxyBaseState extends ImmerBaseState {
+	assigned_: {
+		[property: string]: boolean
+	}
+	parent_?: ImmerState
+	revoke_(): void
+}
+
+export interface ProxyObjectState extends ProxyBaseState {
+	type_: ProxyType.ProxyObject
+	base_: any
+	copy_: any
+	draft_: Drafted<AnyObject, ProxyObjectState>
+}
+
+export interface ProxyArrayState extends ProxyBaseState {
+	type_: ProxyType.ProxyArray
+	base_: AnyArray
+	copy_: AnyArray | null
+	draft_: Drafted<AnyArray, ProxyArrayState>
+}
+
+type ProxyState = ProxyObjectState | ProxyArrayState
+
+/**
+ * Returns a new draft of the `base` object.
+ *
+ * The second argument is the parent draft-state (used internally).
+ */
+export function createProxyProxy<T extends Objectish>(
+	base: T,
+	parent?: ImmerState
+): Drafted<T, ProxyState> {
+	const isArray = Array.isArray(base)
+	const state: ProxyState = {
+		type_: isArray ? ProxyType.ProxyArray : (ProxyType.ProxyObject as any),
+		// Track which produce call this is associated with.
+		scope_: parent ? parent.scope_ : getCurrentScope()!,

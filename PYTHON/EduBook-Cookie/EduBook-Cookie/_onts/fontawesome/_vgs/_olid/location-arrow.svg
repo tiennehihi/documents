@@ -1,0 +1,14 @@
+,
+					"afterEmit",
+					"invalid",
+					"done",
+					"thisCompilation"
+				].includes(name)
+			) {
+				if (childCompiler.hooks[name]) {
+					childCompiler.hooks[name].taps = this.hooks[name].taps.slice();
+				}
+			}
+		}
+
+		compilation.ho

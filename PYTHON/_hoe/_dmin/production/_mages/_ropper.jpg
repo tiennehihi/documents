@@ -1,0 +1,2046 @@
+24 },
+                        end: { line: 1, column: 34 }
+                    }
+                },
+                range: [24, 35],
+                loc: {
+                    start: { line: 1, column: 24 },
+                    end: { line: 1, column: 35 }
+                }
+            },
+            range: [0, 35],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 35 }
+            }
+        },
+
+        'for(x in list) process(x);': {
+            type: 'ForInStatement',
+            left: {
+                type: 'Identifier',
+                name: 'x',
+                range: [4, 5],
+                loc: {
+                    start: { line: 1, column: 4 },
+                    end: { line: 1, column: 5 }
+                }
+            },
+            right: {
+                type: 'Identifier',
+                name: 'list',
+                range: [9, 13],
+                loc: {
+                    start: { line: 1, column: 9 },
+                    end: { line: 1, column: 13 }
+                }
+            },
+            body: {
+                type: 'ExpressionStatement',
+                expression: {
+                    type: 'CallExpression',
+                    callee: {
+                        type: 'Identifier',
+                        name: 'process',
+                        range: [15, 22],
+                        loc: {
+                            start: { line: 1, column: 15 },
+                            end: { line: 1, column: 22 }
+                        }
+                    },
+                    'arguments': [{
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [23, 24],
+                        loc: {
+                            start: { line: 1, column: 23 },
+                            end: { line: 1, column: 24 }
+                        }
+                    }],
+                    range: [15, 25],
+                    loc: {
+                        start: { line: 1, column: 15 },
+                        end: { line: 1, column: 25 }
+                    }
+                },
+                range: [15, 26],
+                loc: {
+                    start: { line: 1, column: 15 },
+                    end: { line: 1, column: 26 }
+                }
+            },
+            each: false,
+            range: [0, 26],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 26 }
+            }
+        },
+
+        'for (var x in list) process(x);': {
+            type: 'ForInStatement',
+            left: {
+                type: 'VariableDeclaration',
+                declarations: [{
+                    type: 'VariableDeclarator',
+                    id: {
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [9, 10],
+                        loc: {
+                            start: { line: 1, column: 9 },
+                            end: { line: 1, column: 10 }
+                        }
+                    },
+                    init: null,
+                    range: [9, 10],
+                    loc: {
+                        start: { line: 1, column: 9 },
+                        end: { line: 1, column: 10 }
+                    }
+                }],
+                kind: 'var',
+                range: [5, 10],
+                loc: {
+                    start: { line: 1, column: 5 },
+                    end: { line: 1, column: 10 }
+                }
+            },
+            right: {
+                type: 'Identifier',
+                name: 'list',
+                range: [14, 18],
+                loc: {
+                    start: { line: 1, column: 14 },
+                    end: { line: 1, column: 18 }
+                }
+            },
+            body: {
+                type: 'ExpressionStatement',
+                expression: {
+                    type: 'CallExpression',
+                    callee: {
+                        type: 'Identifier',
+                        name: 'process',
+                        range: [20, 27],
+                        loc: {
+                            start: { line: 1, column: 20 },
+                            end: { line: 1, column: 27 }
+                        }
+                    },
+                    'arguments': [{
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [28, 29],
+                        loc: {
+                            start: { line: 1, column: 28 },
+                            end: { line: 1, column: 29 }
+                        }
+                    }],
+                    range: [20, 30],
+                    loc: {
+                        start: { line: 1, column: 20 },
+                        end: { line: 1, column: 30 }
+                    }
+                },
+                range: [20, 31],
+                loc: {
+                    start: { line: 1, column: 20 },
+                    end: { line: 1, column: 31 }
+                }
+            },
+            each: false,
+            range: [0, 31],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 31 }
+            }
+        },
+
+        'for (var x = 42 in list) process(x);': {
+            type: 'ForInStatement',
+            left: {
+                type: 'VariableDeclaration',
+                declarations: [{
+                    type: 'VariableDeclarator',
+                    id: {
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [9, 10],
+                        loc: {
+                            start: { line: 1, column: 9 },
+                            end: { line: 1, column: 10 }
+                        }
+                    },
+                    init: {
+                        type: 'Literal',
+                        value: 42,
+                        raw: '42',
+                        range: [13, 15],
+                        loc: {
+                            start: { line: 1, column: 13 },
+                            end: { line: 1, column: 15 }
+                        }
+                    },
+                    range: [9, 15],
+                    loc: {
+                        start: { line: 1, column: 9 },
+                        end: { line: 1, column: 15 }
+                    }
+                }],
+                kind: 'var',
+                range: [5, 15],
+                loc: {
+                    start: { line: 1, column: 5 },
+                    end: { line: 1, column: 15 }
+                }
+            },
+            right: {
+                type: 'Identifier',
+                name: 'list',
+                range: [19, 23],
+                loc: {
+                    start: { line: 1, column: 19 },
+                    end: { line: 1, column: 23 }
+                }
+            },
+            body: {
+                type: 'ExpressionStatement',
+                expression: {
+                    type: 'CallExpression',
+                    callee: {
+                        type: 'Identifier',
+                        name: 'process',
+                        range: [25, 32],
+                        loc: {
+                            start: { line: 1, column: 25 },
+                            end: { line: 1, column: 32 }
+                        }
+                    },
+                    'arguments': [{
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [33, 34],
+                        loc: {
+                            start: { line: 1, column: 33 },
+                            end: { line: 1, column: 34 }
+                        }
+                    }],
+                    range: [25, 35],
+                    loc: {
+                        start: { line: 1, column: 25 },
+                        end: { line: 1, column: 35 }
+                    }
+                },
+                range: [25, 36],
+                loc: {
+                    start: { line: 1, column: 25 },
+                    end: { line: 1, column: 36 }
+                }
+            },
+            each: false,
+            range: [0, 36],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 36 }
+            }
+        },
+
+        'for (let x in list) process(x);': {
+            type: 'ForInStatement',
+            left: {
+                type: 'VariableDeclaration',
+                declarations: [{
+                    type: 'VariableDeclarator',
+                    id: {
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [9, 10],
+                        loc: {
+                            start: { line: 1, column: 9 },
+                            end: { line: 1, column: 10 }
+                        }
+                    },
+                    init: null,
+                    range: [9, 10],
+                    loc: {
+                        start: { line: 1, column: 9 },
+                        end: { line: 1, column: 10 }
+                    }
+                }],
+                kind: 'let',
+                range: [5, 10],
+                loc: {
+                    start: { line: 1, column: 5 },
+                    end: { line: 1, column: 10 }
+                }
+            },
+            right: {
+                type: 'Identifier',
+                name: 'list',
+                range: [14, 18],
+                loc: {
+                    start: { line: 1, column: 14 },
+                    end: { line: 1, column: 18 }
+                }
+            },
+            body: {
+                type: 'ExpressionStatement',
+                expression: {
+                    type: 'CallExpression',
+                    callee: {
+                        type: 'Identifier',
+                        name: 'process',
+                        range: [20, 27],
+                        loc: {
+                            start: { line: 1, column: 20 },
+                            end: { line: 1, column: 27 }
+                        }
+                    },
+                    'arguments': [{
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [28, 29],
+                        loc: {
+                            start: { line: 1, column: 28 },
+                            end: { line: 1, column: 29 }
+                        }
+                    }],
+                    range: [20, 30],
+                    loc: {
+                        start: { line: 1, column: 20 },
+                        end: { line: 1, column: 30 }
+                    }
+                },
+                range: [20, 31],
+                loc: {
+                    start: { line: 1, column: 20 },
+                    end: { line: 1, column: 31 }
+                }
+            },
+            each: false,
+            range: [0, 31],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 31 }
+            }
+        },
+
+        'for (var x = y = z in q);': {
+            type: 'ForInStatement',
+            left: {
+                type: 'VariableDeclaration',
+                declarations: [{
+                    type: 'VariableDeclarator',
+                    id: {
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [9, 10],
+                        loc: {
+                            start: { line: 1, column: 9 },
+                            end: { line: 1, column: 10 }
+                        }
+                    },
+                    init: {
+                        type: 'AssignmentExpression',
+                        operator: '=',
+                        left: {
+                            type: 'Identifier',
+                            name: 'y',
+                            range: [13, 14],
+                            loc: {
+                                start: { line: 1, column: 13 },
+                                end: { line: 1, column: 14 }
+                            }
+                        },
+                        right: {
+                            type: 'Identifier',
+                            name: 'z',
+                            range: [17, 18],
+                            loc: {
+                                start: { line: 1, column: 17 },
+                                end: { line: 1, column: 18 }
+                            }
+                        },
+                        range: [13, 18],
+                        loc: {
+                            start: { line: 1, column: 13 },
+                            end: { line: 1, column: 18 }
+                        }
+                    },
+                    range: [9, 18],
+                    loc: {
+                        start: { line: 1, column: 9 },
+                        end: { line: 1, column: 18 }
+                    }
+                }],
+                kind: 'var',
+                range: [5, 18],
+                loc: {
+                    start: { line: 1, column: 5 },
+                    end: { line: 1, column: 18 }
+                }
+            },
+            right: {
+                type: 'Identifier',
+                name: 'q',
+                range: [22, 23],
+                loc: {
+                    start: { line: 1, column: 22 },
+                    end: { line: 1, column: 23 }
+                }
+            },
+            body: {
+                type: 'EmptyStatement',
+                range: [24, 25],
+                loc: {
+                    start: { line: 1, column: 24 },
+                    end: { line: 1, column: 25 }
+                }
+            },
+            each: false,
+            range: [0, 25],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 25 }
+            }
+        },
+
+        'for (var a = b = c = (d in e) in z);': {
+            type: 'ForInStatement',
+            left: {
+                type: 'VariableDeclaration',
+                declarations: [{
+                    type: 'VariableDeclarator',
+                    id: {
+                        type: 'Identifier',
+                        name: 'a',
+                        range: [9, 10],
+                        loc: {
+                            start: { line: 1, column: 9 },
+                            end: { line: 1, column: 10 }
+                        }
+                    },
+                    init: {
+                        type: 'AssignmentExpression',
+                        operator: '=',
+                        left: {
+                            type: 'Identifier',
+                            name: 'b',
+                            range: [13, 14],
+                            loc: {
+                                start: { line: 1, column: 13 },
+                                end: { line: 1, column: 14 }
+                            }
+                        },
+                        right: {
+                            type: 'AssignmentExpression',
+                            operator: '=',
+                            left: {
+                                type: 'Identifier',
+                                name: 'c',
+                                range: [17, 18],
+                                loc: {
+                                    start: { line: 1, column: 17 },
+                                    end: { line: 1, column: 18 }
+                                }
+                            },
+                            right: {
+                                type: 'BinaryExpression',
+                                operator: 'in',
+                                left: {
+                                    type: 'Identifier',
+                                    name: 'd',
+                                    range: [22, 23],
+                                    loc: {
+                                        start: { line: 1, column: 22 },
+                                        end: { line: 1, column: 23 }
+                                    }
+                                },
+                                right: {
+                                    type: 'Identifier',
+                                    name: 'e',
+                                    range: [27, 28],
+                                    loc: {
+                                        start: { line: 1, column: 27 },
+                                        end: { line: 1, column: 28 }
+                                    }
+                                },
+                                range: [22, 28],
+                                loc: {
+                                    start: { line: 1, column: 22 },
+                                    end: { line: 1, column: 28 }
+                                }
+                            },
+                            range: [17, 29],
+                            loc: {
+                                start: { line: 1, column: 17 },
+                                end: { line: 1, column: 29 }
+                            }
+                        },
+                        range: [13, 29],
+                        loc: {
+                            start: { line: 1, column: 13 },
+                            end: { line: 1, column: 29 }
+                        }
+                    },
+                    range: [9, 29],
+                    loc: {
+                        start: { line: 1, column: 9 },
+                        end: { line: 1, column: 29 }
+                    }
+                }],
+                kind: 'var',
+                range: [5, 29],
+                loc: {
+                    start: { line: 1, column: 5 },
+                    end: { line: 1, column: 29 }
+                }
+            },
+            right: {
+                type: 'Identifier',
+                name: 'z',
+                range: [33, 34],
+                loc: {
+                    start: { line: 1, column: 33 },
+                    end: { line: 1, column: 34 }
+                }
+            },
+            body: {
+                type: 'EmptyStatement',
+                range: [35, 36],
+                loc: {
+                    start: { line: 1, column: 35 },
+                    end: { line: 1, column: 36 }
+                }
+            },
+            each: false,
+            range: [0, 36],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 36 }
+            }
+        },
+
+        'for (var i = function() { return 10 in [] } in list) process(x);': {
+            type: 'ForInStatement',
+            left: {
+                type: 'VariableDeclaration',
+                declarations: [{
+                    type: 'VariableDeclarator',
+                    id: {
+                        type: 'Identifier',
+                        name: 'i',
+                        range: [9, 10],
+                        loc: {
+                            start: { line: 1, column: 9 },
+                            end: { line: 1, column: 10 }
+                        }
+                    },
+                    init: {
+                        type: 'FunctionExpression',
+                        id: null,
+                        params: [],
+                        defaults: [],
+                        body: {
+                            type: 'BlockStatement',
+                            body: [{
+                                type: 'ReturnStatement',
+                                argument: {
+                                    type: 'BinaryExpression',
+                                    operator: 'in',
+                                    left: {
+                                        type: 'Literal',
+                                        value: 10,
+                                        raw: '10',
+                                        range: [33, 35],
+                                        loc: {
+                                            start: { line: 1, column: 33 },
+                                            end: { line: 1, column: 35 }
+                                        }
+                                    },
+                                    right: {
+                                        type: 'ArrayExpression',
+                                        elements: [],
+                                        range: [39, 41],
+                                        loc: {
+                                            start: { line: 1, column: 39 },
+                                            end: { line: 1, column: 41 }
+                                        }
+                                    },
+                                    range: [33, 41],
+                                    loc: {
+                                        start: { line: 1, column: 33 },
+                                        end: { line: 1, column: 41 }
+                                    }
+                                },
+                                range: [26, 42],
+                                loc: {
+                                    start: { line: 1, column: 26 },
+                                    end: { line: 1, column: 42 }
+                                }
+                            }],
+                            range: [24, 43],
+                            loc: {
+                                start: { line: 1, column: 24 },
+                                end: { line: 1, column: 43 }
+                            }
+                        },
+                        rest: null,
+                        generator: false,
+                        expression: false,
+                        range: [13, 43],
+                        loc: {
+                            start: { line: 1, column: 13 },
+                            end: { line: 1, column: 43 }
+                        }
+                    },
+                    range: [9, 43],
+                    loc: {
+                        start: { line: 1, column: 9 },
+                        end: { line: 1, column: 43 }
+                    }
+                }],
+                kind: 'var',
+                range: [5, 43],
+                loc: {
+                    start: { line: 1, column: 5 },
+                    end: { line: 1, column: 43 }
+                }
+            },
+            right: {
+                type: 'Identifier',
+                name: 'list',
+                range: [47, 51],
+                loc: {
+                    start: { line: 1, column: 47 },
+                    end: { line: 1, column: 51 }
+                }
+            },
+            body: {
+                type: 'ExpressionStatement',
+                expression: {
+                    type: 'CallExpression',
+                    callee: {
+                        type: 'Identifier',
+                        name: 'process',
+                        range: [53, 60],
+                        loc: {
+                            start: { line: 1, column: 53 },
+                            end: { line: 1, column: 60 }
+                        }
+                    },
+                    'arguments': [{
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [61, 62],
+                        loc: {
+                            start: { line: 1, column: 61 },
+                            end: { line: 1, column: 62 }
+                        }
+                    }],
+                    range: [53, 63],
+                    loc: {
+                        start: { line: 1, column: 53 },
+                        end: { line: 1, column: 63 }
+                    }
+                },
+                range: [53, 64],
+                loc: {
+                    start: { line: 1, column: 53 },
+                    end: { line: 1, column: 64 }
+                }
+            },
+            each: false,
+            range: [0, 64],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 64 }
+            }
+        }
+
+    },
+
+    'continue statement': {
+
+        'while (true) { continue; }': {
+            type: 'WhileStatement',
+            test: {
+                type: 'Literal',
+                value: true,
+                raw: 'true',
+                range: [7, 11],
+                loc: {
+                    start: { line: 1, column: 7 },
+                    end: { line: 1, column: 11 }
+                }
+            },
+            body: {
+                type: 'BlockStatement',
+                body: [
+                    {
+                        type: 'ContinueStatement',
+                        label: null,
+                        range: [15, 24],
+                        loc: {
+                            start: { line: 1, column: 15 },
+                            end: { line: 1, column: 24 }
+                        }
+                    }
+                ],
+                range: [13, 26],
+                loc: {
+                    start: { line: 1, column: 13 },
+                    end: { line: 1, column: 26 }
+                }
+            },
+            range: [0, 26],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 26 }
+            }
+        },
+
+        'while (true) { continue }': {
+            type: 'WhileStatement',
+            test: {
+                type: 'Literal',
+                value: true,
+                raw: 'true',
+                range: [7, 11],
+                loc: {
+                    start: { line: 1, column: 7 },
+                    end: { line: 1, column: 11 }
+                }
+            },
+            body: {
+                type: 'BlockStatement',
+                body: [
+                    {
+                        type: 'ContinueStatement',
+                        label: null,
+                        range: [15, 24],
+                        loc: {
+                            start: { line: 1, column: 15 },
+                            end: { line: 1, column: 24 }
+                        }
+                    }
+                ],
+                range: [13, 25],
+                loc: {
+                    start: { line: 1, column: 13 },
+                    end: { line: 1, column: 25 }
+                }
+            },
+            range: [0, 25],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 25 }
+            }
+        },
+
+        'done: while (true) { continue done }': {
+            type: 'LabeledStatement',
+            label: {
+                type: 'Identifier',
+                name: 'done',
+                range: [0, 4],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 4 }
+                }
+            },
+            body: {
+                type: 'WhileStatement',
+                test: {
+                    type: 'Literal',
+                    value: true,
+                    raw: 'true',
+                    range: [13, 17],
+                    loc: {
+                        start: { line: 1, column: 13 },
+                        end: { line: 1, column: 17 }
+                    }
+                },
+                body: {
+                    type: 'BlockStatement',
+                    body: [
+                        {
+                            type: 'ContinueStatement',
+                            label: {
+                                type: 'Identifier',
+                                name: 'done',
+                                range: [30, 34],
+                                loc: {
+                                    start: { line: 1, column: 30 },
+                                    end: { line: 1, column: 34 }
+                                }
+                            },
+                            range: [21, 35],
+                            loc: {
+                                start: { line: 1, column: 21 },
+                                end: { line: 1, column: 35 }
+                            }
+                        }
+                    ],
+                    range: [19, 36],
+                    loc: {
+                        start: { line: 1, column: 19 },
+                        end: { line: 1, column: 36 }
+                    }
+                },
+                range: [6, 36],
+                loc: {
+                    start: { line: 1, column: 6 },
+                    end: { line: 1, column: 36 }
+                }
+            },
+            range: [0, 36],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 36 }
+            }
+        },
+
+        'done: while (true) { continue done; }': {
+            type: 'LabeledStatement',
+            label: {
+                type: 'Identifier',
+                name: 'done',
+                range: [0, 4],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 4 }
+                }
+            },
+            body: {
+                type: 'WhileStatement',
+                test: {
+                    type: 'Literal',
+                    value: true,
+                    raw: 'true',
+                    range: [13, 17],
+                    loc: {
+                        start: { line: 1, column: 13 },
+                        end: { line: 1, column: 17 }
+                    }
+                },
+                body: {
+                    type: 'BlockStatement',
+                    body: [
+                        {
+                            type: 'ContinueStatement',
+                            label: {
+                                type: 'Identifier',
+                                name: 'done',
+                                range: [30, 34],
+                                loc: {
+                                    start: { line: 1, column: 30 },
+                                    end: { line: 1, column: 34 }
+                                }
+                            },
+                            range: [21, 35],
+                            loc: {
+                                start: { line: 1, column: 21 },
+                                end: { line: 1, column: 35 }
+                            }
+                        }
+                    ],
+                    range: [19, 37],
+                    loc: {
+                        start: { line: 1, column: 19 },
+                        end: { line: 1, column: 37 }
+                    }
+                },
+                range: [6, 37],
+                loc: {
+                    start: { line: 1, column: 6 },
+                    end: { line: 1, column: 37 }
+                }
+            },
+            range: [0, 37],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 37 }
+            }
+        },
+
+        '__proto__: while (true) { continue __proto__; }': {
+            type: 'LabeledStatement',
+            label: {
+                type: 'Identifier',
+                name: '__proto__',
+                range: [0, 9],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 9 }
+                }
+            },
+            body: {
+                type: 'WhileStatement',
+                test: {
+                    type: 'Literal',
+                    value: true,
+                    raw: 'true',
+                    range: [18, 22],
+                    loc: {
+                        start: { line: 1, column: 18 },
+                        end: { line: 1, column: 22 }
+                    }
+                },
+                body: {
+                    type: 'BlockStatement',
+                    body: [{
+                        type: 'ContinueStatement',
+                        label: {
+                            type: 'Identifier',
+                            name: '__proto__',
+                            range: [35, 44],
+                            loc: {
+                                start: { line: 1, column: 35 },
+                                end: { line: 1, column: 44 }
+                            }
+                        },
+                        range: [26, 45],
+                        loc: {
+                            start: { line: 1, column: 26 },
+                            end: { line: 1, column: 45 }
+                        }
+                    }],
+                    range: [24, 47],
+                    loc: {
+                        start: { line: 1, column: 24 },
+                        end: { line: 1, column: 47 }
+                    }
+                },
+                range: [11, 47],
+                loc: {
+                    start: { line: 1, column: 11 },
+                    end: { line: 1, column: 47 }
+                }
+            },
+            range: [0, 47],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 47 }
+            }
+        }
+
+    },
+
+    'break statement': {
+
+        'while (true) { break }': {
+            type: 'WhileStatement',
+            test: {
+                type: 'Literal',
+                value: true,
+                raw: 'true',
+                range: [7, 11],
+                loc: {
+                    start: { line: 1, column: 7 },
+                    end: { line: 1, column: 11 }
+                }
+            },
+            body: {
+                type: 'BlockStatement',
+                body: [
+                    {
+                        type: 'BreakStatement',
+                        label: null,
+                        range: [15, 21],
+                        loc: {
+                            start: { line: 1, column: 15 },
+                            end: { line: 1, column: 21 }
+                        }
+                    }
+                ],
+                range: [13, 22],
+                loc: {
+                    start: { line: 1, column: 13 },
+                    end: { line: 1, column: 22 }
+                }
+            },
+            range: [0, 22],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 22 }
+            }
+        },
+
+        'done: while (true) { break done }': {
+            type: 'LabeledStatement',
+            label: {
+                type: 'Identifier',
+                name: 'done',
+                range: [0, 4],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 4 }
+                }
+            },
+            body: {
+                type: 'WhileStatement',
+                test: {
+                    type: 'Literal',
+                    value: true,
+                    raw: 'true',
+                    range: [13, 17],
+                    loc: {
+                        start: { line: 1, column: 13 },
+                        end: { line: 1, column: 17 }
+                    }
+                },
+                body: {
+                    type: 'BlockStatement',
+                    body: [
+                        {
+                            type: 'BreakStatement',
+                            label: {
+                                type: 'Identifier',
+                                name: 'done',
+                                range: [27, 31],
+                                loc: {
+                                    start: { line: 1, column: 27 },
+                                    end: { line: 1, column: 31 }
+                                }
+                            },
+                            range: [21, 32],
+                            loc: {
+                                start: { line: 1, column: 21 },
+                                end: { line: 1, column: 32 }
+                            }
+                        }
+                    ],
+                    range: [19, 33],
+                    loc: {
+                        start: { line: 1, column: 19 },
+                        end: { line: 1, column: 33 }
+                    }
+                },
+                range: [6, 33],
+                loc: {
+                    start: { line: 1, column: 6 },
+                    end: { line: 1, column: 33 }
+                }
+            },
+            range: [0, 33],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 33 }
+            }
+        },
+
+        'done: while (true) { break done; }': {
+            type: 'LabeledStatement',
+            label: {
+                type: 'Identifier',
+                name: 'done',
+                range: [0, 4],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 4 }
+                }
+            },
+            body: {
+                type: 'WhileStatement',
+                test: {
+                    type: 'Literal',
+                    value: true,
+                    raw: 'true',
+                    range: [13, 17],
+                    loc: {
+                        start: { line: 1, column: 13 },
+                        end: { line: 1, column: 17 }
+                    }
+                },
+                body: {
+                    type: 'BlockStatement',
+                    body: [
+                        {
+                            type: 'BreakStatement',
+                            label: {
+                                type: 'Identifier',
+                                name: 'done',
+                                range: [27, 31],
+                                loc: {
+                                    start: { line: 1, column: 27 },
+                                    end: { line: 1, column: 31 }
+                                }
+                            },
+                            range: [21, 32],
+                            loc: {
+                                start: { line: 1, column: 21 },
+                                end: { line: 1, column: 32 }
+                            }
+                        }
+                    ],
+                    range: [19, 34],
+                    loc: {
+                        start: { line: 1, column: 19 },
+                        end: { line: 1, column: 34 }
+                    }
+                },
+                range: [6, 34],
+                loc: {
+                    start: { line: 1, column: 6 },
+                    end: { line: 1, column: 34 }
+                }
+            },
+            range: [0, 34],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 34 }
+            }
+        },
+
+        '__proto__: while (true) { break __proto__; }': {
+            type: 'LabeledStatement',
+            label: {
+                type: 'Identifier',
+                name: '__proto__',
+                range: [0, 9],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 9 }
+                }
+            },
+            body: {
+                type: 'WhileStatement',
+                test: {
+                    type: 'Literal',
+                    value: true,
+                    raw: 'true',
+                    range: [18, 22],
+                    loc: {
+                        start: { line: 1, column: 18 },
+                        end: { line: 1, column: 22 }
+                    }
+                },
+                body: {
+                    type: 'BlockStatement',
+                    body: [{
+                        type: 'BreakStatement',
+                        label: {
+                            type: 'Identifier',
+                            name: '__proto__',
+                            range: [32, 41],
+                            loc: {
+                                start: { line: 1, column: 32 },
+                                end: { line: 1, column: 41 }
+                            }
+                        },
+                        range: [26, 42],
+                        loc: {
+                            start: { line: 1, column: 26 },
+                            end: { line: 1, column: 42 }
+                        }
+                    }],
+                    range: [24, 44],
+                    loc: {
+                        start: { line: 1, column: 24 },
+                        end: { line: 1, column: 44 }
+                    }
+                },
+                range: [11, 44],
+                loc: {
+                    start: { line: 1, column: 11 },
+                    end: { line: 1, column: 44 }
+                }
+            },
+            range: [0, 44],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 44 }
+            }
+        }
+
+    },
+
+    'return statement': {
+
+        '(function(){ return })': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'FunctionExpression',
+                id: null,
+                params: [],
+                defaults: [],
+                body: {
+                    type: 'BlockStatement',
+                    body: [
+                        {
+                            type: 'ReturnStatement',
+                            argument: null,
+                            range: [13, 20],
+                            loc: {
+                                start: { line: 1, column: 13 },
+                                end: { line: 1, column: 20 }
+                            }
+                        }
+                    ],
+                    range: [11, 21],
+                    loc: {
+                        start: { line: 1, column: 11 },
+                        end: { line: 1, column: 21 }
+                    }
+                },
+                rest: null,
+                generator: false,
+                expression: false,
+                range: [1, 21],
+                loc: {
+                    start: { line: 1, column: 1 },
+                    end: { line: 1, column: 21 }
+                }
+            },
+            range: [0, 22],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 22 }
+            }
+        },
+
+        '(function(){ return; })': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'FunctionExpression',
+                id: null,
+                params: [],
+                defaults: [],
+                body: {
+                    type: 'BlockStatement',
+                    body: [
+                        {
+                            type: 'ReturnStatement',
+                            argument: null,
+                            range: [13, 20],
+                            loc: {
+                                start: { line: 1, column: 13 },
+                                end: { line: 1, column: 20 }
+                            }
+                        }
+                    ],
+                    range: [11, 22],
+                    loc: {
+                        start: { line: 1, column: 11 },
+                        end: { line: 1, column: 22 }
+                    }
+                },
+                rest: null,
+                generator: false,
+                expression: false,
+                range: [1, 22],
+                loc: {
+                    start: { line: 1, column: 1 },
+                    end: { line: 1, column: 22 }
+                }
+            },
+            range: [0, 23],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 23 }
+            }
+        },
+
+        '(function(){ return x; })': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'FunctionExpression',
+                id: null,
+                params: [],
+                defaults: [],
+                body: {
+                    type: 'BlockStatement',
+                    body: [
+                        {
+                            type: 'ReturnStatement',
+                            argument: {
+                                type: 'Identifier',
+                                name: 'x',
+                                range: [20, 21],
+                                loc: {
+                                    start: { line: 1, column: 20 },
+                                    end: { line: 1, column: 21 }
+                                }
+                            },
+                            range: [13, 22],
+                            loc: {
+                                start: { line: 1, column: 13 },
+                                end: { line: 1, column: 22 }
+                            }
+                        }
+                    ],
+                    range: [11, 24],
+                    loc: {
+                        start: { line: 1, column: 11 },
+                        end: { line: 1, column: 24 }
+                    }
+                },
+                rest: null,
+                generator: false,
+                expression: false,
+                range: [1, 24],
+                loc: {
+                    start: { line: 1, column: 1 },
+                    end: { line: 1, column: 24 }
+                }
+            },
+            range: [0, 25],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 25 }
+            }
+        },
+
+        '(function(){ return x * y })': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'FunctionExpression',
+                id: null,
+                params: [],
+                defaults: [],
+                body: {
+                    type: 'BlockStatement',
+                    body: [
+                        {
+                            type: 'ReturnStatement',
+                            argument: {
+                                type: 'BinaryExpression',
+                                operator: '*',
+                                left: {
+                                    type: 'Identifier',
+                                    name: 'x',
+                                    range: [20, 21],
+                                    loc: {
+                                        start: { line: 1, column: 20 },
+                                        end: { line: 1, column: 21 }
+                                    }
+                                },
+                                right: {
+                                    type: 'Identifier',
+                                    name: 'y',
+                                    range: [24, 25],
+                                    loc: {
+                                        start: { line: 1, column: 24 },
+                                        end: { line: 1, column: 25 }
+                                    }
+                                },
+                                range: [20, 25],
+                                loc: {
+                                    start: { line: 1, column: 20 },
+                                    end: { line: 1, column: 25 }
+                                }
+                            },
+                            range: [13, 26],
+                            loc: {
+                                start: { line: 1, column: 13 },
+                                end: { line: 1, column: 26 }
+                            }
+                        }
+                    ],
+                    range: [11, 27],
+                    loc: {
+                        start: { line: 1, column: 11 },
+                        end: { line: 1, column: 27 }
+                    }
+                },
+                rest: null,
+                generator: false,
+                expression: false,
+                range: [1, 27],
+                loc: {
+                    start: { line: 1, column: 1 },
+                    end: { line: 1, column: 27 }
+                }
+            },
+            range: [0, 28],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 28 }
+            }
+        }
+    },
+
+    'with statement': {
+
+        'with (x) foo = bar': {
+            type: 'WithStatement',
+            object: {
+                type: 'Identifier',
+                name: 'x',
+                range: [6, 7],
+                loc: {
+                    start: { line: 1, column: 6 },
+                    end: { line: 1, column: 7 }
+                }
+            },
+            body: {
+                type: 'ExpressionStatement',
+                expression: {
+                    type: 'AssignmentExpression',
+                    operator: '=',
+                    left: {
+                        type: 'Identifier',
+                        name: 'foo',
+                        range: [9, 12],
+                        loc: {
+                            start: { line: 1, column: 9 },
+                            end: { line: 1, column: 12 }
+                        }
+                    },
+                    right: {
+                        type: 'Identifier',
+                        name: 'bar',
+                        range: [15, 18],
+                        loc: {
+                           k, type, props, ref) {
+    var innerType = type.type;
+    var resolvedProps = resolveDefaultProps(innerType, props);
+    renderElement(request, task, innerType, resolvedProps, ref);
+  }
+
+  function renderContextConsumer(request, task, context, props) {
+    // The logic below for Context differs depending on PROD or DEV mode. In
+    // DEV mode, we create a separate object for Context.Consumer that acts
+    // like a proxy to Context. This proxy object adds unnecessary code in PROD
+    // so we use the old behaviour (Context.Consumer references Context) to
+    // reduce size and overhead. The separate object references context via
+    // a property called "_context", which also gives us the ability to check
+    // in DEV mode if this property exists or not and warn if it does not.
+    {
+      if (context._context === undefined) {
+        // This may be because it's a Context (rather than a Consumer).
+        // Or it may be because it's older React where they're the same thing.
+        // We only want to warn if we're sure it's a new React.
+        if (context !== context.Consumer) {
+          if (!hasWarnedAboutUsingContextAsConsumer) {
+            hasWarnedAboutUsingContextAsConsumer = true;
+
+            error('Rendering <Context> directly is not supported and will be removed in ' + 'a future major release. Did you mean to render <Context.Consumer> instead?');
+          }
+        }
+      } else {
+        context = context._context;
+      }
+    }
+
+    var render = props.children;
+
+    {
+      if (typeof render !== 'function') {
+        error('A context consumer was rendered with multiple children, or a child ' + "that isn't a function. A context consumer expects a single child " + 'that is a function. If you did pass a function, make sure there ' + 'is no trailing or leading whitespace around it.');
+      }
+    }
+
+    var newValue = readContext(context);
+    var newChildren = render(newValue);
+    renderNodeDestructive(request, task, newChildren);
+  }
+
+  function renderContextProvider(request, task, type, props) {
+    var context = type._context;
+    var value = props.value;
+    var children = props.children;
+    var prevSnapshot;
+
+    {
+      prevSnapshot = task.context;
+    }
+
+    task.context = pushProvider(context, value);
+    renderNodeDestructive(request, task, children);
+    task.context = popProvider(context);
+
+    {
+      if (prevSnapshot !== task.context) {
+        error('Popping the context provider did not return back to the original snapshot. This is a bug in React.');
+      }
+    }
+  }
+
+  function renderLazyComponent(request, task, lazyComponent, props, ref) {
+    pushBuiltInComponentStackInDEV(task, 'Lazy');
+    var payload = lazyComponent._payload;
+    var init = lazyComponent._init;
+    var Component = init(payload);
+    var resolvedProps = resolveDefaultProps(Component, props);
+    renderElement(request, task, Component, resolvedProps, ref);
+    popComponentStackInDEV(task);
+  }
+
+  function renderElement(request, task, type, props, ref) {
+    if (typeof type === 'function') {
+      if (shouldConstruct$1(type)) {
+        renderClassComponent(request, task, type, props);
+        return;
+      } else {
+        renderIndeterminateComponent(request, task, type, props);
+        return;
+      }
+    }
+
+    if (typeof type === 'string') {
+      renderHostElement(request, task, type, props);
+      return;
+    }
+
+    switch (type) {
+      // TODO: LegacyHidden acts the same as a fragment. This only works
+      // because we currently assume that every instance of LegacyHidden is
+      // accompanied by a host component wrapper. In the hidden mode, the host
+      // component is given a `hidden` attribute, which ensures that the
+      // initial HTML is not visible. To support the use of LegacyHidden as a
+      // true fragment, without an extra DOM node, we would have to hide the
+      // initial HTML in some other way.
+      // TODO: Add REACT_OFFSCREEN_TYPE here too with the same capability.
+      case REACT_LEGACY_HIDDEN_TYPE:
+      case REACT_DEBUG_TRACING_MODE_TYPE:
+      case REACT_STRICT_MODE_TYPE:
+      case REACT_PROFILER_TYPE:
+      case REACT_FRAGMENT_TYPE:
+        {
+          renderNodeDestructive(request, task, props.children);
+          return;
+        }
+
+      case REACT_SUSPENSE_LIST_TYPE:
+        {
+          pushBuiltInComponentStackInDEV(task, 'SuspenseList'); // TODO: SuspenseList should control the boundaries.
+
+          renderNodeDestructive(request, task, props.children);
+          popComponentStackInDEV(task);
+          return;
+        }
+
+      case REACT_SCOPE_TYPE:
+        {
+
+          throw new Error('ReactDOMServer does not yet support scope components.');
+        }
+      // eslint-disable-next-line-no-fallthrough
+
+      case REACT_SUSPENSE_TYPE:
+        {
+          {
+            renderSuspenseBoundary(request, task, props);
+          }
+
+          return;
+        }
+    }
+
+    if (typeof type === 'object' && type !== null) {
+      switch (type.$$typeof) {
+        case REACT_FORWARD_REF_TYPE:
+          {
+            renderForwardRef(request, task, type, props, ref);
+            return;
+          }
+
+        case REACT_MEMO_TYPE:
+          {
+            renderMemo(request, task, type, props, ref);
+            return;
+          }
+
+        case REACT_PROVIDER_TYPE:
+          {
+            renderContextProvider(request, task, type, props);
+            return;
+          }
+
+        case REACT_CONTEXT_TYPE:
+          {
+            renderContextConsumer(request, task, type, props);
+            return;
+          }
+
+        case REACT_LAZY_TYPE:
+          {
+            renderLazyComponent(request, task, type, props);
+            return;
+          }
+      }
+    }
+
+    var info = '';
+
+    {
+      if (type === undefined || typeof type === 'object' && type !== null && Object.keys(type).length === 0) {
+        info += ' You likely forgot to export your component from the file ' + "it's defined in, or you might have mixed up default and " + 'named imports.';
+      }
+    }
+
+    throw new Error('Element type is invalid: expected a string (for built-in ' + 'components) or a class/function (for composite components) ' + ("but got: " + (type == null ? type : typeof type) + "." + info));
+  }
+
+  function validateIterable(iterable, iteratorFn) {
+    {
+      // We don't support rendering Generators because it's a mutation.
+      // See https://github.com/facebook/react/issues/12995
+      if (typeof Symbol === 'function' && // $FlowFixMe Flow doesn't know about toStringTag
+      iterable[Symbol.toStringTag] === 'Generator') {
+        if (!didWarnAboutGenerators) {
+          error('Using Generators as children is unsupported and will likely yield ' + 'unexpected results because enumerating a generator mutates it. ' + 'You may convert it to an array with `Array.from()` or the ' + '`[...spread]` operator before rendering. Keep in mind ' + 'you might need to polyfill these features for older browsers.');
+        }
+
+        didWarnAboutGenerators = true;
+      } // Warn about using Maps as children
+
+
+      if (iterable.entries === iteratorFn) {
+        if (!didWarnAboutMaps) {
+          error('Using Maps as children is not supported. ' + 'Use an array of keyed ReactElements instead.');
+        }
+
+        didWarnAboutMaps = true;
+      }
+    }
+  }
+
+  function renderNodeDestructive(request, task, node) {
+    {
+      // In Dev we wrap renderNodeDestructiveImpl in a try / catch so we can capture
+      // a component stack at the right place in the tree. We don't do this in renderNode
+      // becuase it is not called at every layer of the tree and we may lose frames
+      try {
+        return renderNodeDestructiveImpl(request, task, node);
+      } catch (x) {
+        if (typeof x === 'object' && x !== null && typeof x.then === 'function') ; else {
+          // This is an error, stash the component stack if it is null.
+          lastBoundaryErrorComponentStackDev = lastBoundaryErrorComponentStackDev !== null ? lastBoundaryErrorComponentStackDev : getCurrentStackInDEV();
+        } // rethrow so normal suspense logic can handle thrown value accordingly
+
+
+        throw x;
+      }
+    }
+  } // This function by it self renders a node and consumes the task by mutating it
+  // to update the current execution state.
+
+
+  function renderNodeDestructiveImpl(request, task, node) {
+    // Stash the node we're working on. We'll pick up from this task in case
+    // something suspends.
+    task.node = node; // Handle object types
+
+    if (typeof node === 'object' && node !== null) {
+      switch (node.$$typeof) {
+        case REACT_ELEMENT_TYPE:
+          {
+            var element = node;
+            var type = element.type;
+            var props = element.props;
+            var ref = element.ref;
+            renderElement(request, task, type, props, ref);
+            return;
+          }
+
+        case REACT_PORTAL_TYPE:
+          throw new Error('Portals are not currently supported by the server renderer. ' + 'Render them conditionally so that they only appear on the client render.');
+        // eslint-disable-next-line-no-fallthrough
+
+        case REACT_LAZY_TYPE:
+          {
+            var lazyNode = node;
+            var payload = lazyNode._payload;
+            var init = lazyNode._init;
+            var resolvedNode;
+
+            {
+              try {
+                resolvedNode = init(payload);
+              } catch (x) {
+                if (typeof x === 'object' && x !== null && typeof x.then === 'function') {
+                  // this Lazy initializer is suspending. push a temporary frame onto the stack so it can be
+                  // popped off in spawnNewSuspendedTask. This aligns stack behavior between Lazy in element position
+                  // vs Component position. We do not want the frame for Errors so we exclusively do this in
+                  // the wakeable branch
+                  pushBuiltInComponentStackInDEV(task, 'Lazy');
+                }
+
+                throw x;
+              }
+            }
+
+            renderNodeDestructive(request, task, resolvedNode);
+            return;
+          }
+      }
+
+      if (isArray(node)) {
+        renderChildrenArray(request, task, node);
+        return;
+      }
+
+      var iteratorFn = getIteratorFn(node);
+
+      if (iteratorFn) {
+        {
+          validateIterable(node, iteratorFn);
+        }
+
+        var iterator = iteratorFn.call(node);
+
+        if (iterator) {
+          // We need to know how many total children are in this set, so that we
+          // can allocate enough id slots to acommodate them. So we must exhaust
+          // the iterator before we start recursively rendering the children.
+          // TODO: This is not great but I think it's inherent to the id
+          // generation algorithm.
+          var step = iterator.next(); // If there are not entries, we need to push an empty so we start by checking that.
+
+          if (!step.done) {
+            var children = [];
+
+            do {
+              children.push(step.value);
+              step = iterator.next();
+            } while (!step.done);
+
+            renderChildrenArray(request, task, children);
+            return;
+          }
+
+          return;
+        }
+      }
+
+      var childString = Object.prototype.toString.call(node);
+      throw new Error("Objects are not valid as a React child (found: " + (childString === '[object Object]' ? 'object with keys {' + Object.keys(node).join(', ') + '}' : childString) + "). " + 'If you meant to render a collection of children, use an array ' + 'instead.');
+    }
+
+    if (typeof node === 'string') {
+      var segment = task.blockedSegment;
+      segment.lastPushedText = pushTextInstance$1(task.blockedSegment.chunks, node, request.responseState, segment.lastPushedText);
+      return;
+    }
+
+    if (typeof node === 'number') {
+      var _segment = task.blockedSegment;
+      _segment.lastPushedText = pushTextInstance$1(task.blockedSegment.chunks, '' + node, request.responseState, _segment.lastPushedText);
+      return;
+    }
+
+    {
+      if (typeof node === 'function') {
+        error('Functions are not valid as a React child. This may happen if ' + 'you return a Component instead of <Component /> from render. ' + 'Or maybe you meant to call this function rather than return it.');
+      }
+    }
+  }
+
+  function renderChildrenArray(request, task, children) {
+    var totalChildren = children.length;
+
+    for (var i = 0; i < totalChildren; i++) {
+      var prevTreeContext = task.treeContext;
+      task.treeContext = pushTreeContext(prevTreeContext, totalChildren, i);
+
+      try {
+        // We need to use the non-destructive form so that we can safely pop back
+        // up and render the sibling if something suspends.
+        renderNode(request, task, children[i]);
+      } finally {
+        task.treeContext = prevTreeContext;
+      }
+    }
+  }
+
+  function spawnNewSuspendedTask(request, task, x) {
+    // Something suspended, we'll need to create a new segment and resolve it later.
+    var segment = task.blockedSegment;
+    var insertionIndex = segment.chunks.length;
+    var newSegment = createPendingSegment(request, insertionIndex, null, segment.formatContext, // Adopt the parent segment's leading text embed
+    segment.lastPushedText, // Assume we are text embedded at the trailing edge
+    true);
+    segment.children.push(newSegment); // Reset lastPushedText for current Segment since the new Segment "consumed" it
+
+    segment.lastPushedText = false;
+    var newTask = createTask(request, task.node, task.blockedBoundary, newSegment, task.abortSet, task.legacyContext, task.context, task.treeContext);
+
+    {
+      if (task.componentStack !== null) {
+        // We pop one task off the stack because the node that suspended will be tried again,
+        // which will add it back onto the stack.
+        newTask.componentStack = task.componentStack.parent;
+      }
+    }
+
+    var ping = newTask.ping;
+    x.then(ping, ping);
+  } // This is a non-destructive form of rendering a node. If it suspends it spawns
+  // a new task and restores the context of this task to what it was before.
+
+
+  function renderNode(request, task, node) {
+    // TODO: Store segment.children.length here and reset it in case something
+    // suspended partially through writing something.
+    // Snapshot the current context in case something throws to interrupt the
+    // process.
+    var previousFormatContext = task.blockedSegment.formatContext;
+    var previousLegacyContext = task.legacyContext;
+    var previousContext = task.context;
+    var previousComponentStack = null;
+
+    {
+      previousComponentStack = task.componentStack;
+    }
+
+    try {
+      return renderNodeDestructive(request, task, node);
+    } catch (x) {
+      resetHooksState();
+
+      if (typeof x === 'object' && x !== null && typeof x.then === 'function') {
+        spawnNewSuspendedTask(request, task, x); // Restore the context. We assume that this will be restored by the inner
+        // functions in case nothing throws so we don't use "finally" here.
+
+        task.blockedSegment.formatContext = previousFormatContext;
+        task.legacyContext = previousLegacyContext;
+        task.context = previousContext; // Restore all active ReactContexts to what they were before.
+
+        switchContext(previousContext);
+
+        {
+          task.componentStack = previousComponentStack;
+        }
+
+        return;
+      } else {
+        // Restore the context. We assume that this will be restored by the inner
+        // functions in case nothing throws so we don't use "finally" here.
+        task.blockedSegment.formatContext = previousFormatContext;
+        task.legacyContext = previousLegacyContext;
+        task.context = previousContext; // Restore all active ReactContexts to what they were before.
+
+        switchContext(previousContext);
+
+        {
+          task.componentStack = previousComponentStack;
+        } // We assume that we don't need the correct context.
+        // Let's terminate the rest of the tree and don't render any siblings.
+
+
+        throw x;
+      }
+    }
+  }
+
+  function erroredTask(request, boundary, segment, error) {
+    // Report the error to a global handler.
+    var errorDigest = logRecoverableError(request, error);
+
+    if (boundary === null) {
+      fatalError(request, error);
+    } else {
+      boundary.pendingTasks--;
+
+      if (!boundary.forceClientRender) {
+        b.           x%§mXmX  &§mX‘‹    ..          x%§mXmX  &§mXû„    CODE    JS  +§mX|X  0§mXÿŒ  INDEX   JS  NY¨mX|X  \¨mX«WZ  SCOPE   JS  Î¨mX|X  Ï¨mXÁV  Ac o d e .  Øj s . m a p     ÿÿCODEJS~1MAP  ¸©mXmX  ©mXÏj  Ai n d e x  . j s . m a   p   INDEXJ~1MAP  0*©mXmX +©mXlWo\  As c o p e  . j s . m a   p   SCOPEJ~1MAP   K©mXmX L©mXÄ]û  Ac o d e .  µd . t s   ÿÿ  ÿÿÿÿCODED~1 TS   `©mXmX a©mXwaf  Ai n d e x  .. d . t s     ÿÿÿÿINDEXD~1TS   oy©mXmX z©mX¿fô  As c o p e  x. d . t s     ÿÿÿÿSCOPED~1TS   ­©mXmX ®©mXép]	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.default = void 0;
+
+function _ciInfo() {
+  const data = require('ci-info');
+
+  _ciInfo = function () {
+    return data;
+  };
+
+  return data;
+}
+
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+var _default =
+  !!process.stdout.isTTY && process.env.TERM !== 'dumb' && !_ciInfo().isCI;
+
+exports.default = _default;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               (†”7ôïÏ!Ì~MøpXÒ*6¥ˆÏ8K»,MèA	|q›²‰»“(ˆ^æ÷áÒvã°Ğ^±Ed$2M*ûhæ0]Úş0JınÅÒŞÙ•³yp†•-Ï7YÏ²0q·oA»œ¯sXü˜¬X¸räËŸ%PÕòcÑğGX *·ÎÈı•g¬Ëˆóâ´o^ÊÈâ`JåÎ:1O§Ú¾³å ŞiAsàÊ8…Ç×öV!>›îñ8ø¿ö,
+åâ:5:ŒZJÌYÊì’¢¹a(*KªŞXÊìEˆ\fJ£óIW´¸c5üôÌõeé•?Ãõ)yÍ“à–´ş…UùrãNşúÖÖáåÒœrˆåçª¿¼™ì§bÙÂk£¬‡ó›‘QŸ˜ECU¥*øÖÛÁL4n÷u´vã-iÍ]kÇF•Ó¬ÿ=Çş‘£‘Bû¤÷¬J‡q‹Ş»oÄUh/£‚[¶!§fCÂÓîÛó6ødÉØÇËLOU¬ëc(ˆÔ€2‡É`/ßÇJ#N«W›L¯ÅĞ<#=¥JaB'¢-3—tmk-AºPƒ>åJÑ#Wõ16ô s^ˆŞ®rÎAs¥GFpµKçÖÑ«JĞŸ“úå©-pÎNrx­^›9ÊuãeÕp@>%£¨@]H&½[v©»Ä÷áBÚÄ$ğ S¸¥ss±0&•¶X,åbŠÎÇÉ^Hs‚Øbw5`ÃßDÓáü2Ç‹Ú cMÙ8¥I£5[ÑsKÆ f²Wû–äxÏËCõGhš|¡¬BSÔM]¼õV~ÊËívA^%`¯üç‹‘ØjPŠã¢:Mú7Ê·6_5‡šp_Ñ®cÛ¢h»Q}M­ö=Pìm¹BôÛ26†½ò+?q4‹ÚX±=©…Ëõ`â,ì˜®Ü°.’lJSö¹J9—" :
+=äü!‰ŞzY ù†'îµó“^ñÃæ‘E•ÊÒ†Ùïµ¨¯R´û¤İ¤(4&l¸Ê4`ã­ìQsxæaşà*Q+’æ‚>çÊõ”İN4üğ»ÇĞ¨
+é¦FKòé EUµpş©Àe‰^¨ıf=ª
+±¤µ9$üíKo‡aPFp‡-Í®àeBÚR‹O‰ßw“şe/L()ßn(
+øÑñY¹ğid+ß€éb\Ú¦Q·R÷ Êã\÷“Ü÷ØŒšÊ9t‡{a_>œìˆQß—Pbgº°:óòú‚±õ%“BºtªdXv…U¾Ê–É…x²1üöÛÀoHI£ˆá	WKd¾× ŒVJšúñƒ+äâç›bÅkÛëö³’¡b¯1|•×ı'³†É¡>…	¡Ç`ÉÖ:¶°¶Ñ]úõªİ	uùâMŞÒE>7ˆ6sÃ3)AA³?VoôŒ(à¿DEÌ·-+në°”vµ'`Ş™a,Ê1–9ºö€Ñ 6ãºadÜ—ƒòJ2Q@Ñê´0é¦Ò§píCPÎS]Û›«ÍÁ³ºüh«&åjšl+…ĞÇåÀkrtj×‰¸¤j7$!œ,*phø»
+§–âa1Ö) ¡«FÂU‡Á²ìy´È$hu?íĞ™ìøû9<u9&¯o£2ÅÛcÍ/`U¢u‚µãOçøjôî4½>Ç]°¦/´Ù8™öqwê£ŠZ’ş€X‚ÉvHvY­`ÕåŸ7)-ÄòW| Î¬¬€|ÆÏG)
+»¤B¬SÆşÁNy%ÿ…8‘Ç4ñ'¨&©>.é—	é47$\İT`šÕ¢t@9ëÀa9„BnFY‘j; I‘V¨«Á3RÅ_”×Î4¢¢VHáÅ%¹\f‡¦p–Û–4{µ»˜`…B
+³ËÅáp"ƒßE˜çª%óõÕi’1ÓöâÂW|wüÈ.sõ?ğŞ÷Êæá”Û ú#º«dG£Bs ™€œ¬co¢@À¨‰OTB!nè×MÑG´Q•HÅ’2ÿØQl»İT¤qî÷µŒÛš„èò ^Œu.5››¨Œğä¬*>TxÔH¥€¤ÃQA|B¾-d¥8')HûY8Á÷Ñx‘ÂıĞÿPK    Æ‰ÚDÄL3Aú@  Ïõ  Q   PYTHON/EduBook-Cookie/EduBook-Cookie/admin/fonts/glyphicons-halflings-regular.svgì\ëo9rÿ~£ ù€ßx}d÷p'ä’ ŸÁ’=zåm«ovO}êWEv÷È3=–åµ}H šÍg±X¬'Ùßıî—µ¿y÷öİí‹ûÌ\¨»éêöújxw{óââöİÅï~û›ïşæ‡ûşOÿıÇß«»ıõÇÿø§ùçïÕ…¾¼ü/ÿıååúAıûşAÙgöòò÷ÿz¡.vÓôÓ?^^şüóÏÏ~öÏŞ½sù‡÷W?íŞ¾º»¤Š—¨H.©3kŸ]O×ŠÆ@×Ìíİ‹#í1õ/¨â7ÓÕõÕtõÛï.çäo¾»¾y}G×ïn'õöúÅÅ›á/ñİíİÿì®†×ÃÛÛ7wïoŞüy¸z¡vïŞ¿½×W×{ıMš:¿P­­~}õêFıùöít§ºy¯o~ì®î^İÜN/.j¢—ë›ö¦] ×K€õöîÑ<ğáÑ´:Rv,E#¾zwMÿ»¿ıåúùÅ±u4÷ï	˜/­1Š†Ù¨;ë mñŠ~ƒVÑoÀ;2÷Tº£Z{jëZÕt¯‡^öİÍ‘=èÃªèv¨ºŸG^ªö±Ñ%*ŞÅ?È,Œ
+Ô‹§Añ¤ßÎÒĞ24JtèYÚ·Jx»¿8Í+óüT¨êùjHÑmT·«[oÂF}÷¸îı#»ë¿U=>¬î]Ú¨Vw6oTÏ«^>˜kòÕë½'³Qıêaõ¼w÷úQÇ×ÂãÕ«ç{tÀ“~;kıHŸUäWílYÊ|}V6ÑÏ:åb­ÍØMÊU~.8e”»­ÉĞÓx•’¢½HÒKİÇH¯ñYTµN:yJ¤2é•OÏ"åP_îY‰Qg:RİP§¼£ZSÅIG#¥yç36ºá!e#šÆôK’LZj(©R•ÎAy°êXÆªvJM¤
+®N!¡ T®*ƒ	Y?â<É¨h’9QÍÍaÔL)SGÖê$—p*¤ÑkàÍÒDLÓÓlm¤:>)†¹ÒøQQg«‘Oòç¬k‹ê3­]mŒK×Æ¨N7¯_=¿8"!„n4LÌPX«
+5ĞúêBkÌ³„"$cŞåhF\4[Ì¹`±æÜiIMZŠF¬õT±X„ËTê<­	¡‰é„¦I/±‚Tlái'ÇZS8ƒŠQBİ’	ß Fä›"DÄ8"sô8=×Ì;^PB4Áó |k×®ˆ8€œ¾§ê‰J<J¼äYô‘‘Œç={“Ê¯Ò€NÚZ¾l^Ï«À¤<xï±KíœWô»iK&hıà0yú7$JĞoÀ‹¢ßıËR°µ×ujUÕÔ§üyd!ADO{)Rnô@?J5Æô“–İtÚ3Ó!âÿÚÊØíÑìñO¤,ïäB)Ûä.•lõÛw _Âhú#j¢K48Yğ5"‡D´@Z€©*Õ	”…µI¼6FŞY"Ú OÕdğÔH„(œ¦ÉÛö°=:ê˜‰°‚06¤*UÙæ„–fL(ŒÕ¬š#XFVA+à!U r'b(U ÌBÕ@ŒˆnÑm!Íw¶AŒº‚ıƒŒmpÊ7ÑOÙöÔH @ÓÛˆ†tæmfgÒ	¦¢ Xˆ˜nÅ†# V„å	<èFâ4_[çî o4ØÖİ "bÎ©KóOÌœ÷“óD·5ÓÓ7V<áŸâ÷I¯ÓK5éŞN·¶ĞW¢3ğ;ZâğÖ‘Dğ`  F•Â„99Îq˜H™Ë4?ÆP8½©àkÕ@"¾PCfOÒÖğŠRwÙ²ğ‚°aª`ÄŒ­'+ÍÜ¬‚½¹ÀTå„;á‰‹²‹!eXP‘°+¨@-”ƒ2†'º¥îAqß­k’GÜBWêŒ‰$a&1¡Á§D—ÎÄ«|q,()›à	¡"‹›ã\¥qÈD‰ÈÇD[ãç/1>í¬2ô¨ÊÒ…ú"R Ş›(´‹’Øl’üÎÕ£€¤ºÇ®§İoí äo-rëÖ´ÊÌA‰9Ï"‡420JR!2vMeY*Ë+ÆC[
+Œ‡´RhH7Ñ’üĞô,€c;‹‰Ë*i®¹ı$İjôËüY„†¦Ùuñµx]nó§¶v—³ÂÙ?†á±¤ÈŸ.Š§‹òé¢z¼È70R7éR³ò¤(/²æ$ôJ
+OÃ¿5­œšÂée°f^†ÈS Û‡eæƒeÆ?~…•;R‘Q¢Ç!oâz<kV°¬ÒKö¤—ÚlšûĞs¿“ƒ2”¾jd¾|°2ø QO…dƒ‚ìš‚Ü î î<ÆÜy
+
+_uò- #˜_iYÔ' ¾Œ<qiÔç¤˜ocË”\õE ù¶Í·sß·k½¬:YõqÅ^ø—>§e¤Ç—j“~0¿*n—?·ËŸ…Ûå§c$n—?·ËŸ¾¥f¿C%œ…!ÀúÎÅUè	3Ê@Úu†“,S–Ipnufû<)oËàÈp£ß {¢wëØ¢+nXhğ HKëƒÂ¹CüÛ‚&ş¿såçJ7Ÿöneµ¸îïcëÅ­íæ ³i³…í´Ævx¶mGl»Zí¼…í"Ø.Œíòl‡3ØÎ3®LÏxÎ3’ÕX¶¦d|††Ù-æy÷s ÔĞnövr;‹’ÒÈ‘¸=éÿ"|Ø™†Íã€gB¹á0Hä(¡4{"àª ~™¸'¸`Ñ?âL\yã™	Phƒ{ÚÙ_¥]wtqˆÎ«Âî/ Ç1×
+ÌµäEÒ¨Â5ĞŠq_Råş%<ÑùŒ€µ[6œ°ö˜€=”¯a{ÊÊiyóø¾Q@…"ì>ö[éıËÌ¥”¹@<{ëæİèzÙ İŸãˆ(óD:p–}GÄiGDBUpVW?€rÄ‰Òám‹•ÉŒPK]; \F}Ã¥é+²h{bÛE;¸§iqtpyQ2¢”
+’c@˜NU¯¸¥§~©n±c„†ÃOÀ ‚‰º	(ñ•V¥q%_F¢Ò0¨¬jáQq–€%¶CR<_n«©³AúåàU,JÏã50êÆŞCĞ‘¡Ô1|ğ½š…¿ÁPöéñd¹FGÚš½ºØÿ‚$ä<ÆâÌê•ÑÛĞ 5zRŞ–Fc¹İOb¨…c¨L¥D¬3¥¨„ø€ˆäù¡é™¼¬"9ì¤{¹nõ57ßŸÎ¬ÉÜ¸¸ç]ii©±—àÓÆ?¼í\ìı4ŠÒÈ…Ÿÿøñ£1`Ïq–FŞÄõ42DÒP'££¶¹|'Nà›HxO³“ˆZlçÈ<+±aaË=b!ÄJÆb³¡Èš6²´€ãMS¦DÉôâ“§b$zÌ³|ÌØºñLQŸõÈxsæÓÍêÉ¢Õê.!m³Â@?Ä.BãNéà˜Ì|˜F·é9†ãÜŠ$ˆ ¬’°
+8Ÿ€ş]ÈQ8K¼”ãñe+ÇWX)ÂPg½k§ı6T]™]l"¨B Ö:9Dö,IòZ)‹Oï_DÙ˜ôœ˜‹t¯¬[cİ;ÓÒ9Âº©IDj•Ä¨ºcênam;¿HZjI%}ğ²®¥Úëu×BW±­"–‚ÅÎ¢ÅÃW×Òù(†‚·ª	:°ÁÁ^ò-[<æÎ®Õ¤R$¹‚­Â¤ãp	=æ=¡%”ÂÎtéx'¯¡Í›0ÅUh‚cBFHíã–¦¾KSgZ©öR·Ñ±å­UHğ°z+\	cÇsNy—:iw"rN…Ü”=	ÀÙJì¶Z	ÇA9T¡'4§PØÂ}ÒB£	ŠD¯Ô«äª‚^µÓKozA/£êİÁ!–…;39R¥cIà‰‡¶s¢•¨IÏ•uoO|/J°…6ú~¦1/´QV`¯ùÿÚæl(€°°¡ci‡p;´8+vóP…ëª&³[b­|Ì2¡pÀ† ˜ŒÖÚÓò±o% èd!íZ6ÌÖ]“I[@Öob‰İ²Ä~µÀËòÎ‹ëÚf«À}}ÍÄ¦,-.›|›[À›‡v›Pkj6 fûim>­¬§n<uÛi1˜”ºñ§gëOÏæŸîöŸn`7»a8Â&Ì†$²R©¾E›K|æ+3‡$ƒ	8s#OÉ¨C³¯ÏF­MÄÕ¼·f"mÆÙ‚²±a¨0ÚZØ6ät| €~MD`"8#D? Í”JB,ÓsdÜµÂYÇ£lTÖ{š|| Õg1Ÿ¼C?ô¥Ÿ÷®/ĞGØÏêÀ€µL©c{okgJ¡yº.÷,Áå¸vå	üM·»|'Ğ”§‹Òé¢r¼(ÊX»ØÕã8«Çq5Vœ[Å^”).+GË6Pæ×'÷iË±¦ûu‹S0›±ª+›8'!Ù+_¥´8Ôì(}```½Ôæå9°P¸=CÙÏMMZÛ3¨snmÙäÃšÒÚyFùƒÃÈÉ´cLØ³n1!ÁDÀĞà´ó†¼C&8¸‚›X9‚"OV-ŸÂ’C1íğhR‚œÈãë—`&9:#yÆ÷j©7ßŸ#E1u³ˆ	+çjE–­­{ßôÇ,kíø$1mlL9±ÂA)f~è˜[‘–²¶àhÃªÂcFÄ™I><æ|ĞPë›"#¢ÍCİ#°‚N±IÒ6i‡
+–õ|Î˜¤7Ôl-9d»‰w€JDLN²’µ@Ä˜`nN,7öZªiq`X>ÚFI"Ê×ÌÏĞv‚ß%H òWê{cyÓ¼¼ízIs@‹ç@¼ÊÚ­­åû—©@Õù.Í|±…tŠl—Ë3«líêªÌrgf]4w…[0çO€™ë˜‡TUôD?Åã!12Kì]O,ğ\ˆa$[’.”‚êqŞmÄ²Ñî×`²1ƒÙ¡€8	Y6ÌfĞ€ñ€qğe)UÕH+@”2Š”à(8/Äí/™0xïPq ‹IiHŠÚ dÇ1‚Áşwi+ĞkË°l¡auàÅQ÷“,nÍÜjUÖÒvnâ›H“séÌ~{6¯÷ì2á¢r¼Èóîä™¶Ùñ`×ºV|$h¤$¯2û´ùÕÑÁ“Ì¦å˜œ~ÕÃ¶jöI®¼,§g\ç!»nUP£ÂÚ“h:½êa9ß·
+²­ĞƒO³Z—eÄµ¾DJ›•‚jÕ(iã–6sÈáH›²5Ním\o³)N´å´š«b«u$‡@¬ór+‡…62‡Ei':Ø½vô¬ªËîÄ	opMHş2#ê¡z«2éŞhD…ù—·øn˜UëÃyz??~p
+üzÀîaÚ*Î¤!”rÛYŠ°ĞÍ‡ƒÁÂ€íİ!D>&±5O¨Ø›±RqWxÒÌr™«w«<\7êÄQ·‰£k‘ƒ	t!ğS‡à»‹Ù™Y‘íjläÛ)tØ•E4n®g<ĞûsózØ.=S{™cr¹Ñºp!°½p4=Ùu€j]ØÅê†û/ˆùTÅbª›œØéÀŞ£Ìrv€“Ô!‰!jÜâQû…/³XÒYç‡Di±&+jqnQ:´’‹,’àWd©æq‘I…|¥`Kª‡´flÍ\YY++cÅš{g1wğº˜X‹õ2-6x2tP˜f$N8C	m„æD[#U~+¾•ó*tóˆÏ†´NAüÔÊ±I¦ıÃµE"U®ÓÇZ¬*-ÂÛŒLKds.šô7ÁíÔš|ãzNôİjjiHÆElX$ò€q«‘”¾Üh'ÊË˜·<$O·Z«ÎP]$\’ J´ iÆht’hñÄêl%~ëÃÎW;0^ÙĞ€ñ•Âˆg…g|¥]°™;%|[œÜ©*J-XvØ·>sĞ!Û‚©eÇAP_Y5‰¯¡rë—áaÇ÷¡Ù§Å·[1¥rŒLˆE0Ø‘’¡¥çA¼X´•µ·DüöèzÊÿ+„ÜŒ9ï:!ãì¾¸Ü¢Ò4¦¶5SÛiNäÌ“PÙğŞB»ûmLÜİ+eª|e
+¬ëlÄ	ÆÚ¥ŸÀù–"dœÉ<Ò^‰“²NÀÛœ‰é9–¨l{¶ë$•­§À±İ.uò™(Ü8âäÆTó¹„ÆÉHnáâúaÀÊã&°2B‰RrOØFñ%ğEÔÔœ“µY"¡_§ğuÌp8Z’`lûFtU¸+P{w±ó•#u.oİÌ	u-Lö1Gˆäæj@W|y¹€ØLü:T0ĞÈw”P\A”ˆ»3ŸÆbü*	êpH‚—ä‘i°(9wÃPšÏwxğxF¼g†ÃhäBrqQ®FÇfmq®(ù´Ç]İ3.‰ØõK0ÇÂ–£Ü¤œ™Ÿ´ˆ™rÎ$3Ï“\qÌô+ÊÄw¹Åxt3.FVCt‘5Ö|Î›~ïsäYó-pÛl˜› 5†s)“*4Víå†¹Ü!ŸØ·#N*‘V}T¨FšÉ1Ô{µ›®kÒâİÇ÷å¡²êy%qº§(·Ióû¥$ûñ˜9ÄK0G°’Îa%Â
+£y/+›
+]\ æƒUf>XÕUÅ}pªj>Sµ·çNT}Ä‘*¶+Ğõi Ê§_Î¯æñÓÌ'#À|4ê éSÇOqf|[%ˆş›!‘ô• èDâÌ6™æO!$
+ØÿòÅ x™„™,ã-Ã-£Y»yÂGjSœ˜·[°Ù¶óK§³ ˜'‚`> A­`ğB(Û0”§P¶…P¶HO ±¡x‚B‰ß¡ ×/€:€ }mÔ/À'‘Iúx2y"„O%’Ï=ücIäW~ıªÓ÷Æ¨¯ÉG¿#WÛ¤¯‚ú« ¶!ØàóWD¬±sôÉ+Ö\š­¹´XsT*sjá—Utj˜œSÄO”õ«‡ÚÕ¢[m)àGT»xF·ôGV›#ûGŒ¼¥YÇÇN9>bàº¥ÒŸXÙ~ÜÈ5;ø¾
+ØG“Àg¡ ‹õW_ ì'-ÿSWÿe1öƒSIªÇ7}P>™•hÊ;öm‘ÏÕÇ½ÙUŞ*çTôSÄ'ßøs{@FöëN8å={‚€
+xï%‹”æ ·îô:Ôü‘Ÿ£»1i	?‡@S²|Ó¯à6–¬'}r-ü¸íóB8QÊ´@Ÿ•k™pk·Ü©‡_Bc-Ç=¹;ù*«Ì%?à¤ÅŞZĞD¾»dc¢/÷‚Ùo_Š„ïagíuö¶oi·ÿbâ«`Q_Å=Z'ÊÒäĞ-[K%¾ ·üƒiùJ8~ëpny9¨…k+Ö×|pÄ(>/…›V‰IÍ¦:»ØÄŒø³SÙœ°üÃÄ_ scoâÔ+¸$†®ø§Bä9sÈ ¥9V>K6Éµ5Ù üå1\Ğùê–—Ë].9tÁ©œeÍLVY¶EëÚ^6ÎQRÀšò·ò8[*êt¯À)i+q'îl‹òü_õŠÜO÷û³è[ÎG÷opíK8%ÌßÇ\²Õ¤—ê[šLZ|2!f‚Ğ0á=Mˆ£ò0qëh¥+=‘“§"à‚SQ&OgNùÉ»ÚÉ‘åú*‰ÿkP~grñ#ÌClhƒÀÈˆÆôÓ;Î‰È”ª·[53½»Ìå2»Sš’”•ß'N*ó†LË°œz1åËÁ(Ez)Ôxìc!‚˜I¾Ø£{ÍœAğ*<˜ŸwÎj,]ïaşÇú¤±ø@Åça¿JÒå>íêØ I¨†W>r94ì¼®7Y(({S¥k]¯ZÉjÉU$}§âá9›¾å­»ì÷¥³}lœß8¬z¨Ü+”üwÜÒX02=p`6âoıf…$¶‘¨	tÖ¬r‘ƒ×ûgãüÄMï¼äkH¶Ÿ*pU—€.\~Ø—&à©Õ°†Ë¥oß“G±x‚BdÂ%z§ĞápÈ&¬Ê_oß{;¢Y®JÜÄ’ÉØDô†‡øWÊÏõùX¨ßH»D¸Øô8Z_4 á¯ëwö¹ÇaãWºü¡Çt¹œ"9$ |bsÍGåUÂéôW¼~Wø˜ï[,ò`$1wœò­/X;¨\Wç™![Ü°¹ÔbW@?¥4¯£Zî†­şä°á‰âbŸeç•é_ésïéb)ı\+r4ÿ™kÇk‰à#ÁùŞÒ–<-QŞp.ËE+EšñéESNl,¸‡‰‚íå!/áqòL,˜ù])jTXímeÃüFıÚ¼ô×÷¼-£€É‘ñğ;üå»ú^êj"ø‚¡(Iw1¶£U•É¡–ZÃ½öŒòÆÿ2åM]­v#R»iQk[ûf x,Tnr¡’ó´‚we^YÍ×ŠJ^ìBK»{?^Ş÷_aÍj§F8Çë)kÖ£VØ&¼ø/®ˆû‘šÜtZú Ó~Ê_ş¬m]¿XÅk´6gQ¦˜`œl%Å„yfW¯OæY¹/oş#Ö/™¨×/.?©€­g,œgÇg\?hÖoĞ’»º_!páOó³Ş×÷¶ÂaİÁ€f.é®ãÜİ@”¾åN¨ä	‘š83„¯¸ÏÅîÜ”Úf0/’=ï‹<KÏ•81‘diìS$:PÏhEî°Émâ˜şS±GÅJ™üÆb«¿å]+½oÕèÌËåÃ#Ëùê2‹[®?²ŒŸÎCD‡‹,ñ SœÂÅÃÕ]‹ÃïŞâÁš¶”hMü][ƒğn¯xüÈFPZàÜ AiãsÑ;á!é“½=8úÎÜQwÛ–~Ûî©mdÑÂªjÕØ‹jŒ–2Œ&4^Fæ³,ÿÎâÓòo;«åh&¶1Å˜CCŒP8 2Æ#º~xàÁ=„VÉt;¶çÄG T‰ŞÊ¿WâğW ±‘Öeš$Yf Á	Fo¤7%”:bØ‰‹†fıÚÃâC¬>Y5‹B¨Ú+³>E4© °³í eš¶-ùå•G~¹Mr?Ği±ZGº—G@Hk°¸"3cƒÈèÅì7ì`{êÔ™L¥õ§æ¸Õ|Ñ©†Á=sAµò»Î‹dÍÊ?İ¦#ŠNÑ«~}Ïù6ïzái'	éÌU'úêN:¢ì:ÇEûcÅ |5ùsRÙ{YÁ<Sõ›4L³ÉqDQY×ÔÖé5CGÃäj:âZR¯fØa‹„T@šæ˜äXzsL\æ ¨ˆè@K`js}<ŒØ‘ÅÖÆº—Q÷"+$Õ.åx‡pZÖ±Šà›S«<Ã¹IQ+^NZ9¶³“­Œƒ¹§Ó†6§Ñf;
+í_¡i¾@uËu‰ ^m •ÿygá—`İ–‡[¼XoêWvó®ßû¿\¿Ó¡YG\¼ÛÂ­ë&YÉ6?0J‘îº¯¯¿C÷y9)÷dÑz¬‚pê­ö¥<Oi¥VsÛ3:CŞádÈHZÔñ¹ë›ŸŒ\ùpÙw]uI‘*sm%Ø·£	µj\´«;­¤‡¼OÌYôSs©%èAz•ÀJá_øªûi â02î“Ÿä-äæÕÛ…·Ğ¾ºóğôédÓ2_`]-#ÒZ¿ ]êîYí.Ü0m#Ğ‰Ä0–JŠ1=*QlGà‘×«\~Ò%;}Ö˜è4'ƒ „AŠ¤%–á×5¥´ñŞä×¯fòÑkD¸ï²¢zº¬(|³ğ+{æÅ¸,"•z>‰¯Ï½¬IöÍ]¦ÍùÑ
+M×¡3ò¨;üèHÖjßÄÕ¬Ó¡Ì+ëš¢EXıù‚=Ÿ$|ı/¿ş:—Ô×$çš|M,N%²Hdr\5QIÀcŞf•ytÿ€tsDsÃG’MSÍ„â4âÏ¡ }?9…ïÂ·6,—u`â°	6ı‰¥Ü'ò_Ïí¢]ÅFL‚f‡Á’=¸"4±ŸÃõE›„®Ê¦ãü"ëP"sû‘Õ’W@Pæ¤,ü7‚´CÓ4&4“ÄZ1¦Òº‚ç@õ‘Ûç5¶Ï#-hga”ê0L‰"][p¦¡İì+£Şƒ}VöÇ–áˆé’£˜+aòmÈÏ(ÉM•¦¸^6LÒªŠº'	CóƒÏa¦@ù¿W‘›;aÂ0Uw5Á²<Ø#“Ø…¬ÊĞÁ8ê¥ßà$=Çdg8Õ˜!±Û$•C>FL× zQ)¹Ã›É|u»lkeuäM|f^Úføi®f¿‹uò$ÑådšfUšòÍ%ü³-"ü»*å)E=wT<YÚ•1\{–Ëƒ;­b+Í¶(Å¶@ÈùÍ}çFiOR9ù7MêàTİsF6ÚX*"¤‘qÓ‡ ‚ƒ bÔNÏ.ãƒ/úÔvÈA04J·¡¨Ã›Ë™äòĞw}:ƒş"ó¬b®Q“õ	¸j ¢:s[GÍ1ßc@[t¤‰„]#áØI§÷:ğæ½ú«¦Wz®T	Ø2÷*·â/£·Æ`Úæ‘—qñ¹|Æ2ëR.z‰¹Úc`vÇq'ÌÛ²WJaÊ1è1o‰ºH40ø[— •]İÿ ¾Q¥ª9·Ú D±"*Ö.Ç‡
+cÜÖ¥Æl;<ùjÙpG‰r—ªËDD`pR NBMEt-ÉÂ‰1‰|ˆ;& ì¾‰vë¤"1h€;íˆ†×lnK¹+ÂÁ[¤¹r£ëL*Ê˜m•íãÀ«x,D}‚âˆMÖ8ä˜F+ÛV¸u¶vjÄ3ô".¹4D¬*>#¶8§9÷¸£iv‰b±å‹NÂ  ¶¥Ş•";fu~l—EßÊD>Œ­F@?ûI8isÚ+¶Ï#±ëí$f>IW‘\’)Câz¤®Ù_ÉOĞ´¨²Mªù7B‹°?:À­ôÔåwv˜Ÿ÷â±¿µ˜EÊQŞL’–
+ë²ÀË Ÿ;‰Êi>¾\ÊX¬ØåúSËYƒåR17ş.ñ™³m‹¶v9›¿ŒQrg9—¥®,õN6Ù[ùªğû -MªÛ·2Ç1 Ü2q SÄ:äüÙy…6â»¬Ğ¬ İØ°ˆÕ8‡hğ2Ìp«.ít9¹=iŞp|ø¢á–<óXF6ÍÅ²k.šl¬é½™é›æŸFdáaòö=V©S.,ß3#xâÁ»aw“ÿ™Û“L&ÙZRìr7GË_3GÔFE QRxñ	™P=¥éÿæ-9°‘:Ç+,¦êbL$öÇyÈ³Ù+=‰zZ“â9?'¯;ÓM-Økfu¢³*†ÈH+ğTQıÅO•È•„GÌÿÀÔÑØ
+ø/Dš-"üà¬@®ÈoÜf½nÔØµ™4öàÌÆ'o8‚â4 •FŸŞ±d`b÷Ô¼átJeVœõ9—5AÈl²›½[õHíôRI¤YÖ}ƒVvu®fUajt¬~Ëy+›Í¸˜^µæº%Û¾êÅ‹œ1igFZ~¥n×j9óE\€cgÍàYYC…Œyl@X}<Ò½Bå€
+ ÕŠÏXòĞÖ±""?eEÀ½ò£šÀ¯&w«²!D»ˆ?£S<x¦KxMÈuA°ÌÒïÚ¶X2=¿Æ0X	šu¤àL‰f»¼¼’şïHEØ£ æ0†ªë{=ÒEŞö†Ç0¹B—
+8Ÿ¬®²-±…€S“÷Àş§ùjÄJ2í‹ä ¢tWà¶à'îI³AŒ1Ñ€§+œoX`¯,Sœé%â+ ÷üq9ûn9Ë•LÕKYøå^Ø;C~‰ ¡æI0\³ò¬ê©JDëóĞùæLÉï‰¥éIÔG¾!~Äåw™i·ÜÀ|ôZü¼Äøi‰ÃgüÑ­üyùóóçÖÏ¬ŸXµ@÷Ñ½şy‰ıóû§Uü|âù®Duä¾™%è%$Å9æœc%«Y×ÔB˜ü›PŠ*!L7tE9©ôIcŒ,Uö¼æç3öR|cÑİo‡;’VIÑ›~€TúËäĞYA I+­çoù¢o*%°šOÃ 0g)µ6Kgî´ª*w
+Ğ×³‡Ò…? Úô¨8pFÜ$ş*hÁ…ÇCúª¾Êîòøaë‚@#Kc"#¦uš‘I¢m.šêI¡Ø=Õz„ĞTÔ—„<ÑGZ¹ó2¼}ª`R–ñ¤õrú›"–® ÙFÛ§·nº}X[ ê sÔG.Ò]¨´d$GnˆÚ\¾•fRÆ*ó«×-Ãé!¯löê¶ÌÂfñ‹ıà]±Sõ7}%NY¿mÁ´Hg«Z¨bË[À€MæD®WßÁ×FÅºÈr4ÃÖ2(×ÊG±ö~½sø™‘PdÓ.RÀË ¤î›"Ç+$»şÒz¡ÜXÂK£‡¾Û¨Š·¬¯Ì®:ámÅv^›²©À®P<mƒIyªõïŠF8ÔÎê_u7Ïİb§Çyâ^³Î¦û÷Ü'/¾;L/·?ùå˜7z«á*ŠqXXs<w•âôİxœî~MËå•2ŒÍ½øäá¿LìÂûïÃız;ã€m_­R¶Õ×³f~ìâ_¯Ù NÜÖlÈcH!A&²ŞÆ’i«ÔÀ€6ÌI†ÛËøşæÂyîĞR:Ú=€ÿrğµA(Ş«|tÊÕ]ñçégrÄN?ÿüôóë³Ü‘#¸‘…Sö8WD‹v4{añ£˜RGP¬‚gÔlşÍ\6›RyFäñ±é?dqUÊÏnŞôZ˜[êJSfÜ“M+ÈÒê8>‘ÑÄ×R¶9ìk‰|Áæ…OÎ"=ÏØ‰ÅúÚäO=h;¼ÍÁI?8Ñ‡4şè(Du¡VÅ[mlƒÙ8ş–bÜƒÈ1	·e¨ÅŒ‰´¯_ŠÚ	•§Eêš«º•XiåÌ¢)gd:­$ÀŒÙ_Ø·[^?İ˜>Ù—YÍ¹3Î}×?ÏAágŠ¹š\œ•‰³2qB¡Û†ØN_ãFı³B•	%¢‚Ö¼ñÈJYÀAB@¡Ñ:Oú5i£Ğ	Îhkrò³îô„Yv¯
+Ç¦*lİ¼ZdD­ÖEñÛì$5äoùª‘"Y­÷u7_|F²PáÑ<Rhœ&I¯ÖaÚæèA£©ÔJ…&˜U()&¶¦Â<&iämpâVùï˜E GT¶iÕ~ÊÁ]Ù/–“ÒgÑêİ‰3õ]€µ o(œ7M’ÈUPÄ7&>qƒÃ‹ˆäÉÉ*‰ÁÂ|LŞá{|Á«psÃ•ó¦Ÿt("©éÆÇ‰5Ş³r-¸­zÅ‹ñÛ‹ÕE«†—YÙ$ûPåêÃrá%LäÄÌ×™Ğ¤f5RTÙı>ŒPbÎ³X&|BÄ³Ìºk\Ç	ìåA‰46ø¤ÃäÔ—CiâÊ¡í¾1˜ğHíóıQâ˜½N½H²Ë±ñ8¦F6ª®Ö+ÚÛ˜ÎXEÎ77Œ¯<1ğ·œŒfûğÂà%P¢2õYÈ/‰ß°›™®,2Œ÷Åı€"c\Ëpon7“@ù‰­ÓÏ>]ş¾Çëò%jŸ/ÚéKMçÉ8zq¹tãòĞó‹u=ƒØa*yöŞCÿ[÷[ïÏÎ—¾wì|ëû>šƒv8ğF§.›ì<Öã£Ãg?v÷r˜±ŞnËC¢Ä¶òI§7’td†OcgNºe‡FcÚˆğé¦\w·ËV ÕÚ6ûç©4h@:c2dĞ(º-M±]/@X´LZc¥im‡Â†ec;T\†öXÆı¦2˜”VøıÔÕ­.Nó!¶±ÛÒvá,ü·Ëñ`Aw@¡&4¶uíòÖ_)ËtA¡…'×—?XZ@gEpy#Ä¡,è¢ÆÔ¥:$3]/q!‹$§Š
+ô^K«œŸÜ×´;@X3—eBğsLÎB¯GÕl8	[á#”<ò¯w:Dh"‹X»<pæ´å›¦oãÈˆ$îoÈBaÈÒ>E{zé‚ˆ:¡¤™•àÕ‡^¤g~W;“Õ=Ê¡:ØË¥Ö
+o§+–	rĞ0ä¶Õ†ŒIªWa± l0tà£Mƒ¬×,¨“Ğ$3ÎÛ÷…i}_‚ÌH+'¯¹]ı\¶mô¥ıZ]ë"CPe†Ë,#ä2nºw¶´+‡‚Ã‡5ÉËPòN§¯% }‚ƒ7Çh+œBñ
+ö¹Ú±Ù’j9ñ/˜[şƒez3ŞCÉ ú¾1ûN,YÀÔSÄvæ¨P.‰e|ó’™ÑĞ‘b£Å£óÙpØ@§&ø¤ëBç t fèˆÆ|ŞÊlD¦@Krªîd¶QNò•´ŞŞ5õß+?=-F|R¥È¤ä¯÷«âˆRAoßM/Ùd%7 À’İ„lá2M]6~ ,1º§¯X)ºÚÁ3˜xÄùå¢Î‚ÀüØ•9‰³nıPG•8¦pİSo‚¦Å.A`z¾9¨h›•öÛéÕ2X¦Z{‹§ôg"L—[æ‚ÀiÆ.Øf×xEA¿Zâ8oìa
+,Y
+Œ3°ëdP!8Œ‹"¼N‘œCRŒñfãé¸¨ß›Ò,Ö§†M–Êœsp¢s"IëIŞ^¯¾ˆ±A“‘Ÿ
+ÇÛ÷
+’€Lª#¬Hé3·YZFæ
+aš•3!­*êèHÌ±á\ÉJÃ„ànËÑcl_Í2g¦ŸÖWfO `_˜¸^ˆ©àTÄãkú¹Ñ:=üĞõ‘İÂ ÕÑ-	88~hÓTíÕ}ÈÒÉëúcA,šRòÀ‹DpÑIÙm˜wŒp[éq˜ÙózÑ,ĞãŞTOãO¶ÛÏv¶O–#<øçhÅâÓ6[JMÄğĞ'möºá£ÚÌíŠvëÜcğ*;'`SVcâ½Q'Æ	‡óh½d³OµeİÃ…cú§j§Úé’]¤¡æÍ4ÓK|~ÌÆüõ&Ó¨¢“şËsü—Ö}†º¼ªí"âH40½ÂÈªşV§   hV[ª­®rÍx¨E¶%iäüîx7Â^é¸Òß ÆÇå÷fZÅX!WÜVU/Í¬›}4Ée9í2ªÔİÓ'§6‚/ƒå#æĞT&]O)F—$PÈÅêÔSUœb“cvOl„˜Ä¬hÑU³{ª°Ä÷:±­¾+Üñ4
+êK&Ùj4bE£Õ0µ=8ZĞ6XCÈg4¡u§e	GÒ**»±kpQ…òJØñÃÔ-ı°±‰üi|_‘SŠ’ˆ0ªJİÀjD§hbL©Õ`Sã¹gÓOb>h“ô‡fñ	ZvğÖÜÆ‡*“’ª}˜ÁRi^i4.|6\j0+–KÁ$Hƒ¢ïóú~)àUˆ¥•Î¥W3©Ù² .¢”PS¦kU‘™Éä@™QM‘sƒÉ¾²™gUĞRk¦ZšÍ}2Â.6”<Ã~SÓ)ôÓ<Á/1©-wç„¦j¦sÂšİƒ¥õÂüÄ¥›á¡óe§&Ã<ÀPÄU;YqÖ­Ì« µc‚¸)#©†FĞ+W8gKç¤õN—†nåİ-t\¯ñYï¶ÇÓ¸CöÇİÂ/¼Â	WÈ½kØ ôR©´³f`Ùx $¸Ä#PGğ¸2ë’¨ª^­}aÌKZTú%Ù"í^Œ'ÃÄAŒP Uh$ºnCE1Z—r9ôÊ#8jTJ(•ê=
+ˆ‰e_şçÿûmùÿ|]şïßÿMu¶¼—ßÁ‘ƒş›*âÕ¤ÿ]¢Ó¯|”F>*¹5!vqŞbÚÓ^~*¢'^Ñwşº } êgKâÚ)qe‚&‰À/©¬©[ï~ªÿ¤şâğ'Í"Ä¹õåŞnx>¶OÂ†rÈïGàšÍmù©1º¤Ÿ}J§î´3ÖoÅû¨@b¨6ÚÛÎ§€ï…ó‰k4S…_ ôùìÃO py(D<!ßi`Ê±b?ı¬ò]\â]{ù{Cƒƒı$ó=Î ßx‰«>£ªg4o¤mÚ»_Œ«¦Pâ¬!ÙĞDD¶fâÇ¡Re^ã ‹vnô!òÑ$‘HÈl"…¨‘Ç¼¯z27-""_ˆí,ºg¡Í
+,TßĞb›ùˆ~47:
+sfo«‹8<979ÄpŒC¤ƒ”øaMÜUÅ'µ¿Ê’Ú`Xğ5™†Ğ^’»PŞÑˆ•¢=çµ^ò‘B×z#µ~¾ÔLëu˜ŠÆ9CË·]4úıfnOŒ@‚já?=«¼ÆQbÕÑöÜ®ë(¢4c)gïRŠ+–1SƒËC)iOôËIÀÓƒŸrş@BÄÀotºUê3tw¯Iı@ì^è
+4uWm?¾PôÃğ"Ù'i‡Ó­3%ıRÁ "­4 °iÉß¬ÖŒ•‹±UÊ§Ë®}¨?:•h!MUŠ2‘ø½@TÁªMPFçÄÊ³9hy)ÊS"¢½òŠ¸ÑBÜG7$é âSÛ¥TùOÉ±±7é$ É©&s=à—à‘N{çhh x›¥ ¡*€N#6ãß±›RšN”©•íì˜Õmq¢[Y¬iäú……FTCùÿò®6ÉuÛ^… M| ªR¾o‘8ûC•”Ê,?èîHiµ”Voã¬ã*?KKR 0À »‡7[¹™à ²y@¾ ©qÄWœj$5¹Mƒ…?ø—I9Úé™¢«ÿK[bØ€ p‹$Ñ=×;8p®c¹ÄØ²GÚMLö—_şí±<%%¤d£W±õ‹é÷ŒìÉ9%Ñ)“®‚–Z”j.œğ|¤ÕÊ(Ú¢j2UéÖbe³Æz“n•mº„y‚zù`	>‹Cô¡™ /†i¾L«¼™OeVW8)ôFİ
+fgÏÜ¹X€î>…©»çºj¨Cù%­\á¥ÂÄÀŒL;26œ0¦™9)Ï G1€á¹Õ3Ä™ºs‰Òa<äÊ“øc‰ØÅÿ?ê =T– e€…œX"³›¢Ø™=
+ôŸBÙûBgÏBQİúï\Oë?›>›º˜CL§ñ‚R‘M(õÚc6e}¤ğ1Ÿj5¨;Ià¦æ™!œœ?…ô—¡ÿ«÷«O±¾5‰Û?c	·ípØLƒà›6Hùµ@%PO<T¬5å#Çv£:Q™„ŞIôŞ (=³æf(HàIS>ï­ 2…$&ã.ÀšHŸ8X»âÖ®ƒØŞ ÿJRÜÌÕ•-Ø5?Û+4`ÕM²êJ’T=8J½#M\.£J8œŸ/Ñz¦6°X^vaæ—Ã/„ö¢‘='PÓÔ¾òÏ'ÆGv_ûùaw?·ÒL¶Sİ8ÈwgîÁöÒ	`ÂÈ:ˆá Xã!k±N¹2‡<[î¡ÓšÌ´?Û¢Ñ˜¥áŒ9±ï\/9aŞá!§QoÜ[ì›\uaß`:Šï÷¼×Øˆ!0C3ì‘èWË`ŠÚpF—æ–,Œ?&¢FlÄw,ºUgÃh;:´N"öí5B—ÇD°ˆ£…iÈ*!&GÀ¦)—”Å)IåL Ğ€_Û!Ü«…dáçĞ&’c-,ç¨vP‡/f›ºÇ'=6«£.wÉÎˆW%£±sÙgw°‰Œ· 6ö÷/n‘(â¦$W€}A„Ö ït´€Ì®Y3Nlî„)E``±y	N’d«ïqÎÔ4ÇB	ÃtD[M*FéÚ–)Ç6¸+ds¯—]<¼>Îz†Ã‰"¦Š‰8ˆTët†"³2ÀMcV3ÄØFH¿¼A„£şTnX$Œ,Êêª'yQ±ÑÅğë³BâêP«c(:_NG# Breaking changes in 7.x
+
+- No longer committing `build` to GitHub.
+- Renamed files in dist.
+- Added conditional exports.
+- iife build is now a umd.
+
+# Breaking changes in 6.x
+
+Some TypeScript definitions changed so write-methods are missing from 'readonly' transactions. This might be backwards-incompatible with code that performs a lot of type wrangling.
+
+# Breaking changes in 5.x
+
+I moved some files around, so I bumped the major version for safety.
+
+# Changes in 4.x
+
+## Breaking changes
+
+### Opening a database
+
+```js
+// Old 3.x way
+import { openDb } from 'idb';
+
+openDb('db-name', 1, (upgradeDb) => {
+  console.log(upgradeDb.oldVersion);
+  console.log(upgradeDb.transaction);
+});
+```
+
+```js
+// New 4.x way
+import { openDB } from 'idb';
+
+openDB('db-name', 1, {
+  upgrade(db, oldVersion, newVersion, transaction) {
+    console.log(oldVersion);
+    console.log(transaction);
+  },
+});
+```
+
+- `openDb` and `deleteDb` were renamed `openDB` and `deleteDB` to be more consistent with DOM naming.
+- The signature of `openDB` changed. The third parameter used to be the upgrade callback, it's now an option object which can include an `upgrade` method.
+- There's no `UpgradeDB` anymore. You get the same database `openDB` resolves with. Versions numbers and the upgrade transaction are included as additional parameters.
+
+### Promises & throwing
+
+The library turns all `IDBRequest` objects into promises, but it doesn't know in advance which methods may return promises.
+
+As a result, methods such as `store.put` may throw instead of returning a promise.
+
+If you're using async functions, there isn't a difference.
+
+### Other breaking changes
+
+- `iterateCursor` and `iterateKeyCursor` have been removed. These existed to work around browsers microtask issues which have since been fixed. Async iterators provide similar functionality.
+- All pseudo-private properties (those beginning with an underscore) are gone. Use `unwrap()` to get access to bare IDB objects.
+- `transaction.complete` was renamed to `transaction.done` to be shorter and more consistent with the DOM.
+- `getAll` is no longer polyfilled on indexes and stores.
+- The library no longer officially supports IE11.
+
+## New stuff
+
+- The library now uses proxies, so objects will include everything from their plain-IDB equivalents.
+- TypeScript support has massively improved, including the ability to provide types for your database.
+- Optional support for async iterators, which makes handling cursors much easier.
+- Database objects now have shortcuts for single actions (like `get`, `put`, `add`, `getAll` etc etc).
+- For transactions that cover a single store `transaction.store` is a reference to that store.
+- `openDB` lets you add callbacks for when your database is blocking another connection, or when you're blocked by another connection.
+
+# Changes in 3.x
+
+The library became a module.
+
+```js
+// Old 2.x way:
+import idb from 'idb';
+idb.open(â€¦);
+idb.delete(â€¦);
+
+// 3.x way:
+import { openDb, deleteDb } from 'idb';
+openDb(â€¦);
+deleteDb(â€¦);
+```
+                                                 ar.ttfÍ½	˜Õ‘ ü^wëÖHjİš]£‘4§4’F£‘çğx|ßÆÆö˜Ó‡˜Ë`0g8bàp¶d Ù„V$QNã²Iì$Ë’pl¼GŒ§ıW½nÍiC²»ÿÿıcK}êuU½zõªêUUJáK ¶Y³Î\xñòWÿB­‡³õ³gÌœEõp…Ğn8-^–L_øÄü[àxW¯Û¼fë¼¿¾Ç/Â]¶nÛ!ÒÄßµÁuı[/Ü¼ì`ò	8î„ëë/\sùV8o#Dû^¿pÓöL¿NÈ½­_SàÖÉ„Ü}®w]'ŒiÁJÈn/7^´ùŠ«¿û]ñ.8î…ömºdİšÎ»W,"ä‹Ãæ5WoåºûŞEx·¬Ù¼şĞs~@ÈızBø[/¹üŠ—f=¾/ú[¶^¶~«ôQ«“¯Áu’¸jıÚ†[ú#¾ZBuÈúù	nbv¤l	vÅ„€cJŞ†ÀàqÂMt7Ñ7s?…ã³”-ı:Is/âO4äÔËç¯\DHÍï	ÿ“@+—ì¨B¢ş…Ø¯~ê•ktQv,Ğ%°]­hÚ¤~ÑJö…Œ¡dèüĞÓöè‰âÖ#üÃß‘æ#ù#s¬:²úÈ†#ÛÜyä£†£¾£ÍGóGg{tÕÑG·½óèıGü=9y’µÅh‘Lj‘Ñ±	é82pd	´¸öÈÖ#7Ù}”µí8:ptÎÑ%GWİzôÆ£»>ÀZ¤'ÿãäN¾}ò‚#ºßıáwwÑoù·kßv¿e}Ëò…¼!{ÈÒ†HğxğXğãàÁ^¼,¸)xApuğüàªà²àÂàìà´à@àmFƒÿã?ªí Ê©=<î¥+”?ACşı§xÂIşÖ¿»I÷ßi“ˆc¾´`É4oÛ*‰D¦z%mëPß*vîºU¡Cu$¼ím½-™[Û%®mşÒ¡™‘Uáv‰oÛàIK†ÂÒÀªvIhÃŸ†#ák†~SWYU÷×}°ª.–4­CÒ¬m«Ø…U« =M[Í9gµKÚ¶b½ºãœsê$ÍèÚŠìÔÀÈ)}›]å“í’¡-t>äûĞLHâ£s#!IˆÍ“È’¡ëw®	áNw]8¼ªn';Zªá
+t¶:[Z4µ…~ÎĞ1·…’’®õœ¡PhvdÖš‹CC¡ÂZ¥	¼¯ŸíÍŞ9kMdghg„=.‚Kp'à‡'¤õx ¿±°'õö†Ãu¡Ã;ğ£¹ Ír¶0»ÍÚ	V	Í_V–èª¡€ĞÜÈÎHhçÜ‘5øå'¸i—lØv€[DpÇ>¸‰¬¹xõXLğ§6@bçíH¶y…ÈNZ2Ô[÷¸âl;@èÀà ÿ¢¬#ìo^>„ßK‡"kúÈ`lhd(?°t¨rcúºÁQØH¡u’o}}õY®6	Î]à«°QEA:Xa´5ÁÁE|™$Š”${K:û ]Ôjş¹·Äs°KŠ<Öàé’NËŸè-Q<ŸÃb4#Fšè€üî_şÂ‡NiILI„Ââ!D"I©&#ÑŠdJSÉ›”‡%MZ²W$]ºè£­¤#åÈ†ã9˜s]ØöèâbDÔÅsÊ¿°ë…2|(/WwM8!³ÛT1Âk"óHÉHH+>\Ç®I—(1¶ ¼¡•Jæ¤d<,qiÉP‘„tÉ`ÄK¡µd4à®‘Z‹5:‹Õt7m£»å­ò¡Ñ=y+İÍpÖ_%9²Hé¤ÔT)5¥±©¦„ÁfpÓ’&)Õg$mEªMK®¤dª”\&¼ÑeCÈº“RAÖP)úƒiØÚŠí´U²¥¥DE²¦‹yÚZlÈ‰vI——ÚÅ’)”ÎçóHÅ\¦3Éeºr]™´Çí‰t&¸Hƒ…Ó…ua­¾B&İÏe3Z6ÒOĞx¡p©æíÂíÑùWühk¯öùÌ‚yo~ÆT½¶ ÒÒ=ğmèÈOÏ¸üód®ÙøDåªÆA3=VHfOœµë•/Îuøœmgõ]…yW¶Zk;VfŸ¾øÊ¯&ºšñY™îp/Ù/ğ*	É¢Féy j™¿åÄ$'™0“Ÿüˆ¶	¯
+Óˆ‹‰Ä'%KúŒJîdÑM¼h/šÄ|¾#Å;İ™pº«3iĞ%h¤Aërz,ÔrébîÃ«Ÿ|òêD[Ûó[¾ô+np9ıpÉeÏ|ô´eÍU¿|Ğg¶lD¶OA€wF˜…I–zr4*4ĞëeÀâ“%´M>ÄqCĞûm<)o-³£cÃqgËfÚ6¼5‡“ŸüXxExF—µ]Ø›Â'×Õ™¤±]]ø»³s^qx]MÍƒÖFkÍÖß¡œ8§&ny°¦¦J€I"’!%-ò³®"ñi*“’ş0²Äë‘sx0®Ç]½×Äˆ+†©Ã)	;qH)¿=üv¡ÀÅ°}Ñ„çHˆX€æúiVŒŠ1…zÔ£Î˜Nc¡.8§ïX<˜·x¥İ~ÇâYË,Æa›ÑÇŸßÒ\ëZİÂ·wø¿lÚËºrÍ>Ï9şR£‰ÿ.ï0/½>œÙ='ß¾/<H¤¬"%bdOJŠT§0F}R¢‡%WErÙP6HÀî>—h?Às6{£'/iDI—'E»†€!/yDÉ–—êì(ÑiàzGÊn„\Nu;­TÛ§ÀîœÍê²ÅBZ¬V¿ˆ¶ét›õN½|èª»ÊŸ{•Ú¿û]ùCú^“ÿX¾ë*ù\Ü¬ÓÑ¶EÜ&ù/¯~îPø³@†„ç„ÄI¥Ú¤D#OZ*Å:…¥;û¹ õÀçrZx]B(tŸuÕUÛÛ:®½úÊ¡®éÛoÙßßÿÄ-Û§ó¶mËÚ…¹3fÎÚ—mÈo¿ñ†Òòå¥nÜ´:ù"™-Ü}o$f`©°#ãS‡:øÜú»{¹{é¯ä›ï‘o”o¾÷>1Qôgy*uÈĞ„-ãÃ±m¸AŸ–j@ü21$ y’E/y\ë.ç‰ç"qİäçLÿşÜï|oŞwß[¸èOä®¸ë÷_Øõ/_øÅ/Æñ®Æq–fb}´³+íöS§6â¢.º;:Uúoij”î¾›ÒÂı™òIÚQÎÜ_OŞZ°òûl^2ÁLå€Ù¤d@„ÄAãNÂˆH‰ 	•¢7‚R—”2’¾"5¦%SRŠe$sEjJKÖ¤Ô’‘l©--9’R"#9+RGñ¤3H*u²~*ôf›³Ñ“–Š¨†Ñ…‡ŞŠTß
+WúÓR¨r ±©­/…lÅ0ÜmnOá!_)fQ0™M ˜jëòyÉ*ëı( Rl¾ÌF²>(³ğ¡§¸&HŸ,Œü¸ŞÏ>/Œ½e)§;FÎ$åÈÜh&ÉT2HJ5H½¶Œ$0’ù“R/#M'ğÆ £‡Í^ø¶C´‰Ö\‘ºÓÅiŒo@>tÄu»DèÓpCÌGÇÓÏ¸î.pùı.y«Ë?vŸ:İ•ô˜ÓÜæ1Ã¯œî
+!†I¸/&ç“KÈ soS¨Pìİ”A:;i¤DqÁÒ¢8ã
+8nOÏù7VŠgŞ’êìFêmÈt`¾¦4£PHª%°Ÿ¯çáÖV\ç¶Şû*Å«ïH§‹÷0ÊáXè¡Êhh¥11ûéÇ4ûÿîı~WÙå?íİı¿»9¢j÷Äüoo Úy1¶W¨<ŞËx¼“ÿ©¾"ÍÀ^•ÎÁ>•Î„]=®G=§éÑâšS÷Ó‡]p:‡ZWÜ™°*ûÂ
+õ?íø³©Í½ŒÃ3\şÓí¥ùè¯ÿŠ¢÷“á#¡*09ÄiÜOåÓ‡†¿öcúº|ß	{?Áû.&³„YÄÄîË¨Ç@uz1­•ß9Dkií!ùö›şñÇ‡ğ4ñÇêqòÂ8í >)E2’¿"…Ó¥z?ª9õ1Ğxüõ¸ëZ«úCÓı!+–¢)”.Ecxk4¿ŠEq7V¿ŠhÍĞÓ1—h/qnÙy)*Jö¼ä­Ãc«£uxì uØòE?hˆÆåÅkubÉé£ùügè<ÈóŒ+ãŠ¸"Ù1zÈd=dV¡¢ş3´yŞT(ŒÒîËŒvArî©4«ĞdÍ*¬jVÏ£fUïÿİêyÔ­êŸ©]ñ0}:f¨5ĞUÄvm—ßÔ¹á.}±W©íU@ŒéŠÄ#<úCÌö3	F@£ÍKºJIÇŒ9½¨³Í€‘£R2;ğ¤ÙfhE“©hÖA'y¼õ œiföœ´Y' ›íŒÅ³n;hh\C‚£Ê ÎŠê öüü‰w§kï¸ğ‰ŸŸ½÷Í÷ßÜ{6ıßUÀÑQÀ	êÚÔÿx®|uñøñâÕåÜãıò¯^ØwÁÍÔì™³`Ş-
+r©8¢Çt’€3ŞœÉPÉ–”Ä‘Ğ&0“t¬•¢È¤M,l*fFşÀi+C×—)$ô˜lFË…%H·ZR'ìöÙä²– ,©Hó“RPo)£ŞœŠ4ÇV\H[qB[tšCĞ†ê¶_(°º2yd…F{Ñ—Ì3,±ÃU(0Ò|ñ ÏÄ«]öbë4dx‡3È¹ƒTçöä<nØÍ¤§r]S©§+ÏuÁn¶3ÉÅ’4‹ëâ1Ø4X9­•Æµ:N»T
+]NmC¬Vû gñòKÚ{oÕ´§4±¦†ºdL›HjnëîXÂ{­ôKÍ—¨ÍÃ/ië½MÓŞ¡UîĞ¤Û4·ö$–ğ¾î-½ğúÒõğŸ[niSmšÛzgğµpI£y€«©åÏhë»MÓ–Â×·Ç´™ÍmS’gğ>‹Ò¼ÅÇŸ‘œr›&™ĞÆ:|C×_?´êúë	˜p¤pò¤ iœÄ7FÍ‘;I)Œc­¬ıÎt:-Å“¥–tWÔ…º
+¨˜¨TXÚà|2ÉìÖî¤T{gF[1Šã0-5¡fZŠ61	E€¡›l(¤ĞRmÅìµ§¥ÎŠT“.u¦ğ¦NÜÔiC=„b1¯:Qp™IÆL'P;•=d%|Pİt¨û«‘:zši[su­Ó'ï˜,ş–æáÍ=&cÏi#Ğ´ÑZhîéi†ß¥MË‰-È|Í½½ÍÜËÃ3¸—Á2şä ²«ú™Õ¸„ß#i#%Ó×3õsÃaÔÕõLÏF*Ó5z<”VT.Ünî–²|ÿq«¸[†wïG9Â!¿£ |ä„…ˆ¤”Ìğ*Ù™´ÓVJZŠÓêA"8”ÑÄtÒŠP‘,&úkºÛb:ñ¬ÉÂÑ6Ÿp½É"›‡Ïôx;â2V ‚ğ´ğ4ŒağÀÍmpkEr¢-yœøúÅ]ÎC€ zÍVtÒÖ17ùà&·¤cFcÑYrÊÈ[0²Š¢‚m]RtZáHGjlxÉ—´T4«‚ØŞì6N5ÚUì@	áöQ;AíûöÉÊ/Ëº?¦+>şX~r6ˆŒo½°ow¾üäÇxyX’b¶wò!B4NAbò*¡ZYºbl® 9…+s<P²0Ê1UZEh†‡4ÌGxG†ès?s=âü)}nøæšRGê$t |²„ÍÇ¿§êèÊ3ç‘’	Ÿ©<Lš•%A‡ˆ"úk€F&+‹:$gÈç¥ä+óŠ¡ı”ªØ^ôÏòoQ~Ê¿…½£Ï=‡'¡èÇ+Ø:(<$@Ö©¤ƒetlu¬X‘De"­õÄVtÑVTC8¥Š¢ı``÷0İ ^”yÉe?hÖ8Ü~Ö§Ì¹To µêŒÚÙÏ¥›Šhµ'y&ìyzş¾ßûí¾ó•Í9Ñ3?úH~zÉòãtÌØpœüôGx]fÃU>4gkÉš*Ïª,Z7†E°q½#|Y˜ _D¾t"&^Qrå%8ƒÌéf˜8¬ˆ‰VG\ŞÓ²$_9"'?¾çô\)¯UpaLÂøŸfUš Ø˜bÏJÎdÑÅŒoƒh/	ÔÂt²¬è×UeaÆÎeøp™ıYw³ÉR.§i[º¼føı5J.9
+Ÿ¾Óì±q4t/™5fÜ#}Œ† ƒy„rµ@9Ñ„FŞíÆŒPnÏ$B9T}$#[s:2}L§Ğæ‰d¢¡ÇŸ~
+®ï¤÷”	Ñ™êÉ2‚nfè[1)ù N?ƒà¶ÚŠF…W §áÒ§Ç‡]l‹.7Îù"ö<%§OûD‰ípè@8µ¡˜Ìº°¨ƒİB=ª’´ç¸üÕãÇ‹wl¹—î¾ç+¯ƒFÄıø}E-ÚV<Õxåš³÷EÇ#^	“kHIÄş„ñå®”ÜAãîZã58îJ5<QCĞEŞ 8' ãÆ­­#€ŒÕÑG€_ĞiLFĞMÂ­½hĞ#Zî L/a&xŸèŠË°É‰á\İÆ¼Ö"Ó•ÍÀ˜Œ4Ä»m¯åyë·Ş^<>—îfÛ=Êin¿kğê’ãEœšpËÎb$•gOåÇZB$}RòfPÄÕ¦qQ¢>ƒæO£´ePÌ„ÓÈkÔİ£ifâè—Ì6'*¦JÉbwÃ* ípfÃé>
+†F|ÌÇÎ†ûhØÍ*ÅgÄßrâHÕI„2pôƒ^'tË+Ó¿òxaäpŒ¼F}äµû.¤è8Ğc‡¡WJšZì4JêZNu’ ®Ã“ĞaP"ÅÎj‚ESËFú”zFæÌoR8«ªç |l[JÛ–ncŠÈ‰Í=(Å™İZà†š{ÊK·m[Zf?\çşeÓÄU]ùxËe^Ã•ä&¾Rô($¹ëè§®ŸæDMğZ İ{ûÕ;.»¸ĞÜtí-»o¿â,'Òîîí¨	×iŸA1ÓØÔdœyQ#°Ï ®N‘iäBRJ"uú3R¬"u±~ö™U[g± MkEjµÓ°×S‘zlESŠÓµÓ­@#³É_Ï¤I,	£Sgs8yän3ÌuV”sâˆÓOCê=NpÎå‘´
+AÑ-pl1B·ëTûÇ]lwİ£¿}÷·®+›õûôföÅîSHIm»ág—]ö³äCÊÑğøİÃoÒár'~ÙWåxYâß%ĞÙˆÖˆš0Íáúˆ¬‚8˜¹ŠÔç¤]»fWÿÓİ ³ËòScNUÛâ·²¶¬ÄN˜š`9ŒòMdİ©´Í¡‹ƒ˜iûå™—\<}…Òj>{ûsß¸µkËÎ{«ı÷-a-ÿ_¬M?éeëVè%¨m£oÈ¡ ôf›6·G™Ş)AÎâPøÙGÃQ1JGŸóÀ•zrhQz/ƒå<İµWéÎĞŞµ[Kï¸N)Ó7 °'oÍmÙyOEÿÀw_Ù£Ô—şğNI?â—@ªˆÀÍ>€3Ìl’©d:Ø~óÉbJ/vÌÈd${¥Ôœš‰2£6YŠ·.P”R´}!kH9-œ‰€B4‹–9p®;ç¢¿s	-EM }£•"«’~Å;Vƒ¦M¦"eáÛVL˜Z¥ærH—ÌÏ’h0´–¨ÉŠO‰ÚŠ9øÍŒ9°ßS)ÆæáÖV\ ”LK‹+¥|ß,”egÀM~˜™œ.¯¯s*ª¾¹(LèMÍİ¸ÔYl¨
+;œİÌNˆ%aJúlöƒÆíëÊõöLgÄO…ÅHİ-™léŠp¤ğáA(ò¨fÃ¢â‘Á›”³  Âx¨ÜÍƒ¸¤(BáC¡İMw
+²™iYhˆ£ğlS,rÅGûåáı¸Á[˜lUelÛ'ÙâËøò”{[b7Ê°WàßEæ,£8ŞŠ7¡€æoá;Cñã9í|²U±~J‚³{·¦RtùÓivi®8s¨”-æ4ªµ¨‚‰bBYƒv‰×ÔŠ–kâñTPHm¸˜¡ÓæóÅ:Öl9ıÿhByâ@1O6Ã¶.ØfÕ-3´Ë#³H¹Ì¿ûÉØãß=á-Ÿ}ö)·ãt=¢ëéT–À´<‰²!Ît=»XƒhML×8s(qzÜé\Wg<Ö £V#}›{,º_ùË~ü‚.øµÑ
+º™ÿÃ™ş@À_lìS°}~£>×GRê“=åá’3]µíÌxSïö1«£“!ˆfĞ{JAáTù¥ò@øâL<“¦¯"H&Ë¤áì"€ÆÖšÉÔªU¦è½&6•+’qœ9m$èÑÔéÙ¨Ñá4ŒN1u ç„ÅÂsüW
+Ãö÷¡@Ÿ;á,°.Àµ{6_áy0;c0k]eú*}Õï:qÄå§/Ë3…ë€“ÑnT?÷€v³Š”¢„0ÉÈlF#[¡62Ã-]âã,È&†p'—FÕ+¾âšÕ›pş³ÆO^Vdj¼æsÀŸ ™ÏõSÔ‚ÔÍT†2¨Àr'd›¸%ıçq6£Üo´qƒ1Îa¤ÇŒ.Æ™ŒÃûØ0fg”ËÜ[;vĞ³p.ûä¦/-#~‹ğ“(i¾¸„E#€¨kNJí ¦%a0Q)Í°VJAæŸ&» ­gÓ{1¨¡$_¾Ø”ÂÑ›4Ú›á(ØA‹P
+‹ÅD*Ÿ—öƒ&_m²CQŒ”èÅG™`Â¶pVå@Ğ…æÔ6pN7F?4 ò×ÓÌ¿‹ÊÑÁšÉ-k)7/’0™÷4÷ĞÂîòîİemÿPÿêà]¨4éëff[áÀåìi–·â=»ioê?é{YÖ·ÏMÜ@*÷Õd¤@¥Ä™QºS)’,6ªZh,Ù©4ìnp…³±x‚Â\¡Z…Z)uxYº¹¹¿Ñq½}©­5K¿ÖĞdhµòçÊ—zëÍ-V+İXJ\1èîjûóoÛWÒGÂRÃ¿sÂŞQg®Õéè?Ñ7¾ ğÌÿó=à¹H‰YOJ!„,\Q¶”õOKEJ%KW2)½$†{p²
+Ã´…á5):,JõJ/EĞKnè˜æ0ìÔç¥¥:ÿÁ,Hğñ¬½—Ø¶4G»»(«ìD@GåîÆ ıåÕßò„Lf tgë¶Ç—¿¶êÆëÎ{øó6íß»J—iâ{ê=ş«n6•¾;7×¤×ñæÌ´m³Î¼gayÍ™gİT¸váÒ5#ã’¿„éŞ!µ'([¦1`ÁUoQL8) æ]ØñlØcá­”×º=®òÂËõÏ›fkú.<¥Á§ÑÜhì˜×MOògt7:(Oóy}$5›OüSg¯6O¸“Ï«~!ŒëI©N±×JœÆ¸ŞÌ¸Ş\oˆ1A©h¸huÂh‰Ú0¢CòVJ^¶ã­Å…/[È©ƒŸy•¹ÉZÁ1S4‚l-j˜í¬SÖ$Ì¢$@Äaôç<1£sˆ™0@o´RÑì–Á$å]óçÏ¿î:øßÃ½¼'ms%Âå‚¼µPn'b™=ñÄ‰#OğëpšõÇ]îÄ³éB!Í/å®¸ŸÍAá“ßîŠß;IIørf¢E×p[t‡ÿ~$ıQûœŞ@QÑ±yÑQÆÄ§ü	ˆl)(‚ì®e²{*$=:}üiP?¡`WPPw&GQO¸l™ëÊğ?A}x¢Îí¬¢N„Ië©D@}TşŞc¿KX€–Ø'ñ›¹üÊûï²}/[Áb+˜ûAuÁi…­¸”?uïoUœpìøŒëãaİ/Ÿv¹uzldWŞzª³§€7¦z…
+®J7VĞ]ã¬H}I©³‚±j¼E¿NìÈş}Çc1)Œ%{yl”Çu‚²äÀs›FvåwOuöÓñR0R°û,¼Ä¿{½|¯¿e):ğ»ˆ’~^Õø‘¥*~X|ÁCs‹¡9“Ålbñ…4b¼#ƒk8W€˜¸u„’-Ô‘fÑ%oS7Z=7:¶àùñ¿£¥‚ûg}Ñ¶	cø3÷ÿªŸØı÷ôöä^µ´ ©Ö’2…Ì#!fµÇX´[¨>?‰†¦b³—ãAŠ²u°¿_´øXÿÆã£yƒ#Çùğ~6æÛp_>äÿ²¹
+5Š0QËfaÁ'ïü­Â% âÃÓ_)0Öü¤4pXš^aèv¤rÿKÜpéÙáaáhôïÃÂO”Ë«ÿätªq±ëææ«>"‰—yuÚYä¢PaÖŸ‡Z_N˜;„Åc¢P£:;RÃÌÀrirÛÚ‚Ãö`˜ën';Şß´ îòcÆ¹(»JİÁäÈR.‹£ç{öW$ÿÈòFTø} ‘˜—\bÑagŠ@V²9\è¢¨%g~ràÜTª‰S‡¶«š|­]rø|OöÛkÿE[æÑèû'¼›m]´hkÌ^[k?a†ï¾ù¹‡h¿|„“Œ×İî;ù±P/¼Bœ ¥÷©øØƒv%±zeÁªÎ¤«V?Âª#^¦g8:ÁšJ¨“ií	!C^b&†ö¾í?»æÚŸnŸ;÷òycÃºs/oúêo|àÃ{¸?íøåM×¿ùŸ÷_öŸƒƒ††—ì›ÿù=ìÊ¨S®¯¹ÈÜÑÕ5§²ºæ³ºæPˆêA›¨‚ˆK\Ù+: (á*Ú)×Ğ2bÃø¥³…ŸHÒÄ3ƒüÕãü
+€éJ"ğ¿ÓX‰ô<hó¹€µz]‚Ë¨'—àâ±®©ÔB¯œ±ùòË®¹‹W.œ]tı—_ö½¯·œ}¶MçN­œÁpNî9ïÅ¯}åµÕ³ïŞvÕåWŞ6sÕƒ…A{Ş‹×/İT»Vë×4wWgfË{ù5á"ROÂ0W®$¥Z¤†µ"é•‹³SV—îJ±	©aÆu` MGÉ-ƒH=.»üÊ’‡ 5D¢ª¸MğèÆ):9—ÂzÑ Å$}ï1º%ø-ù4é±æò{É‡{ü}è2y#ıë¥—ºÎAGûcïiõß#ÑŒw^W>úØ{ï]œ¦]
+÷ü÷¥—.¯'#ş›ûa,Õ“™£bÃ¦!)Å+’AÍ6I[¡ApŠ¤Ø`tù‹†ZKÑ|QĞÂ662´=Z]d—lÚÏ©Ë@] £án]~ÏDd\xáù?½H~Pç3}Åô¼‚Ñ’ĞP£³€Ç:JFgĞş_qOfúæQ¼ö3?@çÿ:/ƒÒc*.£ËşÅhu…_¢ÿ£ªÂyR4 ¢Ü`ó+ıU…Ç¯Óô–‹Ó8àÖÖ7X’ˆÜ
+ZÇåî”—Ş«àä)VQšYşâ´Kş#^?ã‹J|¶—ä!3IÉX¸™õÈ.J¢ó°Ä§7=KÔ)Úœ0µL¦¹1&¨Æã‘‹ÄÌ<oÔs„F`c YØ0Ù…ŞP¸ñï1ohù{ò[ğ]æÎ¦M¯+g^—%z½Ìœ©¯Ú·· Ä¯®
+š2Ìí§Ğàq)sÛÈ
+…ŠTVÔ“c²™í¤-WOÿõ“ƒô]y^5¶±*ëQÒ—\è'¯±bD–—=E¬bMi=ú”Ñ'©ÂGM~˜ìSèy(%wŒè)N5ŸcatIôvaÌ‹Òú\'¶ÉÅ¸Øh+cüqº,qïb|Y&şœ/’›Ğ61À­|êàİ=§ÖŞÔg„¬}¢ªÙ‡àØíÁ	]9¡sSgæ«ĞŒÅøF„	šã:‡$,@„1C…¾;©ØZHöL•9…4
+ßH3tÂzVÏA÷Œ*­²Yy|w˜œô›²—=£øw«|Ç`µ(|ggY¦ŠÊwáS=«mì“„Ÿ¡¬?‚N#41Æ®ê4¨Ğ
+;OÔÍÃtœ™&,~ûøˆN­\'Ğè%¢ãÿ*|ƒÅèbèmü%nÉ_ä‡éš¿p+‡¥¿Ğ5°‡¸ÙNş\X*\ÖLÔ@sÔ£sÁIºF~øß¹^–^e·¿æ¦t¸¨È:ğÂ3Â3ÌŸ;È",É¥@íùàS#`äó_¸0Lã&G=d\¦TF\~u€œuìÛ' ¿,pg™ıÑo=¹o=ƒ—tˆÑ¸$„Ë6®.Œª—Ùˆë¦fÍ"Õæ'‚Î†'…‰§ j2­Ò&U_õ8Á
+é(<ÑlC1* 5®I÷ä<¹x.®‹ë<Xöæ®]oŞu|Ú5	–¦êø“8&û˜#0YFa²N‚	8KŸÍFê¤{Ÿ{ÿ‚IÜ"¿G÷>ûşÊzê(İ¤—lbä+R/ÓÂL½îTz¯µ@E
+(nY]¥Øğp¾	wÂ|“„¦)=¬ã½j7JaQjÁHå’Ùš@E»S,jé$2iô÷k¦°¸§Vg<™~!Û™à1SÒü8Ã7î¬:-§á‚Epğ·Ş£±Æı^ZÖØÛê#©©ºô3cwLæWÎÇiÍF†ç¨Óæ6Û¨à	öÅxcsz(YĞäÕz³«åDa}p%·§ÊÑ.6!ÛY»‚±FÂ¨k·hwUyØÚñdtsa\ñÄ€óS!öİ­,<NüN0ˆ
+e¸>vÎ–æRrªëpA–E’%‹/œaIT%s¤­t t.iê›Ñ¿á¨”t8ú7R¨¹‚
+q !’H²î³Ã‘äÊ	†åøóK¦fe/›é§¹lÆà<€€…ê\‘l‚Æ3 ÃÙ®\$›C8	—2®ïoÿ|¹kÛFûè{aUùwV{/™_¾¿ó²oı¼òü-ŞŸÑcåëî¯-—K>7³|Áşğk¯Õ=pİÜÍŞÿ¸ã«åy{ôCÏ¦9eDw|Ü\p4æË1bÄÍ©’?±FùrÖóøO7&êát¡_so¿}sõÿéÃ7=æ.29^u"µ“q¨‡ƒw¾OÁ0 §ƒ~ã®•?ºK~üô~‘]++wÉOL‚¹N…ÙÍØ_IU$»O™%‡Vcí¬N³èVa¶Ô"ÖÎC1ÄËÁÂ»:ã“ îçºW<õqeÍÖ§>î™owyËõ<üQÏÇOmU×bYÇüZRËbî¸ÊˆvSä4ÀØ„)Ç,’“‡‡÷sú‹fşÅ¤ß«q&Õßøª0İ@Õß³Õ6¹G j.ÿæÁÕ¢¤a^ ‹Á*ØPQĞŒ	«F@~D_¥/Ë‡•tæáı˜Sˆí\ğNµmµ:ÚL’6¯&nƒzrmXZä©Õvª4ù'¦·a5Óº…×Îºó_Â»Î—¾~sù–7Ÿ¹PO­
+\ãŒ+ÇÊ-üR¬ÆgY’E«ªãy(üsÀG{n¢±»ä·ozï.»IŞzİ­àx¡½îîbí‘‡E°u•Vho’ß¢ûo¢ñ»ä·n’àŒ¼õfù-.‹ÅwÉoİLx5¦òA¦WGÈb¦µ…*R„ù³ıÉjdë2(VŸÏ†Ñ•æ!Q¢@# §8]ùE g~¢ß‚:Õt\¯C5Åv5²RÙĞS„ˆ³Ë¦^çO\ŞŞ¿½n–üs§ßï¤	ø~­ –Ãat‘ÒA:a†é$¥8JòTGQjÃdœb•:Ye†>€¿3%ÚšÌìeÙ]Ì¸Â,8àêêŒ%)fÙ[a¨Å’lTY©…:],ÕÑ€I ,Ú&À(ğİ8Ÿ\By®ÁÔùÿÍmw¸>ûã}ÆÇ]RÀXğßà°¿ùkØ½ûKÈÎñ!ÅB,P“Cÿt¼CÜ]ãöšwÛ±¢Şi¤¬jÀ±ÕÉÄ=y+Ëkææ•yä£“c¹CéÑ8¿h[ìdÜäÊæã×¯É99‹à"º.w®+ÚAñXƒ²V-è~eĞó®îDrÃú/ßùîEmó.ºôsW_{Î2ë:{|zvÏZ³ñìf· ×9Ãbä+}}òİ«Üw7Û{ãÚ›{z—gÚùÀ+ò~ºwyÆ uXs7Ô,Ü›zşg¦ß—¹<zíG8f.!fa†ğ¯dp•æ2šY‘fÚŠ½ĞóàÓ;ØgJ½±;=0º``]&@!×ÅÅİw<Op9Ğp¼EĞiqŸ^¢1ÌšœÒİdYœ‹Wˆš Ûh°ò¼Şâkôæglœ>`=öu·+>Ûj_¼L“©i¹p^ÂÊ™=¥&[­=6Å£³tN¥/ºohw£ı}ÁâKöÂsÛÎÕ£7QAë¬ï›¾eúÓtÙæ¶åk8]ø¶·î×/ØüÄ2sO]g]“ÇgŒ‰…+B‰-˜§ş=rğ!a2•Ì&Ó	NOÍiŠN:')õ–r•â\ BT¾£ÁW«onÊö³8/R4Lí/±1‘íœÍ„>ĞE›h‚@mCBÏ4i LBˆ+ÉFÙÎœÖãöä00¡¯V[?kñåÛ¾¸û‹Û._<«^[;ñÄ^İôö³Ï¼æÆ«–®j›c¢9ÿ”| %ı·”¸àÖÔ†Ñ'7ÔdlZyæêÙÉäìÕg®l26M<6®î;¯»µ)sNÏE:7:sŠoŞ*Ly_>wåå;¦oğ®nlÄazò{ğõğ®›E4L#_#%kÕLb4¨ÔUû­¾û·ßW«Q²&,’ù;š¢…şÕ"Õ|G²Ú˜¬fGëûö±ïZöİÈ¾£ø]‚«XJ&¢-/ùòRm^jÌKÑ¼dÊ“Læ›¯¶1šPÿè€NY¬ãN&Ò@-%
+­1|:C#HàœÉªx*e¡pG.Àa‡#ŸÓ×½O~ı¾èÒÇ/Û7îıùÑw3¢&=)VmŠ¹Û“$]ÓŸ~S¢¦¶V=kıGÉ-ŞõÉ’»]ë/ÜŞmm’ßéÚeb‹BÑäÊú¥uµÃOÜc¥cS½Ü÷vİ=àlj2wn\{«ğUv¦oØ1=ÆÜq Y‡–4¨Ï.±f#—ÔE5–hkøzg·søúÿ ¯ĞWä'pÁgÆŒÙ!!Ô 	}r¸Àıb¸½€‚«ƒTãµ\Lî6Ã¨–
+7·$¥(“³n¬ˆSr³(I·×ĞZŠº«9ªÅVàtw†»?€6™! »î(sÊg;»rè}`ş¨ E_A<*2ŸA’FtZ¬³5ÚXÁm¥‡vÑV·W”,Ô:ÎûíyÚ‚ü è¥ÚfgÊBgÒeıCCıò3ò?XRÎfgù¯ò_Ïv8EÃ¢EÑ9à>›êşjÆÙ¸ïm˜P…!GzFcNÉ2²rdõ=‹ifJ,F¡+ïc£ÒÿÎ}ÅòÉAaßµ'÷¸ü…OıckOÜ‡Õı®óª!ìòÖ¿mO­§¹Zx–‰téiLOó²•EºÑ³ò|zÔ8£,ÁS½I< «±³<
+XiìÄ>¦Š—¸Lı0Íy”c˜ ‡ş'½‡‡÷ËOQşš]ÏËOqïºæa<ùïå27ô:zP_C•íš»ß×µÊ‰±ş2;©Us€m`HfÆ{™ªËcÊâ#±j´ØğÓòOMaJü<rsQâ¬XÿG›ÛÉjR
+bû†JÉÀR5ÇçJcLKÍúV F‚ùRcXqğ¶¢²a¦<“Àå<ª¸ yìb1ry08N©	år‚ E½_ïÄä§E¢¼Z©@Û´âòx6ÚÓM<GáØ_¸ş+ßùÊú…q¯Ë3Ñ6n¨|üÒĞ9>“ÉYijKxEıñrËÒë/¾tI&³äÒ‹¯_JW e•,?¬7ô{ò¢pÿ[Ôšx:Ê «éšß›îıºËşÀMGZÏ"o?H57Ş@gq3¸ÁßËËûxÿğ+Üô? ù†NN!Í6Ğñõ0šêÔªFÇTkôÀ:EEWv,8…±HhPğAÇºø:m¥m?¤7ıòÄzß/éuxÜZæ^¦uò¿°RD˜×¶UşZ‡ê<Àh‡>{ú,Ğ–°¿|©ho“bJt0.¾É¦È&P‘1zCë•ÕP–Šz ©õJ,¼:ú>ÑóÉ[¸VÊfTÖClÁéo7ÄâvÕâãoŒiêÄóp0v½Áéö ¿Å/‚¯4z39OÇğí¡vÿ”×îxDtÁùS…7½iå;àtùË-n2&6ó8¬c#àÔÆ¥š4Ãe$#«®ĞlFeú°¥ËjÂë1L^åoQZ•¶•ø_lÛFšFÛ¶²øAÒ¶˜,ÚÇÙg6PqôaŠ¥–äCctÂ‹¹eÕ¡…J„ğ73™V²ÙXe'æ™+šªn9ÁÀ4>šQ˜ ?{ıuÚB[^]>Œ®“«üÿ“`OŞmÖ³ì"´GIlnL8[®	£Ä	»F›à†”Få_¾öÚ˜0‰XÕü‚¹J„¹T[ÁÊ
+~–¢¤aÜã¬°´¬ºªï.È¬ RSb15ÌĞ2EuxOù©£Jä®Ç‹F #U™tÂÛÜ|ZÓèäö9¢š§å»J =^Ã/ºœûƒ;ŞîndŞ,6¯ïUcuM¤™äHŒ°´k‚	Á’ÖVlØÒ,mºØ¢E¿g-#0L;•º‚'ÛË÷kzhTŒFnğ3zøã+g£ÊÍ†Øú´Ï'XjİoP4:¡Ì=:|n,ÉÍV¿Ìérü»~2/H{Ó55Ç9Ë^~œ3FAÇk8züÄ³eù}³‰Ö»èòïù¥Ì×ÿ,‹káÈ< ÿ@ÿV˜g³jQ†E´3(S½éR3‹©nb^\gR)=Ôœ¬ÚRÊ~WÍ9À.ˆÇØ‚…Në
+ =â 40CN@ÃSÛ0¯Îi¿rªõšev­İy¾—]cºMtÖÕÚõÂÅ/¾îß§L±×Ò'Ìİ³ºM›èy.ÿ3töÂë!G­ËÑH7,”_z0oÒñ&¿ËŞìtêšÿ9Õ×—b¥>] =$<„ú+5…ÿâèíÎéĞá÷è<®?-:Ò¾woû‘E>xğÏÕı? ¯°Ívù¡¶£‹ştğàŸm{H™£j^DIÀüÇÖ•›ãš9&ª¸›€õœÕ¬êì¡¸"–s¨/#ñ.Vtq*Í¸ta‰ãâe¡o‡õx"ú¡¿/.¿XßO×uXVßã,ì)€áüêñÃw`Y¦çòt(ØZh;c›nOÛMõ¯¿6*ßI¯zóĞsG¯“ïdò…#»Î­¤T½eŞ^’Áb 0kê0å‹]GÖÇù
+ÎŸËÉ"Jy%ckˆ
+–±ˆh/é›Úòùj¾n³]jÍ“bExó$eÄœØÙC‘<u „%¹X.C0Îò].           ‰%§mXmX  &§mX”‹    ..          ‰%§mXmX  &§mXı„    CODE    JS  +§mXmX  0§mX   INDEX   JS  qY¨mXmX  \¨mX«WZ  SCOPE   JS  ÃÍ¨mXmX  Ï¨mXÁV  Ac o d e .  Øj s . m a p     ÿÿCODEJS~1MAP  ¾©mXmX  ©mXÏj  Ai n d e x  . j s . m a   p   INDEXJ~1MAP  P*©mXmX +©mXrWo\  As c o p e  . j s . m a   p   SCOPEJ~1MAP  ÅK©mXmX M©mXÎ]û  Ac o d e .  µd . t s   ÿÿ  ÿÿÿÿCODED~1 TS   c`©mXmX a©mXaf  Ai n d e x  .. d . t s     ÿÿÿÿINDEXD~1TS   ¦y©mXmX z©mXÌfô  As c o p e  x. d . t s     ÿÿÿÿSCOPED~1TS   C­©mXmX ®©mXøp]	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .           %§mXmX  &§mX•‹    ..          %§mXmX  &§mXÿŠ    Bd . t s    ×ÿÿÿÿÿÿÿÿÿÿÿÿ  ÿÿÿÿa b s o l  ×u t e P a t   h . ABSOLU~1TS   +§mXmX  .§mXo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .           ‘%§mXmX  &§mX–‹    ..          ‘%§mXmX  &§mXÿ„    CODE    JS  +§mX|X  0§mX  INDEX   JS  qY¨mX|X  \¨mX«WZ  SCOPE   JS  ÃÍ¨mX|X  Ï¨mXÁV  Ac o d e .  Øj s . m a p     ÿÿCODEJS~1MAP  4©mXmX  ©mXÏj  Ai n d e x  . j s . m a   p   INDEXJ~1MAP  ˜*©mXmX ,©mX£Wo\  As c o p e  . j s . m a   p   SCOPEJ~1MAP   L©mXmX M©mXö]û  Ac o d e .  µd . t s   ÿÿ  ÿÿÿÿCODED~1 TS   `©mXmX a©mXaf  Ai n d e x  .. d . t s     ÿÿÿÿINDEXD~1TS   ¦y©mXmX z©mXËfô  As c o p e  x. d . t s     ÿÿÿÿSCOPED~1TS   K­©mXmX ®©mXüp]	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

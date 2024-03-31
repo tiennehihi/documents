@@ -1,0 +1,8 @@
+// Internal function that returns an efficient (for current engines) version
+// of the passed-in callback, to be repeatedly applied in other Underscore
+// functions.
+function optimizeCb(func, context, argCount) {
+  if (context === void 0) return func;
+  switch (argCount == null ? 3 : argCount) {
+    case 1: return function(value) {
+      return func.call(context, value)

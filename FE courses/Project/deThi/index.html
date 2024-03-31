@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="" type="image/x-icon">
+        <title>Document</title>
+        <style>
+            *{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            html {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+            .services {
+                display: flex;
+                flex-wrap: wrap;
+            }
+            .service1,
+            .service2,
+            .service3,
+            .service4 {
+                flex-basis: 50%;
+                padding: 8px;
+                overflow: hidden; /* Ẩn nội dung dư thừa */
+                word-wrap: break-word; /* Tách từ khi vượt quá độ dài của phần tử */
+            }
+            .services h2 {
+                font-size: 24px;
+                font-weight: 700;
+                border-bottom: 2px solid #000;
+            }
+            .service-img {
+                width: 100px;
+                height: auto;
+                margin-right: 8px;
+            }
+            .service-content {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="main">
+            <!-- Begin Service -->
+            <div class="services">
+                <div class="service1">
+                    <h2>Service 1</h2>
+                    <div class="service-content">
+                        <img src="https://via.placeholder.com/500x500" alt="" class="service-img">
+                        <p class="service-text">Lorem Ipsum dolor sit amet, consectetuer adipiscing elit. Proin sed odio et ante adipiscing fobortis. Quisque elelfend, arcu a dictum varlus</p>
+                    </div>
+                </div>
+                <div class="service2">
+                    <h2>Service 2</h2>
+                    <div class="service-content">
+                        <img src="https://via.placeholder.com/500x500" alt="" class="service-img">
+                        <p class="service-text">Lorem Ipsum dolor sit amet, consectetuer adipiscing elit. Proin sed odio et ante adipiscing fobortis. Quisque elelfend, arcu a dictum varlus</p>
+                    </div>
+                </div>
+                <div class="service3">
+                    <h2>Service 3</h2>
+                    <div class="service-content">
+                        <img src="https://via.placeholder.com/500x500" alt="" class="service-img">
+                        <p class="service-text">Lorem Ipsum dolor sit amet, consectetuer adipiscing elit. Proin sed odio et ante adipiscing fobortis. Quisque elelfend, arcu a dictum varlus</p>
+                    </div>
+                </div>
+                <div class="service4">
+                    <h2>Service 4</h2>
+                    <div class="service-content">
+                        <img src="https://via.placeholder.com/500x500" alt="" class="service-img">
+                        <p class="service-text">Lorem Ipsum dolor sit amet, consectetuer adipiscing elit. Proin sed odio et ante adipiscing fobortis. Quisque elelfend, arcu a dictum varlus</p>
+                    </div>
+                </div>
+            </div>
+            <!-- End Servive -->
+        </div>
+    </body>
+</html>

@@ -1,0 +1,27 @@
+/*
+  Copyright 2018 Google LLC
+
+  Use of this source code is governed by an MIT-style
+  license that can be found in the LICENSE file or at
+  https://opensource.org/licenses/MIT.
+*/
+
+import {WorkboxError} from 'workbox-core/_private/WorkboxError.js';
+import {logger} from 'workbox-core/_private/logger.js';
+import './_version.js';
+
+/**
+ * Given two `Response's`, compares several header values to see if they are
+ * the same or not.
+ *
+ * @param {Response} firstResponse
+ * @param {Response} secondResponse
+ * @param {Array<string>} headersToCheck
+ * @return {boolean}
+ *
+ * @memberof workbox-broadcast-update
+ */
+const responsesAreSame = (
+  firstResponse: Response,
+  secondResponse: Response,
+  headersToCheck: s

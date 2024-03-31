@@ -1,0 +1,22 @@
+import type { TSESTree } from '@typescript-eslint/types';
+export declare function isArrayExpression(node: TSESTree.Node): node is TSESTree.ArrayExpression;
+export declare function isArrowFunctionExpression(node: TSESTree.Node): node is TSESTree.ArrowFunctionExpression;
+/** default parameters */
+export declare function isAssignmentPattern(node: TSESTree.Node): node is TSESTree.AssignmentPattern;
+export declare function isClassDeclaration(node: TSESTree.Node): node is TSESTree.ClassDeclaration;
+export declare function isClassExpression(node: TSESTree.Node): node is TSESTree.ClassExpression;
+export declare function isExportDefaultDeclaration(node: TSESTree.Node): node is TSESTree.ExportDefaultDeclaration;
+export declare function isExpression(node: TSESTree.Node): node is TSESTree.Expression;
+export declare function isFunctionDeclaration(node: TSESTree.Node): node is TSESTree.FunctionDeclaration;
+export declare function isFunctionExpression(node: TSESTree.Node): node is TSESTree.FunctionExpression;
+export declare function isIdentifier(node: TSESTree.Node): node is TSESTree.Identifier;
+export declare function isLiteral(node: TSESTree.Node): node is TSESTree.Literal;
+export declare function isMethodDefinition(node: TSESTree.Node): node is TSESTree.MethodDefinition;
+export declare function isObjectExpression(node: TSESTree.Node): node is TSESTree.ObjectExpression;
+export declare function isPrivateIdentifier(node: TSESTree.Node): node is TSESTree.PrivateIdentifier;
+export declare function isProperty(node: TSESTree.Node): node is TSESTree.Property;
+export declare function isPropertyDefinition(node: TSESTree.Node): node is TSESTree.PropertyDefinition;
+export declare function isTSEnumDeclaration(node: TSESTree.Node): node is TSESTree.TSEnumDeclaration;
+export declare function isTSInterfaceDeclaration(node: TSESTree.Node): node is TSESTree.TSInterfaceDeclaration;
+export declare function isTSModuleDeclaration(node: TSESTree.Node): node is TSESTree.TSModuleDeclaration;
+export declare funct

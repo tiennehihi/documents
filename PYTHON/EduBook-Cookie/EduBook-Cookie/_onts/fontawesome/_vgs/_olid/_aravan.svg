@@ -1,0 +1,19 @@
+var TYPE = require('../../tokenizer').TYPE;
+
+var IDENT = TYPE.Ident;
+var FUNCTION = TYPE.Function;
+var COLON = TYPE.Colon;
+var RIGHTPARENTHESIS = TYPE.RightParenthesis;
+
+// :: [ <ident> | <function-token> <any-value>? ) ]
+module.exports = {
+    name: 'PseudoElementSelector',
+    structure: {
+        name: String,
+        children: [['Raw'], null]
+    },
+    parse: function() {
+        var start = this.scanner.tokenStart;
+        var children = null;
+        var name;
+ 

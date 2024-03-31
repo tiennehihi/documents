@@ -1,0 +1,28 @@
+/*!
+ * depd
+ * Copyright(c) 2014-2017 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
+/**
+ * Module dependencies.
+ */
+
+var callSiteToString = require('./lib/compat').callSiteToString
+var eventListenerCount = require('./lib/compat').eventListenerCount
+var relative = require('path').relative
+
+/**
+ * Module exports.
+ */
+
+module.exports = depd
+
+/**
+ * Get the path to base files on.
+ */
+
+var basePath = process.cwd()
+
+/**
+ * Determine if na

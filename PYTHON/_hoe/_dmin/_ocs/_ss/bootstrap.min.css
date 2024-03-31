@@ -1,0 +1,1643 @@
+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","sourcesContent":["/**\n * @module LRUCache\n */\n\n// module-private names and types\ntype Perf = { now: () => number }\nconst perf: Perf =\n  typeof performance === 'object' &&\n  performance &&\n  typeof performance.now === 'function'\n    ? performance\n    : Date\n\nconst warned = new Set<string>()\n\n// either a function or a class\ntype ForC = ((...a: any[]) => any) | { new (...a: any[]): any }\n\n/* c8 ignore start */\nconst PROCESS = (\n  typeof process === 'object' && !!process ? process : {}\n) as { [k: string]: any }\n/* c8 ignore start */\n\nconst emitWarning = (\n  msg: string,\n  type: string,\n  code: string,\n  fn: ForC\n) => {\n  typeof PROCESS.emitWarning === 'function'\n    ? PROCESS.emitWarning(msg, type, code, fn)\n    : console.error(`[${code}] ${type}: ${msg}`)\n}\n\nlet AC = globalThis.AbortController\nlet AS = globalThis.AbortSignal\n\n/* c8 ignore start */\nif (typeof AC === 'undefined') {\n  //@ts-ignore\n  AS = class AbortSignal {\n    onabort?: (...a: any[]) => any\n    _onabort: ((...a: any[]) => any)[] = []\n    reason?: any\n    aborted: boolean = false\n    addEventListener(_: string, fn: (...a: any[]) => any) {\n      this._onabort.push(fn)\n    }\n  }\n  //@ts-ignore\n  AC = class AbortController {\n    constructor() {\n      warnACPolyfill()\n    }\n    signal = new AS()\n    abort(reason: any) {\n      if (this.signal.aborted) return\n      //@ts-ignore\n      this.signal.reason = reason\n      //@ts-ignore\n      this.signal.aborted = true\n      //@ts-ignore\n      for (const fn of this.signal._onabort) {\n        fn(reason)\n      }\n      this.signal.onabort?.(reason)\n    }\n  }\n  let printACPolyfillWarning =\n    PROCESS.env?.LRU_CACHE_IGNORE_AC_WARNING !== '1'\n  const warnACPolyfill = () => {\n    if (!printACPolyfillWarning) return\n    printACPolyfillWarning = false\n    emitWarning(\n      'AbortController is not defined. If using lru-cache in ' +\n        'node 14, load an AbortController polyfill from the ' +\n        '`node-abort-controller` package. A minimal polyfill is ' +\n        'provided for use by LRUCache.fetch(), but it should not be ' +\n        'relied upon in other contexts (eg, passing it to other APIs that ' +\n        'use AbortController/AbortSignal might have undesirable effects). ' +\n        'You may disable this with LRU_CACHE_IGNORE_AC_WARNING=1 in the env.',\n      'NO_ABORT_CONTROLLER',\n      'ENOTSUP',\n      warnACPolyfill\n    )\n  }\n}\n/* c8 ignore stop */\n\nconst shouldWarn = (code: string) => !warned.has(code)\n\nconst TYPE = Symbol('type')\nexport type PosInt = number & { [TYPE]: 'Positive Integer' }\nexport type Index = number & { [TYPE]: 'LRUCache Index' }\n\nconst isPosInt = (n: any): n is PosInt =>\n  n && n === Math.floor(n) && n > 0 && isFinite(n)\n\nexport type UintArray = Uint8Array | Uint16Array | Uint32Array\nexport type NumberArray = UintArray | number[]\n\n/* c8 ignore start */\n// This is a little bit ridiculous, tbh.\n// The maximum array length is 2^32-1 or thereabouts on most JS impls.\n// And well before that point, you're caching the entire world, I mean,\n// that's ~32GB of just integers for the next/prev links, plus whatever\n// else to hold that many keys and values.  Just filling the memory with\n// zeroes at init time is brutal when you get that big.\n// But why not be complete?\n// Maybe in the future, these limits will have expanded.\nconst getUintArray = (max: number) =>\n  !isPosInt(max)\n    ? null\n    : max <= Math.pow(2, 8)\n    ? Uint8Array\n    : max <= Math.pow(2, 16)\n    ? Uint16Array\n    : max <= Math.pow(2, 32)\n    ? Uint32Array\n    : max <= Number.MAX_SAFE_INTEGER\n    ? ZeroArray\n    : null\n/* c8 ignore stop */\n\nclass ZeroArray extends Array<number> {\n  constructor(size: number) {\n    super(size)\n    this.fill(0)\n  }\n}\nexport type { ZeroArray }\nexport type { Stack }\n\nexport type StackLike = Stack | Index[]\nclass Stack {\n  heap: NumberArray\n  length: number\n  // private constructor\n  static #constructing: boolean = false\n  static create(max: number): StackLike {\n    const HeapCls = getUintArray(max)\n    if (!HeapCls) return []\n    Stack.#constructing = true\n    const s = new Stack(max, HeapCls)\n    Stack.#constructing = false\n    return s\n  }\n  constructor(\n    max: number,\n    HeapCls: { new (n: number): NumberArray }\n  ) {\n    /* c8 ignore start */\n    if (!Stack.#constructing) {\n      throw new TypeError('instantiate Stack using Stack.create(n)')\n    }\n    /* c8 ignore stop */\n    this.heap = new HeapCls(max)\n    this.length = 0\n  }\n  push(n: Index) {\n    this.heap[this.length++] = n\n  }\n  pop(): Index {\n    return this.heap[--this.length] as Index\n  }\n}\n\n/**\n * Promise representing an in-progress {@link LRUCache#fetch} call\n */\nexport type BackgroundFetch<V> = Promise<V | undefined> & {\n  __returned: BackgroundFetch<V> | undefined\n  __abortController: AbortController\n  __staleWhileFetching: V | undefined\n}\n\nexport type DisposeTask<K, V> = [\n  value: V,\n  key: K,\n  reason: LRUCache.DisposeReason\n]\n\nexport namespace LRUCache {\n  /**\n   * An integer greater than 0, reflecting the calculated size of items\n   */\n  export type Size = number\n\n  /**\n   * Integer greater than 0, representing some number of milliseconds, or the\n   * time at which a TTL started counting from.\n   */\n  export type Milliseconds = number\n\n  /**\n   * An integer greater than 0, reflecting a number of items\n   */\n  export type Count = number\n\n  /**\n   * The reason why an item was removed from the cache, passed\n   * to the {@link Disposer} methods.\n   */\n  export type DisposeReason = 'evict' | 'set' | 'delete'\n  /**\n   * A method called upon item removal, passed as the\n   * {@link OptionsBase.dispose} and/or\n   * {@link OptionsBase.disposeAfter} options.\n   */\n  export type Disposer<K, V> = (\n    value: V,\n    key: K,\n    reason: DisposeReason\n  ) => void\n\n  /**\n   * A function that returns the effective calculated size\n   * of an entry in the cache.\n   */\n  export type SizeCalculator<K, V> = (value: V, key: K) => Size\n\n  /**\n   * Options provided to the\n   * {@link OptionsBase.fetchMethod} function.\n   */\n  export interface FetcherOptions<K, V, FC = unknown> {\n    signal: AbortSignal\n    options: FetcherFetchOptions<K, V, FC>\n    /**\n     * Object provided in the {@link FetchOptions.context} option to\n     * {@link LRUCache#fetch}\n     */\n    context: FC\n  }\n\n  /**\n   * Status object that may be passed to {@link LRUCache#fetch},\n   * {@link LRUCache#get}, {@link LRUCache#set}, and {@link LRUCache#has}.\n   */\n  export interface Status<V> {\n    /**\n     * The status of a set() operation.\n     *\n     * - add: the item was not found in the cache, and was added\n     * - update: the item was in the cache, with the same value provided\n     * - replace: the item was in the cache, and replaced\n     * - miss: the item was not added to the cache for some reason\n     */\n    set?: 'add' | 'update' | 'replace' | 'miss'\n\n    /**\n     * the ttl stored for the item, or undefined if ttls are not used.\n     */\n    ttl?: Milliseconds\n\n    /**\n     * the start time for the item, or undefined if ttls are not used.\n     */\n    start?: Milliseconds\n\n    /**\n     * The timestamp used for TTL calculation\n     */\n    now?: Milliseconds\n\n    /**\n     * the remaining ttl for the item, or undefined if ttls are not used.\n     */\n    remainingTTL?: Milliseconds\n\n    /**\n     * The calculated size for the item, if sizes are used.\n     */\n    entrySize?: Size\n\n    /**\n     * The total calculated size of the cache, if sizes are used.\n     */\n    totalCalculatedSize?: Size\n\n    /**\n     * A flag indicating that the item was not stored, due to exceeding the\n     * {@link OptionsBase.maxEntrySize}\n     */\n    maxEntrySizeExceeded?: true\n\n    /**\n     * The old value, specified in the case of `set:'update'` or\n     * `set:'replace'`\n     */\n    oldValue?: V\n\n    /**\n     * The results of a {@link LRUCache#has} operation\n     *\n     * - hit: the item was found in the cache\n     * - stale: the item was found in the cache, but is stale\n     * - miss: the item was not found in the cache\n     */\n    has?: 'hit' | 'stale' | 'miss'\n\n    /**\n     * The status of a {@link LRUCache#fetch} operation.\n     * Note that this can change as the underlying fetch() moves through\n     * various states.\n     *\n     * - inflight: there is another fetch() for this key which is in process\n     * - get: there is no fetchMethod, so {@link LRUCache#get} was called.\n     * - miss: the item is not in cache, and will be fetched.\n     * - hit: the item is in the cache, and was r/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+                                                                                                                                                                                                        ó‡â	;ü†$öğ,ºÛ<ò]gıtàˆ]’eäôô”Ìöööë¯¿®›Í·ooôxƒ7¤]º€, ‡táBJ=§8‘TÃRB¥C`$–DYl‡Ú'uÕ@9/M/s6¦‹å‹ñøÁã'¿x÷ıŸüìç“éœ3'J4 9¡R[AN§šËÌFğ‹RygÀ¬Í™s‰PM/	!*¼bÉª
+c¨İH“Rñ=]¥K€#æ*õ=fßæÑæiu×
+‚Z]hè¢ÿ*T³±ĞK²î«p®ëGÅWš¸ËPjt/…ç¥ñŠ¶pÚ¼R+h“õ8Š†H_~õ¦òÕÔÍÈ!ä‘&[	üƒ[8c¤ÔâŠ)qt–Àÿº4÷õ’lm€q˜]2ÖD¿t13g/b ¦úƒî`¸Á65==<ü«·~ô§ßúóo}ç/ßúñOŞğğéÑ®ú	NôaÌ0;õc%æ|3Æ
+i\fÈ?@nÆl–x^èc©`æÓ#dØDõë€³ÙDËşÜ×Ú^BÜÒ¥Ş.Ò:€$0Ûs°ñÌõ@8)ˆ|èZ0ìN¿]¦A[¸MBÃµG©®æ˜„ıÒ
+À {n®â—v5‚Ğt RŒ¤.=
+2ÖMì¬ V›¾\¥¯‚"jE&„Õ(›Ò6\éÂLé"–‘,ëaRgIÅtSªËè”úùŸF~¥pÈ­¯¿2
+=Pò•¨¨¥4‚”˜Ìk‘K€&”ób­ÎÛ@)[¡j•»ì‚V}	©Pu2â™®x	®BŠsh"ÄÊ?:‹zÇ¸Ë†ãˆCs•R+ ÔSÆ•¶VHQ m\‹‹dİ)(‡Iõ‚¨
+~€<Úè#Væ8=­ÊÓw˜Õi"U(ª¥©¥Î4ó=Âd±$i=šYª¬™¤pê]^²¨B!Ğ{8ÍÇ!Ú’RÑ@@ycU•	 S~`MBífPŠÂºÔ;]C‡h…³ó»¿û{Hlmm½öÚk‰={öo|ãK_úÒ;ï¼sxxH—ğıDw³TÃ‰FÒ ´»_"¯‚¢ØÇXù1Ö·_dyÓîÇ)Lj\×´èpĞVõ„_âĞRˆ6³Õı5Ğ&J@g;àª%A„­‘`AdĞ‘ê*õ™	IŠmœÌesgøë~©ñëï×ş³ğ·vw_ÎgS¦Å ×ßÙÚu—¬¬Š0ÔĞõŞ¾.j8ò¯Ø`9q¡=\ÃH[T õÑÖh{gg¾XN'GGÇœ0Ve£ŞÂîp	½X.P-µTØÔNÏáÜ“C¿ÚĞåÀÇ5ƒ~gá"}WIgv¶/t%­YGÿ6‰`I›1È±¿äe¿”ı>—ƒãÃ£›{{„`Ğg=D9î¢ZFJw×{úêâ¼˜4‡ö¹ íB!àè¢Ö¡”‹ŸI\ QèVèûL\ ûlõ¤©¨Û-M[\ƒâ+˜ÉÎ,G³0]ÜÙå™¾Ç÷#ìgTÚéÙkQ*iõGí“êå¬^èÇ!¤0Ôëx &y¹"«\xHá EŒîîa6#S Jı”IXFt—ñâ,C¤AÓ)+%·zIV'c¼„–ô¾¼Ğd_b®½ğÂ*åÊK?ó_¬ÆÕ~•`re¹×*¬U–;·-uïŒIT|]Iè-Ğ÷íÕ®¾{´½»½»ãŸÀüüı÷ŞüÁ[ñï|ÿÍ7òÓw=y2]Îğì`4º¡×2#hË×T8V·¦ì!ÜS'w¹yÆÙŠO¤ˆñÒ\Ã&B‹©¢»À=]\`HŸõÛÖÍ¯aÇZøxÀ5ú]?24=Õ‡äŠGóuÀy­õœºÒ a”şÀ9!ÊC£*œmaP²Íş$Ú=¼‚•@äÛÀ&y&uÏF1ÁÆÚ‰Q…Vª°ğÉZÚT$!uÆ!Êõ\ê~Ú]Ó¨\‡8°µ+ "Ö0Åi#¥@–7¸*ÖæHØW½„Y9B’ÎJ#ı&â`eĞbµP9Ú-ÀºÂUÛ
+J™G+4£Ÿ Và4PùLjf«vƒğ|°S€ê,¿¦ÀGØºıD¨`škPÜ²ĞxíT^Lj‘¢D¡á˜—_›cœ–4óèâ?”ÕF³RÂ+tJ(7mÕÄªpÓ¨>P”>IŠ-ñUÊ±—@¶¡(L[á§ûV©D,ëIPù¡1 ©ÌweßY-P¦3‘Š0s „ı$c:–E Äª¥I‘UE‰[Ú­@ÉUOÉF¡PµkÀÈ€Ê6m>QDÕÎïıŞ¿İŞŞÎ§¹Y.ßúÿ7÷æ[’GzgfÆš{-¤Hmİ‚Mõ;HGï 3ÿ`F3GO&©Õ‹HŠdƒØˆ…(Ik¯\#"#3õû¾ÏİãFdVdæè«[ææææææËµ{ãÆÍ÷ßÿÉO~òê«¯.£—}!tÂ×·Wh(&‚Ö*DœŞĞŠğ”:áa¢Ñğ[¢­€"Ô¦•h(JÚ S›åA—(ğ„â3ÕtF´"KãğJt™Ï00ï#‰Î8`vüP„*Ğ¢…ãvÛğ£;ÕIÛ¢­C6Š(“Ş®é¨:ìõ_~éû?üÁËûÛÛGO8Qpº#bŞÜúî•Š
+—}òˆé¬xRĞØŒ Î¯³é™b¢†¾Î7§ÓS,ßÙİá b>8>zğàááÉ1»
+¶i,ú}66	ı¹P­9_ÁhO×XŒõ‹$òDÌšvÕuêsK”6õóUh÷ÒKQ!ö±›ì‹J—vÒ2Ø’X„øıôèdgs“€rgg{4±¹^\*î§kFPëoË®N’u\`Z«ì‘f8Ä5Ù†,£bg-s|Ã¡€â;U))Ô`yÀI?¤ÊôU›f¯}û&e+ÖÊ­ª ‚ŠûåQi€hMÛŠ%Àl>—~Í8œ”u}QØŞm‹|Ú
+'ÊÂOÖ¥íÆ|æHÃda& rëë¹ÉlƒĞt‚Ö5HşIµQxM¬ã
+oö®òv¬2Ø_V£W8åÃÃ¤`–êº¢È†QÎ"È`Ù3?á€ÁªÕŒ77·öö	—YQÇ''Ÿ>ıÛ¿ûñ›ï¼ıáGÿáşƒÃé1gÎa_×¦—ZÒCŠ¹KJŠÎe¯8üÓ®>ê‹W!ı%M„CøËE/&ÃÁ‡LXRü¬XYß'é¾ëŠÈkÆ8b&¨DK†¡:–ÉÉÉ	bÈ 1ìL£I£¤õ(lÙ†Æ(İÒ‘aëê‘%t”×ı°YEZÆ»®°æ÷è¹ûÈ¤”f˜ˆmy
+0dnõª(=š[«dH#„.úÆÀÒ¨M[btáV3€ŠŒn)9ûW«T	%šrchúéÃü´Õ!‚ºTé6X±lFe)—€>VQ¡*¿
+-²U\ÃÛföŠå3C‹˜aDŞå½2s‹ÅQäÓ<!'!£l¦“a™‚ZEÚGdËB)¥ò†c,8¡=8ÊH$«ÿÙ]]ÏÊĞæçEª7[£İ´›®«L9-@ˆéöãOô)£Ë¦¡…ŸFÕq31³÷;ÖJU%g„=Q&Z›\—è"ÂIœ¤8­[ûPÈ–¤…_û(˜¦:µR±,Ú:Ù"ßÙ[Zîü^ì¡‹TIÄŒ$N„6dc~>ÛÛßùÎw¿Í5ØOıú¯’N¦'8Jçbf‘¾é[ç€†+/ÒáĞdŒëšÈ†s•OZT\»‘!—#R¥¡Ë±ú¢¹ KƒçıcKHcg²€&‚d²+.J• ŠêÊTióCdBÈ)ñ™p¶#¥ˆeHU¢\=#]¿QÒ£ÂƒÑx¼5áÃämv´B]?ö¬¿”kÃvìïïëæ­›7ná`-r	•èlg©1	ÈêJ[ÛZ¸ğ÷¤¥³ğ_‡H×ÎÎu?pÖ—®CÂ©²§Çõ¼õédòôğàÎo>ÿíW¿‡Àır<¢!B…õúfŒù5İ¨¿d6oø÷ú…¢¾„È³
+ºÃ×S}-Î6¡PX»ĞCŠwè÷#[¡Kö@_ê&9Dw öé–§%{}=şf,JË…§áÆø (Ò“ËırèoUèç¢æ
+û²Ø«?èf‘™]¢a¥.P3uAª´T|TÌ¹˜9Ó!‚É9×„“4H7RZø'iR 3i@Ñ
+¨Š.ék,şë‡}¾Êñ½İÔ õÆçãÁxÄÅ&>×k,üZ]©èĞn¨/¬õx±§¯™õFcÂå­]ø¿¿wïõ·ßşo÷ßßyÿ½O¿øòÁÉÑ)>ĞÖÙ»/M-Nºë\¹Ş¢‡Ù(…úÙŸqğ¤O=ç
+ÙWG„^“–îáÄ{º«lhUúÊ„Òø¤L&EY¼ b)JÎ4L6ÊA(4L€Î–í2ƒdA+
+º’!‚•ì7‡*r^ô°‡CX«9çÙ…Ñá“Ê«ŒˆsÀÌÁu?‡h÷y6‡o~¨ùëÑ‘Æe”âŠp®òAcªÚ:©\ĞA8*%éø"Y]¶•!ÌWénú§€íÓK@Ö”½«m_f1—‚8­ë:ŠHSªåì‹Û."ÉF£šYÍÉ´ÈŒÒ”Ã¡:sÒ¨RÑAT©âª×ì“á—Ì2à§zô¥ÌHÓ Ùè	‡µœåD Kô"’Ğ²£¶‚E¡uÑ±Á"©’4Û^
+':AZ¼ŠÖn,i~XÜ4‡ÀˆP
+"¬ &¦v«D¸é2€¢ ²)í
+<ô†¦*]<ßû?ÿı¸}ûöîîî½{÷^yå•Ÿüä'Ÿ|òÉd2‰é2¡~£DKnXÅ‚ 42ŸŠÍ¸V„nœ&³ø²·:Èà4RŠ´;Tå¦#ÀÖÚmºeU·cm˜¹ÆÑev4\Áâú¬?`ÎQšV°<ÍéÄèKÀTvù¢-š¡“»Š¼D{ëkó³9ôx0ü‹üà¥^ÜÛÚ:>8d&rò'ª£yPTÀ™OmY'c¿RŠI¼í—Í_èıL_&ìÖæ–~1ğCÀçÃ¡ÂjFqçÓÃÃƒ£ãÓÉÔÆèûâSo	q/Î×ËÖ´µ¡Wvh\hÏ–Ûf#}ÑÿdZİqx62ìÄtİì,†»ı£|8^¥¬Üˆú–G¿ÃŒûygUgşc„=o¯v·âAp{^«¢Z£†ÔeT,¬·"“¸†öSŸÂú)ÀW k¨Š}RÌ‰Lä¥›°}CÑ¢3L*JZçøÎo,¬P„hİc–LM¤• ;®Ú]¸"ı©ûÀâ*Ë~ª-ÕW	®h@Gy6;j´¢(ÊriY©u$Œ‘¢"Ÿ¶T£ˆ¨~B“ºÍ9t³ĞèÑø¡ñD7[#Ë®ÚÒÌÚÒ.lê*¥ÇÂb”ÕÑê6Ê(¥oŒ‚~-À6Ú[ïF\ÎlïîîìßonMæóßİ½ûŞşòõ7Şx÷İƒããã\ïi-¬kFrñ¦—3¬]äÒK}!ÆR#:43Ít°™ œ$’‰¹2ÕS–ğ/£Êıo|šŠ’±¼æK=-©/ççÓSŸkÅìŒì	‘¡¾ôÔ¡ÔØÕáV×ªU¡ƒØR¥¦J«¤´i°.%ËXÔ;”hQU´ñy‹IU˜d»à™…fÿ’´ºš9Fœ
+2á
+\G’Wé+ˆX¡[Ûb-³[\v]±¬
+X|1%€½/^)Ë¼"õWÕi,Ì š¥]º¡ÙÉjuWpmÅ†”’šÒ±Y¦.øFÍ©šVˆ¼`”>R±¬ı„İE²–B>áôıD›„µTš§ÔÂ‘OêüÏL\½¡<èÏZˆÓœ´V×”ækQ3ò Í3-#AøjË&/Z	'ˆºÏ²¦(bšµZé	ú#¯ŞUè.˜ÄÔŠòCC„İ¤a®¹«páÇÛÚe:;yGfq±Ñ.•6_Ã“E	Yh¡­/¥Éª}?¶Ğ•,ğ	¤8"©E"4ü˜
+zş&­ñC£$\¥ªUî1§ƒr{jìı?ÿï"r:<<|ï½÷~úÓŸ¾ñÆ<pÒ ÔgWÍ± DèÆ‰Y U0“¶"Ğ²€l#½‚˜‘ÒhÈÃìª—Î­0“%­ÏEéÀ®x’4tu,ÖÒeT[€â*2¥±3P¦}hd ‹ı?-ÂD¾êk™c¥ú¦SvYFhåiĞ;¨(gPˆ+bşÑË/1ïnn9bî³0ô÷õö ı`v ÌÒƒ8?;›Îfºo9åFòÄOß3§¹pÚİÙ¥-Eg3.-‡Ãÿ°l%V~rpp|rÊv•L…‰ï!ª3rŞFšÔiYSE17°?8åª;rañ0‘zìŒKİÔ9Ÿ-]Ã¡SõÌ¸”JNÒ/ôãá‹Ë
+ÍÊ \»n”ÓÁ)ölmmíìm3AæúÙ»Â ï’zO›–´ş¤bœ/‹4uˆi<*ºALgÊ„¤ÈÈhƒ 3#“‡%TÄØxĞKõÃ±SqpVQˆ]Ã8=·,•”:ëŒny"ÀXë½š™èVÖ¥@ˆãg*‚(']AŒ [Ä¬SWØLÜIÁ…_ßæ8Wƒ§)X§k€‘h€€ŸÒ.è@¡€G(ˆ—!²ÉAÒ£ör"±ê}k©Ä–A‰Ù¹QìÂ¿OV¥æX@´µÚ3º\&#WÃ4ßÁºX}Â}+‚O°×¿E”‰ºõëÙ‹	ºŒÜÜŞÙŞÙÙ¿}›Æ=yò«ıÖ;ï¼ıŞûw>ÿìŞã'8‚‰ÍÙàÂËd¸¹Ey–Öê8£Hû…¾ß œ;thÅŠSltAÏI2ŞEØÉöœÛ©²ØÎ$ÍNzÅ•0µVæs¦;)YövüçÈYoõ‘kˆª31¬“T’cÕ±àj6Pÿ*È6"6ào„Í+XÊ”Z‚go¸¤Q*SÌğÁ×Tæôæ"²´H8â3$â`eTQzã;1¼IÅdQ våpõvÀ)4ük·(–º¶3mQôtˆ¤°Ç~Š•9PÚèÌ¶ÆD©"[Mp«„ ¯a²Õ†ÈêĞ˜¹]R®`Û”WM¡¹Røl”iÒ¶™£©´¡_Chl5ÀŠÃÄ¨Ôq°ú%døûìŠ©¤î§ X2HCìbH¤ïwÿòš õoi1í;’Ğ.2mQ˜'ŸQ…”eäo”jí­úJ‘H;ÜYI™[}2”1ª¡M-çÔ¯¨JyôÈ@A©àMÕ~ ‚º90G€³¯–P'ŞjØÜÛ-B#•¦]ZÎŒA£i*¹]~²ËÛ±V¯
+ğæU¯üs^K]
+B ’†@?†
+²T„“^0¾¤"¥%¿J]Q,±YúgKre²±‘?ï÷Ûßşö£>úÍo~óøñcªH!
+‘†AZ¥ŸqĞUD 4¸½%4ÉV+èÒW3°\Õ³‚ÆdZFĞÃÈgéùÓå@öÕ1îò˜L…’©†u	Š Lú&:™a™ddSš"àEBC8Ô»t6üZbfíÌ?!$Jà Y"fÿ	²z­J5C···oİúÖ·¿õ›û76‡cËóËÈ€yÖÆpŞåz>#@[0É6óº€‰=Óé´=‰‘±ò ™€RÔ^êìÚú>‘Ó[¿G(‡ÓùÙƒ'?ûíï>ûí—Ÿ>|ëŠaÌi”Ò3½ÁC/ñĞÏÓHÙjmHq fP¸u¡&i²é&¥Ê8è‚^¼peºFæZP*ø$¡énÀÇ¹Ñ	Jùj•’i¨µ@7ùD ëç ÎohˆVëYˆdàÙ*@§ˆsœÄ¶çÃ>ğL#’Î1áU«4°ì¥ œVËê±r°¹³}ë`ÎèÙ	=Úä9ÓgBm1oííõF£ÃÓ	[çÏùêös"æû£ŒóíÆp´>Ô}åsvçA“ÃäüŒ”ƒKª©[ÉZÊ!Uˆ[;XXÌŸcr*‚.Ü6'ë(¨a¦ªÈB ¶w.2Çãq44áÈ7„CQÄ‚p…ni£©té?
+n¼tÈ²jmøñUŠHKœW³—“åüßuSU{½ajµÚ|•¾
+Tu	Ò µ®EäK¦fó=ŞUD²¥ôeİ#$ä"&d(’„Ëáw!#t—óÿ!ÜÔRëáwQÜÔv¼e„ÓMW$5<’2ç6"8ä‘I@Û Zİ©»Â×òÃ!ÕZ5Ò‹F4A$¯EÃª Yà^u³4úYÎô%b¬ë†´­ãd£4Ea˜©NkEû¸•4LJ› °±‹m?Àó0‹~Ô¦éHf\ ©“"ÓĞ$³eAS~d‡‘*Aaı1ˆ*_A²Šä6şŞÿõÿÇ/¾øüÕW_ıñüî»ïLNO	—£LÅ\ú}T¦Qb-ª5]–YŒ=tƒl4Òáwé Ã¿Šø1tä3–µcÅ¤2€U8€O*¦‹T¿Ÿ4òf®älUcö‚â*R2vvv=Q4gà!ãD«á#éßòWÛœf²5šÿnY€‰&¾²ÎĞœé‘Û›[?zùåï¿ğâÎxüôñ“É©Ş
+§G.ÎuëJwúkó³ùÙTo”¢Ó›ãÍáp„Éd:›PÇ›L‰ã£S®¬.×/‰°Çc¿™¦Ô´æ/§”ƒ£Ã'O&ú+'zCôúpÀIh~¡ØÍ ×.5­FCvjæ¾Vuêê®s_ïÅÔZ;µcäKëe"¤ötZÄî~VèiŸb	Ù¹vÊ1L.OYDúkë£Áùá˜Ö×î?|pÿÁıŞ ··¿×ëo†#"xN,÷¶‹şp~~A|Nuí;1ò¶ú*kífİ§ñyÔ?ğbÉè£Ä³¾UÖ<µ˜ç*búåŞL=K˜'Àš~ ËkíUı‘Å!µõ! ¥TŠ˜0TÛ¥òLDÒ¨ZWdq—«–#æÉGv#„zJ˜~‚6)YY©¶SäÕšŞ^a‰bŸå“ƒ´äÜ4ÕûËz2×Ïs«±¹}Ôjô%	µ±Ø_˜j\B0üq¥¨×q©âpª;õîÕò×"%d¡ƒKFjÒGºKi”£ÆšœÌf“Ù´ßœN´FôëÕ9súüBŠstv<bŒ¶w¸ø<<™üáÁƒW_{ó•×_ÿù+¯¼÷Á‡÷>œĞFİÌ·áh°9mm‡›¸„ùF£ñ7YyÚ·ŸÉë«,ó|ck€Æ>e¡ü«kôa59z•!vÉa²<éi áp·ñ*EtIÉ{SEƒ8ª­\ÑÜ;I/TÖ5èï|÷»/¼ğ÷îİcÓìd"+ıªªòğLû:îdÓJ²n³Øã	!¦4Ó@½-¦ ¾R•*¥‚šĞ<	'_	4aÀàÃbnk;`™É!óè•:&k#*V¡ÖL)å¿¿¤Ò(˜Ö«9™xtKí–/âe€ç0¡¢Ö›v"áŠ%+K•V«£¢‚¬KÅJg5§	 ™Ôš@ wXøZ=†~CbHŞîviiQ­‰•4h—±èT|·˜iÈQ&â™|ç¦;Áô©E)Uq>ÚüsMkİ:Ø˜µ-ê&jøœ¤½@[ƒ—¹äuU–x×Ğã‡èÈ^$i£yÒ$ı yÛ£Ò˜dBS,+ˆ\j¥HŸS‹^PJçÔÁê¼ÔE55+@#ÖE¥¤ôÛKQeŠOoàË£rcéµ«[¯ë†?À™µ(³]+%Ç?p"f€ÌÜ‘k„)Â	™ov¾ƒV¾#†Ñöö6{’ùù„$ìdPPE‹p¢S€ª{@	ÉBP=0áXP€™Ö™hêŒ¯Ÿ[GV ì=ô0ñÎtPqÚ×ŒÔ)XşÚ888øì³Ï>üğÃ»wïÒÚ¡½iø	L©ı-XÉ~s¤"iĞhşoœ«2f¶5~Ò_ÛHdW÷»ÂjaF8hÂ€=%§?©]¥y6höäÁĞp(¤:ÙÈPD$Š:˜ÈïïŞØßİÛ‡*ÔÉÑ¬öôJ®²BrçYÖyAÄ	AømÁ‘ÜtlÂ7±)Ç\±Y9ælşƒ>±3—Óó³ƒ“ã?xøøÉÁa›z>è¯³hd£·µµsûö·™ï1…İÖWÌdãÃÚR¼Š<¥Öl%
+§µ™ãCT4¸Fd®€ı3sDÆ;¼R¤	òs {Ö*¡êÀ.3©ÆËS´;ĞªomDè.'paA7‹r´u;f@6œ¤ÑÖEìD’R†Cgé{›0#ÉyÊò­(|P\·\Eú‰‚{Ã³3œ£ÍuƒØh{4âÂ‘+½³‹ËÁp|óÖ·n}ç;ãíÃÓÉ§Ÿñö{ïÿ—¿ş›Ÿşâ•÷>üøî£ÇzŠ¨·¦`kÈ©ƒİ—îéa\ÔynèRĞˆëÉI@©KƒĞGºœY„aÆo¡A—¦¨)ßĞ²4ç£9L¹ÔßÛÛãÔÅ L£ğµÔmUàXÓ5P«Ë(Wîàö®6äŸ£DáJÚ…„† £À¡¥Úªç
+Ü]»Ô»Şı_45‚A3,D­WÌèÿ+@£j×S7ÀIC¹e°ÿÚÌb'`B3?\¾@dB\‹”şQˆ£‚ké.ó9x~ë1/S$[Ê–‘¢@‹ÄH-˜ØÓ\± ÕM•Ğ0#¬,RÄP›MìZDCÓÄ'¤É¦•aİê’î˜1JcIâÑÖzÃ
+'ªJ¦óË?”M)€¦‰øŠl” yóŠ?ãÒæ"ª6:š›$ÌhƒŸ"ĞjdpxwãŠp daÆò¦
+X™n€!Üì”ãê™1:AöÕ$”âRäßı»ÿãç?ÿù/~ñ‹ßÿş÷hoÕĞÕ©¶0š¢Ğ 	4º‹ğ‘oÕñ§i]Öáƒ%ÚÓ%ct31ìjú,”ËB‹5ÉçTar’úü¢›ë¸˜,„íÕ®ØFd"\¥ºÓÄ¥İ†®s+ŠduĞ7)¼ğ×2zäwms8úÑË/¿ø½vÆãÃ§ó³“/0•¨­Å‰ürE£aå4Ùë†Ã­-ıµ†5â‰ÂI_f0;¨ÈÔ„ËœÈÍN®õ//O§³Ã££ƒÃ£ÓÉìüâò„I[,›‘ëé¥ièCØ÷ó`¡¥@BÇX½Rúş‚¨RÖ–Nª^$&ì8ÜlÄÛ4è˜ ¬jû–ºÒÑhqx|8a°Êh”ÖY£áxskÌšBŞz´0tÿ±ŠF¦áİç@‚Šºûgİ¡*R¤ä|ã–†Ü'4+y8A²äæEz>Qª`pº)×V¨ÉÅ¡"ÙfIìÀ’¨òAV-ª´ Ñ²ÇÈÄAÊ†÷™€á!Ífbİ`ƒU^”t³Ô-D‡ˆ>’1”ë]·<ÛvÚ¥ˆê¥oŞ"0Øn+ KO½‚ø³ç;FDÎM˜NÇ¨Ğ(ó!p=×èlè71r;ê/óÄ§6ÄÒ;èË¦’Ú(ñq¿)L–û;{ûëƒÁã§İ¹óÆ[ï¼õî»ÿğ«>~|t6A^i2ŞäCï`Á0!&Aú=Æ¦iÑvhÒ*|Ñ!®ÆR_ãPÌ`¬1>œè4âøŸ`¥½)Øår/¥ê¼‹–˜îwŠĞŞ$3
+èBóŞ¶Â
+wo÷Ö­[Ğ§§§=âŒ‚"dØÊpÕ¥ÁÓ8òd­XcvÃI)œÖ¾¡Ò œ=d >ùNÓEF´å+¿¤.`¸tùğ¥ş- İ©BP!!H4A=EÉ"K¯r¨J–¤¶%ûèÒt@Ãzõ Ôí®p¨ÙêvèL[9ê
+a+fğûƒn‡Ğ’±Hbaİ<©(—©S@W²4A¡AÖ’‚~ı‰%³”"ãCó¸Òn­V\Aã‡Xdµ—6¦üÔ²ET*†—ò'Ğ>«Rú_«DXT$%Å¦á»6ºJJÌJ€Ò3ÿÍ‘SnfÎ{ê.A­éJ^k‡ÒêEôJuÖ&hê,GİCyO¢’FŸüi³™;’'Å$ôƒ.“:$’³7ôñ¾ÄFiñ„şŠhùÀ¤&iˆ¶€6[hJÂeLëÛ»|„­J)üôÑõ£§ø“ÄŸÙÃ¡ç¾W‘O×êsµ ç~×^€ép¢¬4“JÀ‡ˆXÙElK­M§Óù”²– õS¿|ÿ@¿a“¢„¦6<xğå—_~õÕWì„P£ÑˆhtEã…´]2F”ş	Ú®¢)‰BĞe¶¦WløÿiGãC¦4îfhñª=ù½€+]ƒR¼,Ğ²)ÉöÇâp-uqÎ¤ŸéqŒ™È .“ÖRd¥:æÅ`Á	cÑ?Ó‘ì ?ºµã[·¾½»½Ãn½¸Jób ºy“ï¹ĞíkA€ª(ç‚¢Á-•¾h®V„ÿ|Ø‚œ)9æ?½umuƒáæöîxsûtvö»ßõñ¯ï|rç7wïß›LÏôZ·µ)qÿÉÉÉ±¾ti½iÑŠèBW@mAúNUN^zÚX¡˜ºLJÿi®ÕmZ@mT(ƒ0œ’ÕIÎç¶2jú‰‹\Jš›ÍĞª¶‹4!ïx»ÍóÀÍªzø‘é‚¢–ªfyèÔÊèWÁèu.=ÏBîpÊ¼Ê€T„€ÓåË)Şm2¥U÷4UàG2D*ÂG‹8 ¸–»yóöÖî:œ{×zÃÑhgwïÆÍïşó6ÚŞz|tğá'w~ùÆ›?{õÕ7Ş}û½?ÒOá˜lãıİı[»7n·wˆ¶õX?Óàrƒ‰¢®^×Ù&Vª‹K}EÈ*ËfïÙàrzB·4„Ñé²äê¾ àã^öüímı}J	”(Å9M›œXİµÒuÔ¶ÅB€RpM‰Õ“†tzV£Ïoå*.½È¢šµœê8$÷_ÉÆK¹·ĞjE¦şÓµWÑU[XFùÚî
+Šè4ûAq²i}]fD¬d,SÄ*BG¦¥à96D¦Iv³¤KVe®E+Â/÷¥m9vvù)‚ÂéÊø!ÜQÁ‹L+.ÂCŞ“bqÛ2| 6h5\«‡Óx"–º eCD[Š œTI]~Äğ@ÛaRÚºM­&	Ñ”@\E@d@W•]b\RN4ƒğI›»¢¡e)šZ­nW¦lJ!0@‹Ô·ÀAF ÉÀDL+»š(¥ëKÅ>Û,N+ÈëÔ.mVx¾¶Á9™LP¢–(İˆi­Hé³ĞJ»„¬0ÂùZé+Hi4'>pI‘y&.9“ı1Ç	Üˆ1	cR[c+ÿ±ˆ¶ÀC
+GL”ZICm‘;TÍÜ"‹ŒØfŞŒÂÌé[Ñy®“
+N±·oß¾yó&§ÛtVŠ1©rA.Ï id°ÎµÚÆ:Áúl:ŸNÊk ›œv°j9 ÊgpË@Ã¹æ …z»Åâ ¬<ßXóôüùÚå“Ãƒßu÷½>¸óég=:¿¸Ô3¦ı!=:MÕ
+ãœ•×{Ät™ƒxW»w²’Ğññrš¸¹ÜlÎ¡U:QotuĞ¢}ÄunqCokVĞæô’_,ÙĞ{ÑIÅÄH½ÙWJÔ†’õì£e3áHsd›o–Ğ’M áMšŠp Â…êĞE¨ÂsDHví\Ç
+RàÊ;Íü ¡ıĞ-;õ4Ğ`ØïÂ¡¶ä}®ºOs¹nĞ£\Ëq@Àä@†ñå(ê2†Ão¢ÈÃÃşÛ§E³³ùtvÆ¡WÅ¯Mgpô8ÿp¼9ŞÙİÜİÛÚÛ?>™üÃşÍü_şæ¯ÿşµ×>ÿİïNfg³‹K‚f—‹==Äå£¦5á²b1:4u<WtĞ4q5)SØ<İÉÏıä!Ùªo.˜¢“³³)§FP—O4§—Ò\{Ğ³Œ)È«³fâŠŒY<ÏÉh4"\Î¯ıæ\pïŞ½ÇÏı¾96$¡³o0‚ĞV¼€u/A“£¢°®C‘¸‚èì*oİRYå¤€Ù¡+L#ã¾‚æQ#{‘?½–ƒËôÚ›£Ä<håH­:¯:Çÿ¤wòÎ•uç µÀõÙôËÀ“mÍ£¹P:Õ[úµÀÕ…2’­©Vtã„íTK |ß/tÖ…§²–9’>Rİ«f)Ö)}£ğ»EµJÙ!™× ÀI]@ğÒ)§TÉ2F!m±|XD­!5Ù¡S+3tW´Ò†ˆ•Ì³’ÖÓÀy >I•®ÚH‚Ü¶èÊĞGa˜¥4:‘Z8ÈÄQ º‹VW]éT² ädQN-âí„Xq{dº@lh4ht·ïÈhP}¬V^±?I{ÿúßüÛ;wîÜ½{7^ ,='kÍÅM të$h mw>WĞJ¿9Ğßš Û´uU•"Óİæ2Š·Šd7}X¯…0â*°‘7Æ€fv¾ˆëà°Ë–LƒB 5A©­6DÇ	Çi–É‹úÍáè¥_øŞŸıùÖpøôÑã³ÙTJ/tAFŞR˜dšèœaßaà¿ûA¨Qn~3â,@’µFS$jÔ²Êä9š…{¡î<~üäáÓ'SN4¾+JtHŸ}ÿĞÑ*µ™*¾˜S7è¸»¾á¿&HVı!Ğ´—ÔJÇ¥ÊÖQÃ’ì”²”6~ˆ€(À«“8§O›ãMÈƒÃ§>¤ÙA¯¿¹Ix€ŸÊL¢Eİ¶°CwXM!”ºÑ‚ë‘ Š7ü%˜~,¤û¾¦İuÉ@ÈŸ®‡<ÔmÓ–\|yLÎsØíŞaV›ØÇ€’Qª© ‹q¢°ŸC ‰“ÃI¿Ú|Öb¾Ç†¬ÜÖÊğó5òú0ARËKÊIt^f†_ªÓw_˜ÙıåjÄ?ã"nIE40s#I6œÜTáyVÁ§x¶E`vcÛ¼œ#Ë©`—@ùdrŠo	•w÷ööoİom<}ñå—ïüá«¯½şÚ›o|øÉ¯rIi—~ß#ªğÏ¸ËdÕnŒ‘?tÚç#°ÉÖQNI`Å¤*µˆùµŠ%)™¸·’©®VŞµ¡wĞd©o‰•GZãıİ=8ğ'“ÉÉéIşJvTNGdÑ:ÑĞÓŒ:4ÈÆèdA ØÖ Rª’€¾‘¦˜VÇ[)]ty!¶”J´¢QšıŞŸ#°ÌHcyzÅ'’ÁÆ´Nì²EÀ]Ö3p]ùójtåm(]f
+áØˆ…a]»C79§Òà|á3WD›ÙM›Î&ó*º6t³L%h0L"9‹@-æ@)((«˜ÿıŞ^šÉàù Z½~¹ø‡ß,…¯çñj+’÷Ò,„hcEáÚ’€XœDÈ¦ˆ*µ¼ü²–RŒ¢N¤ÌŒB¥¨¹(ª[hBèÒVÉèA¹*T*5?»ÔólÅEtŠàÿÙ{}3¢L';úÅó¢]…},´ôtì±*Q—nCÕî¤×	0I)m)@¡!§2¥\¬RàÛÉºåaÒRÙÀrR9Ú521F•Ş“¥ {R¥qÔ¨<¦Ğ7.ƒ3›ÎôRuLEk½—_~ùóÏ?{ğàşl¦W+ ™2œàçq©mt6tàvXAk¯Ñ±2œ.bâ?×ö¹Ñ`QÄÿå»m3Ÿ”Z²›>-Âö*ùœ*”ÄĞ¼Á s1”9dU/2eè Î—/ªÔZˆşE-³õ|®Û©ãáèÅïıùöç›ƒÁÁã'óÙ¥ÌEùŒÿ>©&'¿Ë5ÖŠ–K~Gì!šµzCúÁµ “ Q>W0€XÌÒÜÇ¬¬§?:œNtB¿NñúÑ³`M‡X‚hRW„>MÙM;ßG¿S-e(Ó„–6ƒ¬ÂF#àWZVë¤Ø*¢×ò‰~.ˆ÷vw½ŞéÉélrz6;›é5çˆÒ}¬Á4½—™E‹<M×I¼Bªy8Ï{‰¼?pWºø‰âamDëhT_‹CH‡½òwù5ıkn)ÑV°’%eQp„Aækíy³À0ºã‰X,Á$¥ú§&f×U$ÛÒ@ôÅâŒè+´‹f›¥ı«FÌ¾å”¨˜éZN³¿@k4+àpI†ÑÉ"Cy×SêÔÕ
+Ü"ç]ÄRÚÅp¤»¡ôÍØœ&Ğ"tšCIÌçC^²á ëÆRpæ×‰SŠQ´§_ûÇû7nŞşÖ·w÷öá>xğğ“;Ÿşç¿ú¯o¾ıö¯>üø÷øÃÉùŒ
+zûÊpÔï9ÿĞ„=v (#êY<«[‘8Ã©q-³TC[áï#ÖYÑf*®e‘Â²ÁyŞI[_ú%•.
+g…	pD˜¢í¹›sº777wvvôc_ÿìÁF>Ş#V>8<8::BÕöö6’0§~±cAla ƒÖ:tèr€M€ÎgPU “] vÅ›ÿÓ§0)ƒH«N*T±‚Œ|nÂ«²[J])É¤e©én¿-±ûOSÖâƒ,"´ß=ÌA—DŸ…»€ë^á86`£3èÊ„píÂašxaVJÃ·oùßª3}Cü#Ñµa™fEøÓS_ªZÃã%S³v÷*2¹Üë‘Ù*Ğô'ç~‡®
+Ô#W28¿©êeQkˆÖê.G"óÔ)g±Å°†· ‹”R‹K%F6òÚ:v$IC“F6º. ¹ŠÂ2ªú ëÒ¬D•&åT”ôN§~í½Šnã+©¨>Ò}Ì·&PR®¸!àWW—÷ã
+ 3| =9˜† é…œ	$dˆérë["(ÍTÁ	 á¨·½ŞÙü,¥ £?bAjpÓ€”#Ìî=8IÃ¿óİz÷îİƒƒºK[èÆFÂ;k[™.Ú)
+U›lt³,œ [·Kÿ±ˆrRèkõ´¦S¶ÔnùÊÎiÉnú,(2	a4:ÄuX´–1ƒÀ™¸~ÅìdsN]BÙÿÓR%01‰Ù‡”â“ù‚SßK/¾ğıùç£ÑğğÉÓùÙLİÔíäşĞñWœ¡¿i²>$`8(*©—YˆäŒHX©&‹mj×Qo.XÉ£¬¿¹5ÆŠ‡Ü}pÿááANõügîë	´ôz³³9g„ÑŒ4Ğ£ÅãıBµEŠn´4ÓE4”Yåœ€œ’1X´IÇ7nì³Wœ g:9=<<™)°UtÛ»X;÷‹ğ¼ñ–æËL“{£.'wC{„ö”ÌV¦¤ïï}×
+-ÓÎâïAèervr²±»eIø€)3j¿0*a­L1b$-T9Nˆ‰V±X¨ZdA·zíª€²#1=šÒs.*¢Ì¼ g ÑKš=±j* ~	ÁÓÿ:õWõÕ)hùË®ğ,Ğ„t¾FHWïz*Ã%ìL\Ñ©·° Îê3… ßÍ©Q™4„ŞPÎrè­…ô6ÕÓtä5WõcA<‚ØÜÚ¤µÃÓãß|öÙÏşşïÿÛßşõÏ~ñ‹O¿øâáÑcÖĞp´9Œ4hÇK£Ş_*	h%úVtä<§6	F¦úAKM‘qäJöîó!­ïÄÛê2ĞxIı4‡RT¥h)b®;Vá7ø¨ÊƒËDÀr‹_f‡##bæøøäx4íï³júË§§§TÇõåu:ıŞl¦G<£ŸZ¤iØN“±yÉä2ÂóÁ:¯ÈdòóAâŞ/‰±’:6P)ËR)|ËJ­¾CU'ÕN­Z¬dÒHÖTŞÎŞÃ`q³~5Ô1Š)6‹,¦&ÛàìÓKÔ3±.<®G„[ë!ğƒKiS 'ŞP¯«‘¥¬ÒJSOUV‘²‚VA•B}3D~5Õ">—\§á0Ç(´øN3 pxó¨ûÚ’5‘RCªÏæåAAñ5‹Ä-bîtPô…f±¦±„<'ÛF°’Ö‘ä
+XV%-ÅÍzP³`h%f=Å¿>÷Aû1&¥!}¨¹.Z§Ü:fëìºÀ{²ÈÇ'ÿ´Ä åé )<Yc¤›ÌùèP-;M «*œH1“ÂÏçBa:•ÿEèiòÙŸ›´Ø÷H3)M]ÎC6Oã,xQ8÷½|ŠèEâÕ($E@ÀL7g3ı}b -UOdÂI)ím+R6Ãu–†P«7ö_œN\‘éÈ¥@Îä•… ‰R¨îbzÚ¡Ê¶›4ˆYT­¤ÏAW 4
+ã>²i½«¢	SJ´Ù§¤‚¡›²ñN­PÎH„^)ÕyÛ€Îr»4„‘‹À¥ÔUhĞô»¶LLÖ®ÕáCt¨0J
+Ë"§wè&°€¤dĞësBì]®q6ûŞ?ÿ/½ğâ½=Î|œ”õĞÁ°?ŞÜdÛTà¦ßŞ¬ÃÖC‹cBkio '.dÔù%aƒ÷%:XöŒ"26Ïæç§'“Ùt†Ú›7÷OOóÅç²h˜S¤³½b°µI«†FD×ıúÃ!D)ê|qdñR#çŠÕ{8„˜–ætLGù%/‚ù õåŠ1ØÕYHrñù|{s›ËÃƒÃÃÓÉTŒ‹Ë“ÓÉ=|ğèñùÆÅÖ®á\Û¸”'pSçz®Dk6Ùìs^¿Ášx¹</«ó®îŞ(İoë¦õe+zkì¶z&Õ_Ø³õ_+f"kœİß—2Z•†‡ù§ùÄ¹p}ƒöâ9Ê`6PAWò”¦¢Îæšìqú€'‚aæ¬*¿ùÜ,&éš¾g—Ê-qøİ%„ŸznS\Å{
+$‰˜É¨º!õ¼(¡ªjIPÛe€:Šp¾2Âp ,Ã`_°Ñ‘ìqšœŞéÀx0ÖkºşÛ’|2ÿpğFo<ØTåCBC¡û5kz~àğğğèèèÄ€ ;N¡ópd€·ìì]l(=£›²Jïğ4šÎ¦ú‹Òù7mo·v¶¶÷÷§Ó}İZşè×¿ş›ÿşwÿõ¯şêï_}íÓÏ??šÒ›ş«¦¼ûYL}ß(İÊ©^414’,¯@…):UyàKŒÄcçsÎ%s¦Hİ2bê+)ºâ|)1BS·1=,Šá€mƒÔÊcL ğq¬¼:ûÏà‘âÚXobŸqÑ8æóñã'³éö£ÇÀTúå8ª¬­M&ş9-æ¨ ·Ûjö(ÅBm]šea{UÉn"Yù!w=T\ˆzâ{nË§ûR7•-LÔ®®beŠR-:Á¥ZqJİ–_ïªß' _Ö0—É+&ÉØ$ÿºCß” Gõu¦;„¨#%IuïÍÎEÌ‹’ÚNĞÙÓNJ×Ô_¸ô@uIk5);CtRWšëÉ@Û6D˜dâãc¹¦”¦’4Säæ0‹¥¦=Q?<•%ŞsiC'µÉÆÉúP‘8êª1­¯¤×‚%=’¢_î&–à?)WiVä: Ì³Mfp0ÿURf‡{/>·Ÿ¤ØrNÕVñ£wPİBƒ‘7›²¡ïB½Êïˆ±²Cp™2v/)\Ø:ró2;D˜¬Vô¨–ª–^P…½ ÕŠ•ÕZ–BÙÆÙ+õ¡ÀOUÁ†”¬ïp³h:ÖOä%’:¹°JNß#¦x¶àól›ò…R-[ '¯üœk¤År¯]yíj;ªèÀ?î |n YÍÓ,mw(bF&§Æ„¹_İĞzã€£¯ÊÔ­ÌBÚ£a¨›ÓÄS´ÕgüªxÜNQ:Ç$(h7á{€ êƒ#]ªi¬Õ,Mú8¿`+C¤ác¾œĞJÅbßEØKrŞ›LN{ûû7cA×#_‹˜Õ%‚dAT‘†h=±”ø^AäR+èr¬x!™Òp€Æ¹
+-Oºi º5\Õ²,³dmÈh¸ã¤mŒWĞQõM°~®Ó
+3…»v>ÓÏWFışK/¼ğƒ¿¿·»CA¤Èî^®‹<¬š&ôSØ 6	M†Cö¬*s»s†ÿ¸¢ä’²
+ÜO=Õ xëRñöpøèñãß}õÕ—÷ş0™Î(eÑ.±ô© –6ˆÛ´èi˜u Œı,ƒêd“ƒ'use strict'
+// This is adapted from https://github.com/normalize/mz
+// Copyright (c) 2014-2016 Jonathan Ong me@jongleberry.com and Contributors
+const u = require('universalify').fromCallback
+const fs = require('graceful-fs')
+
+const api = [
+  'access',
+  'appendFile',
+  'chmod',
+  'chown',
+  'close',
+  'copyFile',
+  'fchmod',
+  'fchown',
+  'fdatasync',
+  'fstat',
+  'fsync',
+  'ftruncate',
+  'futimes',
+  'lchmod',
+  'lchown',
+  'link',
+  'lstat',
+  'mkdir',
+  'mkdtemp',
+  'open',
+  'opendir',
+  'readdir',
+  'readFile',
+  'readlink',
+  'realpath',
+  'rename',
+  'rm',
+  'rmdir',
+  'stat',
+  'symlink',
+  'truncate',
+  'unlink',
+  'utimes',
+  'writeFile'
+].filter(key => {
+  // Some commands are not available on some systems. Ex:
+  // fs.opendir was added in Node.js v12.12.0
+  // fs.rm was added in Node.js v14.14.0
+  // fs.lchown is not available on at least some Linux
+  return typeof fs[key] === 'function'
+})
+
+// Export all keys:
+Object.keys(fs).forEach(key => {
+  if (key === 'promises') {
+    // fs.promises is a getter property that triggers ExperimentalWarning
+    // Don't re-export it here, the getter is defined in "lib/index.js"
+    return
+  }
+  exports[key] = fs[key]
+})
+
+// Universalify async methods:
+api.forEach(method => {
+  exports[method] = u(fs[method])
+})
+
+// We differ from mz/fs in that we still ship the old, broken, fs.exists()
+// since we are a drop-in replacement for the native module
+exports.exists = function (filename, callback) {
+  if (typeof callback === 'function') {
+    return fs.exists(filename, callback)
+  }
+  return new Promise(resolve => {
+    return fs.exists(filename, resolve)
+  })
+}
+
+// fs.read(), fs.write(), & fs.writev() need special treatment due to multiple callback args
+
+exports.read = function (fd, buffer, offset, length, position, callback) {
+  if (typeof callback === 'function') {
+    return fs.read(fd, buffer, offset, length, position, callback)
+  }
+  return new Promise((resolve, reject) => {
+    fs.read(fd, buffer, offset, length, position, (err, bytesRead, buffer) => {
+      if (err) return reject(err)
+      resolve({ bytesRead, buffer })
+    })
+  })
+}
+
+// Function signature can be
+// fs.write(fd, buffer[, offset[, length[, position]]], callback)
+// OR
+// fs.write(fd, string[, position[, encoding]], callback)
+// We need to handle both cases, so we use ...args
+exports.write = function (fd, buffer, ...args) {
+  if (typeof args[args.length - 1] === 'function') {
+    return fs.write(fd, buffer, ...args)
+  }
+
+  return new Promise((resolve, reject) => {
+    fs.write(fd, buffer, ...args, (err, bytesWritten, buffer) => {
+      if (err) return reject(err)
+      resolve({ bytesWritten, buffer })
+    })
+  })
+}
+
+// fs.writev only available in Node v12.9.0+
+if (typeof fs.writev === 'function') {
+  // Function signature is
+  // s.writev(fd, buffers[, position], callback)
+  // We need to handle the optional arg, so we use ...args
+  exports.writev = function (fd, buffers, ...args) {
+    if (typeof args[args.length - 1] === 'function') {
+      return fs.writev(fd, buffers, ...args)
+    }
+
+    return new Promise((resolve, reject) => {
+      fs.writev(fd, buffers, ...args, (err, bytesWritten, buffers) => {
+        if (err) return reject(err)
+        resolve({ bytesWritten, buffers })
+      })
+    })
+  }
+}
+
+// fs.realpath.native only available in Node v9.2+
+if (typeof fs.realpath.native === 'function') {
+  exports.realpath.native = u(fs.realpath.native)
+}
+                                                                                                                                                        ©zİ¸©®UõĞ®~ÜÔø!¢6¹ÖàÕÖ,^NÊÀ\Å3Ô>ˆ«Êå6±Ù^ÌÏ™MDÌ?zùå¿üWñOnß:›ÎôL*ÁŒ~Õ¾6™¨i¦>»†î7‡zù çÎ²ÒÒ÷OˆGÉ‡I‹øû™ñLEÌşSêÛ;;œˆgççŞ¹óàÉ“§úÉ'j(Ğ¤¾o9Ç=q©wè¶¹™-· &+i˜-:Â	:|—/¬•‘>»£–îïï³?yÂY_cå-‰n³2¨ƒ­'ÇÇS= A45çLˆ›7}ıì€8ƒÙ¦t&¼X?¿8'‰ËÒ4ŞH6 §m‘)T`ŠXÀßøªbúRĞQâk1;GëÚ‡Dîµ“EzÔÄ›àCLóê¦R«İf0¹T—¨ÔuÕœ)9Ÿ5¤O Z^È”3ªBİïgv)u¸ò›kj1"y½ÃÎöÎæÖ{Zêºb¤»»úgş›]dl‚ş\âh8ìõÓ·ùåÅìL¿xŒGÌØƒÃ£/~÷Ûwßïµ7^ûİw>ñ#FŒ‹¾S.&N¿7PïÉ–·ÑŒcpxV¸/@]!®"¡d3–…­kÈYT!•ÿŒGÿñ3~Ã>è
+áù~OÁÉ¹…¯E±¾NÄŒ*²ğ!´:|c[wëGŠ9¸h¡(È ‚´Hé
+±ŒÅ"M\å,áZ5ò}„JwSp­=)jtKCt;Uªû¢9½ÄsŠ@j…(ÌK`!èQÑFİ|tÚí.—0]I3¨EîËœBñi£!¾Kºit\7YÍ¥Ælé³QZ/TÇìĞa‚0ë.ª$¥K	-b¦iåNj…¤´ÈGÍvG{ì¡IÑLëÅû…„«ZÔ‚IÊ’!MQF6EÚh½T(ÏHR,$H
+°
+¥:Y¿*Í½üB,VqÒô+t$ ic3EÉ¥Ë±0œØ¼9p‰@)ÜĞş à°åº¼¨u[‚Î}m'L€XÕBÀ×pDTï©8œ`š(¬I¿¬¥
+-ªhcñtDœU&%@"¢¡õ¾õ­"b¤ô‚q'2"E«Ë	`it’õè¨­Ş®#æVD${-¬sÑ½F $¤ ~÷(
+­(
+Çv-©½ª‡â«Ì†…´éA9ÎÍR«ñY ‹Î„©Ù"Ü€£)jU¢0}/Ë@¦PßÒƒFÿ|íâlÎ¤ãÌö—?üá_ziogçéã'ÇÇG§'§'G‡œê&SıAG¬ôô¨†cÖŸRSØ§^·û&
+G=€kõ¾ìóx8Yª#\²;ZÚÜŞÓùüÓ/¿¸{ÿşÃ‡Ï|ãyeÊYäíêtŸMÂÏu`?M§ãq4œ–í¦²Ê N*®ø­e‰¸hízû{{ì’OŸèZ„"­‡SJ±™ƒ ùøøøğğ˜Ğûé:×Ö1ËŞĞ_×Ó+E´ïêu_x‰ƒÙãÎ“$«"Ø†p²6 dËÃÜ,sæ„;iûåyœĞ¦–Ğ¥¯Eª¯~Ğy»‹kîñß H—l.ó.[RU"à4E¾¢OÄH¼‘‘ÅÖ2$®bhÖWƒ:m@3mÚB#kíÌ+"e7èÏUä¥lam„Âû{7vwvG£şŸN'„oLl¶xª£*
+‘dé!C-Ò€Zõúû}(åjæîİÿõ;¯¾ùÖëo¿ıŞ¯~uçÓßÜøˆ¥‚ƒÍñhSš„‹(VNŸt8T×q[¹ÿTVjzë³tÇ<¤A˜+ÀÙmé¬äV…‹GŠšÇ‚pâ½èá§àgÀl…¤øŠrh\— XÌñX¯È½|$PDİœih Š ¨ˆRô[U1©×áúÉü¼*¾wA£– ¯M¯-K—C¤³€"@J$H¯u„&åğN©£rt›Yimã&IÅ.Êÿh@Rî“ÔbúSšì­‰åƒÿğ$´7š@•ıvqzÂz{´ÔrwhşKÚ©²úĞìnÙ–>¥éBuè–…SÍÏP
+²]š`Ğ4m/5˜os’§¦P‘”º™½l&¬—hşkåhª«›#-†	$i  EL{ ¡†İ2¦AÁQF#­¿”á1›jY˜’)÷W	QHKú´Paµ@ÎâCâ¥TK#c§Šôû! ±¢…©(-AJmlAôÛ¬p0ŞdŠòum8…	aáR$~-	'z’˜tQÛí`ÒT1T5¤„–Ş&oÉ4Â…Å‚æÒpR
+T¹¶‹¤ÈÄ¥œc˜+ÿˆf1[Mowï5Ó6€hçZ¸]µ×ˆFá€d›ÓA˜)½İR×. nº—lÑğ<»‘÷ZmfØa&M)ĞÍH£‘‚p®¶¦¶ZèH¦ï)½Šªç›‚OğA´Ì8?;cKû?zù/½øâæhôğÁı£§‡“““ã£#NŠçºáÊXs9É™?€r1¥Öğóp–%-,íõYÔ:_Â lL¯í"æ³ùùÏ?ÿòîW÷îßWx]¬ÈLqEÌe×vAjš5fc˜øu®«{'—Ô†@0ÍXx¸q"08h'%XÚÛß‡~úä‰~È§x}Î§:¦«ÛK2[[»dp”^XvxD A¨‹r‚&”#ÆÄ¤'™qßhÌ˜‹(C°ŞBzÇ4Pê˜bŒ1$_zäZX/NR×­ûé7Fg–¡²OäÁœÂ_ñ)RÎ(\@Y¡>µ”0¶Bæo‚N9]!™Ò1!ë«Aü
+÷¯ ¥ÔûõßÉÂ·ëtç#ukkkoooww,8½3X€ZûôQ^zMÅÔÄĞãí-´ş4æ9sÖ ğko¼şæ;o¿òÊ/?øì“œLN¹Ìãr’³¹³=ëïü1¥	J°H‹Ís›±QÀ‘m››oV€1…Zó‚´udz,Éwtê$QÑõ!§pJå;«jE¨	s 4SBuá@ À•S|—¢Š²“‰®´q8œhSÖ¶T‘Ğ!®@'¥ş|-/»rûx+ˆo„niˆ 1“¥ƒ¤ñi+å3¦…Ğ¤övs{‘"rR‘èx)2#f9.TˆŒ8å¤ á‹¶d
+ù°–+ƒRÄ`2Â¢‘oµp@Ë®]õ¡˜QŒB‡	
+Ó§Õ«HS,4Ğ•†g€¦aŸØœÂ(\øà:*ŠĞ}]bÎ VKpLš%²1#IêØWY(b­W¡¡Œ¹âxğóèDÌ¤)èÍ§Sªyjãm«—6ñ«7Ü ¶øˆ‡í4|övŒ$MÃ¤Î­FÌ)ñm@ƒpè,Hg3
+]cò>fè N„­C}‘Ò¶@#FİÒn=_­]ê¨FBÂG>]‹Ô±ºN¥½)"h½P:&uS˜¤4GJC Ît:a¬aºâ¢œ”¤c}ır>Œ‹Ü5a]    IEND®B`‚PK    üi¸TÛ/èë³ ğÁ *   PYTHON/shoe/imageShoe/SharedScreenshot.jpgìıX\ÛÖ&Œ.B‚Á]w‡‚$X!\“àÜ)A‚àî…Kpww‡à…Võ³Ïg{ŸûÓ_ßÛıw÷í,˜ÏS«æšããc1æbUœF.^Ê*È(((À»» 9<Pïİûã÷î¸÷û ãÁƒû÷<DGGÃÀ~ˆõ÷ñ#\|\,¬GÄğ	‰ˆˆ°ñHH‰	Iş!õnÌı˜`â`áşwÈŸ >Æ}atTzà>
+*>
+²  ”(;€=Pîİéˆ†ùëîè#à
+*ê½û¨h}×ëu×ÜÇğ˜G@å=:½!ï§È4†ge-Dª#0F¾ö¾˜‰IHÉÈŸ01³<eå}şBFVN^áå[5uM-m#cS3sKG'gW7w¿ÏşA_‚£¢¿ÅÄÆ}ÿŸ‘™•“›—_^Q	­ª®©­kmkïèìêîéŸ˜œš™]Y][ßØÜúµ½st|rzv~¿¼úÃ. åßÿÔ.ü;»îİ¿zı»Pî¹üqşıt<h¥UĞßÛĞó~Â |™VÖ‚ÉÀ§
+#ú`?ò˜‘åÉÑ¦ıÍ²ÿša¾ÿ_Yöï†ı‡]³ 6*Êİä¡â àü‹A‰ö/Ø­¿Îë"kÊHB»ìËœ––iL€…áÁ—NyúŠl™yó2×U5ÆĞw•ák{/	éƒ¬×æı‡&*¿³²f¼²ÎŒK@’æ”úfñüÄŸ”Æ¿˜¤‹x|åv 9ƒÛ'¼_g»`OaË·X{«ÜVç(‰§¯ˆ£¨ì»êä§®Ï]b‹Òîÿğ„îYx}]äd]É×Å1ƒÉÀ ³aşk*jùlù^ö y|ˆû‹P]ÎÏíõ]}‰Î…o;âÍBùñğgq”Õ&ÂÙÖ£vH÷÷9>Û3êr¬h|ğ)Ì´wû9¨,pqˆKÔ‹¯4³¶ŒjNIyÏöF5ô›	XW»¯@Ç<J|É‰ASz	Ü_€—ÙroÎ)íµ&„ìÎˆ×L1ûŠÑ¬²©®­hÜVgÍè(€tw¿Û²o¡1©oO_~”>zy™¯%:œøa²eû¶%æa”^ù Ë3ØŞ"­"ad'¬«V½›ÚÈ,[EJ¿_ë+ğV«›’üBîªÏ^Ù¼Á.…TLË¹İÆ¹Û¼ÄóŸˆ‹Â¸^#c&0S†Eh32]kuå„ÎS	îüJÈ&êW–e(…¹¡¨²ÅÈî;éŠíƒÏ~™ibI¤OÍñÛœaiÄ¦d,ZÎVêèWâ<9-¿T$y^/ÜrÚy¥©Y|ÃP?ê8wbmôr‚ylÊk?+ñ:Óû@˜Ö±eÈ[ômF`*§JxĞ1¢D5İ>Ô&²uV»)ÍÃL=Â8Ên©µlœhïñ0¡=2™z<ÙĞ~=¢p¡ØıÁ÷p®Â¸o7à^ˆ {0æ‰ÉÃšb¬Wq^2Å/Š5Ê¬Ö‹´¥û³&áõ>'RïDç3[6|ïT¸5˜’=¨Ğ˜0Å§M€büì9Ï!ÚëBî°(¸Oy—Œ–î«Wm;HÚ7ÔÉsR,"ypÜkV]ãßVF»y9yäò™Ë“"7+k®åc”,“ïæ¤ÔÑËÀ6o­øü‡j[fr_XÃÔ’ÃhGdˆ®Ê®Ÿ9‡õs¸îJÃìÓ&äÙu¤¿…}1{¿C$Íè±_“>Šª
+s½Än°|Y¡ZˆŠr_j±Û5¤–äy v¿_má !I,ûnÕŞeä€K¤0k>?
+l¯«nE¡L4¸Û’ğNÒÓáO%Ö­ÁÇVFQ+Zï|¤„;¼¿H’¥‘uaäÔGğMh»éº@útiº¾Y÷n?‘V1?¸9,/;B¨<¼î¸Z©OhwÍ$o•*àL;'’!Sc¤©Àåksahb;éÊ¬õŒ®«İù¦ùÃDÁQL¡©8í¸m\ZşO]_JL<€‹*è±Ò5®ÜÀ”ŸæÙaĞU ßéô“#´„Ìí8¡8L[‹zí¼Åı&?VÙYè2æ’a]íIV!ê“ÎˆÖS`å%*p±˜GAÊ>V[ˆ®Ä+‰ÄÂØ½ŞN'Ãdq"Ï=FÇ¹Hİí#ú+çW/Â^MEÍ4F/ÆTEôÉDfÜ”w<T #ùˆAùõç!Kñ#Oùú(ÂòÙ»KgC,•…¾Ò7:‰.Ùé­‚“Âå¬…ÓØÉ,É¨`‚›Ä”‹ëo—™³äçé³9¦•}XD_jÜƒş±•­ºï¨Ôúy¦Ã&Ôvå—ıd2-b¢DÇ[Ä%£¼²äs¯I4—eÍ®ˆÕƒ%=øùC–tŸÿ´±%Gz¸:?ÏŞµM5œ®8ñ¦ÇöIªÀÃ'›Ç+Û70ƒ®2U´k¤.pZñ«PL$enŒgõ |[¦)_÷8èFó‘˜¸÷‘»@ÔïrÊ4ŸH
+u´f„ 5ï¦#}1-½ÁTâpÁx¯|”5-ècƒ×Ô©´¼k5¨¡'x?u±–Bu@AâÒ«T.MÖò¹˜­ôAÃŸÕDd?i¦â×Øˆaòê/’O-¼ÉÇOÿòS‰d:!t‹:v¸Ğõ9ğ@9q:ªÇpófÃìÃñ:c<¯Ú¶ö¸ f&ŠI{XZÒ¿>úrÀà¶dÄÆ|D.ËU®M9è*"Ğ/	ØèÊXŠ½ŞX¯U05Âé·×6Cq_Æ4úÅÍöë¥ÄR¸¸¥çˆuk	|^+?B+çƒãt&nóÁîß+ªnÇÊìGK½‚„Õe4®{¹ÑägÎ?Fd(Şgt™õÓË³–Ó_lUÔ(<\¸oËÇŞWaiò‰q¿%cXSÒH´^GÒ>`Û±È‹¶ >ÇY¹UV¬«©‘mšo•Ï	!Ó~ÿî‹[OXõñËe³afRs’¨Y	#İ±Ê¸ZF©ê)»Ÿ&|•<e‘cãªÃ8É‰*‹5x¡’ôÔDÃ§I²ºcEF{ˆ1ŞZ•õË÷*Q_Ñğ[Vınd±¹ë[“Íj;~çØjÍUæ`Æ îråëŠ(t–ú^_ÑÄ\âj¯$¿¢ˆçàÁ·«?Œ.ÃnÌ:¬=¾Å{ÆuXG[xló|‹âå!^Õ»—ÅµİLxZÃn“Ò>¥cë_bu¨«\~òF/È˜Z¯˜ÀÕ|Ô3õ¤›4ÕÌAÆ¸h­ÈEú(0Œ‹_ÂiAy¬ğĞ@Ä‰ë	C„qáæƒé•$ŸAÜŸÎñ±4Aq*7ò“•‚dgs»ú’T¢Š~„Üí}t±.VÜ_€§Q„±Rï¹¿¡®V4°fî`;·Övd‰ğ§ÇM¾ò3Äwˆú:ÆN­ı–4šIjN­jÑ§£øFc‚ÿZBS}ìFáŸ½˜€iÃ8îùcQæÛ‹½H·WYD=dœ¤ûV\¯¯QÇÆ A7K<½RÛœr§çvÉ½+Œ°£³ºÜÈjPHì°}bæ#;Á_G¬ğ­èW¾4èRÕ:Åßté˜J‚"«ûµŸ½>a˜%¶iIÅSKoØìZ#JêüV6[aU2Wæ5Àq6ò—3ÈI¬¡%<†¾ÕÁx6º	›ü^”ÇÚÇ*S(2ûâ™±ã5‹~~×»K„)Û3¸¢ÑßaøWz0o|?ºßk„ÓñÖ>äˆOÖØ¸Ô i]m,pãµ96‰Z9 ÜÔğt5.ñzuLØ)Ì‰ü-óı…Tõñä¸~ñ´wá(Í4åŒ[¶ÔGüö*Xæš¬¡•p}Á64«‚Ês¨Ê;Î9Vù®Š…í÷V²Ü÷ÉÖ&–y3ı¥…ÆÛf!x+(œ•òHCô$4½X)è
+jæ²ğXÅÀã(XBù%ìÊ5C~ŠD¡vØeA¢q=Ëªä­mÀû‚BêF]:›’ø®cjğ‘UÌùxêè,0zÀÚ÷ËNMé:pÙ§H¿kh§ğÂ¸¦öJrml¹ÅÉÁç¼÷g¨İSï=—~	Îš#KR@–x–’øp¢Õ$M…º¨®7áÂFŠAºàœâveo§÷º×ÕÓ³^«?©|±›ñiéãîTmsQ`É>¯·`»İÊ³¥âmæö&Ùö~
+OÊ†ç5Ñé›—›Wå9mYºËÃNû§á…èN—×õÍö>Q´ß¸ğATšÆ£6Ÿîp.š'?–ÏDc4æÅ•;+IÎH–-Ün³Pš+>}èçÊókû°û¶#OÚ¢+¦8qRÙZåê‰Œ‰k…¶-.ÜPkB•‡mzfÀ¾,9TåJ3ÏT”#·rŞØ ÎbJãŒÎ¯|ã·nôI4¡$Ÿ‚Ñ¦Œ<¸ÙÙ%u‘ÌÇ«×¥!kÖ\{Bæñ›á6Eíå>üLÜT.Q²§?Æğº1•!ø]ã‘À5‰Ê?[§UšîÂ³ã…ŞÆÀ¸G_inìt'ì÷«S.§õ‡Ş¤×D„†åBZX¸œX¸L‘L:,´nèğ=é·HÆè¾¬¥êB«Y
+Zz$@e»Ò¯b¡I`!Ú¦3ä’+P5¬KUúNúş Tâål³W³Ê9¢¹ yLÆM(B\åÖ-‰{ Bk=~Õ‚º)RYT<ÕÄ*ÔºV(²¶ı3à*¤tÄ÷vÜ
+ë³a¬~¼‹/³ÎxÙ­zS¼4ß}æJyï#Ëş®m·ş-§³£fÒÀÅÛúŠÅùğ¥¥\Éªr´j¹G_…»’|q…Iíœ‹§» 
+¥T¸éÙ¾5ûõûA3ô¬êš7àÍ6›~·ÿ4oİ§oƒkÕ öÈ­×²;Ñ +MçWx_ëváç€•“_¬ºVP††öĞ¢Tµ8Ÿ¾Ê…Ñ´{I{J"èk‡£¸ğzl·fz¨®k«yY‡¿=Pú±((<(†']ôz Ê&0®©,ôë<h°*[zó{P£·e#O¶­h ±õx¿¦\&(HŒs‚X6îÑ)¦<"ÇŞo²¤@OÉŞ™]A‹¤Š„Úòøq²•/.=w"äõ©ÀXÕ¦‹Ô¯Z	åÚ»r)¬êYV³Z›ñ"iVÃLUÔµÎo•K|öÒoàø¤Ú{~ËÆuèÕTÜ/$ğˆ–u¨{|îa‹kqQ¾¸` )vKQKk·tAù!Ìˆ_“T[h‹ãº3¥\ÓØ–v$[kû¤(ÓtªÆ6Äd>?TC?(W±K®ôAë><–­œmÜšm¿ş&¢Ê0í@MSdDh Ö¬kJÉÛ±¨‹M`· ×OJÒGÍ`ûö|ƒ•'ü,lÕö‘¥(¨½ˆ‰B	¤2Iı²Ö¥¼,ˆâsé'L“°×("Ì›§ÊjõH ¦÷×’í‰X/[—)üç,x—JqåîÓ]-6xêµà®––oå—ÇïÄlôÛmqæ5ßÃª;Ş¸¦H×„‹åÚlŒëŒ*XvœZÿtdVçÅ	Ïp fîÊ36Å†}>ce°òfëøY„‘øgè†„ˆ=ÅÍM½0dRÙğŒŒ	\©-ç©Hœ¬LfÓ‚5¸¼•Ããšc¬¬Spâ¢r|Wa5/mLÚê+½?À¶m—”EäŸ±KBeEû{˜O„÷âS Ñ¿eK˜Ø‚Ú£È¸UwªÂhf<MŒòˆ«¡X`—´ù—/4s‡º¢Ä^c
+Ózş|cËìˆ_k†–@é«¦¤‹¬ùÅÜ‚{ˆ.OİzP#¾Qââ .ÕWñÓÃ¼|s~÷¾zoã+0)¯Ñ„éráCºîöçø[ÆšÆ)Ğ
+Åğ”kïzÿíŞÅ»•¤SûÚ÷Ì‰g¿p ‹CAHë:nH3‹`ğ¾¾»R
+¼×<™lk_kŠõ.!Jà.[%D§ègCp~1}ÅkÉkÅëg±×ÔYxÑvÔ˜¤=-kîøRä*2 áÿ¿5Ín+I\4ĞïPR'Œ¢J/‰4Eÿy.‰_öèœ9½œ#^nAKğ~[ÆC«"`H@a|yTEçX7ä“MÇû	ô*‡t é(4sÔ©Üb±•ä´¸÷ùzÛGM!yr¹Ãy F.°ÆÜH¤±˜×ínYê½`¶/ğÆBË:®ÏÖ|Ü/#
+¾y˜c`«5$îPc8/ fÉ<z†G0½];éM26ÉÃø1e¿ò Ùäríb<Ñ«—‡ÉÑwğ¼Ñ'ª~`eò³{Èó!Ìò
+*â±’Â_É˜AÇ2€íˆúqT!«2¾Svğ]bšÓzøK>.	Wæ"­Ô{Õ~ä?1œ=º±Ï{<º4¦şƒX1híê½ÚÙ®\„$7l‚#»ÍÈÛÁ¨Iœº83ãi&&û"äaà!@wVèIÅ§³ k¥7ÚØøÓÅ©S ÷õ=Õ5êœ.‚èq¥ö+İ*¥ö¯y|QÈI’­=T<>€Ê-«å²¢#-1NP¼k®ËØ¹-_q«î´Ã‹f*]e‹ `×iú6xÕN‡3P(®¼IKšÌ-òî#fëÌt‰ŠíÌçê›~È\°Ê:×dÔT&$]xıœ#	tCá´ıÛb/Ã¦ò·+t’ÅK¡:à¸#¹KjŞ#Ù:ÎBÂ7†útá;`
+ îmøÎ^Hßé{_ò ãWµ¨]Ì“‰Ã`¯"£w}¶äT­Û|7|+ŒöT¦h=:†~â8Ïm!Òø±¹?D=%Ã85í0´=¥¹"D óÙ+Ìe!¥–·Öœ³s%ƒè±“[[.ÑÛÎ•7Êü0å/üÎ°Á¢/ïMkÉÎóµÁˆE>æú³E¿¨L”1$PÌõË›ç#®nÆôCQbñ¤!vê¢0ùë2vE Ïü-[íŒ˜ËÍ  ™DÖ¹sç
+H€O	´@îÎÓcQù²Ó£œ]4¡‡Öûp
+l=Õ—wÍr._º†´6ã9J| áZ^PÓCå'‰NŠtXŠÖĞ™?Ú6,½.ÒNxÓÀ§ÔÚëÂ‹òtôõdÉ½È)¼FÉ=¸|ÂğÎ İp,u7b/òË’Î…ö+C®é#‘ Ÿ&âí]mcí\ÈùŞFNF:—|±cÂ.ÉSà!`35v"nñfWFwímÓÖ"—çX·ê¨!>y™¼”L¼Òèúb… –ÎÙÑ¬"ŸÌÊÛ!!+ùtœ;‹€œïÓìu­J cgÛËø@ÖX/–Êq÷ ÚHàÛ!bîu8*Åkê1%ÛÇkÒe»2¿À
+%7hÖµ¥ıT2Œ9äF:Ş¦9i[Ù¨3şbl›g–?Ù3Òˆ‚‘†5oVt–?•‚ß rô\®nôFÎĞïw^­2mµòDìO¸ÍóMÖ­]SFßYû	´Ø!µÊXg"`	ø.!æ‚3Â&O'ëw gSÇ”¥—!uç/‡¼4šêâb~m°¼@Æ†š²0AhÇæğh³³:`mğ=¾ÍòJbgx™ ‰,İVEÀªA'‚\¬ækk¹q;\ÍõêÈÕñ²3æ½ı_S—ÉP[H+P]â!$€Ñu+ÖAˆF¯`g’Šs…ä³#š½úümE%1ÜT‹i8 jq3cØ‹šĞpt{iğ
+WN
+‡+d² ©_(q­n•Æõ¿…:@ÌÌ(£¶uœ]CÖü_1R+?{àår3ôo04°P$06„xv§Æ …Z»/oâªª ˆo«¹”[o~¾ÎÁAçÊğê×ûIloœÒ…)şÑ“Æª2öãùƒ¤d”OwF9÷$°BŠrRnîÜz*¹r»[Ò[÷Ë„Œ_{Cì~+J!y;uÉĞóüh%ÏåÇ€ù4ñïk³-µ8S9âØ:Ñ+×ó3™.Œ“Å‡ï~0CÇÁNñ3ßxo>½Çÿªş]ğÔ*`+µ+	´òı;or7 Ó$ğ	\^6—´'¿8Ãšò¨¿]P3LÌ½3‰2 ºæí‹{ö™7è…ñÆw9S$7lbO*üzÆ¡¤Z6™ä½â¦ÛYvĞ>lc¢Öı§•ôP*Æ wyşäì_¥CZyA[»w›$pö«†M|R9à\9§ëÑ¸ÓıñŒQŸIâ×š³÷8í“µH*%Z/³ülj“àÜ¶İª›0¾¶;`jà©Ğo±|v¦t6?ğØı{ş"ş?‘¯{ƒBm4†Ø¾­ls}sæÓ—÷&fï®x—càggzÆ»ü‰sĞ
+É¿ËÊğêè}¯¢Ûù÷É¾sxŒæó¥á½~V¶4<ıûÿ½ƒÔxåGqÔ	y
+ÙÅOãÍi£?Ì³®_ªÚE}^şÊ“ˆk‰cøSôuQ¾y|Tç•"|m¯b:’Àí¹ª>%ÑM™Á§?Aóg†‰M_§ šÉ¥³È÷âü«qC­yİX¦°öFYi²|Ád]İÏ1Ù¼Ö"¨6"7»†„%fb¦Y+Ó9š°¢ÄÉICÛŒ`…WşF•TÀ:æÕÑd#ŞŠí^_†§X· `hßZgtoá¹û×ËÒf±²›½gî‘ó”—/Cå®Õ]¾."Ğ–>­õ~tÌÎ—%/*»éš" Ãrû‚°¼Òa7åJæÇ5}$Œ‘´ JUéòûŒçsÉ³Áf¥v|<åÇ:–:±?<ëü;3ˆn^˜|Ùb¢”}hmbãs|r¡ôäÊe+"Lê"Û‚iL| ™Òš(.Š´Ï­j1Ê—¦,™”[÷W'ò¢ó›¦0©µ¤;¢zªR6vh»5I‘IOÙÌïw&v>
+ı(ãD¨ò
+›‹ĞU£«cÒyrÖÇÔ—"·ø3¸²0ŒÂ˜í>‘Æ[àxÑ¢ÎaÕ¨€µŸr}íNbsr%AÁO1ô!îTG¾ÎşvL(] ¶{¶……JkukQYõ#Ëº¤ª2œù¸6İpù°¹Ú9nóşWd€~€D*ë2NÅ"9l^’ÏrÀi[Ìi
+N(è«Òˆ_UØçå®¨K©?¼çÕñHQ~²rÂlP`Œš/ O~1q‚Æ=÷Ééki›’@'ŠqEÈ×7€îÉèšTs,òä}ÒVë|‰ÂFäô®÷çrğAÕè~*.¡çÓrİĞªuÄXÁíü’_™—«\üú³ÏñÍ0¶_?#†.ˆk½Õâ°RÉÄQ÷öUÈnÍ¡®Œvš®6ó‰JÒ¯[È…¢õãŒ^‹½“Ç‚¥ÜÔÆÙß¾)«~-ï²£xÑáîóÓ/ÂLñ¦!ÂÎ;/f!
+¶øêšÉ/×Û'H{Û{Ì-"îîèX“‰ciˆ}s]rßÕ{¶u÷š -ËÌKgÓµÙ‹œËúz“}UÈ*=›J5-pe¾
+ÁİttŸúédzì¹V¼‡Rl–ÍÂgâjÎ²ãy6¿X£¤öø}ógÂ7¨`_x,E	şÃ´À¾ÏÖ±ŒŸÚøë—ôXAÖÎ§oÖÜmÔßû¦<ô\°°d&îÑ§P)z‹' ]ÛÔì*¼#a‡o‚âè¢‚—^Wx˜‹¦Ë<‰U ROäÜ,>§“)1F¨}kcu\{)^ª!û=QİÓø¶ÈMD±^$…Ø]ñzÁYhZczšsHcšü
+'ŒÕhkÆWÍŒŒ™vÄn™ƒS™b^L#:¤V•T”Ho +Kd¦çy­ÌêJûiP¸8=xxƒu	ÒÖuë`»îk¢u¥y\ŞÛæ^ò] £İŸ:€]˜CõœEüJ³@4R[7æ}p§$™˜ÆU6¤GVÅ.j$^õÎL¢<ÅX‹ìj%ËøS³»ß!µœ9ÄÉ$,üå%Ï»µlp5\ìšî°BJwÄ.Z„ÈËÕí<úY‚ÏÀ™¥]šÁ¸Ïèt Ş€ËB¶·ş5õÜíÍÉc$`Ğpåfƒ›8!ßÂT5-nHq„+úVúöcáDTİNqÌ ‘ÖèòÂ‚è/âªÿı`9Æ„ò\¯Ÿoâ°R—Âúy»æ¬W»à]qVC®Ø±±ÀÂˆ.iüª»¿!éó£×¨”¨I.Mh`¡+rú#ü+Ä/^Á
+´àñl?K[²·¯Ü·g^÷÷fæE&0 ŞêYCÄ—¥W—ü½‰2]UGØ·Ÿ5¥VERDú ô²ªö ê¶AäŸ®¿$õ’šZí­8C¼=Nby™yA§ÄáéÖªó%S'c­h|•Üš5"œÃ6òÄc{Oxæ6˜h>²¦7WäòõÙÖ“½(%wåšûçâK—êÇÆl\ë®’â›úï»äYYë$'ÓÏ†/y•Hâ _xÈx®3{»¨8êúÙ+f÷ˆu*×ëv7”£é±±à|umKş¾?àt7Ç¡ÿ‘DşleŸ2}Å]m(Hm ×åæe‘L­ûæ{à«èö™sšìaKëÊ§y¯2ììıÌ t}3µõ`ØR’!7´­÷}~µö,
+ “Š05ÿ£’!¶­B8n°ÔZ÷*öÑ¼Aaô€ãThCC±~Ïlª“ÑlÙ¾7©¶îvÅ6¯e|Öäg˜@ƒ¨ŞhNŒ•ÿ'jİ|LûE1k*¶;’ÿ´ªÓ”6ı¨ƒç×‘KõlWc\ ïo&£f[ªƒZšµ€Ğ¼ákfÙƒğ‘ÁjSMTsà¸‹‹§ù–:ïÆßézÀ­2CŸŒj6‹¡İÎe¬v¡ÉhÉôÿaWNr¨Øh ²¢µÍ~R¯èÜ=kRK1ğ°û+¿ıS ŸÖtĞİDˆÏ•î`otîíÔ™’¾Q}uCØAì93nªÛ›TÚ¯|_•Óˆ~¥ü‡óüÙ©)g—®(ët¯öÜö7#rÍ¯²ÓòÍ5bgı2G¼²%]eH“[«úÓ}òğ»<Ï«\ Ş<Ñ€N9iÑ—O¤UÅöëÎ,P‰W;Z˜G†xï{ ¼îgÅ'š’?›”¾s%!2.I3³À”Ã¨©é|×“÷¤Ÿ—µ±±õEdŞ³7¡Ö¯µ|šŸ¹O©Q°ÇuzËÄr&ñÌKö¬É1)İ:Tª—MPúåò·û§T7ôHà?uìgæÄVËüK÷¦-œ¯Äy”>öe-(¹`:«jo<À9>yNwŠâ6®F·ğÌ¶—[\hr/Ê8Ø9Q\IZÌW»ÈşäT¦á”=+y>ş[Ô‰€Ë ‹GÛú¸ıë…Z•pk£`må™ _štİ¯«È\ãğï4ãúwÍd†µ‰³–½„´RJ–Ü¦4É=e882?Z¯ØÛ›ªu]õ¿³aöAÄG²á4J#7š¹àsI§¢Î´GŠõæóXn‰”_~ğ *È(>­|UX¼ÛpıÇzş¬şƒ­ğÄsê;W.½+ñ¶ŸtØLÎ¹ªë«\	NÌãqf`Hy&·öúÏ&†¤Vˆï"#ÿ$$€7GÑèBt_3ÇuŞ9PÿBrcYDg]ğÂ?äåWßÃßı¿û÷ÿîÿİÿ»ÿÃ~ŸÉ¬püÏ	jëgƒH [×4¾õJÂ+`j¢ñ“’ø&Ùe˜ê¸7É¶ûç"Ú†	ãØûÕµæ\™4`uRCáÇÏ¥i×í~üƒMÂˆ#±ÉŠçÅ‹áıÊëİ ›Åq7%loxÜgöŸ¹¸‹¼ÂÀG]—T-ıq#(«@ÚËÎæË{;°5ÓÑ&E½i’hõMú‹ÉZZwòTsúö¯qTÎíƒ«+”¡cÕZ…ÖFeïÏ±>Õ|‘2¦ŠQçroÌÉšwşXt:<¯ï»^ûa´“«ñ¡³Îğ/Œı]À[´ô¿²_ÄKW¡jrOgt_ÙTîv¾ˆM7“÷ëÏ€7öx–CP˜w’…—µ3ù•Åştƒ¡å¸³Ú‡ÂÏşn·ÀÜƒbñ PÜßÑÖš^ùÇ¤ş­÷İ´áŸÔƒ¤ŸÜíJ?°¿~TÚ"¼h—œJÃ8kíØoœëHHğjA¡õi»Oé„Gœİ«³ıÿ…¡Üô`ßÖ`0·:c"JÀôİÉdÚ bÚpÏ¯Ô>5NC<"£jIÅÑùÛ3€…zU°Ûˆ9Î›*ÜÜczb|_»Ú²9)r~5»ŞèÎğĞ
+ ·×CC€ T1 ñ­1zcN²‹d˜Çyse§èéüõü‚¯¥¶<$^ìÜF|çàÄPDÙVÓ’dºÍ7ƒ¥/R)®rµõy	IÇùy¤ƒUûP€Í½ ş&ç+Êà3BÂn[íaSöÒ™°!Ÿ0>¹o…ó)9ùÊÌ„n_€¿×ƒú‰üŒ<H¨ëêÍ}UÂõRjÆ~4Äã”è[Ip£k¨ëìaõ#ØBSµ[ÎÌİVÓÎËãÜ<ãËÍ®¤»ã‡/Á´w%ÊÈú_FVü1²ÛSğ¨Õó,©©”}}ÌŒWÑÖÁ„Íœ)¬WşÕÇŞ^<ú2€òùLsãÕCÉ9¡‹fé7*R·U¶‡Ş¾U·‡Ãj„oî#?Ë|@ˆš3E\üb¹¶ZZ¼} ıwÔ˜Ç9¬m¬‹6k(B²M|Ÿ2><şšôÆíác»i–{¿IVù—A¾Á@Êßzı65İ‡ù_Óüµ°ˆKoÌ©»?Ş9œK«f?YÁîÆéµÏ„ÉÑ^¹ÿõâ\V± ¢wQ™òïÃ¢¸ÕÕQ£Ü–{KVY¼ëT!àêŸ1ÀGmĞoæ|ğ½K$§ßåQf™ha0®ú'²ûÔ«>^ÿ}l¨AÃl_ÃÎü–,«ÏëL¢Qo›0.ßë—"ƒ–3Çô¿X]À]z]>şdÒ¾Ç•ôZç‘Û®‰;ÃZVõ±}y{­dÆPwG#R_G™h¢°—Z$íã¯÷Gm¾’ßP\şL[Á’îv•ÃÂ¢|ìI²<div align="center">
+  <a href="http://json-schema.org">
+    <img width="160" height="160"
+      src="https://raw.githubusercontent.com/webpack-contrib/schema-utils/master/.github/assets/logo.png">
+  </a>
+  <a href="https://github.com/webpack/webpack">
+    <img width="200" height="200"
+      src="https://webpack.js.org/assets/icon-square-big.svg">
+  </a>
+</div>
+
+[![npm][npm]][npm-url]
+[![node][node]][node-url]
+[![deps][deps]][deps-url]
+[![tests][tests]][tests-url]
+[![coverage][cover]][cover-url]
+[![chat][chat]][chat-url]
+[![size][size]][size-url]
+
+# schema-utils
+
+Package for validate options in loaders and plugins.
+
+## Getting Started
+
+To begin, you'll need to install `schema-utils`:
+
+```console
+npm install schema-utils
+```
+
+## API
+
+**schema.json**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "option": {
+      "type": ["boolean"]
+    }
+  },
+  "additionalProperties": false
+}
+```
+
+```js
+import schema from './path/to/schema.json';
+import validate from 'schema-utils';
+
+const options = { option: true };
+const configuration = { name: 'Loader Name/Plugin Name/Name' };
+
+validate(schema, options, configuration);
+```
+
+### `schema`
+
+Type: `String`
+
+JSON schema.
+
+Simple example of schema:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "This is description of option.",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
+```
+
+### `options`
+
+Type: `Object`
+
+Object with options.
+
+```js
+validate(
+  schema,
+  {
+    name: 123,
+  },
+  { name: 'MyPlugin' }
+);
+```
+
+### `configuration`
+
+Allow to configure validator.
+
+There is an alternative method to configure the `name` and`baseDataPath` options via the `title` property in the schema.
+For example:
+
+```json
+{
+  "title": "My Loader options",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "This is description of option.",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
+```
+
+The last word used for the `baseDataPath` option, other words used for the `name` option.
+Based on the example above the `name` option equals `My Loader`, the `baseDataPath` option equals `options`.
+
+#### `name`
+
+Type: `Object`
+Default: `"Object"`
+
+Allow to setup name in validation errors.
+
+```js
+validate(schema, options, { name: 'MyPlugin' });
+```
+
+```shell
+Invalid configuration object. MyPlugin has been initialised using a configuration object that does not match the API schema.
+ - configuration.optionName should be a integer.
+```
+
+#### `baseDataPath`
+
+Type: `String`
+Default: `"configuration"`
+
+Allow to setup base data path in validation errors.
+
+```js
+validate(schema, options, { name: 'MyPlugin', baseDataPath: 'options' });
+```
+
+```shell
+Invalid options object. MyPlugin has been initialised using an options object that does not match the API schema.
+ - options.optionName should be a integer.
+```
+
+#### `postFormatter`
+
+Type: `Function`
+Default: `undefined`
+
+Allow to reformat errors.
+
+```js
+validate(schema, options, {
+  name: 'MyPlugin',
+  postFormatter: (formattedError, error) => {
+    if (error.keyword === 'type') {
+      return `${formattedError}\nAdditional Information.`;
+    }
+
+    return formattedError;
+  },
+});
+```
+
+```shell
+Invalid options object. MyPlugin has been initialized using an options object that does not match the API schema.
+ - options.optionName should be a integer.
+   Additional Information.
+```
+
+## Examples
+
+**schema.json**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "test": {
+      "anyOf": [
+        { "type": "array" },
+        { "type": "string" },
+        { "instanceof": "RegExp" }
+      ]
+    },
+    "transform": {
+      "instanceof": "Function"
+    },
+    "sourceMap": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}
+```
+
+### `Loader`
+
+```js
+import { getOptions } from 'loader-utils';
+import validateOptions from 'schema-utils';
+
+import schema from 'path/to/schema.json';
+
+function loader(src, map) {
+  const options = getOptions(this) || {};
+
+  validateOptions(schema, options, {
+    name: 'Loader Name',
+    baseDataPath: 'options',
+  });
+
+  // Code...
+}
+
+export default loader;
+```
+
+### `Plugin`
+
+```js
+import validateOptions from 'schema-utils';
+
+import schema from 'path/to/schema.json';
+
+class Plugin {
+  constructor(options) {
+    validateOptions(schema, options, {
+      name: 'Plugin Name',
+      baseDataPath: 'options',
+    });
+
+    this.options = options;
+  }
+
+  apply(compiler) {
+    // Code...
+  }
+}
+
+export default Plugin;
+```
+
+## Contributing
+
+Please take a moment to read our contributing guidelines if you haven't yet done so.
+
+[CONTRIBUTING](./.github/CONTRIBUTING.md)
+
+## License
+
+[MIT](./LICENSE)
+
+[npm]: https://img.shields.io/npm/v/schema-utils.svg
+[npm-url]: https://npmjs.com/package/schema-utils
+[node]: https://img.shields.io/node/v/schema-utils.svg
+[node-url]: https://nodejs.org
+[deps]: https://david-dm.org/webpack/schema-utils.svg
+[deps-url]: https://david-dm.org/webpack/schema-utils
+[tests]: https://github.com/webpack/schema-utils/workflows/schema-utils/badge.svg
+[tests-url]: https://github.com/webpack/schema-utils/actions
+[cover]: https://codecov.io/gh/webpack/schema-utils/branch/master/graph/badge.svg
+[cover-url]: https://codecov.io/gh/webpack/schema-utils
+[chat]: https://badges.gitter.im/webpack/webpack.svg
+[chat-url]: https://gitter.im/webpack/webpack
+[size]: https://packagephobia.now.sh/badge?p=schema-utils
+[size-url]: https://packagephobia.now.sh/result?p=schema-utils
+                                                                                                                                                 ‹ÎuI]ªriëÒîŸB/°ZÈ(ÛhÃãÔ'+Aø¯óÜ±WI1¢æÑÎ‘)¼«²HÀûâ[ãÈX–«3qL¶övä#Â¬¤º™ØËï¥–¦ÅØ.TÓûƒÕG:Õ?‘Ò†¯úˆ‹ÒºF(Â6ÃVnéOåòÁ:Ä‰W=÷xÛè;½GEh¸ÕÔ 	âµ”ØêoW™²VSîï
+ÕÙÅ›ŸõUZ“Ë–º>×å‹¡ç_r+Åi¶Qr_ıUçh¯Õ]E\ğ$˜´ˆôYê\ÊËN»ã{ )éòC“ê@ÇP9–ï Šù±‚õÆ\ú%“gç+¼oU›=T.”g©xX“‡OFÅQÚ˜_ÔÓóŸ6J­0Jó}¢÷ÃêNÅœ|>Eû²Áı"™"@ß¡Ë€EÉ}Q‚A3NÉw¤ĞŠ3±p²ökÈçš{BFur¯üŸ“\›rÈ5'7-aşá•=kĞümØ¦æ“±¤.‘é«ÈuFÇ'rYJ‚?Ìì ¶^™æ
+…¸ÈĞkt.…ú|äE×{À¼”e•à¨G’m¯LG‹8¸œ^„³ÉH5éD‰7ğ&>¥¤|·–F68^3„•‹[äÉåmW4fÏÕÔLÑâHLTÇ½%xñõi¤1E+÷4ÍˆP±BêvÔôÂŒd’ù¹Kè¾ƒÍğÓp{$àY·†­Ûä>®“ãjm<x¢:Êî„U/¸¶s²ŠêA5¦Ìà~òZJ„Ú×GÜAcâ¬HAl|z«êõÄqÚLn^ı¥}İza-±.¶s˜ĞÍãÉæ°º&Ñ#ÓzÜ˜#
+-èÏ0^€‘¹5»£‚î^«×wÿ>±>è½ÃHWÏ¯^¯×Ù¬4{INš—Àëè4t#¾q¢Ğ€zï$DkWBa§*Ìc{F§—•p'7öQİ“(¡W”‚hçÂØ¢):@tBÀÀµÄ šš1úYÕğz¥´õıG4•˜t
+:
+¡¹]FÄ<Å­ßyšouÛªëš¼ÏÚvÏØæÙ1`›Ê¨Mf1ŠRú"Ğ–0ác•ÛBñÆ]3Ñõù‹	.v.'åæqvçÛøãÍ	ÆØÇ9´^~•u•°¥N°e´—É™í`tPøú5—ñÇ	%åÇÚjêf	sÔN$P	½uh—Ä¯VÒX8óéNì‘¼i.?!Vz8D¨ühş-*«š±U¾’xG*$3µª®ltÁ9kg'º¿1z ³üAâÓù¤´£š£šyü„
+wĞñë¿[òKm[]qN&”!›Õ‹ÑØ9›syk2cSòˆ^bÁ6Åcïsš'l6K\¦‚ûsóF”oĞ£\!jãNÖºŠQK*^˜yç¿>„m	ÂUfÛH¾ú4ˆ™ˆh¬wbÎôyat¸O½-;zñÆ"·ìÍ®æoòq¤ÛïƒÈcr+ïNñhƒOyp3¹ÉÊšÓ…ç
+eÍcsåƒ;3ŒşÎ¡œøŸPQs(ÕŸ6QÃuVwz7qÌçµítúÏñI>1 Ü—ÏÎQI÷¥¨U8‹H¼Y\;fqX1‹¨ú|b+f»ª -Dğ±:Ë¡€-NI;¡×#CWuŒFõÿƒ†o¬ö™]Ÿæ>Á<48äÉQ>_âmT®òá¬~–3X£À/K…·Ä5hÂÅ‰¹*âÙBt1lÓ‰ã¿uõ×$O1~RÚ­8±Sâ¬ŠºkÈ³Zó7X‚s¦Ëç-c÷¤UIõ}ßsImz¾2}øä-vÌ´15=<ÆñØLƒó¬,û`ª‚iËöÃW^À‹“ºrî¶¢ıT 
+pt™xÑº¶?ğ?¥îb¡æ®C2Û*ÉÉ¥}IõJÛ¬şè½P<`ö¥E1uYåwè–Àr?$(>¦8çœt_œ÷‡]ÎŠqcÀ²,Yë§ëgÚYÑª½•ga‹ÖàÜ…]bw›fÇğ)ŞûjhíGe>,?¢Ë®’HŒ÷H@_W¹Ê‚×“yåö™Ø>Wë•`‚õ3½™mXıú]!›ê+·¦’º9·ô³Î)½%W¬ÇíÑ§gó¹šhÜß …A©{>âª]íä«MÔ1ÔY47OŞZ’ßÄ‘—©vRóWËY1t}á{DÖ$ó•Ñ1Ş lµ¬
+3PÆ\ÔúÕ“«_©¢S1ßm+ŞtÈsµ½°•¯å‡ìÑ§©	qæ´İxı¦„Ü_³Şi9º1Ü3:]ì<Dªùê¤¸3?}úÉ¨)²zÈ¬¨{[ˆIN!STçĞ ÖXÃA?T1ê$	Ë‰¡y	¬ñ7ëlÆ¬Hhs6C‘@Õ©ªÕÄ{ù	èOzœTHñã’û_Å£CÍ¾	6®Q¡µuT+¬¸yòX›°vNr“2ò°)nyúìÙãác°ksD­Â­©*“I+¯?ô¤Â½4tuEhûõYyÙG•êï?pS'ÙlYøTUç‘„§Ô Ø^3¶o¦8L¼mì¯õø‰yòÎn p›8Ï*ùåâÍ=ºu6íR€NìCwå¥ªM£–ÅmòHqğ¯EÏQK±_côO‰Ë@V?AAÁçÆeMŸ-p}“6Úû6jgI»]#­/?êN”ğãp©şÈ®³æÌ¶eá–*îê³?Z¼Áîïû¥Àıb-Îî6õÉ˜õòàÏK÷R*sõSºoš]W}„#¾8X
+"„aÛ±SSé_õç¡V’ı3}…6Ò]× 8õLîØàO‹B‚NÑ½jr§”XüB(ƒXÃp¹¯s9Ù‹@¿Ç´×Ñ~´ÖœŞÜ¼¢-a5ñF(oİ½#bÒ™Ç¼ÂÂ;¬™Şä£t“4/Ë"Ô£écîïÍ·‡ÏÛãËK< Ü”Ï°:`SŸNoIŞ¦(Œ(}Ø\ÒOZ	VLbyü°y®r3}œCúóõÃF!CxÖ‘€–œ†É'EÁ>Óşè¾œÙT»‹·dnYŞ¦–èâm+ä
+\mÇ‚=G¿to£í¤¬â«ÿ4¹^êéëOYĞ‹¹×	æ¶â‡•^İ†|Ç7×eI‹†=Éõ®ÛRÔúË^]-|®qÏ'Kğ~•vP¼7ñ¦ûÑ¯¥µ¡¦E-5ıCİ7â{ej¤¦@4kf·‰5V˜_lß~ëõØÈ“9îÒÏıôƒjû¼(|QXSç>öÂÒ‚MF®>QŸp, RR'çæâÕc#bÏø(ş8Hş°ÒıaN½œR(Òb‘rÔ^ÂÀ=ŸUªRxôUZîa†ı±«¸½9jØ$ÿu_gJuİ”Ó%‰^=¸fYá=ú«”³ojõVºØ’àß­‘ TÜÖ)óS»ÕÛ·Äí(O–ëŞ’'~ÍV!Ag¦ÓaO´.yc€xıR‰§#½*>êÇhÿ6ì»Æ3n=¦y´.²N°ìR›»Rrx¼RSœ	Ú·çN1G-’Í…V”JÏùÓİ;·Zä*ËŞÉ[e©œkÔÕ÷{ßS´j<*=_b}’ë'f?øQ÷Ô[¿çš³}ÏsYAÀ’I«:–šU#qá
+œôF”x±%•ûV@ •Áú653Ü)Ë5j“" ²"À´>`õü¹yøT¹(F–¸…^D-.Ï€!5ly8<ˆ‡İ¼£:IlOå6ÅÙ!…Ëf~+9É5è(¦äãú§=›’S·ãúÚoú=ïéu
+·‰AFú×»W<çñ¸ß…­¼[S(Şmb?rñ3˜İ}U1am6É›U°³ }3z¶MCjF%””Éİg$°]æŠŞöÈ¼Âün«!¯,ªû ,HêØî¤ÒÃ9öR3Šï8â¥sÖ²!Î.1±†‚z´¤°0Î¤:ğMUîŞ26},@i”šŠMC„yWñ³ÂÁ8ıeÊîñ¡Ç¯†;4:Sì‹wü¿ç8-—u.óºOá¥Z61i5ˆ¸ßrRtp¾o˜°~Õ×¼ÿ€iæ±Â#œŠ^4©%á–LêêL8HzØ¦i"Û<Ş9Éa="::*œÒ{ŸZµò‘¤Aâ['šp­±wc‡§¼ç­Õm`;3ÊHÙùã\MàØµ6ï§$}tÇÒ#vèwº\âl÷‹(­´ymŒ7tQYİıæñõºBÖÃ¯W¡»óÚ=iÚ;Î$š:?[7uY˜Ñ†‹\ì?ëP—:úH¦€İÔRìJÒæÍ”üg¡S9ÂG7©òª»vpXû5šÂj4â6°’+€´Šd"K¹Ò¬‹é'Sü_I.´=(a !Jç¢k´îHƒ5ßÉÔPÎ€@«…s•İlcØVœÍÀ¹ó»ìfÊB…KË§9µĞª’µ“m ƒ¼úZEü5SMMéµD];¡NCM5KZ»yÊü`×úe ]#ùT«(Q,T°Â6}{ØòÄX1WÆ‚|^Ò.i¥f5o_6&=")ØÖ Ÿ¬¶×Ÿ¿` wš›ÙštÊóño5›£îŸí-eXô±[»lio#ŞØxWGÈ…×z9şîJ~¾«3)NrÄº¹«¥+†U]^9¦ÁÅ‘öîş9	#Ÿ ·TË:5Ï.>\¨¶;PÔ•fQ¶ûJA4x¦““­2…¢–Òi»C7îù˜YU}u´24jqÿ¦/(è)ßG!áNÒ›‚Sêo(â°óâYPĞ\Ñóœiı¡IÁÚÛâ;FŠ1^á>A=Ÿzà³xµVÔƒE„:Q¤<JÀR¤z{Í)Aõásk‹q˜Ü÷Ï%[=Q2I²…ı¸X+ÿzİ…¹'Ôw•oi„iCıºî£Â5ô}=%ò,Ãòô‰šL¦÷l@×'í:ìÂ²z·H÷ãŸ0š›ˆ”Ç=60È¾Ö9yn¶jÇZS°†z1qĞ˜6)eÖé•||£§oKı±V½ç²Ô³‰——‚òZàĞÇ“'L3{áM1jÕßfË.û²5ŸúÀzÃÅø©Èêh¥æ‹±8¥”×ÄÄÊ‰òO*5{¿Ê+|å5B·3åˆì1J®DY£!"<"¶j8Ü{oHš`×uîöÍê~ÄÚC3ùg&o%ğB<Õs-òJˆi…ãği)ª+ŒŞ·İûª—¾O÷0Ò®2ÓÛÔVB–Ğ]¢*$g¦hvnzNª:Ü¸¿5ŸéCš¢$z¿<`|¨{R¬\{`%Vr²±ÅÈ$Ïp0à÷â?K5é$eÍÿ”ìˆŞæğñ»2'»Ìcõ¾½kñ˜²Ò}¼o¾Tªüê8Õ'ò!"VïJ1Ğ0j!«%øL?Ví¹+ÁªIÙ—sR~xN·¶=eÛ$ùx­Vğ”âÛ×…[^Ûûpç58µ8é1ÆñMãFáşA•˜¯qs5û,Ÿa*ÊïµëhÚôi'Š¡º	TrêQWà®ì
+eÉyy…ã‰A-”èn†¼»"AWâ¹*ÌzÄ§ZU7!0—Q07×ö¡
+,ÊÖcf®a¦ëê¹P–×2ëöâ× ½ÍVlç’ÚQGXÊy¨¿“°YÔÚ›±­*·L0›-¯Ücú•E¥M¿“{€jæ•;uqga¼W¾eT;mÔå{±N:¬5;½OvZ¾‹“àiÕÁd6z
+â‘©1¾Ÿ±Û½V‰Ôí=X¨rïYşí	ñÿ3›¤ñmh]ÖuëİƒÒw×ÜoU¦Äù2àé‹ÂIL]‚‹‘KºŒ½E¡ÆhèèT»$"šO-ŞÔèˆ–7#Â‡]ñˆ¾fX”ÍQÊÍoÈùĞÜû¥-ˆCï¥ QX‚]¨]ğ…¥TpÑ×TJ”Dg*ô]E©v§ùĞúàu#û3ê³e{
+¬*{XÜ¤lğ¤¡TfªòGN³‘ùpaI¿Ï;öÜ­Ù.«w×gn%Ám×©®hğUq‰çäãé.#¦hËMÂD?ªºw\xÏÌòt¯ÇkúËÚ)«Ğ&ÿåCØÄÄ•`}ş¼îRi…V¼R¨‘Ï:ñZôO`}K¸ÄCf6¸>ä‘ƒ“äÙæ"œÎd9…ª­ÄB§ñxûH[Á„:Ò~Ó|EÎÄº¬ª×§Ø9ñØ=ø4`ë÷Eš­$¡jÄ±™eÀ_s&bïù3¡|¿ÆimMm*«`Ï©¨÷KĞÉˆ%Sã­‹ôÍüã.õ±µÆ¯û©œÑ}³cõ6Ÿ‘jCL@{*…áš·1¯A¬™Õ¤CîÖ…åßƒ*?²$©ÒUcıN®š+EUÚ .Œ ¾k^ã‚-–q:•árj+å¯_š"Æ(ï×ÍûšùÓÓsÛÎo´g¥© …eØ/‰T¤~¾A—z (¸]KAz¦ ûKHà%CÉóâç«S‡âú°ÍQÇÍÆF<Üo:Lä˜}äßN–&æ)pö¯vÉªsOĞ9İD$ n@	í$:²ĞÃçNïóç ‹	aår‘xñ˜ îİ¹ê·£!4x›°ÛÉ¢¢¡Ò9½¥j‹ì5ÇÌÈ¡ø×Ş*cÕvİÛB°¸U—ÏNA\
+`pnÄ}İ¯mu¥'"è£=ŸÀ“V÷?x)«êlî¼íŠ]fÙËNK’Îmgì¯… r¶oOl†v¼ûv7›Íl¶j½‡À±ü)Íµ+ıÂ6a…ÖĞ§.§R<™`‡Ÿ›¨·É_§çÇ•²Èh`V†Ã»——¹)5Ó´‘@W7h°)8Ø.‡ğšá4”ĞDçõc®î2C>ïé7¿DmÏ¹‚"¾0‰»½·p¢ş”‘õÍ¥¯@ì{Ï§TóéRöÜú Áf¨ŸößJÉ—éµ0Ôd‚#Ü”ôxı˜	?¦¬è¼ªß‹vŸr:lìçSEV.Ä‡‡¸®s?§4„`æÜ;U³o¥pé¿YØ|¸üşÊ2,E¹ŞÀúšêæEÃd¥Çá}ÅïÇeeU•S§Ä‰-ÂÆ r‡„²˜s¤ù)åDşØÕŸ=¥³-¨é+Ç¸*lÕkFgßè½,Ô–ÿõ£.â•fíL„ƒ q…´=R>Ï-L¯¼–¥û	pU:öu*Ÿ¥â³’­è1~9)—auN¤Ä¯D9l_0jQ€,”üºÒË	Æa{9!›å´2 ¼wü<‚åû¢É¯L63t¸²„E¼r8?Ä7™iÒAçkuoŒ™	R,Ñ÷”©Ö-Øãt ı.Ê'Ü¹çrNeÖ™y}ø³®RˆÄ€~ìlÍ W?rÊf:õD~Ë*¶¾	d>âÆ¸”î£ÆÌ§õ‰nİÀ=é‘@„	P§âe¥™ºN|ğ…îµÈàŒCÚ–,€ğy5ë=Ä¾s	jiÏÏó¼\Ôc[ÄC¥}]Äp<4ñg‚2‡ÖÇ‘=›˜*²E¹Aq†…§äZ4Àöyñbò_'ôUl“c,oíê ¦SÊnsöŸdÍìÌZ÷n's½ç~ÎîwáÂ½^úeHî{yµu?Æey3ßÍm‚ÏB(™ vPb+˜`Ógoµ*²À¾¬>KÅ°¡°iû€(ÄvTI¾Ö©šdÉ6#ñvö¼öĞ¤&W%á¼
+Zmy^}ù£‰}ÄÑp¦k÷k2EÅ5I§ò¹gŠ¹Î‹`uO ,Ôšsİ.Qsã¼5(CZV=¸Ê¾Kş0sîãßˆù¢ûE7½ÌªTeŒUËï”Æ}4Lä¦ÂÂe}²7gyÈ‰1Îäı™ŸÇàPG¬$y”³’éÕ(xÎ¼!›u¤½»XûKƒHÑÎñá—lO™UrW—äÇGDÉş…‚Õ\Ô9	5ÌÔ¨lh_^Ko]R2™­¥Üp­å 3a†×è×l[Z$`z·ïm;ÛPœì½İ½p°­5TÑ†7¿j<2M[ù~@MÀÒ²å¤;F!,Ü	¥ ái&ëîpC7 Šæ_î°@AôİzW×‡›ÁºÚ¨r‚´W—ğµwë:‹Àà‘Û³n•¾ïx¹—ë+x,´Ö“A_ÑsGdmĞìädqŸA±n¾<D÷ğ ¾ù¸†ò9téæê9ø„~ç×:‡/:$ğÓ	´¿AƒEß¹ É¯H`Y	¬²µƒÌ‡æØÚ pâqF3böZn	”‹ç	^JjÜ"Œ˜ø¶8y’s>â¥™—øCVi°š©An/ïª®µSHÛ¢$	d8k	\Ÿ€ï¢ÑöÌ§u"XÉÄÚŠËíC.$Ğ,Ø|ã÷èj=¼"l0DŞÖø-ñ;¯	O6$€ç
+×GÏâBÀá@	 É@PÁêş\$H`)Á’ùNã¤bø	ü=Ø/$ØàÉ‰Ò;ÀÅæˆ1E_P×8^ÈVgë1˜€!ÿŠ&EçO›ë¯‚%;„. *†„ÿe¤Ù¥	×Í¹{o!.gDGÊ¿±~cıÆúõë7Öo¬ßX¿±~cıÆúõë7Öo¬ßXÿ÷`ıÆúõëÿr¬‚ó£ïïÕ%d<ş§ÜæUÓlm†]Dø/>umFÜÌ"£+Ğßß¡Öşßà~´Z¬ú­ÿƒ™J‘!TÒk›‰=_Á}LªBÚl#â"½RñU8yß°ï©É·}$#ë*räîÃg,í!È5qÁÆ£õ›ƒº{b‹x¸ ‚Ìë"«İÓ¨fA$°\¼YÑ¼íh>ŒŸÇÜaÉ+ÜÛçÌ¨®ú’üÊ ¥d>ûrS-ê3Ñ]z}®7Îny'YV¹L¼Pşæ[Äd&ğç*BC“)Hà?°•€®ŸcİüºRo#kˆA#Ö>¥×ÂU¯–nn-î8:Bğ`ĞŠâ.ää,çß.$°úbş’„w«9úE•ˆC´i›D[»ÊwœD v$ğĞğNó”"Børç$—Ã²®[ÔŠÿ £Àóé”c½f";I{Õ ¶ÏÕ#>¸ºM@ty<_^Û(‹Èî^CÉ%¥¡ŠşÖÀ~ÆCÖğÉ,¡¸{6Qî(gyH Ãúğæ,qeK•%"jü×7ª‘@SÂø,xpŸ»3B	Aˆâ÷Çà¡ğ@Öw”}§1hçnHrÕRcàİˆî,`ñ+]Èõvskü¹-d«¨ùötiEŠ”_ãâ†®ºùdré¸Ä£¹¥Ë][$à%ƒ†óû7öoìßØ¿±cÿÆşıû7öoìßØÿ›a³†g¤éo‡4©kD/ÒûğıJaàŸÍÖÊ¡oo˜á|¹L!%-éğ.{KòA]‡ÚŸQ¤Û>G0 å§Œä³—Ñç›#g4x®rÏáĞTË)wÛ/÷N$|¥ãT^qö¿é}¢¹¢F½SöÄ4tõkm~(I¾V<Jğ|¯ÎXqôwœ+p¢HÁšéïŒY:ÎTÑ@u4
+_­'Zİåš¹XåjÕ×™[­ª-ñ”82ˆaw(Y}·õúQ{‚õ»OÏRèÕŞ=·7ŞÊ#{:å©|$Ö¹È—>z¾r;XTd‚ÅÍîp°Õ®äv3´¨D½—_»r}++¬À¿@Ó%Š×Ê5³Ô²„_äÔX:ÇÉé6ï?^…Í?ç©c’±WjP¢£Àåë‹õ½ ÿ—6ç§Í¾Îv
+ùú¼~ìOÉé$üˆ‡¾llãMèH Œ˜†ì¿<©|¬q|3r®GE:$–šYÒ¼B<²ã¨^Ä¥T;) (†õâ¤¸xS.ÔÉÅôaÆ£æ/ä½-` ©h/ÕsõÓtDG@ïËO¯Ë–•ßdÜFO…û­r×ˆÖtŞ¦¼Ş:Esj{¾+d£ËX|º°3
+Ë-IY6ÏTáù
+M’g‡ØqtBÉÈŸ„/x¸I-”V¡m00R7?E—Pş~Ã·p;âÒª÷ëæ/lE«`k¸t.åÒŞñBwïÍ¦.mêT\ûXÛD@â«ıùÉuÓmÎÂaVİ©ğ,Û°¸ş²-Ú¶7U‚
+ì°¥á¹v…ÅÉ¶ƒvoïÌå˜÷;Açµ)Qò®‚LOyXœ?nÅ&°Õ™i.ß?_õÖO@X×ìF¦XJiœëìOHtQ.a‚kê'9@NL§—§âMÁ§†d7t’ø0¯óÆÛ¢óæ
+x€j÷µàÀâ‡ÍƒE»¤J³¼ÑÂü·IÌX!iaÙ[Ò.—)’Ï*B”bs°YKì\ËIiEì(9@ÇoŞ Èİ·H Êğê)[lÉØÇ°ºG¶å7ë‰;<fA¡êQ‰Í|5°B6ê‚O'òÚßŒ—Ó…ÍØH wñ 	¤‘G·sX¸«ÔæÎm_9eNMMá2,.òËw¥ªSF¾pu9àYÅeó¿Â×>BÇ¹(ûàAñÊğö"ÄZiŸI(j2;íhYç»¤ÒpK-L'¿–œ½·*nSÅÑfÉwñVë)(ì’g—£È~ÿJü†…öŒŒğqÅôÍ$¼äZ~¸Ü­İ —3–TÅ”epªàù……«–ÜâÃu+ònz~^ÑìÀÃ]Ú¾d;ÓçurvùØGfbåû°ÎoúM–o¶™Á×k=‚Şâ½nÔ—{]Qï­›"Hp"»¤šåpÿp,CÄ¥Ä°Ns[}-6ãº&[9)`ø¨o•xt£¢"bĞßºûúœ•§†¥ÇÊaÔGÜ7øÂğ¤B2må–«­ššª|œsËCnÕÚã™y˜³Éfâ] eÊòeÊ®wÊµ„§ÔDƒZ£EªWÆ«¥Í/£ÇKıQ“LXŒ!$?ö=Ó\ì…SñDÓë@<ÅĞı=ÅRÁuÅ)ç|a›cYn¢tmB±¤uÅò>èUà_‡Ş]¢‚q+K³‹~y–.“u•uVŞôÕ±òñºOL0ùµ¤?3»‡µ”ÚMÅ—¢wú>òîiâšh¢‡ÉÃ¨Cœ
+ÍuĞ²g]›šªı8:'¸dáşT]”S4k\3[«xm·BÚÍS7’×JÔZtMn¶tş›@;wÔc{Œ_¸b«>â;Á§¶Cw*³eî\Åf­ ¦1…€ÅÍËŒ†ê˜å`È§
+#»z£í»-ÒY8L®S’îc¨Ûß‘¾¹McwŞÎÔX´=“•m2X²{ÛW|ƒ†òQ	ğÜ’ñh…˜Ù-ŠÂkWç¨(Ú\â4½õ×¿¸³³SYg®2ÏúŞ«Qzñò&ó¨›ÚìˆbÅ,Øûñî£m¶Qİ—Éj¿xşÚT``ôéc´êmóF*ã¥p4v.V3(ƒ­ÎµÄé„gÙ®w:7»®ƒÁ]jA)œ]¾¢t›E®'çÊ°ˆ¹5CË«kH{2%99XhŸ¨#ıµì¥z6izè7Ã_˜ÉVCÂ»zù5+=Uo=¥Sá	íöæÔÖ"ÙÛÛ…<ÅÖäòEa}Œªå¯ÓÊQB£dyÓÖÚ‘ Ş@ÛvGË*Ôò
+ï3€^Û$q%Q\Â¶(J_ÌøHclå–ä5›5OÇ©À}&¯"ÂW&ÄÒõ¥ÏC¤?TuZ¬±´Ë·lğ¾¨ÅêùìWcßîÛ‡˜‚hvã_ÄoŠ8âuGëkÍ+H4h:ç¶»õYšğ.ûà
+`îJiÇ³M5€®ŸÜhÉ²,pµì*s4MY°ŒsåDÜßÀÏÂ~ri—bc‰‡æİÛL$Ikî<ÛôeEÄ¬¬Î9½¦¾êœ(Ø+c
+øu“.£S1ˆ€5/{C(ÖîCğ2]O“dÙò8J6"W!å—¶åÏP"_øë†åÏHTèK\ì9‰4(¬âğÉ¼ŸØ¯ô(¡WÜ/\}–c6Ç·"Ä2ˆyéà7 ¸†ÄoíÍ­Ò<RXÃÃ€ƒTCtÆû¾¤Ö1o*ZÜSfÄ~ÒıFBıº>P Öu.pDµÕ®hˆG
+Í#û¶§}sõd•õ}ı'ÏR?ã¨ïH±µ¤/{.É¸@7¡Á×îj˜Ïöá¹WÕÍìU'YıBøõ\‹ú#b@Ûu¦ŸA^w—$İz[Jà"=Œø‡GÑ<ØİHGÑÉüXNp•ˆV“'¶7@LÚa,[ğ\‘ñ€´Afršı¤?"H'+£$è2šÊª¿O_ÂúpÚ2‹¥Ğ¿—Kß'.~¦ìã-¾ÖÆMƒûÊäˆñXg;¸âE§v†u¹ì4d7Ñ·ÜšıÎ‹SF4¡Ä'mîç1¹²‘†Ú¯ÎOº(óX´	¿¶Ù?Î¹ÿU>ŸPùã£¿Ûÿ+MÍ¡µúQÃkŞâ‡ñQÁÀñKºoÄ¯Éôz¨ßhüäéu¶l¸–©T=¾o!ŞıGò´ã•2) ×Ãs:¸Ëf‘áË-Ø=™ì¾L%<¿bú2Å>m
+‡ØJ›OEº%]»r]I–‘€Ÿ$yÏ–«m›»s´ëä×é>7k«/ü#/ÒŞˆù`Q¢D/¡J<pæƒb˜ iÚ6Ã
+«K×f†™1—ÕHàóõ]™Ş|Àª'—½]4ó<ñÀ÷©ÛR$0³İ¡.<ß}šò=HºÍò½DH 	8¦ôJùÖİo!ÌŠYOæ!Oõ°]ç/ÁsŠ2al£H=¼.kïrWôU³@IFWï%Íá3Ez©!jãçµÇA•ÀæãÍfºÜ’¯?×6üê^n§T‘`«İ&Şf|^ñ²ö¢‘-nÒIyç½ĞLæÈE¤³M;bK?U^wm²7y@Fï$+Ê½\Åh/µí#º‡g^Ûgh-Y•Àk÷öÔAÿÂ®6±o5í÷í× Ğ]Â—^V’¤ƒXœMG§MóëÓĞK {œ5BØÄtÇòNSn8qáè+á©3ğY•¢©ã­h/GÔL@7oCñ§DW2q„‘Ü›Û®UôO«£N¿ä>³ï±§‡X¼ì/gzñ“$¨ç'Ö®ÛF+¢Y]7NQ·Y9iĞ©ô©kQOıâ¶Í¨f¹‚¾®lìuòØß*sàléíèéİlH" d;=xÑô›“o"bß ¹põ¾>p×Q‘±›,bİŒ<xÇMX¾ó:†iÖæêò¶ëÓßÕzÅ)«F…ÉÂã½‰¡ |r?½ïh?$à˜~±Ay¢7D€ñ6s[I¹D™ƒül>eĞ‰‰YqÆI×ı4÷t1R¤³+ÎĞ W„É^¬
+œu–ÙlÇ
+ó¥F-šëoY}tR÷%øñû`Í-ÕÔx¢ï¿·V
+“ŸÊ1ç†V3PU„£Á.>ß¼Ïƒs©‘Ì/êFVÉÏ}‹Ôµ6ÊÒÌÒö‘
+;t0‰<*}ŸÒÜ5 Ñ?W ™i'(8W9GX>,+Œñ›mWGi½é¾v¹v¶‡×’+‡Æ3iäm`Ü+ÜËÙ«à¥ä‘{‡õ”ö«<%şÏmıˆà&0ùBh•à«sÁã°ryš‹ĞœÜs¢ÍÊ4Y½¥<¯{9ÏoÓ8oè®%f]¹ÚtŠ›WÀãì¦ÙoSW&}ºrOÊ>çÄmÊÑÚ»X‹½\İ¢oĞ	Ç+¼[$`[l0yøš/ûryÓú®$|}û£W¶î8[aÉª”Éz¾‰î®èkL«! Ô>X›òäFÅ°Qİh‰ÑT;OBBïíĞWm(DÓ¾hs·Š<ÍdØp·J¼Ç—Ş¸}8_’QÁó?Å˜’Ù_[y¼HGëx™`7dñò´ˆâ¼uLtdØrµQ•’;7˜k#ö¦™rœZÃûøŞ‚¢?S0ª°·WËï"lÀ³D†‡Æİ\(Şlßp…‹°ÕSbUq|®c¨`š9°xÏhˆ!áà~˜‘(Ÿ¹&î( ¸†º¸Uám« qÕº…ÉÏ+£$€ÃO0@ÔÑğ’š‰·¼ Åû$Y¸$€%ëıüuÜJN'Ûó>OŞ‚…»ş2ÜÍiTº{^×óbl‹»fÅ0‹Î q¯Æïüç¨€’Çª5OiC´ô‘Ìº&q´–Å¹Ëè,#º…G‡¹¶àƒı¯örÌ¢O§9½”W#f›Ûê:"Ú©Dg—ôE«¬=A•çUo*½u+xb8Ú-È©æYÑ»$P~…Bgithub: epoberezkin
+tidelift: "npm/json-schema-traverse"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                       g=¨Ì‡R]ÔGl¨1>´)Ûw™÷|3A‹ú(GŠ–“;/†U·%‰†(¨ltow:¬V¾Dß>Áˆxo¡{ıZªËjª·Råıü™á#OQ¨íL_+Ç)ÜvŸÌâ?¦÷JÊˆ”GÑu^ßº(QEˆß0Nˆ³ÁÒit\gšQZ³y2‹r«j¿Ê3Î*öÔpªH¾Cia Âñ¬¸ó½dßv@¥
+z–$imaª•ÌƒpÆdX\ ˜¾Vòü8 UÀµŞäÆdû*«då)_œ5lå
+1¯-åÈÑGíœ´œ,®ú^Á^~B¡µVx^E[˜{·&=ÇìøúØ*Ë»;’æ£úz/ø{Y²iÓƒÿı;ò·ÿéMö]¾Â2®àæO¨"-w
+VƒJ€•G4f ×º(Nc¿RäÅ‚Í„å£í(’"Pä˜¡ú%÷oËáC«[mÍx:ğ‡®
+éğà)êX·ÏºØ*ıi1A-ğ¼pŒµwÿø¢½ô9p‰kÌ§1-£hxN}™€û3~¾¬©j¼È¨®¢&xgVú[<:n¨„4%9|ne©„éIkŠj&CıªFĞ‚îbªm¾Ëä­M±zP²P•í‰ÈÉqµğxwy³xZ/a*ƒ;åí¼Ù^|«x=¶İ*}ÑX«Û»ñœeÙøùåÌÚÛ	´è7!Ö’ëÈ~’w”ææÒÑÜá+¨©FÌŒé~º\Ği¢8¢šò?{Ñ ¥M´v;¨»@+ÏÍQÅÏ#Á,È?kÔĞšÌàÔ–YIîÂë,z’f®K•¥ùñş&_®OÎ|sµCs±‚×³u":[Ï!n!á'Ÿ×›Ö=@7œa/'¼ëó”}X¿òåÙ8èprä´F¨ræ¿‡8B%n]'\5ç¿È­8š§œìæB–*‘Àên'KÆ5ÖÌí
+¢q‹¦¿im	üå‚Ø¢£ì©½bş¹§-¤µós¦€DDÌz¥ºKkÇâÀM¾]§*.eaşËõ8MŞE=EñãxYÎƒfÆqGƒqMÖrÉ‡olT]¬&F¶ù£ºû6v=qğÅË-‚¿*lŞú†.zï®İøéH«‰	/Æ rĞ
+o9HÖ¤ù—*ß‹qımLL×íqóšÜ“†áIïâÒğ¨X0ø^×İPÌ˜¸›ã$Ğ¤yc>÷ö!Üô KlÎ)­½æ¿¤ıĞ†±E\o@:kfY°¨âş$0AÀÆu¹a‡<KàS2(Få–ÇÿWM×ÌSÙÿ$/âOzêY>ïû³¼‘¿(
+K÷)ûmúoÓ›şÛôß¦ÿ6ı·é¿Mÿ?Şôï¿§å…é¾¿WËoÓoÀbG*ŸÒªdÃtœw#¤õÎø³¤âıšlò¾Í7m€qVÃ¦V3Uôô¶p'˜ôMÅ<+øÏ?Ã4–<o«¼6“à• ¨ÔŒ=›İÂJº,ƒ]œù.İc_›øã¢Üe™k–ïç•Wq³…õj	v»{XÆÜBwd…¿‰öcy}…Kı@={pÄRpL\ze	1´H,S3~Ö—@jV ºõjÔÚ@ÄÀB+ªæ®¯µ±‹Êl¸õ$Ã9kGLİÁ®7Ÿ³_A>Cg¬ŠŒ™sK[¤·ü’­-z²ÂI–—ü¸Sp,Ä®7—<ò^N‘TË‰Ü®*â'ÏãÂ{˜|Ä®næ€o½ğ7¼ Fs¢·Œ%Íp¶ê%¸:°³½­È®F=©f)ÂøıõŸÿw·¢’ûÛÜ»‹|Ãü}¡—$uş•ßw¡ëê ´¢§ãQ¾Áª*¯•Ó¦áxçnGí8‚²£‹‹mÊßLÙÂ='ıêïoÊ°D*	@m”®C_w<Ä}%$Ğ	k’tíS‡eÿªSš×OŸeïÚ³úÀÌŞKÂæ`»O}ƒ´z¬Ú^‘Bmopã@pIv‰2G‹ÒpæKEÇ˜›ÈÕ±¼ĞvµÏßŞÎèl¤À"ÈÀ°²4øù¥>@ë¢æC©É~Hàä(¾	`~işõa¢&jˆ`€+{Ş©òœø®ãÓ(8R¬îmŞo:Q6G8]CVÂÅÍ€´:¸Ç„Öø!5Â²ú†¹é®#-DãtÏ­H	İbëT#Ğ‘@‡ÊşqÉåWƒD²ØåÔ¼6>J¹½Jsƒ‘€Bï"¶İè
+ó/„Èò—`ÉğD ‡.@ÍB«¹wáê¢}é”Çr	NÅ…ˆäşEEØ¹ëá–¡‚t­rJ0ÑÛ"øänxºB‘À/æT$°übéÆ´àï(Ì@,@†;
+ ËÍ7êÔK¬H Eõºmf­9É«ã …j/ÅC¼ßşfğƒáSìßeĞéDÈ,ªLèÜKˆø"p´`-k…h¤ä$Á
+}­Æ]¥ÿvìP¸`ü>^ÜÉ5Üı÷LÒ„€Li(àšJ±×=©_»ùg´ÔœÄ´ÕRàÍ¹ğ„NQ]»â_x²$£1 ğ}IÌ©©â;‹¬ÅQÿ¬Õn2›,‹‡1²ÕÊ½æ½â&/5´´G¿1-@=„ –b„XŠw<³d\–¨+mñ<õÄÄcİ¬ÿP‘½÷ƒAµ´/~btˆ;/8‚Éd<œ×	ùRüÊ†7+­:Ê¸û@Hz|¶-.¡=êÑ½£^Î×W,ù	)u€¨Ì5®
+d²àÎŸËàBíx“?§Ënx‡ùíë³ÜåQ‹›×6ñ‡Ÿ›a¼»H ²à4«Y'Jt³Ö$ Y™AHà—Ø
+ÍvX·T†;CÚ‘À«Ü;p6_’7+–›CÎ¬¼rkj#ú«îäYİ(^†»*ß9èä’:A=âFı­8‰è>»’{ÂZ¢ã‚£|—³—Ú‡®pÿıêˆ¿£YáYLæfL/H´2" ıYİ`ÕŞéâ~—ê}Á7J6ñ[Ÿ‘ ŒwëN#,¶UY±ÏÒWÇoî”´¼y½}[»úõİïÖ„¯å’^ìT=@Æ¸¨ç:6h~é} a½Ÿ·ßæZKÒlkRãÀn[¢Û§zékj‚Lœ¶ê#RUÀßj~hŒˆv¢™®n'§*™u‚P»È}®z´d-«ïĞöiİøé~nãÓ*š2Û/g¹•RW>½YĞ&I®²=^ÕºO.H•sªš­©A÷“gjÀ|´ş¬nÿê!ñ…!ˆÎĞzôE<Å—+›ƒŒuí™ğÇ	…z²«±ÍOzå\Úˆ&æ:¾W[û\ï>”Ïè+ÙQöøM¡aã`{hÁ)$ıß5Ù~˜k{‰³&‹—½bã–5ŞÄH¦‹]Éª1ŒÛgßê79À<ğº-ø<á©”·£iàÕ>Äè®°6í®–Wœe_O½¶¼4İÜî-Å?z^Î>)[¯Xš·“ø¤kr.,9±Ø…î7ÃshŸxJ/#@ÛçsM–ëà¡bCXÔ˜Ìå^yçDÜ©¤Hõ|#+ä&Ûl<°]ìĞx|í}N-F œLµÇ©í8>`RÒaŠ~øµ,Á)\îeüìnº4o4m’é`¶´$pÌáÕx-‰÷&ƒ¢ÎêDì•<’JØ3{§˜»stõiŞ‰hÿè”Œ!Û¢¾=¤âxA¥yd„ Aƒ,[/!úÑ»²#ß›	·-İàÔß¹„Îíë¡>åEîlÁ{7ÑLİ£ÌˆÇxhÕ¥õCˆ¨ñ¦ôQh)º&Ìw«¶ùow«ÄNè7O9	İˆY
+¨®ùÌuÄŞQúLÓ?ZOn¶q	´0{s–HÒÁTñÎK@Vİ-Ê7º‹ùâ2ËU=;ÕÕßi.ÙÊ,„>ü8HeÁ}ÙBÀY’du›Éàßm³‰™6B_+f©§0[oìºy·ºĞÌQçPñp‰˜œ¬°-‡±¯Õ8OŞ0"^º}~²1)ß"n:7Û¬{ »©-Î9Fù˜ß¿—z¸¥£Œg·¦Ö«ıZº¥û–<­'Mï&;Yp$*¯ªRW³¼Oè+^%œ¿=º‹¼Îƒ³rœÖŠŠß°­^ùåÆ0Ì7˜´fâš»‰ÆGt”Ø†=l·l\åG.gªş6ìXn9a>´OÑ¶N
+j)¯R	UdTònÉGdˆ"ßËh4Œïó/1ï»¼™½ÅH?ÉÄl’ÑKV8%2MSP¨LÎÍ!²6oı»4+°ıİ§dj™·œUtİI~·ÿ1hì†	D%¬p]cßÕ¿Ö‹?ÔAü›ßz>AïC@·”1şHÀ50ÿ¦Œ„^¡Ÿ»;]ˆ–²»3àİI…ò%u!d‚Û\q±Ó”Cz;KıI†P3ÔE†ğÍ±©ËiDLŸŞƒ^‰îªg+ó¤Uøg}]6^Q#ğa›n@¿ßñ…k®‘wåvÑö÷ó=ëTÀ~SXÌYéÿ>W9Kÿö«7+Üe%°]á¬ùÑ¼@U‚K–‚U´–bÙ¬|¢13iX jMIª7	Üw¨=¥b¨kÀ`x¿r\@Âù Xfs³×É`’3ò}àİŞÏ#bÂ2Ü2¶‘]ËÁf~X·•òã=lÜJ¥÷êPhÀõ¼ª«]´ÚßvJ¦ºnœ¿ Æ±oY¦q|XTFPtÏ{ú\`À“¦Œ2«_Où}Ö.Ee]ÁÏPÕÓ>±bKî=Á»aÈâÛ7œ‘œ!øÙ]v)8„åÙş¾šï·2•!Ÿ'ßI!-QûúlÃŞ…„úÀ—Z%Ê/YYòœ,¯“Ü<ÕÑuüŸH·"Â»¾{ßÅÃc]O9$`³t¥DäDSºu“ÄìÛ¼ämØânïÊ½õ*xb¡ù4uûn²ÇªÏ3`*H dé–¾¦d€ë¢wiòãBKùÂÒ;ä¤øj<Xj[%€Â-Kç7êƒcàÇ+ªcóG˜„;ø7®Æ_-ú&E±1É	g¸¼¶”X<İÈı¥ l8šÎ1hqÈEà¯Îî°/'?;zßD§GœwË	f3Ø>a|Gô13V²-¢ß}j£@&¾¦Õ4>Ó>ó]Á	òqµìÁpïÚST¢3š}ÍÕ¾}÷A6a=HNë¨"}hÌgyIõÓù9¹-CRËEúÖ9¥ĞHÿÂç¡Ätv9'÷ô4UkMi;Økú±†>İª&+Œ'^q.üN_Nò”¬g@c_©ÖáRÃº(Ìj1»a†#4>L½Óûı®RÅ8*SÏ”$¼H~_Uşâ…†ô/Y%Ó…èÄHyfÔÓie‡ŸÅS­îƒQ­"~¼¨­f†çJvÕ“¼ÏZfg*nTA¬“£œì‡üKæÅb«ßüS”ÓÒ•à²öŸsàÔßÈå¸úµU—äXb.×È¢Úum$§ú}uCk~…L›gÎ­™¼r‰ÌŠfãU>#¬­™ï'Á×Bõå‚èòAÖI³¹àÖS¿Gi!¤¡		¼<Oñ]"<”$…·=Ÿ¢4ÛD3—ÕˆzlÇhŒ¶å·ú©ÃZÖğı™†Ğ„ws {Ó8[øfù©’ıP;9GxQÎ §ã5üñæ¢	BxáùÓ.Í…p°Fá=A½Ğ×7+;ÛB=¯X´6á¹J=+ó÷Låpo=D!/ë\§˜5!¹–µª©ÕâÊ4O& ¢»ñó¬ÿõUàmÇ¡LRHMˆ’Lã7ş>Ã Ì°&wZxÉ¹ €Év/‘ëõ%æ—k‡(ñìlåéÏJéd®3cE×££¯¢µ¨9œı–%Î¸ƒup‚zËĞ»„¥º8—öŠ•¤t;Nàè+)ÁŠ`lw~•~ù°$¹¾ú9a¿7÷<¬Äõ¤D´³1w¨Àòm÷(ÿXÓò‘Y¿ôOÓ¸ãÅ%¦zOkw*Ud´ÓnÉ§ÖJ¾Ì*·Í52Q©3ãïğòb®½Q¥ª·´;Áõ9•Œ™ÒŒDŒé`LHRB‹MÆ$ÎË¦å’x+¸vA%ş?'JªÅÕÏ&´-ïŠí¹Ø)ÖÉzBU¼X#ÉšÑçÛLe2Uåè]P^;ô(µG°{Üóş¬™»kHÕÀ—şKÇ4<ÃÕú½ˆãeC>j©¸ÃÒ'CRM}X„´$=<"uÆÈŞ+ó"ÁèA7H¿æ|D‰Nd”¿IDÅ’Å:øÔéå¬Å1È¦–Œ«¯¤ }ÀtåÀ\Ògøó:‘2tê¯ÍLm?ùûGk Ï;¯ôî¿¼]4‡Ë!{)H çnK‡©|£‚İíßßÆ!Ş/OnÅñ]Õ¶Ñ‡IeCCĞ+L$p?		Äç %·EÔï‘ îİ;ùwïÄŞ*'•¿;×\4 ?"NZ‘ ^S›°‘ì1Bïqæ[cdAQ{¬Àˆ²XqŠd@}$ÓO<k“Gò–±8v/‚ò{h®W÷O"Ú:˜ˆ;¯µ«­¶½t•¹´…\¨Óüéµ÷§Šª
+?w”dÀnÎêôt_F·Ğö*P iP·«ÖcÑ wUfd'	l4"5ÈŸÏÔ¯0åû‰ÄQHŞœ ¨Ä€úİf‡ã±“ñ—³’šSesjúˆ7TÒzZ8SôZ‹äËIí¢~•>ÛüÂ+û A‹duú:ŠfE&ïB5eÂ#Í×>d<uåN¼ªÈù4<i%Ã-o	˜G:åÈšÔømà•
+vnJQ ß|års9%¹\ŸÉ—oLf(RL:(³¾Ú  ê×*åp¢-Âsœ‰%Ù@àk$0ñ	ôy ºÜ¿;/8(zŞ©Ã—/—£oùæ¹Ç“Ì¸]L#[j¡.XXÛI!®›L‚h‹Ğ"‰³Î‘Gèô×YôÌÕ‹½ğ¨ZKšîj¼£ju	îxx«º©n¾ÎøÓë¦è‘FŒÛJåÑ}—/·áÃ^™ú5,M|õØ(”`öÛø–fº{Q¯`üè~Í7Xè6§?i£~üúş!Í+cÍgjHàx	äƒşrv×`‘ÆTvûÍ	,{û}‘Âo£%§—~2>©Tİ1„¹hABÔ”oÃ¾ù!2­êÇ<1™ê#¦ÕL{RlüA»—{ìšÿ-—ƒïJUU0NXORÙ˜T%¸ÜxvÿŒQ¿ø	z}:ğ|=Ğ± QgrWİW,‰‰Ô¬ñ³I2á·Ò ¯(Œe²?É˜©.„wµ¥üõ*êÂĞŞŠÚıØeë½O‰İ½¼¡ktHá@=I§àù.‘¼	`±µÑÌ^…w
+">QW°Q÷cíÌE‰Şb°˜Å˜Ga4KTqf£yôÏ}ªÕSVOs^·“oÕ€*ğæ7Ø%ùr4½·rğiÙ°Xrí“³©, ÈRè†©S+
+›öŠçiì¾oüÀàµ]°æ{£å4Ù£kèŸŸŒ
+<˜Ìœ,ÏäEl*ó9Ü”íÏ¯ÔÎª=úøñ5#1‚~¬øã¬À#Ò![}ö±+QŠ§ë İõOfZ.ôÏ–]Ues05Ù$’¡ªŸêñ^e—ÇDCâ™ÿBìcÖäDkÃIÃS[‡l©«o>;ŞÊÓëÄo¿gŸH™Ñ*5sÓ›ß-=âNÓFDûö¨MZ®L^Ğé­¸MM}m€<ı¾n—7¤İT-9ŒV«ıOIŸ4Œ3Êse„ëº­U$k%éùºÓ©DÉİ¯¼sÛ`Ğ?sÛòµNrb¨d¤`-qÆƒœ¹OKhb‘›<âº%¼Ø8×Vsü‹Nxo,,òâˆíµÛt%•®M„£tIˆŞA|AÿÃW9¨‰ÊÏ@”6jn‡úí«Ç®‹ü&ê‹-Æ&ı$›¬¸R÷×ü‚5 IÃ·=ËRËl6·¼•Îc|øµggŒuAn9‘?¢û+ŠìwŞ,“	ş±kÓ…â3–Q]õ7ıål[ïçÑFêÑÍ	üBW++SˆÍgÏ:3p“òtzr@qÎ´_¹ıK_O2ø¸Š;gİáàÿ7qàŞŒ® 8Ó»G»E†¯c«ª?…÷d¹‰WÊ¬E{.=âÇò¸}6¨$Å^çiÍ1v©êöÆ…¶§Út%òxKrü·@È?£MR9!«¤ÈñøğJÕí=vyƒ‡K6aÀy›Ïä{k‘¦aŒa~>½½öwqê"èŸJ=Qç8-á,&›$=ªé¢w£Å‹‘f}X&3­usıß²ûôñkïäğŸ-á—$–È?J¾*ÿU(ÎÖ®­¥QD~
+BwévBîO¯S¿©Ü™+ùOïö~zHiÙåÅ+¶şzò‡#5ÿƒÒ,Í’¾ÇîíõßHÚ2$¿©ùMÍoj~Só›šßÔüïH\Öÿ[Üˆ48d?gÌ%W¯ğíFAßhÄî³Ã¶ÏaÙ!õÂ+-»¼ı/]üO	¶rÎ”`M›(òÿ^·è™-&Õ5PŸ=ï4èñöÎÔ¿²¡>äù	øš@ZQaH }‘		øGîéóîª^s“Äm¹ñğ'yeîÎ›¡“ıŸFê~D'-İ¦5¯/ı?ìıT”Á¶.Š¶¢   9Ó*ˆdDrlQI"9Ç‘Ø’3* ±œS“349ˆäœsMl Ãk×>ûœµÖ÷qÎ»÷¾ñŞ¸cP=¨¿ªşª9kÖœó«¿ö10U†×6û_¿º=l‹wà{U0Áx·ôÔY_ĞÔ¶xÉÕL‰”v¦b£^ï·á /Çı­e Ë*Ã©Ï±#©Ç2ø×ˆ‚0L|^2Şİû\8 Û8óÙ.ŸŒôwÂbôÇV[ /‡83Â°çø_Àÿõ,Lí–†%­:ÒE~w¯®4ù²ƒ:Oì?qÄ#ígQ²
+­)nêºr©õ6«Jw¿Èë¼Õåã?Ôü`<ÛˆØ¿x™ÂI¾;- Íãg âñÔë¬÷
+?µ;½ƒeİa5ğ*ù`‚I=ıı‰›Á—Üï¼³ª*eR³öİÍnë‡Î‹jÜ&ß=,9kÊ6ÅXÉÌJM(°>ƒğ@Üİ<ìpŠşùè7ÔO‚fÛ(%Ü+sNXìã¥³€ıSt«ˆBòû,8“ğÊŞğF¥¾i¡§O¶-_@˜Cƒ74ÈÙ¹ã¨g¸'›E8e¬C4Œ3íæ„"Åe5Ô*­º~nhkIY|}Päëúá´¡GÕ[BRä—1!•%Q6êı-ïECsn@ÆÙ¹´U@–¬79ï~]
+ïÉ{gW_æ@zè)ñì¢_¶)2şW{âÔ†‘QU=’EªÈ?‰Å‹6†âñÇ¸y_2 &3˜…â¸ô‰vXÕE2Lú(òÅçmƒo|É'Vq=X8|ùùß¦Áæ'°™VC wó(¥.uŒUqüŠìÏâ ÊÅx(_áÏX·–«>ê¤¨`¾‘$ÑÒ{•ˆüÏùòsĞ|ş•@ÆJ]Ğ&æ/xVğ´§8â´›^š16nÍ.¼]ï`› z]Ö/òşÒdš¸ Œ¨ŒJ„[Ì¢Sï„¼X†É)M¾fôQÌ.`ä,ê£qkŞ3«ùaåuĞæ)ÿ·£b®"<üë<)™Ô?Øı?ø&VbYG]=U.=Ö-ƒ¾³*ÜòÅ2cîÂc7¾9Ê÷/³Kœó5£1æ×é‰ŠZŠc/í&:>h|”Ó)×ZøZ‘¹µïtRº4±}tµİˆá±V•o´ì4&}Ÿííù§ï2•«l¬=p(,ÇúQğ´@tÃøn³v·ïdº©mÁ<mİ¾º"¿¸Œ·Ş·|?†¸×<®ÆeµQåëµ]ë MEÃ£½x»½(wWÊ'o|Vò='¸-xê|ò³Ctê*¬Dj,bï5†Mî9¿62Œ*oªz¼Ao	lçppie!_7õ[´©y•â;êi‰s´€mš¨v¶ZYÅŒ¥K¯«ÿöƒ¨-{8ÌÆFÉC6"bAÚˆ·ê¬sTbÇF·š°Ô7¾ù÷¾ùÎ×ê¥öS8À®ş¨ªèb’´+| ŒzÒ•}gŠ+û¦è‘#ÕÔ¬ÿ¾“Ep2ÿÆä †FYì£‚ÓdØwÖ€¡ÂÈPùÀ‚ŠÇ-mûõù;=‰ÅÇ+ÆÊR—A¹êÛJ–uLN=yFï¼kÖ•ÙÜÌ«\LëOOÜ(©—…Aó¤çÿjL ½'¾°L]¦;èvù¤Xóê*+vjè‘:ÿY{ô'CgIÑÉgı~–2]ãÎ“‹•‹V¡ehøÌ\ü0¯·iÔ>T÷<´q›‰+¯'éWÓŠ¸ÕœÌvê¦ƒsÕÔ¥'W¬÷iVp  §^éäáûñıœX£Ì>æ;i]°Èf{•ûJ7I+.mp¼Q!=¬ôàf¿-7xQÎ3äk¾Ä1¸ËÌø!Ÿ¦#ÏB#Ÿí¦{„bò7 È‡…gÄE·I¸1Áçi¦bëhc2/Ò©bMÏM®ùy`×ğuÁçÈQëÌ½µÙ­2ämjMÓî¨BÕËF–š¯§>ıÏ†Å%6YÄ?*<#·Ğß*±my´,âzjUšœß«FÖo£Â‚5˜[g¾ĞI(jŞu‘Kh";Ëçu()Id»smœ®{ë“qø ÍÖ˜~ˆâÃ¾§gzqwòù´÷|Ü*æ)”G
+ÍÔ‚ş§E'‡Šo¡àCê(öCô8è:º¿îï7¹ˆ½–ú/¾lsYeŒ(G6¢ı½'
+ø½Ùd-YŞûU !rcªK>ı %DÄ=âÛÓŠLÚÖÌ 5¡şFÓ#Z{ãE»†(S×Á¬{'Ï?€zïïÉ³9¥rmŞö°9 Îè¥œ‘cĞÀUÅó¸\pU{êÕ¨+µ¬‘j¯r9|rttÑéqbKR¸•ƒú1o4è¶Âå0¼Lû‰ÆpßxsÎƒtKƒKËØßYH§X–n'R¹/†½ßĞ]óY-~à÷ÂŒÁ;’CñXÀô–œ¯>óß¤L¼]¿Åú§á ˆpL> }Ä;q Fÿ.øñÓó1Ä/Ví£¾vÉóHä³ºæ+ÑŠ:?+Lì@¼ê­ø´iMg•
+éN6!]Šª·nPs®&oşØÎîÏ ı=÷*ÆãTµ2„jÜ‹xº yD˜J02K2.¸­¯©+ìÃˆèiŸÕÂºzú!¾Hë#™TÇ‹…
+wøˆÎ#$#şx\!HëT©Ua?çï.Î{—™ «+ï)˜T…´‹ğÚÏjˆ(­5AÜtÓJˆLo¸-±bx& •Å ÍòkÏÖì\4æ% %BïÙá­;ù_¾®ù6?CËx†èuİ¯òñQ.^¯¤53-nø]´A9òÔÜíH ópq÷¿ƒ4û™/ËZÛì÷zR§ŒB¸4tåúöºÛÉŞœó¬ÙóA’™æ@ìH%š=\Á"Î³ñ<Nøû§º—Ñ‘j?W{Îd|Õs”³ç‰X‰ÇH½Ü5ÒÊ´A¿VÆîéG×æÿr5ji_¼}å‡w¯oNspä-šÊX€¼Şhø¹§  Ã3‰¨,Âş;Ùqÿ…lõËáÏ½‘*É–x˜qÁŞz/g†T0:îcšoz)à¡"óY§W$¼Le¼íİ´Ÿó«X®ÈÎCĞxĞ¹:Æ¤Ÿz¢´íĞ'„¢„‘æÅ­/‘Ïêúıx˜Ã%C¿„bÖ$¨÷#|ÄÖ ,•–ıÒ±(­IÆœPK7›Iï¨w«òcüænÊç™V%ˆœ4¦dš
+ãG„a¬V,/u>«»1Tİ®¶ú4d:k,ÏôYèUù×¾˜ç×˜“ qxºo5±¬ö¥æzÍ…úºyÊ™ãÿ'‰`ğVT¾­¹Ç[¾=9ƒÇD.‘?SV3Ş·	²u>/“Gœ’S@¿“eó<½îåøz+ëY’#¹È@¼øX;Exsrä¶ñuîqÎ¼¹ ñ×¹qBîO*42.ì9å©²7<»K9p×œPH¸¬ü¥W|÷·¶§#wB?¬İôÙ³“ùjB³wŸœSJW¿4ŒàgWìÜÜÿMGÚÈ,AZ{†9ñŠ©Ïñ õwlŸšïRƒ¨/!•­îä—»«n¾jÿ qÛlAFGÕÈ*şN<WŠ».q$Ùw·T ›Cÿ}ÔÄ‰î6s…çÚÔyåùƒ±l¥ßƒ¤ˆ©ˆ®ÈZ6ÊçÖ½K÷ünãÙ£æÿİË3Î#Øm¦GUïì^[.MÈZUÓÒFwñYŒ­Oç:ŠŠÌ;üiõw·oœyvÛÛ£ãĞ×æÏ0äû¸P…6ŞI;Xú¨ìmÑ‹¹~üwdb´peŠR,Õ¥Vô fı9ëc¿£Á,ç/¥
+/£.ÔC¶8ß6áµ%eO&åæï©‹¾%Ê»r³%©Ÿ™J-úLÊ;XY®âLìÅ´^P1Õgx5öE0'Ç=9Ê:NÂ÷B9ıQê§³;ûÒ¦–öY;WÖ!ü®‡Ü£Š“UäÕ©UØ—63CéÚÁ€†Okï¹Õök‚Îl+Á!FÂç–ö,ÂìUkJØ<ß1İ?xßıßÄ«°8Ïv”‰Wsnn ~-ˆdCjíêMX–N|!á	j¨½ß4Ewšâ^÷ºÎç]Oe”‹ö[Ä†<™«$	kUA†-|Òw‚‡¦…câ_r~“¶¾óºÔéø8§iâtœú;2²á ùj%@š©³™©ØÁsy:ï"?6¶=ô&Ñ´dMûÌ¤©â•C–ù“Ÿ¿Ê_‡¥?½õå›Úù®zßÄæ‹åÈ—ê	º5£§ÁUá{#sÆŠ±	uºÏ¾l$Ù­×?Š‘Òoª´ÇŒ^j–Õ^ª³ˆ§‘§ìË2íLHÂÎõ’Òä2íÄ$ùNõœ;›[y«½¾ı&ˆ1mŒl|VÃÆ|z•Ûnê¢5&miŸÓGnQ0g˜*˜ù{ğæÃ“ÌwxjÑYg­²up“°?ó÷_QµPÿ”"Ô&ù®_6et{ö’íÅÎÎT%(4ğÅ·~#â¸°öí‡ÄÜ6ıÜËÂíøğ¢»ì1;+ÇÆÅJÍ¿üs,cî,éÑ[úÔzÿl®?ñÊã?:@/© ¥A4Håù²“g•Ò¾	e›èì,°é2ğ½ş8?Ä^¾–°a’2øäÂ“‰¤œ… É]C®Üs/Ô½sİU©ªQz<}o(tJùxiO_‚4õõ¹}1^îóïÙO+¡9	6A¬İ~K@€gB»Æ´hªcşÎca0Ç:SvÍİ{šÁs*´ß–o(‹Ónù3OºY6¹&ñô?Z™84»:ë¼ú
+·ŸRŠnÉª³$¾fvĞ½»ü19.à¸aÏÇº’û |–-{½~äÉF}c9µ"²3*}…œÁl«Şg{†äqÄÓWü1ë‘è‘1×[1YûÉkÇ¹í2ã¯úœ>€åMˆ¡ßçAq€ÇÔÍÚPW¬—*¾{5njª¬‹á•œâÿ“øÿ$ş?‰7õLR˜*£§#jZÊzgóLn  (šÂÎ¯xrÏ.¼Á.‚ô–ıÊè'ğÖ¼ğ}šN14ŠÎÁn£ó}«ñ¿y1QÇ»íá99??&2vnÈöD¼_uBé«Xß­ªøD+a³ªÃîsO7ş×’ÏşµJ„ÃÿÒL‘¨ñ'ç%^Âáy‡ˆª/vÖ ãÍèRòC²+©+'Sà?·axPœMzi2;´xìˆPâ {c8ÀiŒÑ© ¢Ê}r8ó	Ë€¬8ş†®Œ]CG³*o ÿ}kƒ'eŒ<kŸÓWà Ã½¦(ğÅWoøŸ8šË[h8£U,^vã ™–ğ'pL6hÍ»ÿ‚Ğ+Q£cïÃĞbÁU²'ù…7¨™	náŸÿGĞmâîØ¡nGKôŸKvWjr<1É5h/.Ôç™{­¬¾8l+ˆˆ±ÖdÒ¬Òy{c¦~ğêØîMõ9`Û XAö|*R}ìâ=àÆ¦ê¢œ@"Åh
+Ôk£pÉëâ2ë6ë\]¥ä™B-k(r™ÔüÍd<¯ AnõÅkçórÜÂú<»ûG#¼7Çô¿ÏÙ…»ÅºyD‰„¿väÇÔ¶LÊ*5¡û“Fı+³¼+Ãş^–Ğú4d*¶¦É;$D˜d4?r«h™ª©ÇˆÄ»_‚%v½[k'‹]ùDUU%;ş º.‘§'š£|Dbå*FªnnFË	HÒè[ô^~mY¶¤rŒ9í/=Nm’	BU,!Â¤)<'5íìİ¡7µ³íÎÔÜ›Fù¬ŠF}ˆ—–XİåÍî°5^ ù€¥ô‰Ûc<?¼–+V¤¶p[î~v©¸ò¶¢5†x»Ğ—¼ówGÖºuºŒäkNçÚ
+ìjWĞ}Î¥_˜¹[bã±À4î ¼¯0_ç›ÊìšÃ>ˆºsAÓ™y¶óô'}\÷õË‘&E¤ˆªQ’ß@àçĞ ıg-z°ÇÃóŞ®>Ô0\<˜ WœêSÕ:Ñ"¹ÓJ­·æºlïÊßœcwoEIîJ|úÓ|i7à‹Ç:®àk¼Ğf°—Ğşk®Âøeb_f&0`AŠ—ÌÀ}¼tÖt@Ï÷q€¬a½½„Ü¾ÿ!3šê txßÒà*\vŠÇ)ÿ:ÿVrÎµyxäˆi†nSŸI$\¯;"A<AŞ=˜»£¾ò(£%£ƒ
+l‰z­ßØ9šgÈDa¡À®#Ÿh“ øÉ(Ú™0~çàZ¡(‘`]š¤ñ[Nê'{édµ/üÚY4YÒ_wİh–%¡9âŒvPGâ¼@ÿâóÇ[Ë!ô%ÆrÈtW
+ğûôÁúùîMC¡2ÍxXã5 ø„µÒång8sĞ%3UCÑµ]Äiafçæo¬rÃBæ¼â¦Ú2$¦ĞnTJo«3^—áÚÉK?¢©™–¥gCN™Ø”®Ş%÷Œ;ûÆ¨ğ`(É¯Ç.>¦VÏ›‰JDğ{^MîÃù…!0ÒE
+‘[-—b?^²Y¯óNnƒÄËG\Sé=«å}~1XF-¸u¤;<`õbËñ+$^$‘äT\TxïVKÀ­Î›'ÎPHkl8ç¥õ'ÿ‰FİFì`hàTkH‰¼—ßÏp™æ*‹ a}Ğh%Íd¬HÓqùYÏyÁ±BXã±S½ğwêèMFlŠ…ÆÔ²Óe/·ù\dû*û»şıš??.&˜˜%ïˆ±êƒã©-Éˆó’)UuşlêùLÛ|ÍoÔÄU}xLÙsï-í:Êç·úÉ^šÂµì¸l±½Jøtà+‘od¨²ŞÍ×ò»Œ^C("vßH!ëıóïˆ?†ë[(k1¬¡¦Q¯p{ÌÎ’(ÇC]°³2³7Á68ûÑÛ»İË`Iÿ^YÂa4w3óQ]Üõ×ùùÁïk%tŸ1»2<¸ÑEÈ³¨÷A ÌS¾3Ãì‘Y}90‹Ö5˜ãÕ7|â€ìT(¿çÖ/¸¦%ÇÆî=$Ç;Êªf—5IPòÑN¢äæm§õœ™ı`÷Ä'¢¹y{°&XíB©‘®w`M4·ìu™’—7¯3'Eö¼ÃŞUü|8RÓä;­0¯,šJ§Ì7Xı½ßÁiò¬¥Ë™<g'T‚Ï¢®I„iÆ˜¸š–¨—Zdk¯Ûáş„ĞÒ®ò×ê–¾ÛRbÑ¦—,°Ó6ƒZì,<ñAİT…8ykrİ¢ŸÇX2SâDS3@Qu¥ÃEµÁ¹|óŞëÙNQ€rŸâ  ì@=ôË…‰I]]ıGBÁ6òçª¯
+¢BIÉÃó2Â¶$Ô·&Âx: vˆpıÅ{h[ûl¥·ã"¶FÔ?Õ9ÇØà×àgy§óÑ=4ÃŸZÇÿŞo×Ôÿ^ÆnçO†d i,Ôø'¼KòWùˆ^Ö‹Zuu9^n:9]Œ¥0Š¯Ñ ?5îgéàVşªõ;ìÏ‰Q·"R/¹!•º$ÎÏ-S‘KùŒ%è»˜–ònà|ıÍj1jÔn¤J•ĞT.®T5ˆ±·úàõm€ó…3`@·Tìm€R¿w]¼ò×¾…â×ƒÖ“°¦’å‚å¹ÒÚ»ğ½*H%Ü²ds¶êßÏ$v»R"{.ò_ô¹œdÔ7‰-Õ »@û0ìü\Åƒ¦^[à U<{µzƒâ™PæqêãNÒ¢œâF„°·]Şàk]ÍmS²%>Ÿ#èlå¾ÄfÅÉ½ö;i¥€oÏßÀJLĞÜHİìä­mJ¯û¯N”ú‰RÈñN‘Tıq î)›	Ô/nY%±e½4ô[\¢°×f¶Ô›Ù®Ç­¶d¶¤™#‘™#0o®ãöÒºì9|2ş3»¬µŸ¹Ò[ÿ'¯Ï.E$Ü<¼­Òı˜Úùe©‹Jİøú–áâõ*Öì qê¢?$rr±‡WÔ˜lèäø$6ÊîŠ‘ ”zI?Ysúƒé­™*¢99‹Ğ†¹Ê+Ûháò²ñô
+ã‹pó™‡Öœd?{¤õÆ½ˆjÿoÛÑ¢C[d£xT÷õ–Ú©jÃ8W_²ÇJl}»k%û©¼ˆÔ~…Ì>§-ô3ÏçõwœªR‘à³²9‰Ü)!\>àº³g“fAÌ™Óûè%“Té+Íx+q Ù)`‡‡H¿=ªôÙµ—ªz¬6†ÖàÇy{tÄı¿m‡K£"‘›­ ¶º¢®3ocLğ˜×…Ô%È!úôîàkÀ©$OÊù¹DÍ›–Ú~ÕA§õ:xïR¾|³z´^èäÅœ>ä?,šÏ+0&›R%&Ã±we×r<Ä¢*½±U
+Ê-»êÈÂ–óÂPÊ©ÒŸÒ‚½·M´&cö\ÓÈÂ¢bV¨ãÅÙ>2˜ªÉ¥Ó<Pkjš˜(BîÅ¾Ù¥ÖÌ·v'ô²_iÜªÔOBtŞ»Ìší,ä·Ûéy›ÏCŸòß¹`ÖwËØu—}4²Æ"º#ÕÇ4OÕQß|N—÷Oš¥|m3wXŒ»*	Pï0¾ÿ¨âÙVĞèkw•8Í}£AxFó+0b¼],À«]™£â‰u¦ğ®°8ˆ@ÆMÌÿŸÓéÿ ÎöVÅŸ]jÁ|è¨›yì)-Ä€ø°ÍF¾ÕErÔŒÄâ«qû3
+BéV&ç´ˆOr›·\eH†|M3P™ûàiÆì’ìsCé|l?'”¯‰Œ“À,Œóô¿¹72[ƒâÿíßÿ<)“>éfC§öúšÁ]8€‘×£Ò0˜ÌĞÍßäo–¤†ˆ^şË¦&š~ôsäFÂÑdÛ	äjpF5B{vÖ¾"07n-Ås)T—šR9F‡Ù{ˆHYŞòÚjæE~1cˆj7ñ*âË€é¬W>S²ˆK~ûm’Âirãşü4ªqöüëˆ*ÆŞ¥à²œ'³&“üGÇö8 bO{qeÀBÿ˜tºâ $Ğµ”
+¶z%ÁSA‚E’ë^&»ı½òVÁàú5´ç¯ÖŞNá §ªÖÎv•¹h˜èœ†(ô™©›^v_Ÿµa7°ûäÏ3Âxºdşû)¤%™­ç-/eZ‚ö×dê'À8ç³9”· +Ì1pŒJièp¼ºw¾·dYÏÉÒ7F¹ä”À–Ç•ÂLÄ”ú/`Ò—%<­ççöN^³¶ÁB£^=·0%	ˆû|¾b›nƒâ¾ ¼$wL;ƒÇÿ)TË›ß.+2¡Aîv>›]øÃ÷ä}]u5Áí`2/læ	\d­êW`Ğ-PxOƒ™k_·?ÜEM¨Ã¤•eÓ}ü¤­{O×NÑÜ’Éç¬d:^²–š[
+Š[ò]d‘4ov²àıC²ü{›i€÷eÅÙLª-Fö×y ŞJš8@:tµêŞøIÚøZx7”OÄïvÆ¤zÙPáà©_ÈD£ú9ÃiTaG‚æ7~Õä[\ÒÑM}PAğÛyÏ+ãë1ZâYöë§÷4p ¯¦æ¸ÕöUÃ³rÙÁòjŸ&&?œ3û—|è]ÇêµJ¼`óáŸ ßD;ƒys¯zWªúü:ÊÆhN×ô'+ìfôaU, ²#dS­À8_!äÀê<'Ü¬32²ìü?Ö¶²ÕŒÔı>˜W3iC†D7,-Ò÷ælWg!\ë7#R>wošæÀ
+#V5a‡ö¹­g3¿YÔ×ğ¢09èÏ4vÏHøÄëG‚çÑ`Ült™é«€ˆ@UK³N­ _Ûçög”48Àıÿ›MÜ<Óãg²VUëêC“Åò	â]†„ghĞÕt	mÓãïÏâØD0xÑY<»bÖÏóÊøçëôİ¤°¯£Âq ¼|Ÿ¾Šk›ü·Û–ˆÃJhBØy4¿¹…°ıÛÇş-è»ÔK	8!0»‰V7¹øWP¢/wM“ì?ÊJŠÔb¥ä>Ã|‹±O.aDØCrùK`şuÓvƒğŸëáh3ÛÉüÀbOCĞøÅûƒ“âK©Ş¿‡ŠÎøDå6ç­“©5[¯&aÙJYO*¾;hyÓ¯ÉxW1g•n†eD‰çÇ2U¨Ş«/÷§Æ„ÇÇrdÍqM™ŞsÑ©ºa¯‰Ş‰A˜ÉN®u¢åÛf­ËF7k¿Fc±x¬.‹ÊèHœ¹YBŞN2VuÜP˜nÛo;`ËGï¼l‹w4Ç”mvõ +D—?e1Ü ş(2UY™(É‰_5ûµÆ^½[³†ukÊø3ÙDüR;yZc%ƒÀ$J^ïôœ=ÚÑW§²qš¿Æºnº¯Ì%¶ùqÿ nŠup&q]x0¼QûNO™Â©‡è³I6"x-™õn  Y±6P®7· i;ÿjë4¼¶ö,a¿wÛ(¡3³fĞÂ‘5[•ñLcÑ‰Ò·.°Mµ©ĞÈÜĞ¸AÓ/a˜$<§ÎßX¬ò¹Ù‹ĞHÏA9eômªì¹|1†%'ğOé15!/µÑ2K?ãª‹bÓÙ-»oùA2vã/Ä/-­™RàGç3$Êc'4ejrx¥>s²wÙ§-]×Òs¾lÖaù*ìsk3m†¨‚=Å¯şXSpT½U-˜e¥ïÛÕŒàÍv’0Ò—ÊTVÎÀÎ%#ÓQUG1C*}÷ØÃy4çŠÉ$„Ío10_>¾˜™öæ$4± K~OSù	lz'sò¼Ôîüó>[7{¨bƒÕN,ÉnÜED§©şxÕ"e|ÄË&½ÂjÒ©H_â}bÆM.òÒhŒäMWF®îÖH+ÖèYŞ„è5{İ..?€ò‰‰±“…Á¨ü‡$é¦u…İLÎ-‰(áéìÖ·<ØáZHÊÖ|ƒy#“®
+ã96Evûáï`q_õ£à„åïå~Ï~óˆ÷=KåuÛRP^»(bïg[óÀn6Êy­ĞBóÕÄŒ?fè¢ƒì? kß¤Ù‡ÑŸÂâ Ö¿4Œ}åîöÔ—'R ìcñ~ŒÈéêÇy	Ïís-'Â8KÚ…®Dà¿öä7Ì<“Z¯Ôê,Iæ ïú¸RÄ/1Ü<ğõ¡Ÿ”ˆb¼â(Üq´Kôÿ~yìğÈlÛ:ÓòÖ2é¯•b‘ö©á3švôAWâ’=¿áõŒĞ²=Ñy!’üÓ¡ğµ•jeõQdÈöò;ÑB]ŸT_d—{Lûz/ˆëpĞ61÷+ÈÑË^fe¼ëûq³¯²úÁ©.øOª6XWñúZÜØÀÜOöØÜôM:eïÉå³ ¥ÔàfF”‡õcDˆëáµXVH‘²à¨K/”jnrËsàaÏª‚ãíÿ	åB„ñüÎÁá¤Çø/CVóÈ¾Ñ|³¹}×m—lf Ï‰Ëÿûûî\;ïı=ôs}ññÇ ¦ìï'"ÛˆÛĞ!|èy¶_*1´g6ˆ([÷ Ñavh„°ßÉµ¸ÿ€{*‹,Ã¬jŞöÔ”íUĞÌıì^fœ=[:]±\(±b°5÷uãØ‡’G?Ë¹g½´æZù‚¾Ëª¡)o ÛSÎ–wq [½/ÓÑi=€ğ‰5_»IjÕsÓšû7Ö®®ÓT¬ÎRu›‰œ6©-*z:<Œ¡z4ıˆèE„ÆÁRÜ;ãõš~òX—j.Jâ6²Ø×Ÿš<Üm©ÙÊY[¥5áˆXñlşÆà¦ò¨”¤‹ê!íşø‡/¦ŞÕ4qÒºÒ¯± ÑŞaÃEúsCàæ®M_C5i4hmØK†Ñ¤-­ğÔ²CEßÉ¹w¥n<µ¿“/;¾¿ˆ²İÄOË$¡,—íÅÚê£Òm1ùšß_Û/º%u]kq0é¬ÆÖ~ò¸§$ğå«™Ä²ìx¯Ï½ae‚$%ù|ı5E@6ZÖÂ¤/!M›·Î2p›e÷ñ§Ÿ'ªzãMû£Õ…Š3\×2”3Ÿ”^dÁ LõUyábúT³£\Øİò@è²Àı»k£üEoèFgänÍ6/:+³d›ÀJ5ãV7ÏhNö>¼‹6w“
+¼(4ª.v*±ó:	up`îe*ŸÓ$õíw%æ¿‡C¥ZÍUjtŞÆk0j”K–™defined as an instance method ' + 'and will be ignored. Instead, declare it as a static method.', name);
+      }
+
+      if (typeof ctor.getSnapshotBeforeUpdate === 'function') {
+        error('%s: getSnapshotBeforeUpdate() is defined as a static method ' + 'and will be ignored. Instead, declare it as an instance method.', name);
+      }
+
+      var _state = instance.state;
+
+      if (_state && (typeof _state !== 'object' || isArray(_state))) {
+        error('%s.state: must be set to an object or null', name);
+      }
+
+      if (typeof instance.getChildContext === 'function' && typeof ctor.childContextTypes !== 'object') {
+        error('%s.getChildContext(): childContextTypes must be defined in order to ' + 'use getChildContext().', name);
+      }
+    }
+  }
+
+  function callComponentWillMount(type, instance) {
+    var oldState = instance.state;
+
+    if (typeof instance.componentWillMount === 'function') {
+      {
+        if ( instance.componentWillMount.__suppressDeprecationWarning !== true) {
+          var componentName = getComponentNameFromType(type) || 'Unknown';
+
+          if (!didWarnAboutDeprecatedWillMount[componentName]) {
+            warn( // keep this warning in sync with ReactStrictModeWarning.js
+            'componentWillMount has been renamed, and is not recommended for use. ' + 'See https://reactjs.org/link/unsafe-component-lifecycles for details.\n\n' + '* Move code from componentWillMount to componentDidMount (preferred in most cases) ' + 'or the constructor.\n' + '\nPlease update the following components: %s', componentName);
+
+            didWarnAboutDeprecatedWillMount[componentName] = true;
+          }
+        }
+      }
+
+      instance.componentWillMount();
+    }
+
+    if (typeof instance.UNSAFE_componentWillMount === 'function') {
+      instance.UNSAFE_componentWillMount();
+    }
+
+    if (oldState !== instance.state) {
+      {
+        error('%s.componentWillMount(): Assigning directly to this.state is ' + "deprecated (except inside a component's " + 'constructor). Use setState instead.', getComponentNameFromType(type) || 'Component');
+      }
+
+      classComponentUpdater.enqueueReplaceState(instance, instance.state, null);
+    }
+  }
+
+  function processUpdateQueue(internalInstance, inst, props, maskedLegacyContext) {
+    if (internalInstance.queue !== null && internalInstance.queue.length > 0) {
+      var oldQueue = internalInstance.queue;
+      var oldReplace = internalInstance.replace;
+      internalInstance.queue = null;
+      internalInstance.replace = false;
+
+      if (oldReplace && oldQueue.length === 1) {
+        inst.state = oldQueue[0];
+      } else {
+        var nextState = oldReplace ? oldQueue[0] : inst.state;
+        var dontMutate = true;
+
+        for (var i = oldReplace ? 1 : 0; i < oldQueue.length; i++) {
+          var partial = oldQueue[i];
+          var partialState = typeof partial === 'function' ? partial.call(inst, nextState, props, maskedLegacyContext) : partial;
+
+          if (partialState != null) {
+            if (dontMutate) {
+              dontMutate = false;
+              nextState = assign({}, nextState, partialState);
+            } else {
+              assign(nextState, partialState);
+            }
+          }
+        }
+
+        inst.state = nextState;
+      }
+    } else {
+      internalInstance.queue = null;
+    }
+  } // Invokes the mount life-cycles on a previously never rendered instance.
+
+
+  function mountClassInstance(instance, ctor, newProps, maskedLegacyContext) {
+    {
+      checkClassInstance(instance, ctor, newProps);
+    }
+
+    var initialState = instance.state !== undefined ? instance.state : null;
+    instance.updater = classComponentUpdater;
+    instance.props = newProps;
+    instance.state = initialState; // We don't bother initializing the refs object on the server, since we're not going to resolve them anyway.
+    // The internal instance will be used to manage updates that happen during this mount.
+
+    var internalInstance = {
+      queue: [],
+      replace: false
+    };
+    set(instance, internalInstance);
+    var contextType = ctor.contextType;
+
+    if (typeof contextType === 'object' && contextType !== null) {
+      instance.context = readContext(contextType);
+    } else {
+      instance.context = maskedLegacyContext;
+    }
+
+    {
+      if (instance.state === newProps) {
+        var componentName = getComponentNameFromType(ctor) || 'Component';
+
+        if (!didWarnAboutDirectlyAssigningPropsToState.has(componentName)) {
+          didWarnAboutDirectlyAssigningPropsToState.add(componentName);
+
+          error('%s: It is not recommended to assign props directly to state ' + "because updates to props won't be reflected in state. " + 'In most cases, it is better to use props directly.', componentName);
+        }
+      }
+    }
+
+    var getDerivedStateFromProps = ctor.getDerivedStateFromProps;
+
+    if (typeof getDerivedStateFromProps === 'function') {
+      instance.state = applyDerivedStateFromProps(instance, ctor, getDerivedStateFromProps, initialState, newProps);
+    } // In order to support react-lifecycles-compat polyfilled components,
+    // Unsafe lifecycles should not be invoked for components using the new APIs.
+
+
+    if (typeof ctor.getDerivedStateFromProps !== 'function' && typeof instance.getSnapshotBeforeUpdate !== 'function' && (typeof instance.UNSAFE_componentWillMount === 'function' || typeof instance.componentWillMount === 'function')) {
+      callComponentWillMount(ctor, instance); // If we had additional state updates during this life-cycle, let's
+      // process them now.
+
+      processUpdateQueue(internalInstance, instance, newProps, maskedLegacyContext);
+    }
+  }
+
+  // Ids are base 32 strings whose binary representation corresponds to the
+  // position of a node in a tree.
+  // Every time the tree forks into multiple children, we add additional bits to
+  // the left of the sequence that represent the position of the child within the
+  // current level of children.
+  //
+  //      00101       00010001011010101
+  //      â•°â”€â”¬â”€â•¯       â•°â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â•¯
+  //   Fork 5 of 20       Parent id
+  //
+  // The leading 0s are important. In the above example, you only need 3 bits to
+  // represent slot 5. However, you need 5 bits to represent all the forks at
+  // the current level, so we must account for the empty bits at the end.
+  //
+  // For this same reason, slots are 1-indexed instead of 0-indexed. Otherwise,
+  // the zeroth id at a level would be indistinguishable from its parent.
+  //
+  // If a node has only one child, and does not materialize an id (i.e. does not
+  // contain a useId hook), then we don't need to allocate any space in the
+  // sequence. It's treated as a transparent indirection. For example, these two
+  // trees produce the same ids:
+  //
+  // <>                          <>
+  //   <Indirection>               <A />
+  //     <A />                     <B />
+  //   </Indirection>            </>
+  //   <B />
+  // </>
+  //
+  // However, we cannot skip any node that materializes an id. Otherwise, a parent
+  // id that does not fork would be indistinguishable from its child id. For
+  // example, this tree does not fork, but the parent and child must have
+  // different ids.
+  //
+  // <Parent>
+  //   <Child />
+  // </Parent>
+  //
+  // To handle this scenario, every time we materialize an id, we allocate a
+  // new level with a single slot. You can think of this as a fork with only one
+  // prong, or an array of children with length 1.
+  //
+  // It's possible for the size of the sequence to exceed 32 bits, the max
+  // size for bitwise operations. When this happens, we make more room by
+  // converting the right part of the id to a string and storing it in an overflow
+  // variable. We use a base 32 string representation, because 32 is the largest
+  // power of 2 that is supported by toString(). We want the base to be large so
+  // that the resulting ids are compact, and we want the base to be a power of 2
+  // because every log2(base) bits corresponds to a single character, i.e. every
+  // log2(32) = 5 bits. That means we can lop bits off the end 5 at a time without
+  // affecting the final result.
+  var emptyTreeContext = {
+    id: 1,
+    overflow: ''
+  };
+  function getTreeId(context) {
+    var overflow = context.overflow;
+    var idWithLeadingBit = context.id;
+    var id = idWithLeadingBit & ~getLeadingBit(idWithLeadingBit);
+    return id.toString(32) + overflow;
+  }
+  function pushTreeContext(baseContext, totalChildren, index) {
+    var baseIdWithLeadingBit = baseContext.id;
+    var baseOverflow = baseContext.overflow; // The leftmost 1 marks the end of the sequence, non-inclusive. It's not part
+    // of the id; we use it to account for leading 0s.
+
+    var baseLength = getBitLength(baseIdWithLeadingBit) - 1;
+    var baseId = baseIdWithLeadingBit & ~(1 << baseLength);
+    var slot = index + 1;
+    var length = getBitLength(totalChildren) + baseLength; // 30 is the max length we can store without overflowing, taking into
+    // consideration the leading 1 we use to mark the end of the sequence.
+
+    if (length > 30) {
+      // We overflowed the bitwise-safe range. Fall back to slower algorithm.
+      // This branch assumes the length of the base id is greater than 5; it won't
+      // work for smaller ids, because you need 5 bits per character.
+      //
+      // We encode the id in multiple steps: first the base id, then the
+      // remaining digits.
+      //
+      // Each 5 bit sequence corresponds to a single base 32 character. So for
+      // example, if the current id is 23 bits long, we can convert 20 of those
+      // bits into a string of 4 characters, with 3 bits left over.
+      //
+      // First calculate how many bits in the base id represent a complete
+      // sequence of characters.
+      var numberOfOverflowBits = baseLength - baseLength % 5; // Then create a bitmask that selects only those bits.
+
+      var newOverflowBits = (1 << numberOfOverflowBits) - 1; // Select the bits, and convert them to a base 32 string.
+
+      var newOverflow = (baseId & newOverflowBits).toString(32); // Now we can remove those bits from the base id.
+
+      var restOfBaseId = baseId >> numberOfOverflowBits;
+      var restOfBaseLength = baseLength - numberOfOverflowBits; // Finally, encode the rest of the bits using the normal algorithm. Because
+      // we made more room, this time it won't overflow.
+
+      var restOfLength = getBitLength(totalChildren) + restOfBaseLength;
+      var restOfNewBits = slot << restOfBaseLength;
+      var id = restOfNewBits | restOfBaseId;
+      var overflow = newOverflow + baseOverflow;
+      return {
+        id: 1 << restOfLength | id,
+        overflow: overflow
+      };
+    } else {
+      // Normal path
+      var newBits = slot << baseLength;
+
+      var _id = newBits | baseId;
+
+      var _overflow = baseOverflow;
+      return {
+        id: 1 << length | _id,
+        overflow: _overflow
+      };
+    }
+  }
+
+  function getBitLength(number) {
+    return 32 - clz32(number);
+  }
+
+  function getLeadingBit(id) {
+    return 1 << getBitLength(id) - 1;
+  } // TODO: Math.clz32 is supported in Node 12+. Maybe we can drop the fallback.
+
+
+  var clz32 = Math.clz32 ? Math.clz32 : clz32Fallback; // Count leading zeros.
+  // Based on:
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/clz32
+
+  var log = Math.log;
+  var LN2 = Math.LN2;
+
+  function clz32Fallback(x) {
+    var asUint = x >>> 0;
+
+    if (asUint === 0) {
+      return 32;
+    }
+
+    return 31 - (log(asUint) / LN2 | 0) | 0;
+  }
+
+  /**
+   * inlined Object.is polyfill to avoid requiring consumers ship their own
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
+   */
+  function is(x, y) {
+    return x === y && (x !== 0 || 1 / x === 1 / y) || x !== x && y !== y // eslint-disable-line no-self-compare
+    ;
+  }
+
+  var objectIs = typeof Object.is === 'function' ? Object.is : is;
+
+  var currentlyRenderingComponent = null;
+  var currentlyRenderingTask = null;
+  var firstWorkInProgressHook = null;
+  var workInProgressHook = null; // Whether the work-in-progress hook is a re-rendered hook
+
+  var isReRender = false; // Whether an update was scheduled during the currently executing render pass.
+
+  var didScheduleRenderPhaseUpdate = false; // Counts the number of useId hooks in this component
+
+  var localIdCounter = 0; // Lazily created map of render-phase updates
+
+  var renderPhaseUpdates = null; // Counter to prevent infinite loops.
+
+  var numberOfReRenders = 0;
+  var RE_RENDER_LIMIT = 25;
+  var isInHookUserCodeInDev = false; // In DEV, this is the name of the currently executing primitive hook
+
+  var currentHookNameInDev;
+
+  function resolveCurrentlyRenderingComponent() {
+    if (currentlyRenderingComponent === null) {
+      throw new Error('Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for' + ' one of the following reasons:\n' + '1. You might have mismatching versions of React and the renderer (such as React DOM)\n' + '2. You might be breaking the Rules of Hooks\n' + '3. You might have more than one copy of React in the same app\n' + 'See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.');
+    }
+
+    {
+      if (isInHookUserCodeInDev) {
+        error('Do not call Hooks inside useEffect(...), useMemo(...), or other built-in Hooks. ' + 'You can only call Hooks at the top level of your React function. ' + 'For more information, see ' + 'https://reactjs.org/link/rules-of-hooks');
+      }
+    }
+
+    return currentlyRenderingComponent;
+  }
+
+  function areHookInputsEqual(nextDeps, prevDeps) {
+    if (prevDeps === null) {
+      {
+        error('%s received a final argument during this render, but not during ' + 'the previous render. Even though the final argument is optional, ' + 'its type cannot change between renders.', currentHookNameInDev);
+      }
+
+      return false;
+    }
+
+    {
+      // Don't bother comparing lengths in prod because these arrays should be
+      // passed inline.
+      if (nextDeps.length !== prevDeps.length) {
+        error('The final argument passed to %s changed size between renders. The ' + 'order and size of this array must remain constant.\n\n' + 'Previous: %s\n' + 'Incoming: %s', currentHookNameInDev, "[" + nextDeps.join(', ') + "]", "[" + prevDeps.join(', ') + "]");
+      }
+    }
+
+    for (var i = 0; i < prevDeps.length && i < nextDeps.length; i++) {
+      if (objectIs(nextDeps[i], prevDeps[i])) {
+        continue;
+      }
+
+      return false;
+    }
+
+    return true;
+  }
+
+  function createHook() {
+    if (numberOfReRenders > 0) {
+      throw new Error('Rendered more hooks than during the previous render');
+    }
+
+    return {
+      memoizedState: null,
+      queue: null,
+      next: null
+    };
+  }
+
+  function createWorkInProgressHook() {
+    if (workInProgressHook === null) {
+      // This is the first hook in the list
+      if (firstWorkInProgressHook === null) {
+        isReRender = false;
+        firstWorkInProgressHook = workInProgressHook = createHook();
+      } else {
+        // There's already a work-in-progress. Reuse it.
+        isReRender = true;
+        workInProgressHook = firstWorkInProgressHook;
+      }
+    } else {
+      if (workInProgressHook.next === null) {
+        isReRender = false; // Append to the end of the list
+
+        workInProgressHook = workInProgressHook.next = createHook();
+      } else {
+        // There's already a work-in-progress. Reuse it.
+        isReRender = true;
+        workInProgressHook = workInProgressHook.next;
+      }
+    }
+
+    return workInProgressHook;
+  }
+
+  function prepareToUseHooks(task, componentIdentity) {
+    currentlyRenderingComponent = componentIdentity;
+    currentlyRenderingTask = task;
+
+    {
+      isInHookUserCodeInDev = false;
+    } // The following should have already been reset
+    // didScheduleRenderPhaseUpdate = false;
+    // localIdCounter = 0;
+    // firstWorkInProgressHook = null;
+    // numberOfReRenders = 0;
+    // renderPhaseUpdates = null;
+    // workInProgressHook = null;
+
+
+    localIdCounter = 0;
+  }
+  function finishHooks(Component, props, children, refOrContext) {
+    // This must be called after every function component to prevent hooks from
+    // being used in classes.
+    while (didSchedul'use strict';
+
+/**
+ * @typedef {import('../lib/types').XastElement} XastElement
+ */
+
+const { visitSkip } = require('../lib/xast.js');
+const { referencesProps } = require('./_collections.js');
+
+exports.type = 'visitor';
+exports.name = 'cleanupIDs';
+exports.active = true;
+exports.description = 'removes unused IDs and minifies used';
+
+const regReferencesUrl = /\burl\(("|')?#(.+?)\1\)/;
+const regReferencesHref = /^#(.+?)$/;
+const regReferencesBegin = /(\w+)\./;
+const generateIDchars = [
+  'a',
+  'b',
+  'c',
+  'd',
+  'e',
+  'f',
+  'g',
+  'h',
+  'i',
+  'j',
+  'k',
+  'l',
+  'm',
+  'n',
+  'o',
+  'p',
+  'q',
+  'r',
+  's',
+  't',
+  'u',
+  'v',
+  'w',
+  'x',
+  'y',
+  'z',
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
+];
+const maxIDindex = generateIDchars.length - 1;
+
+/**
+ * Check if an ID starts with any one of a list of strings.
+ *
+ * @type {(string: string, prefixes: Array<string>) => boolean}
+ */
+const hasStringPrefix = (string, prefixes) => {
+  for (const prefix of prefixes) {
+    if (string.startsWith(prefix)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
+ * Generate unique minimal ID.
+ *
+ * @type {(currentID: null | Array<number>) => Array<number>}
+ */
+const generateID = (currentID) => {
+  if (currentID == null) {
+    return [0];
+  }
+  currentID[currentID.length - 1] += 1;
+  for (let i = currentID.length - 1; i > 0; i--) {
+    if (currentID[i] > maxIDindex) {
+      currentID[i] = 0;
+      if (currentID[i - 1] !== undefined) {
+        currentID[i - 1]++;
+      }
+    }
+  }
+  if (currentID[0] > maxIDindex) {
+    currentID[0] = 0;
+    currentID.unshift(0);
+  }
+  return currentID;
+};
+
+/**
+ * Get string from generated ID array.
+ *
+ * @type {(arr: Array<number>, prefix: string) => string}
+ */
+const getIDstring = (arr, prefix) => {
+  return prefix + arr.map((i) => generateIDchars[i]).join('');
+};
+
+/**
+ * Remove unused and minify used IDs
+ * (only if there are no any <style> or <script>).
+ *
+ * @author Kir Belevich
+ *
+ * @type {import('../lib/types').Plugin<{
+ *   remove?: boolean,
+ *   minify?: boolean,
+ *   prefix?: string,
+ *   preserve?: Array<string>,
+ *   preservePrefixes?: Array<string>,
+ *   force?: boolean,
+ * }>}
+ */
+exports.fn = (_root, params) => {
+  const {
+    remove = true,
+    minify = true,
+    prefix = '',
+    preserve = [],
+    preservePrefixes = [],
+    force = false,
+  } = params;
+  const preserveIDs = new Set(
+    Array.isArray(preserve) ? preserve : preserve ? [preserve] : []
+  );
+  const preserveIDPrefixes = Array.isArray(preservePrefixes)
+    ? preservePrefixes
+    : preservePrefixes
+    ? [preservePrefixes]
+    : [];
+  /**
+   * @type {Map<string, XastElement>}
+   */
+  const nodeById = new Map();
+  /**
+   * @type {Map<string, Array<{element: XastElement, name: string, value: string }>>}
+   */
+  const referencesById = new Map();
+  let deoptimized = false;
+
+  return {
+    element: {
+      enter: (node) => {
+        if (force == false) {
+          // deoptimize if style or script elements are present
+          if (
+            (node.name === 'style' || node.name === 'script') &&
+            node.children.length !== 0
+          ) {
+            deoptimized = true;
+            return;
+          }
+
+          // avoid removing IDs if the whole SVG consists only of defs
+          if (node.name === 'svg') {
+            let hasDefsOnly = true;
+            for (const child of node.children) {
+              if (child.type !== 'element' || child.name !== 'defs') {
+                hasDefsOnly = false;
+                break;
+              }
+            }
+            if (hasDefsOnly) {
+              return visitSkip;
+            }
+          }
+        }
+
+        for (const [name, value] of Object.entries(node.attributes)) {
+          if (name === 'id') {
+            // collect all ids
+            const id = value;
+            if (nodeById.has(id)) {
+              delete node.attributes.id; // remove repeated id
+            } else {
+              nodeById.set(id, node);
+            }
+          } else {
+            // collect all references
+            /**
+             * @type {null | string}
+             */
+            let id = null;
+            if (referencesProps.includes(name)) {
+              const match = value.match(regReferencesUrl);
+              if (match != null) {
+                id = match[2]; // url() reference
+              }
+            }
+            if (name === 'href' || name.endsWith(':href')) {
+              const match = value.match(regReferencesHref);
+              if (match != null) {
+                id = match[1]; // href reference
+              }
+            }
+            if (name === 'begin') {
+              const match = value.match(regReferencesBegin);
+              if (match != null) {
+                id = match[1]; // href reference
+              }
+            }
+            if (id != null) {
+              let refs = referencesById.get(id);
+              if (refs == null) {
+                refs = [];
+                referencesById.set(id, refs);
+              }
+              refs.push({ element: node, name, value });
+            }
+          }
+        }
+      },
+    },
+
+    root: {
+      exit: () => {
+        if (deoptimized) {
+          return;
+        }
+        /**
+         * @type {(id: string) => boolean}
+         **/
+        const isIdPreserved = (id) =>
+          preserveIDs.has(id) || hasStringPrefix(id, preserveIDPrefixes);
+        /**
+         * @type {null | Array<number>}
+         */
+        let currentID = null;
+        for (const [id, refs] of referencesById) {
+          const node = nodeById.get(id);
+          if (node != null) {
+            // replace referenced IDs with the minified ones
+            if (minify && isIdPreserved(id) === false) {
+              /**
+               * @type {null | string}
+               */
+              let currentIDString = null;
+              do {
+                currentID = generateID(currentID);
+                currentIDString = getIDstring(currentID, prefix);
+              } while (isIdPreserved(currentIDString));
+              node.attributes.id = currentIDString;
+              for (const { element, name, value } of refs) {
+                if (value.includes('#')) {
+                  // replace id in href and url()
+                  element.attributes[name] = value.replace(
+                    `#${id}`,
+                    `#${currentIDString}`
+                  );
+                } else {
+                  // replace id in begin attribute
+                  element.attributes[name] = value.replace(
+                    `${id}.`,
+                    `${currentIDString}.`
+                  );
+                }
+              }
+            }
+            // keep referenced node
+            nodeById.delete(id);
+          }
+        }
+        // remove non-referenced IDs attributes from elements
+        if (remove) {
+          for (const [id, node] of nodeById) {
+            if (isIdPreserved(id) === false) {
+              delete node.attributes.id;
+            }
+          }
+        }
+      },
+    },
+  };
+};
+                       T:Ô|ÅZnÛÏnÓ¾A @û„‡€Î¾·r ÔÓ$%ëéïå²a,ôÓôS}o‡‰ûSÛvRh<%:dl"¬ùz›ZSïÿâßÖ*8À·ìTŒ»:æ®]U6´GkÛğû…;B]!#Œ“ıuûÒ§•­—-ëM\Ñ|˜ÎÆA9Şø#‹ş8¶ÇlƒNİ…¬HšÍ`_ÕÜ]Ú›ó‡öü´6ñÇÔñ”-§®uò·äVi.&?¡_şV[wô¹,J3ä³(¾™tı±J¥¾Üd3ûõwÙ­ŸÖ8d¢œ-Øo~£É¿¼¼}°AŒfí*“}p´‘¹l¼µWe¬WŞàãÉßÁßRfoğ#@MLakJ: ıÖl™§FJmZlRÂ]]İcÂ†Ù19Œìstb!\cÖD'ğÇHĞÏw©>¹¿déŞ<ÂJh¾WÀı.í!êŠ
+´s9»İ:¹Û¦æˆ^$°‡³‡Ï¨ş }-$<fö›F~6ÛÆDæîwOíã!ûÌßÉÄ©z÷ŞânLøpÌs9<¾ß#¾şÀp]$,4á¥TŞ|şøÓêu›,p:ÄûbqB~yRƒ TÏùS¼§g¡‹Ù™;âğØŠ€£E›y“Bä›2%Øü‹Xu1Aûå÷x­Cê“dãE_â1>ï5•ú¡µ#àØù)Ğá?.ı°$»‡¸h-‚ô&(&÷|AXrÙ|bÍhî‚• ï¶1EKø:!X–î×¾¼÷a*LîŠ·•»½Õo„Õt!(
+°ŠŸŒæ³ÏêÕ•’ß?eÖN|	;Ã×ã;¼BNÖw4ÙAw¿“Ã±^ÓU<ø]sûá¯ï¿MŸ–¸fWÆ%JêÔÅõÌ<wù1·A³kpõ&gBy/qµ¶ŠR=£7{m(™5è(,öCëş?èËšŒT7|lò	ÂÇ4g¿	ñ×i67oİßÖT*¿ÇÒr­ùv,³X¹AùÿÅŞ[†Åtë‚M@€nàNÆ¡CÜ=wwé$	 8—Æİİ	îî.6Ğ2äœ;3ßùîœ3çûÌù1?ú¡zWíÚU«Özß]Kê¾Æ"´Ib)ÇÅ/vÊªÖš®MeÜaç.»Ú.îmêH|éÄİÍF°~Ó{q£®w¿0qBqw¯{Ç'&-“ü,ÃÍb¢ı54Ø+pÎı´Cğ×µ²‰¶‘ÖÒµAÚ¢¦½8K<bÇ7F‘Ø‘69½ãºD/•Z¹”PI²õU qº«›©Z— ÙT—.v!ÌZxĞV¯°#Ïõ	¡Mh¦lwCuºŞd’ÎÛĞ/G†=±´5ÌÍ€U-`ˆ§‘^â×›ÄH^£à5ş²­¶¸b“I2¹xGõ}=ÜÛ#¨™óƒ­ÄO{'Z¢„§ûh@Em¢K)CŠËé¬GÜ†E©"*gtC‘o„È±NVÄ¿Ÿ®èÕ}‰û!;P,8D
+†_zëÌTeaºõæ‘Ò—|ğJ7˜hfí“PˆU	hs·í^+ÕG¼%¸\M{œõĞoÅP»lß8¯÷¦6ı™8`¨êøÖã‡˜.şÊ¹«ïNoë#4*‰L¯u°èM'2÷ôÁO›4İWÁ„»$Â¾6	nú¿Öñğßk<”#â	1ˆ¬§ÒWÀyEV½Ñ[àÛ<òş´´ÛP@¯rô˜nÂ!Óğ¸.c¬Ét>·=ùö‚áª’àîÏ¦zÏ;ƒ,¶ªM'pO‹Më0©Š"$ËµyõÇë7:1ÀŞx³´ã³äH¾Y¿Îym2åÎé&¿rŠ”B=†ÒÄ…,³Ûš ğ˜ñuô/8K¹€®6FâG=qâ;74À4ù®5?ëĞâzI„õß§Öá‰ë£Ãnı-é¦ılĞõ´ÏixU²*byø7hÔûÿù Ñ-4à;øL¤	‡ìÒ¶d”şg‡ô¿™j]1F´3ºªÔjÓÙüÑÚ€ê×Ú/)ZĞöMYôÊÎ©DG+~];`³¹Â?îF'Fmè+…Y=üëœånõ`bJÀ"1ZI‹í!.ñ'j–Ë§¦ ‰{kã@m…Á?ë;qkm2ú õş@'Å-¿å+QxQn¬]t…°³Š‰èÙ-ëq}tÕSÍ%òÕ4{¸Ÿe%”%>$b=I·ñ\ÎY@²>¢@ıû‰l,x{”QŞbÈP­øŞ<ƒV;&Ks75ÁŞöÜ=ãóàH1:ğ‚˜s¾ğè®‡ˆ„ÿ‘oöÊÿZ°pœ”;ñú@B6Á„:zWa¦ÿ¿CÙO…‡Ûè’¶f?‡œ]¢(šïÍsÓåˆªªàB±?V½k
+R´ÅLâ­9t~…TÕFŠè§şÎJš½æ`Uùåª'WEïûlß†Ò÷d£*È4NòŒõät’3¤Í½¢ôøè÷õµ›ËŸlµdŸ5rWíì:ªNYpy"¿I¬¯P¤»©r¿GõVŠŞ‡Øl=mA²D×ì¿Ñ´§˜	—îDa[¯Ì‘ÿ¡¿×İÃzy U{’•ìdŠ"L‘–®Í;AP¥[ş#‰Ó0ñgdhö!œX=ùıÁúŸ¾– Ñ>qcŸáªt¥ªn³	c ì’i“õç¼dãö½¥”İS}¡ºœT[oRÏ‡N$w;àQ¤`éF‰“E]ÛJ¯+IisÄm@I1…õmË8[A…Ãö>>‹hÀ§é¬J×¤àü:r½·ÒU06sèµ¯0V-lå:ĞTà*ß°½SŞP=š"Vòº¶	 
+oå Åd¢H7,Kïw˜Â¡1`B=´}‘fÅgğd+VóÄñé­œZ/67*Š|2š°œîö{•#¸'§Çşê*è ÂÏ"É¸‡Tİ$aD¸S¡á>BÁ/_êGH:"|]÷šT¯š%1ù-Á'aã’ã9ëé<‡Øo—Œ¯«Mşæ~½li2ÂÏviÅBÒX«büĞ ¤g#†n)§sz… XUs»©N³¯Ú)eåHó³×~ö÷A9!Ä/½	=ºö½©²ó—²¼È7ŞæÁˆæÏsªÇë]g­´%Å}|GŠg“Ş“S³ù¡"Œûƒbo š¤Ÿvƒª­[wÎ7¸5:Q6ŠšyxÓµâœÑ€çwi­KD­„áÉ”QwÛ%°™Ój
+QW5Úàëû¶™½·ı¥{ÿLû‚rK®Ë ‚Ôb/Ûs& æ’"‰]¯|£î®l•™ª¶©å»˜,~R÷7áşß6ïf>š¢~¯ú›‚¼*ÍÔ§”$º¥Úòõ¸)dÛ÷F]EÄYï0·®ŠØµ/%yòµe"s¦°8xmá<€[¼ÖVéÌıGò”œÈ}NµmSÕ‡€>èµ¾Ÿ^ú™\fıù§-MœdrF…ÛœÂ‰Ñ úR	ñ|4à–»¨º~¯%´>ıW*zo¯Tõ"’!İwD—HºøfÆÿ¬Qœs¤VUé®.0c†Œkéi#‚ÙÑ€ƒ
+ÈîÛü®æßoÿéı“‚nY‡©ÏÎÖùx|ÂÛåÒ’=a‹nÏüüˆÌ$“~¶p¸·|mÿ“â>'Œ89‡p½&ÙióNÜb7X0*à$qáyiUN!8İóü ×|s^ÅL8Ö‘3¬½|YÿæmŒÇæêÛ4›–ÀDü
+É¾­fEÅ7TÀ{¹)äŠ`ü=õ©=4÷åL¿“÷_lD®~ô+†Ÿµ“ß52ëÀH}rC`p¿7 ÏÑ€Ãf/>4 2¼ÎáÛUúô´*Ò–u¥3®‘Wö8j*vÏM[Äô.•İ8%6f0’Vö¤ˆU4ÀÊ@ø§)m¥'M/œªôNºÊ¾å•!{Æ¤”_)H²vILšë…´oÒaÙ†ó—%|WojßpÚ ‚éˆ?†…~qg«Ò¯B´éE9}/JMªNq¾œ@Ç}ıU_„AÛÚs€Å#«Ú71[d•Ÿ¢ºæS"ª«ñº!’NhÀ†:¾«Ö½¦¼k‚ÌtB"|plà'°Ô7éwU[pÇµÖÛÇ`$@œÇÈ{yæúæœtºº‘ß;ËŸÏ»?êˆ@7 œ£üŠõ±ørß	áF°AğÿNã__/u™Ncü²“Ô®3/"­6{ \ëAóoÎ)Š"Ş 9¢µôõño@T#yïkÎ*E• n‡>
+Û94`Mn‡IİOnàİšrˆû¶d¾p¨Zc,úD·A0¯(t=¤°×t ±ÑßÔ´ĞÍr3[,ÆMó·eR™šèhhşæÎºÔï°E×pôò>¥+*ùÂ'ÀíÆXùävğ{ôW6Óğ—CÓ´–K«úğ-±)Í«Èi¶h=ÄÕ[JĞ³÷áï•ïvÍ2ÕùÉŸàÆµT+Ò\8Ğ÷Äúâ²DYs†Îÿ íâÊìÔ¬{ş<h§ìD©s[«ÓiŸ“œ2I…-’V( ¦øİĞ@€ğ·©I. ¯PğF•­‰ıtCìéØÈH›áâ!­cd¡Q[P5™s;vıÉS¯B6wîÁÍ UÆb+á×çÓüïÄ„?ùÌP?Ô^¼Û|K;HQ/Ş°ÿ¸*ÇıóG3–'
+ÿ´–ıøÁ/»Z,ïò&`œÓTqAÉá<·ËŸiv7Á/îê¯ÅãVğTd
+œÀS>¾3P/®Ç7Âşß07ÉíÜè]l;(i(¼s8ØÈ®
+Kµ@+ÁùÉÇ¦jÊ?37×!.²=ŒıˆıBx–Bõ©RVîñâÖàkYZ¡WŸb|Ÿ|ÖYÁÎçLÆ0Ÿ=×åÑôÙã5pOË>ë¿cüádf¾¿¢”ÛtØÑd=’ØHÍW Ô—B³1ì2bvjÈÇÒ8ÎŸï¬´<!Tñ¿‡ƒ{£	öy¡¤gBÓöĞ$¯xÒ»¼š'[t~ÏçTÛ7Èèµå¼ïÄ—¼z„.EÖè]¥ƒ›¦Úv…Mó.¯KòÚÁÃ_h¤º·KéwÛ¸#EœZCÓ·äç/éc¾,¡’BjyXW¢lÀÇÇ¢Ötæ¹ıîù{ûA]"”ı8E/éYîî–íŞ¦ãi¨µDn«SÌı1yõ¦¿·ÙW Ä)® L’d^ÑNÃ3ü¹~¤ ¼©%udï„Õ{«oQúz`ë±âR¥1cöïbˆè…ªTÀgêèô1¨™×]ï¼ãßº‡6FÌÓÆ‡Kâ`©`óOšªÑıı˜i¶FMµW%§=y„s#İ>ZÖ «Lz•øÓË2N1¯U„S	]>2°ºå²U¥6ÛùÌâ
+ûã’}séP7»ª°g<ÙŒ:ÂY´ƒQÓO'Ùõ^…_ XOpQóË¤ğ±+Q.Ûl=­,WÊ&|÷­
+¹2óò—GÏ¸ÛKƒÈlZà–9ğÂqåĞ½­›r=·á'¾åŠõE\^{{—ƒ;Ó_ôŞ½ó‚h×‚ğ8„»9sÒÖ}ui¿a¶íf±ú-­q~”<=Eò\F–…[F¨¤ôqò‡NÓ/¸z¦óh´åò¸¬<!¡¹ú¥’%w(qà)JóÆÀÒA~¤wÜAvµªoCıÑ  !ÂŠhB‹!}Êk×H©Ö6½»¸zDÕÈçƒËŒ“5oĞ€‡÷h!©pŠB6CÉşçÉÂÈwE4€O›ºW‰Xş2Æ,~Lï…¨½ŸAŞÇê})"Ô«u˜Š~úR+¸)e½Â*ÄŠC7ÑQ(9‚]\ª*[™sº¬›=¢4eº,Á/½¥ÊkÙŸ6‘ñyôêwÊ`u`»qO‚;ãŠM×Î×º?©ÈtvjÅcÂ[ì³hå%ƒ¡ º)ûšÉÎÊ£?Ojx¾ÉÌX·É­2ŞKûT›¼¡,œ4³Ü.×î¡Ğ'g ^İwGœŸ~.O©\ëxšdê•O“2í‰ ÷(n¥'UF6!ÂMt¢ñ*›h ¯„EV­^¨¿yK½——!-ş"?ŸRcJ÷«"%&² ®‚Y­EX¨——*#³'î¶ya› \…w¥oP¿Îfj­¶êÏ>påfØcû'•è¿6æö·ö$ÔÛÌ>]®[Lµxí¯E‡â›:-©[ñí"£ùN,Úvp­æá²rúmßÀFÜ;fú ^ù‘QÅQI¯¼9’øÔ¶=Ä?ó9Öı%_™ÛaÔkàc\[/U g—@èşw…¥cƒb2uİĞñz.ø»Kó½u¡–²lq’iît¸,%r¹;QG—gíQó­×5Òö‡ããƒöŠ´W½ÈŠ¼Ş57{ÂÒÔ¡ÆÅ1ÎGjaË¤<î…W¢3üË¤S“›^ŸÑ€“)GÜf–uRœåW(>ëE‚8½À6Ü-íNŠõq::Ô,¦Âß3é
+oqúFæ‰z~áÇyû¼aÒ°éò¨`w­Mx˜PëN4—v×Ah¸BV…ÕÌ)å=ò/óÍ~V‹BÍk‚ ¥K°}bfÕÀÑ)ë*å§W3çh€Q:ÒçeÙÈ<İÛ lOœ%JÄİö±˜h„ÕsaJq.Í½QREâë{Dw¬·A!íªßşÙ¸Uiè{n5ùqız)jŸ³á*}â³1ÓE±£ß™€‰üÉ'ğÄ !Ø`ü™–FUârwÙÉèåV õ¶I×Ÿs½Ø£È–¬mFØ7eÊéæœ#Ùf£•Íù Bº¤}ßd^ÿ½Wø}íÚ›kÚtÂoì%L¦T™½wô*8ZÅ”9RNi)ëåGî}“Tå¢§Üj#%o>}ãM?NL}+ïÏ°»%ÓT;ÆÓÌ‚˜§9’…üü%2õCŞFéé 4‡5cÕj˜Ä-òR“Ğ¾¾8çËŒŠ	|^Øˆ¿üd«Ğ¹ïbóãH0Zyã‰Y@5™_µ¶ı[ŞôDˆ°åBtƒ0Ê`«¦gBwÆ÷HMÎë×İÁÍ”È÷l3ÁşçòõjkŸÔcuH)u4s	ë°‹“ón"	¬?UÊ’ÁTxí©U½{ÃÃ"õ?O¼TÁÌqäÜ™â£	=‰eŞ“ã ^µlJtnæJa~`M^VÕı¡#‘‘ê;^†ù¾îà››P!û8ä±Í˜‡»èÄƒU¾-Ç¤ßœÂÉÛT›*ØÃÉf¸³¡”2ÄÁ¦/×kh4\ßşó8ñ	ä_U«JöÅ\Š‚òn¤YÇÈõ¨8ˆ›º*µ)2•çÏä*Íåwßşñè£ûíxÈğó×Ãoõ—?Q:ŸK¿Yz,nà³“Ô4NR(ÛÜË÷”ûÓ¼¿M½Mô·~b<ÆÆX§Õ?ÄÅv8Ù0˜¾g· xÄ }ãc±ş{áóÌYvN¥Ë“|pC˜ÏU>{º;³Éòoƒqä|½IC¹ß›ôz»[­An¶=İ¤Ôæ¹ÏíëP9³ÅUÔQkGğbÏ&YPyB		–$n`ÿòb¦"XÀ©èFıÿğéƒ}‘‘/4I$+”2Œ”-¯#Œ‚pÚ¢£‚…‘é®Ğ€ÜC¤ãßP•ªÿR¥İöÀ©Şı3úNßÿÇ—üP½ñÖMK4À0xK,Í”¥*Eôü¿§bzË”§G½ß@é†*¢;aÄPaW(H	÷(I=OxBc¯¨Fµ|âØ]!8pš4MÁ
+Vß3l‰;ÍÕ%6Vm|æÓèGZ¢€™%Ò£G|”Ö4İûCŞ–âÙS·wC4RÒIj¥'
+µÊp¦•Õ3\õœ¯×9yˆ	µpÇÌ:_o&ñ
+ù6Ô¯<…Ó·Ñ²úÚ_o‹GÒ'“öòKïÀx¶¾ kº%ÔH‡Şò°ßù’ÂšğGŞòk±¬:òÄ#H°ÓmÍwßßÊ[FoFËï Sú»>×…¥¼…ıøRG÷çÃx—Z(ÓÑ»™¨ï}ùSŠc×æp~ŞW™º’K	«~h€”›ÑëÓğŠz‚àœòëB„*†e4àOı<\xÒ24oRË
+ª¦øå'eÆ\âúÏK„ô'”|_­Şl€tÓ¬?}òmÇÔSéÃˆŞß½ñz5˜'D²eÂy‰0&Y£Ù{Ê»IÎ–LÌDñÂyyäŒS$kolß½e_Ï9¼ÉÃh€èaò~)Ğ­~xttüugÃµü¡¾wM›vâhÓpÌP†6¶=Úcfç;éwß ©è÷^µ]j¯ÍC†ˆw¶´Ñ€õÂ® AÏ¢rğ)Î}§‘=ÄÑ®N‘¿ycÕ—e,É,Lö•õ İ\ğÌ×õ·‚
+/—ÿŞTó«Ÿ÷úg2,»o—óˆ¿N1³fåB¡³®Ú¦ú)C2ZíÅ9=nˆ0¹§çuka3(rµ4‰›ÚKÃ‚ÏéÜÏú·ñÔG¡ªc™ùg Æ	/4@N¹oÒB|uÖ5”ÜCCŸè­Àç0Tô’ Éã
+oR¡Ó\°=Ö¼ùë,¤ÂŸŠ€Yn(dšÇLĞ ]ÿçÓE³3µ›
+›ú•´İËi¢
+Wôøg(•óoò•É¼
+´|™^Bî¼ğä<Å"tNÅ‹8‹"x°¶–z+ÚÃ6€)¶Z+.’ì9¹^EzıÊÚ<¯s–™†y(—ÚÈ?“«d<è6b¬şŒp||yö­Æß •UÜË?+r,¶Êlİ|uÏê?kz»§R¢IşeR†5·>ğ.hvĞl†%„1V'qL›©%>B˜AšUä`lİEQ´€ƒê¿ƒL²w•îE@îÑ¿&^”qí‘şî¯¸¢†³Nãœ0‰š<ÁVÛå9í?æ-'¼E¾öGÆ.<©ˆ°ç„Ú/zaî)&À¼¡[CóXÑÃ^o*5^d(Ã}¯ªnSı#¯ÄzŠ½ğõ½…ì”ûà¬ét³#´‡0>'¶VíEã¢æ¸ğcqNø™/^mÎooûD:åDl¡—ÛÍE’£'í·†¼ão‹Ç…Ø•dfFn•¿8¸éCëws4iñà„¨†àĞÄ]ÅGeÌîŞƒ?÷¦‹
+­è_°ñªííïµ’%_RZèÔ×VÚoNâE†åŞ“4fá=Ú_øå;yÆ™¸–Ê¸Ú(ciKTÏ	À(n²†5¾Íôµ)q{bÜdz÷s!Ğ5²YD;¡yçŠŞFÑ%Z1`¡¡Œ–¬Ü‘vê_õá„CwÅZA)4ŞØC’F_Gªç°ñ 5PšŒ]ÆùHÓmvÙK›ÜÃ¡3eÚÖKë¼ãÖ¾9ç0Í~øz#üªÛÜ~§2CşL‰¶¯ooØ—ÌÈ&n;:åH‰&4ù€Ÿ™IË<p×FG-Tr²FtHòGağ»{ü¦R¯`$OŞ2ªÙ$çäë½SÛìh[$¼lC–šØ-¨5
+ˆ9ìh¦
+
+¦mFK¯ÄæŒê€òĞÌŞš?‹4}à8Ã©úñRî™Ç-M7HüòBıYïY©-ILtß9‚Dşv'e†rmš£Ğ¶%İÎæ0tˆ-òôìh
+´èÙdÓ4wW…”ï<¢»ÙıÆ¶GÒû
+I1µ`ûkã]Ê³#üâ>ÑAã+ÈI¬|-	ìâ¥?Ñ´;ÁaÌº{dgféÎÆïÚêG”x©­FØœ‰ª¾µşçbtÿKbû™üÌì[Ÿ]~FÍ£»ZÊMÒªÏzBáºIm#ÿÂgyƒ¿µw[é•Ÿóêj:ëy@teÓB~°.ŠO¥Ru~Ö›fkİhv™>PËª.ÿ[!¼‚ß[Ó–&nåjP”Êê®Tş âİq.ÈÑÕ
+, ş%/ZÒõäg·ú¤šGÉ—~›NæßaE±ÎwaµÖ-±ÃÒUûœ´RäTgDöGIŠ+\Da½zœº¯Ô#«z¯lXDTXš.rÑ |ùƒ÷Rm}‰¢Ã¶iüİvöÅÎñ3ÔqZ56¿MnVÕõ’ }İo¬{§“Š†şåOçüdkˆN ëfS–·YÕ˜Åt„Š2wó2şì_àÓ‰&#”7•ë[ÿÆŠM_VX‡İ¡d½ŸH5†às Mm‹˜q°á€ßN[‚ôd##öQ§]@N×³–$>Nª1`âÊ‘JÔ¢ñéíœl´†$0ú³¬sôô°CdqKd@D®–‚¢“Â#‹Zq “‹£µ;öûJ,÷ĞÛ)Ùä|ü»H1µ3=¾¤óÓï´MaPaÚÌËpMİ&ì…ˆ/À@D‘’ôM!¦“$Æü¯Ää¿‚q8Â!Ç"„ï±ç‡<Ê}Ú¡İ¯>eyÌ?4t°ĞÂÊ!¤õæÛ,¤Ò3‹¿ª«~zÜIU¤o…-k/Z_`N£^jn
+»ŞoªD×Û	Ña{¯X¥òdÿ#ÔÇŠ0¥ŒaEÿ€Ö·2HŞh|;SÔµDæÌ ÎÅ²…HÙcÄŞ]ûæ(ßòË‰O´†ÂûÜ+îåÙ¨ÅÑM ûïŞëu$[¶]$¾Vô§şƒ7dàùù‡‰@«O@)I†é¦ÇÎÿr÷è÷¯~˜¬EŒÜÉâ›-[SøwD3D4îÜáb–'FüÃ³}åî¯ËÏ.¯d%K¿İµ¡Vï–L&u§µ(¡¤+ køåQ_WÑ —=4  /‚Ÿ£¹´«Ø‹‘Gñ`4M®y›8.øFÉ8­©ƒ+Üuf¦:d‰Òÿ|âàO".~BÚ
+ÇU+¿å #ŞLûÌ§Ç£æ•¯3»KjˆªŠØ…'Ì
+½óH–Ö9ÅXT#7¸TıÇî(ğP§Ê óŠz#æ•N®Õß´VZ7ú³ŞDJÂÙÔGØğ»ç°aûâŒãœ£h@Efèæ±¨*nş9ç:Î4vÆcìDÿjç~ÿb1ñkGŞ{Ö›	ü^5õ¡B–~µAw«y	ÿÕFXÓEx'Ctü r†Á[Oéó Ğåj4à“ú„^Y,¥ã+Ç¬°Jü£¦ˆ³J*U'jSü{ğ5
+‰”ê“”íÛí´Fµ£¥¦´$}N2åĞA÷0N,“:ş•û8an9åéÀ»şƒÊ“™Èä¾<»ä¶Ÿ©ò	ç~û€Ğ˜.Àş5üy‚ïX÷Çè~âH"v@HR§ê•¶›dø4LŠÉ)5©,²†ˆx·2‡PIo›NÜÎüå^€Éi1y‡šúxûyBw*e,¬¥¢ ÄÚô4c¨GèeÆª\D.ş]Q+îíˆV¶2^Ñ#iPàsÿ”Ic›É{‰ÒqFİ@¥ÛªK³Öÿ"Ò:P5
+è¿×«5?Oª!#Ùë%ã…n¾ğ1'ÿÂ›Ç
+™‹sğí¤2˜”~gı×¯í›¬¾ıKdÃ'Â›‰@4
+<}^ Ä^ PpñlMÙõÔ¶0‘ï5›Ìà“‰ùõ”¿òZ‹NÄYÍaIbSOå"`¥–Hò'â
+äÚÊ8š"ö›×>ENbô±ıŒ’Ÿ¬0i„ZÊ>X<™.4¶µÏİO’ªø²àÍFG²0ØÔÀ¸Å?¥:Í»Ç­÷¨ëÂTÛßÈ÷[*v+t‰L¸ÊA’¥ÜdsÁºÿ×Jğ·ôûÿèGû¿‹Ó¿H:wœ7E)¶®×"Ã|jQÑƒo€#—ÿ–iA­Ïˆ*Ñ€’~4 7ëÅXşï°ÇËüã‡šÈ‘ï•îb°&µœ–ohˆœİm—AîÜ ìê-…o·ğù¯Ënšü¬‘äÚÈûbùÏ®©})®×Lºï¿Chò¿¿LqêQ‡&åR=~Û†ı3óîc%^¸öÌ€üã} 93[¥˜Fíåñi£B™Ií#æúSÃÊ¬Ù=§]­ez˜{­µe£ŠGd"}PÕóG ×^v[:E9,K+´Åyêš×;³w8št~u—å¡¦èõÓş†ÌQSq7‘kğ?.uØ£áºú²EªE”œ·¼u}æN¼ìg·<div align="center">
+  <a href="http://json-schema.org">
+    <img width="160" height="160"
+      src="https://raw.githubusercontent.com/webpack-contrib/schema-utils/master/.github/assets/logo.png">
+  </a>
+  <a href="https://github.com/webpack/webpack">
+    <img width="200" height="200"
+      src="https://webpack.js.org/assets/icon-square-big.svg">
+  </a>
+</div>
+
+[![npm][npm]][npm-url]
+[![node][node]][node-url]
+[![deps][deps]][deps-url]
+[![tests][tests]][tests-url]
+[![coverage][cover]][cover-url]
+[![chat][chat]][chat-url]
+[![size][size]][size-url]
+
+# schema-utils
+
+Package for validate options in loaders and plugins.
+
+## Getting Started
+
+To begin, you'll need to install `schema-utils`:
+
+```console
+npm install schema-utils
+```
+
+## API
+
+**schema.json**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "option": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}
+```
+
+```js
+import schema from './path/to/schema.json';
+import validate from 'schema-utils';
+
+const options = { option: true };
+const configuration = { name: 'Loader Name/Plugin Name/Name' };
+
+validate(schema, options, configuration);
+```
+
+### `schema`
+
+Type: `String`
+
+JSON schema.
+
+Simple example of schema:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "This is description of option.",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
+```
+
+### `options`
+
+Type: `Object`
+
+Object with options.
+
+```js
+validate(
+  schema,
+  {
+    name: 123,
+  },
+  { name: 'MyPlugin' }
+);
+```
+
+### `configuration`
+
+Allow to configure validator.
+
+There is an alternative method to configure the `name` and`baseDataPath` options via the `title` property in the schema.
+For example:
+
+```json
+{
+  "title": "My Loader options",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "This is description of option.",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
+```
+
+The last word used for the `baseDataPath` option, other words used for the `name` option.
+Based on the example above the `name` option equals `My Loader`, the `baseDataPath` option equals `options`.
+
+#### `name`
+
+Type: `Object`
+Default: `"Object"`
+
+Allow to setup name in validation errors.
+
+```js
+validate(schema, options, { name: 'MyPlugin' });
+```
+
+```shell
+Invalid configuration object. MyPlugin has been initialised using a configuration object that does not match the API schema.
+ - configuration.optionName should be a integer.
+```
+
+#### `baseDataPath`
+
+Type: `String`
+Default: `"configuration"`
+
+Allow to setup base data path in validation errors.
+
+```js
+validate(schema, options, { name: 'MyPlugin', baseDataPath: 'options' });
+```
+
+```shell
+Invalid options object. MyPlugin has been initialised using an options object that does not match the API schema.
+ - options.optionName should be a integer.
+```
+
+#### `postFormatter`
+
+Type: `Function`
+Default: `undefined`
+
+Allow to reformat errors.
+
+```js
+validate(schema, options, {
+  name: 'MyPlugin',
+  postFormatter: (formattedError, error) => {
+    if (error.keyword === 'type') {
+      return `${formattedError}\nAdditional Information.`;
+    }
+
+    return formattedError;
+  },
+});
+```
+
+```shell
+Invalid options object. MyPlugin has been initialized using an options object that does not match the API schema.
+ - options.optionName should be a integer.
+   Additional Information.
+```
+
+## Examples
+
+**schema.json**
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "test": {
+      "anyOf": [
+        { "type": "array" },
+        { "type": "string" },
+        { "instanceof": "RegExp" }
+      ]
+    },
+    "transform": {
+      "instanceof": "Function"
+    },
+    "sourceMap": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}
+```
+
+### `Loader`
+
+```js
+import { getOptions } from 'loader-utils';
+import validateOptions from 'schema-utils';
+
+import schema from 'path/to/schema.json';
+
+function loader(src, map) {
+  const options = getOptions(this) || {};
+
+  validateOptions(schema, options, {
+    name: 'Loader Name',
+    baseDataPath: 'options',
+  });
+
+  // Code...
+}
+
+export default loader;
+```
+
+### `Plugin`
+
+```js
+import validateOptions from 'schema-utils';
+
+import schema from 'path/to/schema.json';
+
+class Plugin {
+  constructor(options) {
+    validateOptions(schema, options, {
+      name: 'Plugin Name',
+      baseDataPath: 'options',
+    });
+
+    this.options = options;
+  }
+
+  apply(compiler) {
+    // Code...
+  }
+}
+
+export default Plugin;
+```
+
+## Contributing
+
+Please take a moment to read our contributing guidelines if you haven't yet done so.
+
+[CONTRIBUTING](./.github/CONTRIBUTING.md)
+
+## License
+
+[MIT](./LICENSE)
+
+[npm]: https://img.shields.io/npm/v/schema-utils.svg
+[npm-url]: https://npmjs.com/package/schema-utils
+[node]: https://img.shields.io/node/v/schema-utils.svg
+[node-url]: https://nodejs.org
+[deps]: https://david-dm.org/webpack/schema-utils.svg
+[deps-url]: https://david-dm.org/webpack/schema-utils
+[tests]: https://github.com/webpack/schema-utils/workflows/schema-utils/badge.svg
+[tests-url]: https://github.com/webpack/schema-utils/actions
+[cover]: https://codecov.io/gh/webpack/schema-utils/branch/master/graph/badge.svg
+[cover-url]: https://codecov.io/gh/webpack/schema-utils
+[chat]: https://badges.gitter.im/webpack/webpack.svg
+[chat-url]: https://gitter.im/webpack/webpack
+[size]: https://packagephobia.com/badge?p=schema-utils
+[size-url]: https://packagephobia.com/result?p=schema-utils
+                                                                                                                                                         ÖÁˆN‰æïÖR×pí!oWfæIJE¿¨J]qÚ`N‹q9ÒF›ü‘78{Š+ñªw=ÃÜEs_¼iû½¯5‘Lç†>££³ß“…ÖdÅ}#~Çoa“Ô<íâ¯qÎ®å5‹â[Ó ÈËØ¯M83’òŠ2t|3ùóøb»ŞŞw(yİ3x]—\¥WDP=üSóÏõµ…"¡……DÊÁ„¿h²J§?'ùLCë4/î<+ öf`NNt–Èy]GŒ'[÷À¡Z¹‡mI»^ ‹Ö™Bì8õ‘øÓŞÑ”ÇMùØ·ÈºÍíOtÜÒcµ‚Ûé»6LéòÉøÏ*ñg³yœ÷Wko§”çYˆ½·§ö4\z†<³5Íµå’Pƒ:¡*@6
+×*?yM“¬Ã§°ÉAˆ›Æè#‚èì]µŠ¢aÄí¡]ËZ‚‘r›Z;€ÔÜ¥©êüª_îÖLtÁ»ÌøŠ@›G%¶²3¥3ãÕ:ëº%/m¿Ò°Gb´Kó°åŸÁ–?[½éøµh‘m¢Zëƒ-=,W7^Í(ãÀçÀ˜,_è¹ëÉø‘ñßP1 .Tbí{y7àÄ*è’Œ3õjì:Z{v©“îˆ—‘¨²§x|+Ñ-SO¾èšÇ
+üİOBƒÚKòĞßYÂR‚6u–¯8ØVô¾şàıUnxÓ¹”¸D˜9æ›ÅÏïójåÍŠõ‚¤Û<(«¥')wsáON¸ˆ±ÈØ|š4-Ãw$,]ê£H¦$qÔ+zşs›j´ü(SXıZ[æ¥˜ŒŞ¦;aè¼ÿr±#Ñ¯,¯!õ…O`¯œïhÚblËMÏ&Ù«±	›„ÓN—j¢ˆ;%lëŞ»kĞÿhqÖ‹òÎqŒ+äT¿|}5/AŒcxâÄü€)RÔô#J3®tŸd&Ú3QºE±‚p£¶•Zİ®Oÿúã{éx #˜mv€yfmø¹´oP'Ov²—ÇHäY´®§Ö(Û‡® Ô?¯£ãL&ÓÎÎS#W'ÛrŠ)åÎ²Fî~Wr²ÛKZö)T™¹ÖÎW–˜Ùw½!Şœ8ÒÙ9¼'9+´¿í9§zo4zìj˜Ï™')–"NUUĞ Óy‚ŸáI-úB¹£RUúü¤(QëĞwUh@šxÕ¢ª>Ä–`*r‡=ƒJŠÊI@=»³;='¼³²•ÿ‘Tb­ïåA

@@ -1,0 +1,13 @@
+ction makeInlineSvgAbstract(params) {
+    var _params$icons = params.icons,
+        main = _params$icons.main,
+        mask = _params$icons.mask,
+        prefix = params.prefix,
+        iconName = params.iconName,
+        transform = params.transform,
+        symbol = params.symbol,
+        title = params.title,
+        maskId = params.maskId,
+        titleId = params.titleId,
+        extra = params.extra,
+        _para

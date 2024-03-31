@@ -1,0 +1,13 @@
+{
+  "--*": {
+    "syntax": "<declaration-value>",
+    "media": "all",
+    "inherited": true,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Variables"
+    ],
+    "initial": "seeProse",
+    "appliesto": "allElements",
+ 

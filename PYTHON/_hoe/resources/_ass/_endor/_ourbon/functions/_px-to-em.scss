@@ -1,0 +1,13 @@
+'use strict';
+
+var applyReviver = require('../doc/applyReviver.js');
+var identity = require('./identity.js');
+var toJS = require('./toJS.js');
+
+class NodeBase {
+    constructor(type) {
+        Object.defineProperty(this, identity.NODE_TYPE, { value: type });
+    }
+    /** Create a copy of this node.  */
+    clone() {
+        const copy = Object.create(Object.getPrototypeOf(thi

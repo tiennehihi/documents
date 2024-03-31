@@ -1,0 +1,30 @@
+;
+            return token = getIdentifierToken();
+          }
+          error2(Diagnostics.Invalid_character);
+          pos++;
+          return token = 0 /* Unknown */;
+        case 35 /* hash */:
+          if (pos !== 0 && text[pos + 1] === "!") {
+            error2(Diagnostics.can_only_be_used_at_the_start_of_a_file);
+            pos++;
+            return token = 0 /* Unknown */;
+          }
+          const charAfterHash = codePointAt(text, pos + 1);
+          if (charAfterHash === 92 /* backslash */) {
+            pos++;
+            const extendedCookedChar2 = peekExtendedUnicodeEscape();
+            if (extendedCookedChar2 >= 0 && isIdentifierStart(extendedCookedChar2, languageVersion)) {
+              pos += 3;
+              tokenFlags |= 8 /* ExtendedUnicodeEscape */;
+              tokenValue = "#" + scanExtendedUnicodeEscape() + scanIdentifierParts();
+              return token = 81 /* PrivateIdentifier */;
+            }
+            const cookedChar2 = peekUnicodeEscape();
+            if (cookedChar2 >= 0 && isIdentifierStart(cookedChar2, languageVersion)) {
+              pos += 6;
+              tokenFlags |= 1024 /* UnicodeEscape */;
+              tokenValue = "#" + String.fromCharCode(cookedChar2) + scanIdentifierParts();
+              return token = 81 /* PrivateIdentifier */;
+            }
+      

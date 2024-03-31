@@ -1,0 +1,30 @@
+racter == Marker.SEMICOLON
+      && level == Level.RULE
+      && propertyToken
+      && isBufferEmpty
+      && isVariable
+      && !propertyToken[2]) {
+      // semicolon after empty variable value at rule level, e.g. a{--color: ;<--
+      propertyToken.push([Token.PROPERTY_VALUE, ' ', [originalMetadata(metadata, ' ', externalContext)]]);
+      isVariable = false;
+      propertyToken = null;
+      seekingValue = false;
+    } else if (character == Marker.SEMICOLON && level == Level.RULE && propertyToken && isBufferEmpty) {
+      // semicolon after bracketed value at rule level, e.g. a{color:rgb(...);<--
+      propertyToken = null;
+      seekingValue = false;
+    } else if (character == Marker.SEMICOLON
+      && level == Level.RULE
+      && !isBufferEmpty
+      && buffer[0] == Marker.AT) {
+      // semicolon for at-rule at rule level, e.g. a{@apply(--variable);<--
+      serializedBuffer = buffer.join('');
+      newTokens.push([
+        Token.AT_RULE,
+        serializedBuffer,
+        [originalMetadata(metadata, serializedBuffer, externalContext)]
+      ]);
+
+      seekingValue = false;
+      buffer = [];
+      isBufferEmpt

@@ -1,0 +1,13 @@
+om/http-party/node-http-proxy/commit/79f7f99528661162ae4153856888f078f666e017)
+- [fix] minor [`7599cee`](https://github.com/http-party/node-http-proxy/commit/7599cee3fd03a5ce645e313f35557a41c9ac1aee)
+- [tests] added HTTPS to HTTPS test [`31d919b`](https://github.com/http-party/node-http-proxy/commit/31d919b0a3d0b7f574e88fc5eed093c6b1a53548)
+- [feature] started working on error propagation, kinda sucks, gotta think it over [`9ab8749`](https://github.com/http-party/node-http-proxy/commit/9ab8749a9bec33b49c495975e8364336ad7be1a3)
+- [test] testing the onResponse proxy method [`27df8d7`](https://github.com/http-party/node-http-proxy/commit/27df8d72ad86d02cfce00a6e5c183d93dd50f97e)
+- [fix] remove duplicate [`10c0f11`](https://github.com/http-party/node-http-proxy/commit/10c0f11b68e39552051e508c7bf20d65d2d59177)
+- [tests] add more tests [`cedc5c4`](https://github.com/http-party/node-http-proxy/commit/cedc5c4bd2059585e1222ec4f03f09e8bcc808fc)
+- [docs] Update readme with more how to [`ae0faef`](https://github.com/http-party/node-http-proxy/commit/ae0faef5aa0080d742a9740f9cb38bfd54b7d97e)
+- [tests] added test for socket.io proxying [`10a0db4`](https://github.com/http-party/node-http-proxy/commit/10a0db4f0dd4594839f9098b9d67130085a067bc)
+- [tests] added test HTTPS to HTTP using own server [`bbe3bfd`](https://github.com/http-party/node-http-proxy/commit/bbe3bfdf98255b82a185a798ff9f29e74615b6ca)
+- [examples] update the error-handling example using the new error handle way [`a1b25a1`](https://github.com/http-party/node-http-proxy/commit/a1b25a123b4ff71e731f9beb27c5e078acfead65)
+- [fix] quote [`c4ddc4e`](https://github.com/http-party/node-http-proxy/commit/c4ddc4edd324d9910a11eea14561a0e3b953f29c)
+- ENH: updated README and added examples file. [`07091b5`](https://github.com/http-party/node-http-proxy/commit/07091b507

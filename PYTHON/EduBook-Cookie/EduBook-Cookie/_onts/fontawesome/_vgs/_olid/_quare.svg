@@ -1,0 +1,8 @@
+export default function _importDeferProxy(e) {
+  var t = null,
+    constValue = function constValue(e) {
+      return function () {
+        return e;
+      };
+    },
+    proxy = functio

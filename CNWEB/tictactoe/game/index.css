@@ -1,0 +1,17 @@
+.user-profiles {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.reset {
+    margin-top: 20px;
+    padding: 4px 8px;
+    border: 1px solid #000;
+    border-radius: 4px;
+}
+
+.name-winner {
+    margin-top: 20px;
+}

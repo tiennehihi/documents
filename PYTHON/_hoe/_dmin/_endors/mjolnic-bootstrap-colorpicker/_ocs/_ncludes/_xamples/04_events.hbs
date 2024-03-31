@@ -1,0 +1,8 @@
+Attribute(parseJsxAttributeName(), parseJsxAttributeValue()), pos);
+  }
+  function parseJsxAttributeValue() {
+    if (token() === 64 /* EqualsToken */) {
+      if (scanJsxAttributeValue() === 11 /* StringLiteral */) {
+        return parseLiteralNode();
+      }
+  

@@ -1,0 +1,6 @@
+argv, key.split('.')))
+                setArg(key, 0);
+        });
+        if (notFlagsOption && notFlags.length)
+            argv[notFlagsArgv] = [];
+       

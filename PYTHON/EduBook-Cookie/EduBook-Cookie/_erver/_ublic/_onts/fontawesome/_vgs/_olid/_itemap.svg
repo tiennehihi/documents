@@ -1,0 +1,42 @@
+- 5.10.2
+    - 6.0.0-beta1
+    - 6.0.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: certificate
+  unicode: f0a3
+  voted: false
+chair:
+  aliases:
+    unicodes:
+      composite:
+        - 1fa91
+      secondary:
+        - 10f6c0
+  changes:
+    - 5.4.0
+    - 5.11.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Chair
+  unicode: f6c0
+  voted: true
+chalkboard:
+  aliases:
+    names:
+      - blackboard
+    unicodes:
+      secondar

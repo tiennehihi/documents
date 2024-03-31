@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ValueScope = exports.ValueScopeName = exports.Scope = exports.varKinds = exports.UsedValueState = void 0;
+const code_1 = require("./code");
+class ValueError extends Error {
+    constructor(name) {
+        super(`CodeGen: "code" for ${name} not defined`);
+        this.value = name.value;
+    }
+}
+var UsedValueState;
+(function (UsedValueState) {
+    UsedValueState[UsedVa

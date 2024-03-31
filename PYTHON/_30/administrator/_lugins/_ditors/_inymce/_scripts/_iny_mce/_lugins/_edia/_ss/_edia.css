@@ -1,0 +1,28 @@
+/* description: Parses expressions. */
+
+/* lexical grammar */
+%lex
+
+%options case-insensitive
+
+%%
+\s+                                             /* skip whitespace */
+
+(\-(webkit|moz)\-)?calc\b                       return 'CALC';
+
+[a-z][a-z0-9-]*\s*\((?:(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\([^)]*\)|[^\(\)]*)*\)     return 'FUNCTION';
+
+"*"                                             return 'MUL';
+"/"                                             return 'DIV';
+"+"                                             return 'ADD';
+"-"                                             return 'SUB';
+
+(([0-9]+("."[0-9]+)?|"."[0-9]+)(e(\+|-)[0-9]+)?)em\b              return 'EMS';
+(([0-9]+("."[0-9]+)?|"."[0-9]+)(e(\+|-)[0-9]+)?)ex\b              return 'EXS';
+(([0-9]+("."[0-9]+)?|"."[0-9]+)(e(\+|-)[0-9]+)?)ch\b              return 'CHS';
+(([0-9]+("."[0-9]+)?|"."[0-9]+)(e(\+|-)[0-9]+)?)rem\b             return 'REMS';
+(([0-9]+("."[0-9]+)?|"."[0-9]+)(e(\+|-)[0-9]+)?)vw\b              return 'VWS';
+(([0-9]+("."[0-9]+)?|"."[0-9]+)(e(\+|-)[0-9]+)?)vh\b              return 'VHS';
+(([0-9]+("."[0-9]+)?|"."[0-9]+)(e(\+|-)[0-9]+)?)vmin\b            return 'VMINS';
+(([0-9]+("."[0-9]+)?|"."[0-9]+)(e(\+|-)[0-9]+)?)vmax\b            return 'VMAXS';
+(([0-9]+("."[0-9]+)?|"."[0-9]+)(e(\+|-)[0-9]+)?)cm\b          

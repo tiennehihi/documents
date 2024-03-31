@@ -1,0 +1,11 @@
+var TYPE = require('../../tokenizer').TYPE;
+
+var DELIM = TYPE.Delim;
+var IDENT = TYPE.Ident;
+var DIMENSION = TYPE.Dimension;
+var PERCENTAGE = TYPE.Percentage;
+var NUMBER = TYPE.Number;
+var HASH = TYPE.Hash;
+var COLON = TYPE.Colon;
+var LEFTSQUAREBRACKET = TYPE.LeftSquareBracket;
+var NUMBERSIGN = 0x0023;      // U+0023 NUM

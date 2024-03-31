@@ -1,0 +1,2987 @@
+
+    if (moduleInfo.exportEquals) {
+      return statements;
+    }
+    for (const decl of node.declarationList.declarations) {
+      if (decl.initializer || exportSelf) {
+        statements = appendExportsOfBindingElement(statements, decl, exportSelf);
+      }
+    }
+    return statements;
+  }
+  function appendExportsOfBindingElement(statements, decl, exportSelf) {
+    if (moduleInfo.exportEquals) {
+      return statements;
+    }
+    if (isBindingPattern(decl.name)) {
+      for (const element of decl.name.elements) {
+        if (!isOmittedExpression(element)) {
+          statements = appendExportsOfBindingElement(statements, element, exportSelf);
+        }
+      }
+    } else if (!isGeneratedIdentifier(decl.name)) {
+      let excludeName;
+      if (exportSelf) {
+        statements = appendExportStatement(statements, decl.name, factory2.getLocalName(decl));
+        excludeName = idText(decl.name);
+      }
+      statements = appendExportsOfDeclaration(statements, decl, excludeName);
+    }
+    return statements;
+  }
+  function appendExportsOfHoistedDeclaration(statements, decl) {
+    if (moduleInfo.exportEquals) {
+      return statements;
+    }
+    let excludeName;
+    if (hasSyntacticModifier(decl, 32 /* Export */)) {
+      const exportName = hasSyntacticModifier(decl, 2048 /* Default */) ? factory2.createStringLiteral("default") : decl.name;
+      statements = appendExportStatement(statements, exportName, factory2.getLocalName(decl));
+      excludeName = getTextOfIdentifierOrLiteral(exportName);
+    }
+    if (decl.name) {
+      statements = appendExportsOfDeclaration(statements, decl, excludeName);
+    }
+    return statements;
+  }
+  function appendExportsOfDeclaration(statements, decl, excludeName) {
+    if (moduleInfo.exportEquals) {
+      return statements;
+    }
+    const name = factory2.getDeclarationName(decl);
+    const exportSpecifiers = moduleInfo.exportSpecifiers.get(name);
+    if (exportSpecifiers) {
+      for (const exportSpecifier of exportSpecifiers) {
+        if (exportSpecifier.name.escapedText !== excludeName) {
+          statements = appendExportStatement(statements, exportSpecifier.name, name);
+        }
+      }
+    }
+    return statements;
+  }
+  function appendExportStatement(statements, exportName, expression, allowComments) {
+    statements = append(statements, createExportStatement(exportName, expression, allowComments));
+    return statements;
+  }
+  function createExportStatement(name, value, allowComments) {
+    const statement = factory2.createExpressionStatement(createExportExpression(name, value));
+    startOnNewLine(statement);
+    if (!allowComments) {
+      setEmitFlags(statement, 3072 /* NoComments */);
+    }
+    return statement;
+  }
+  function createExportExpression(name, value) {
+    const exportName = isIdentifier(name) ? factory2.createStringLiteralFromNode(name) : name;
+    setEmitFlags(value, getEmitFlags(value) | 3072 /* NoComments */);
+    return setCommentRange(factory2.createCallExpression(
+      exportFunction,
+      /*typeArguments*/
+      void 0,
+      [exportName, value]
+    ), value);
+  }
+  function topLevelNestedVisitor(node) {
+    switch (node.kind) {
+      case 243 /* VariableStatement */:
+        return visitVariableStatement(node);
+      case 262 /* FunctionDeclaration */:
+        return visitFunctionDeclaration(node);
+      case 263 /* ClassDeclaration */:
+        return visitClassDeclaration(node);
+      case 248 /* ForStatement */:
+        return visitForStatement(
+          node,
+          /*isTopLevel*/
+          true
+        );
+      case 249 /* ForInStatement */:
+        return visitForInStatement(node);
+      case 250 /* ForOfStatement */:
+        return visitForOfStatement(node);
+      case 246 /* DoStatement */:
+        return visitDoStatement(node);
+      case 247 /* WhileStatement */:
+        return visitWhileStatement(node);
+      case 256 /* LabeledStatement */:
+        return visitLabeledStatement(node);
+      case 254 /* WithStatement */:
+        return visitWithStatement(node);
+      case 245 /* IfStatement */:
+        return visitIfStatement(node);
+      case 255 /* SwitchStatement */:
+        return visitSwitchStatement(node);
+      case 269 /* CaseBlock */:
+        return visitCaseBlock(node);
+      case 296 /* CaseClause */:
+        return visitCaseClause(node);
+      case 297 /* DefaultClause */:
+        return visitDefaultClause(node);
+      case 258 /* TryStatement */:
+        return visitTryStatement(node);
+      case 299 /* CatchClause */:
+        return visitCatchClause(node);
+      case 241 /* Block */:
+        return visitBlock(node);
+      default:
+        return visitor(node);
+    }
+  }
+  function visitForStatement(node, isTopLevel) {
+    const savedEnclosingBlockScopedContainer = enclosingBlockScopedContainer;
+    enclosingBlockScopedContainer = node;
+    node = factory2.updateForStatement(
+      node,
+      visitNode(node.initializer, isTopLevel ? visitForInitializer : discardedValueVisitor, isForInitializer),
+      visitNode(node.condition, visitor, isExpression),
+      visitNode(node.incrementor, discardedValueVisitor, isExpression),
+      visitIterationBody(node.statement, isTopLevel ? topLevelNestedVisitor : visitor, context)
+    );
+    enclosingBlockScopedContainer = savedEnclosingBlockScopedContainer;
+    return node;
+  }
+  function visitForInStatement(node) {
+    const savedEnclosingBlockScopedContainer = enclosingBlockScopedContainer;
+    enclosingBlockScopedContainer = node;
+    node = factory2.updateForInStatement(
+      node,
+      visitForInitializer(node.initializer),
+      visitNode(node.expression, visitor, isExpression),
+      visitIterationBody(node.statement, topLevelNestedVisitor, context)
+    );
+    enclosingBlockScopedContainer = savedEnclosingBlockScopedContainer;
+    return node;
+  }
+  function visitForOfStatement(node) {
+    const savedEnclosingBlockScopedContainer = enclosingBlockScopedContainer;
+    enclosingBlockScopedContainer = node;
+    node = factory2.updateForOfStatement(
+      node,
+      node.awaitModifier,
+      visitForInitializer(node.initializer),
+      visitNode(node.expression, visitor, isExpression),
+      visitIterationBody(node.statement, topLevelNestedVisitor, context)
+    );
+    enclosingBlockScopedContainer = savedEnclosingBlockScopedContainer;
+    return node;
+  }
+  function shouldHoistForInitializer(node) {
+    return isVariableDeclarationList(node) && shouldHoistVariableDeclarationList(node);
+  }
+  function visitForInitializer(node) {
+    if (shouldHoistForInitializer(node)) {
+      let expressions;
+      for (const variable of node.declarations) {
+        expressions = append(expressions, transformInitializedVariable(
+          variable,
+          /*isExportedDeclaration*/
+          false
+        ));
+        if (!variable.initializer) {
+          hoistBindingElement(variable);
+        }
+      }
+      return expressions ? factory2.inlineExpressions(expressions) : factory2.createOmittedExpression();
+    } else {
+      return visitNode(node, discardedValueVisitor, isForInitializer);
+    }
+  }
+  function visitDoStatement(node) {
+    return factory2.updateDoStatement(
+      node,
+      visitIterationBody(node.statement, topLevelNestedVisitor, context),
+      visitNode(node.expression, visitor, isExpression)
+    );
+  }
+  function visitWhileStatement(node) {
+    return factory2.updateWhileStatement(
+      node,
+      visitNode(node.expression, visitor, isExpression),
+      visitIterationBody(node.statement, topLevelNestedVisitor, context)
+    );
+  }
+  function visitLabeledStatement(node) {
+    return factory2.updateLabeledStatement(
+      node,
+      node.label,
+      Debug.checkDefined(visitNode(node.statement, topLevelNestedVisitor, isStatement, factory2.liftToBlock))
+    );
+  }
+  function visitWithStatement(node) {
+    return factory2.updateWithStatement(
+      node,
+      visitNode(node.expression, visitor, isExpression),
+      Debug.checkDefined(visitNode(node.statement, topLevelNestedVisitor, isStatement, factory2.liftToBlock))
+    );
+  }
+  function visitIfStatement(node) {
+    return factory2.updateIfStatement(
+      node,
+      visitNode(node.expression, visitor, isExpression),
+      Debug.checkDefined(visitNode(node.thenStatement, topLevelNestedVisitor, isStatement, factory2.liftToBlock)),
+      visitNode(node.elseStatement, topLevelNestedVisitor, isStatement, factory2.liftToBlock)
+    );
+  }
+  function visitSwitchStatement(node) {
+    return factory2.updateSwitchStatement(
+      node,
+      visitNode(node.expression, visitor, isExpression),
+      Debug.checkDefined(visitNode(node.caseBlock, topLevelNestedVisitor, isCaseBlock))
+    );
+  }
+  function visitCaseBlock(node) {
+    const savedEnclosingBlockScopedContainer = enclosingBlockScopedContainer;
+    enclosingBlockScopedContainer = node;
+    node = factory2.updateCaseBlock(
+      node,
+      visitNodes2(node.clauses, topLevelNestedVisitor, isCaseOrDefaultClause)
+    );
+    enclosingBlockScopedContainer = savedEnclosingBlockScopedContainer;
+    return node;
+  }
+  function visitCaseClause(node) {
+    return factory2.updateCaseClause(
+      node,
+      visitNode(node.expression, visitor, isExpression),
+      visitNodes2(node.statements, topLevelNestedVisitor, isStatement)
+    );
+  }
+  function visitDefaultClause(node) {
+    return visitEachChild(node, topLevelNestedVisitor, context);
+  }
+  function visitTryStatement(node) {
+    return visitEachChild(node, topLevelNestedVisitor, context);
+  }
+  function visitCatchClause(node) {
+    const savedEnclosingBlockScopedContainer = enclosingBlockScopedContainer;
+    enclosingBlockScopedContainer = node;
+    node = factory2.updateCatchClause(
+      node,
+      node.variableDeclaration,
+      Debug.checkDefined(visitNode(node.block, topLevelNestedVisitor, isBlock))
+    );
+    enclosingBlockScopedContainer = savedEnclosingBlockScopedContainer;
+    return node;
+  }
+  function visitBlock(node) {
+    const savedEnclosingBlockScopedContainer = enclosingBlockScopedContainer;
+    enclosingBlockScopedContainer = node;
+    node = visitEachChild(node, topLevelNestedVisitor, context);
+    enclosingBlockScopedContainer = savedEnclosingBlockScopedContainer;
+    return node;
+  }
+  function visitorWorker(node, valueIsDiscarded) {
+    if (!(node.transformFlags & (4096 /* ContainsDestructuringAssignment */ | 8388608 /* ContainsDynamicImport */ | 268435456 /* ContainsUpdateExpressionForIdentifier */))) {
+      return node;
+    }
+    switch (node.kind) {
+      case 248 /* ForStatement */:
+        return visitForStatement(
+          node,
+          /*isTopLevel*/
+          false
+        );
+      case 244 /* ExpressionStatement */:
+        return visitExpressionStatement(node);
+      case 217 /* ParenthesizedExpression */:
+        return visitParenthesizedExpression(node, valueIsDiscarded);
+      case 360 /* PartiallyEmittedExpression */:
+        return visitPartiallyEmittedExpression(node, valueIsDiscarded);
+      case 226 /* BinaryExpression */:
+        if (isDestructuringAssignment(node)) {
+          return visitDestructuringAssignment(node, valueIsDiscarded);
+        }
+        break;
+      case 213 /* CallExpression */:
+        if (isImportCall(node)) {
+          return visitImportCallExpression(node);
+        }
+        break;
+      case 224 /* PrefixUnaryExpression */:
+      case 225 /* PostfixUnaryExpression */:
+        return visitPrefixOrPostfixUnaryExpression(node, valueIsDiscarded);
+    }
+    return visitEachChild(node, visitor, context);
+  }
+  function visitor(node) {
+    return visitorWorker(
+      node,
+      /*valueIsDiscarded*/
+      false
+    );
+  }
+  function discardedValueVisitor(node) {
+    return visitorWorker(
+      node,
+      /*valueIsDiscarded*/
+      true
+    );
+  }
+  function visitExpressionStatement(node) {
+    return factory2.updateExpressionStatement(node, visitNode(node.expression, discardedValueVisitor, isExpression));
+  }
+  function visitParenthesizedExpression(node, valueIsDiscarded) {
+    return factory2.updateParenthesizedExpression(node, visitNode(node.expression, valueIsDiscarded ? discardedValueVisitor : visitor, isExpression));
+  }
+  function visitPartiallyEmittedExpression(node, valueIsDiscarded) {
+    return factory2.updatePartiallyEmittedExpression(node, visitNode(node.expression, valueIsDiscarded ? discardedValueVisitor : visitor, isExpression));
+  }
+  function visitImportCallExpression(node) {
+    const externalModuleName = getExternalModuleNameLiteral(factory2, node, currentSourceFile, host, resolver, compilerOptions);
+    const firstArgument = visitNode(firstOrUndefined(node.arguments), visitor, isExpression);
+    const argument = externalModuleName && (!firstArgument || !isStringLiteral(firstArgument) || firstArgument.text !== externalModuleName.text) ? externalModuleName : firstArgument;
+    return factory2.createCallExpression(
+      factory2.createPropertyAccessExpression(
+        contextObject,
+        factory2.createIdentifier("import")
+      ),
+      /*typeArguments*/
+      void 0,
+      argument ? [argument] : []
+    );
+  }
+  function visitDestructuringAssignment(node, valueIsDiscarded) {
+    if (hasExportedReferenceInDestructuringTarget(node.left)) {
+      return flattenDestructuringAssignment(
+        node,
+        visitor,
+        context,
+        0 /* All */,
+        !valueIsDiscarded
+      );
+    }
+    return visitEachChild(node, visitor, context);
+  }
+  function hasExportedReferenceInDestructuringTarget(node) {
+    if (isAssignmentExpression(
+      node,
+      /*excludeCompoundAssignment*/
+      true
+    )) {
+      return hasExportedReferenceInDestructuringTarget(node.left);
+    } else if (isSpreadElement(node)) {
+      return hasExportedReferenceInDestructuringTarget(node.expression);
+    } else if (isObjectLiteralExpression(node)) {
+      return some(node.properties, hasExportedReferenceInDestructuringTarget);
+    } else if (isArrayLiteralExpression(node)) {
+      return some(node.elements, hasExportedReferenceInDestructuringTarget);
+    } else if (isShorthandPropertyAssignment(node)) {
+      return hasExportedReferenceInDestructuringTarget(node.name);
+    } else if (isPropertyAssignment(node)) {
+      return hasExportedReferenceInDestructuringTarget(node.initializer);
+    } else if (isIdentifier(node)) {
+      const container = resolver.getReferencedExportContainer(node);
+      return container !== void 0 && container.kind === 312 /* SourceFile */;
+    } else {
+      return false;
+    }
+  }
+  function visitPrefixOrPostfixUnaryExpression(node, valueIsDiscarded) {
+    if ((node.operator === 46 /* PlusPlusToken */ || node.operator === 47 /* MinusMinusToken */) && isIdentifier(node.operand) && !isGeneratedIdentifier(node.operand) && !isLocalName(node.operand) && !isDeclarationNameOfEnumOrNamespace(node.operand)) {
+      const exportedNames = getExports(node.operand);
+      if (exportedNames) {
+        let temp;
+        let expression = visitNode(node.operand, visitor, isExpression);
+        if (isPrefixUnaryExpression(node)) {
+          expression = factory2.updatePrefixUnaryExpression(node, expression);
+        } else {
+          expression = factory2.updatePostfixUnaryExpression(node, expression);
+          if (!valueIsDiscarded) {
+            temp = factory2.createTempVariable(hoistVariableDeclaration);
+            expression = factory2.createAssignment(temp, expression);
+            setTextRange(expression, node);
+          }
+          expression = factory2.createComma(expression, factory2.cloneNode(node.operand));
+          setTextRange(expression, node);
+        }
+        for (const exportName of exportedNames) {
+          expression = createExportExpression(exportName, preventSubstitution(expression));
+        }
+        if (temp) {
+          expression = factory2.createComma(expression, temp);
+          setTextRange(expression, node);
+        }
+        return expression;
+      }
+    }
+    return visitEachChild(node, visitor, context);
+  }
+  function modifierVisitor(node) {
+    switch (node.kind) {
+      case 95 /* ExportKeyword */:
+      case 90 /* DefaultKeyword */:
+        return void 0;
+    }
+    return node;
+  }
+  function onEmitNode(hint, node, emitCallback) {
+    if (node.kind === 312 /* SourceFile */) {
+      const id = getOriginalNodeId(node);
+      currentSourceFile = node;
+      moduleInfo = moduleInfoMap[id];
+      exportFunction = exportFunctionsMap[id];
+      noSubstitution = noSubstitutionMap[id];
+      contextObject = contextObjectMap[id];
+      if (noSubstitution) {
+        delete noSubstitutionMap[id];
+      }
+      previousOnEmitNode(hint, node, emitCallback);
+      currentSourceFile = void 0;
+      moduleInfo = void 0;
+      exportFunction = void 0;
+      contextObject = void 0;
+      noSubstitution = void 0;
+    } else {
+      previousOnEmitNode(hint, node, emitCallback);
+    }
+  }
+  function onSubstituteNode(hint, node) {
+    node = previousOnSubstituteNode(hint, node);
+    if (isSubstitutionPrevented(node)) {
+      return node;
+    }
+    if (hint === 1 /* Expression */) {
+      return substituteExpression(node);
+    } else if (hint === 4 /* Unspecified */) {
+      return substituteUnspecified(node);
+    }
+    return node;
+  }
+  function substituteUnspecified(node) {
+    switch (node.kind) {
+      case 304 /* ShorthandPropertyAssignment */:
+        return substituteShorthandPropertyAssignment(node);
+    }
+    return node;
+  }
+  function substituteShorthandPropertyAssignment(node) {
+    var _a, _b;
+    const name = node.name;
+    if (!isGeneratedIdentifier(name) && !isLocalName(name)) {
+      const importDeclaration = resolver.getReferencedImportDeclaration(name);
+      if (importDeclaration) {
+        if (isImportClause(importDeclaration)) {
+          return setTextRange(
+            factory2.createPropertyAssignment(
+              factory2.cloneNode(name),
+              factory2.createPropertyAccessExpression(
+                factory2.getGeneratedNameForNode(importDeclaration.parent),
+                factory2.createIdentifier("default")
+              )
+            ),
+            /*location*/
+            node
+          );
+        } else if (isImportSpecifier(importDeclaration)) {
+          return setTextRange(
+            factory2.createPropertyAssignment(
+              factory2.cloneNode(name),
+              factory2.createPropertyAccessExpression(
+                factory2.getGeneratedNameForNode(((_b = (_a = importDeclaration.parent) == null ? void 0 : _a.parent) == null ? void 0 : _b.parent) || importDeclaration),
+                factory2.cloneNode(importDeclaration.propertyName || importDeclaration.name)
+              )
+            ),
+            /*location*/
+            node
+          );
+        }
+      }
+    }
+    return node;
+  }
+  function substituteExpression(node) {
+    switch (node.kind) {
+      case 80 /* Identifier */:
+        return substituteExpressionIdentifier(node);
+      case 226 /* BinaryExpression */:
+        return substituteBinaryExpression(node);
+      case 236 /* MetaProperty */:
+        return substituteMetaProperty(node);
+    }
+    return node;
+  }
+  function substituteExpressionIdentifier(node) {
+    var _a, _b;
+    if (getEmitFlags(node) & 8192 /* HelperName */) {
+      const externalHelpersModuleName = getExternalHelpersModuleName(currentSourceFile);
+      if (externalHelpersModuleName) {
+        return factory2.createPropertyAccessExpression(externalHelpersModuleName, node);
+      }
+      return node;
+    }
+    if (!isGeneratedIdentifier(node) && !isLocalName(node)) {
+      const importDeclaration = resolver.getReferencedImportDeclaration(node);
+      if (importDeclaration) {
+        if (isImportClause(importDeclaration)) {
+          return setTextRange(
+            factory2.createPropertyAccessExpression(
+              factory2.getGeneratedNameForNode(importDeclaration.parent),
+              factory2.createIdentifier("default")
+            ),
+            /*location*/
+            node
+          );
+        } else if (isImportSpecifier(importDeclaration)) {
+          return setTextRange(
+            factory2.createPropertyAccessExpression(
+              factory2.getGeneratedNameForNode(((_b = (_a = importDeclaration.parent) == null ? void 0 : _a.parent) == null ? void 0 : _b.parent) || importDeclaration),
+              factory2.cloneNode(importDeclaration.propertyName || importDeclaration.name)
+            ),
+            /*location*/
+            node
+          );
+        }
+      }
+    }
+    return node;
+  }
+  function substituteBinaryExpression(node) {
+    if (isAssignmentOperator(node.operatorToken.kind) && isIdentifier(node.left) && (!isGeneratedIdentifier(node.left) || isFileLevelReservedGeneratedIdentifier(node.left)) && !isLocalName(node.left)) {
+      const exportedNames = getExports(node.left);
+      if (exportedNames) {
+        let expression = node;
+        for (const exportName of exportedNames) {
+          expression = createExportExpression(exportName, preventSubstitution(expression));
+        }
+        return expression;
+      }
+    }
+    return node;
+  }
+  function substituteMetaProperty(node) {
+    if (isImportMeta(node)) {
+      return factory2.createPropertyAccessExpression(contextObject, factory2.createIdentifier("meta"));
+    }
+    return node;
+  }
+  function getExports(name) {
+    let exportedNames;
+    const valueDeclaration = getReferencedDeclaration(name);
+    if (valueDeclaration) {
+      const exportContainer = resolver.getReferencedExportContainer(
+        name,
+        /*prefixLocals*/
+        false
+      );
+      if (exportContainer && exportContainer.kind === 312 /* SourceFile */) {
+        exportedNames = append(exportedNames, factory2.getDeclarationName(valueDeclaration));
+      }
+      exportedNames = addRange(exportedNames, moduleInfo == null ? void 0 : moduleInfo.exportedBindings[getOriginalNodeId(valueDeclaration)]);
+    } else if (isGeneratedIdentifier(name) && isFileLevelReservedGeneratedIdentifier(name)) {
+      const exportSpecifiers = moduleInfo == null ? void 0 : moduleInfo.exportSpecifiers.get(name);
+      if (exportSpecifiers) {
+        const exportedNames2 = [];
+        for (const exportSpecifier of exportSpecifiers) {
+          exportedNames2.push(exportSpecifier.name);
+        }
+        return exportedNames2;
+      }
+    }
+    return exportedNames;
+  }
+  function getReferencedDeclaration(name) {
+    if (!isGeneratedIdentifier(name)) {
+      const importDeclaration = resolver.getReferencedImportDeclaration(name);
+      if (importDeclaration)
+        return importDeclaration;
+      const valueDeclaration = resolver.getReferencedValueDeclaration(name);
+      if (valueDeclaration && (moduleInfo == null ? void 0 : moduleInfo.exportedBindings[getOriginalNodeId(valueDeclaration)]))
+        return valueDeclaration;
+      const declarations = resolver.getReferencedValueDeclarations(name);
+      if (declarations) {
+        for (const declaration of declarations) {
+          if (declaration !== valueDeclaration && (moduleInfo == null ? void 0 : moduleInfo.exportedBindings[getOriginalNodeId(declaration)]))
+            return declaration;
+        }
+      }
+      return valueDeclaration;
+    }
+  }
+  function preventSubstitution(node) {
+    if (noSubstitution === void 0)
+      noSubstitution = [];
+    noSubstitution[getNodeId(node)] = true;
+    return node;
+  }
+  function isSubstitutionPrevented(node) {
+    return noSubstitution && node.id && noSubstitution[node.id];
+  }
+}
+
+// src/compiler/transformers/module/esnextAnd2015.ts
+function transformECMAScriptModule(context) {
+  const {
+    factory: factory2,
+    getEmitHelperFactory: emitHelpers
+  } = context;
+  const host = context.getEmitHost();
+  const resolver = context.getEmitResolver();
+  const compilerOptions = context.getCompilerOptions();
+  const languageVersion = getEmitScriptTarget(compilerOptions);
+  const previousOnEmitNode = context.onEmitNode;
+  const previousOnSubstituteNode = context.onSubstituteNode;
+  context.onEmitNode = onEmitNode;
+  context.onSubstituteNode = onSubstituteNode;
+  context.enableEmitNotification(312 /* SourceFile */);
+  context.enableSubstitution(80 /* Identifier */);
+  let helperNameSubstitutions;
+  let currentSourceFile;
+  let importRequireStatements;
+  return chainBundle(context, transformSourceFile);
+  function transformSourceFile(node) {
+    if (node.isDeclarationFile) {
+      return node;
+    }
+    if (isExternalModule(node) || getIsolatedModules(compilerOptions)) {
+      currentSourceFile = node;
+      importRequireStatements = void 0;
+      let result = updateExternalModule(node);
+      currentSourceFile = void 0;
+      if (importRequireStatements) {
+        result = factory2.updateSourceFile(
+          result,
+          setTextRange(factory2.createNodeArray(insertStatementsAfterCustomPrologue(result.statements.slice(), importRequireStatements)), result.statements)
+        );
+      }
+      if (!isExternalModule(node) || getEmitModuleKind(compilerOptions) === 200 /* Preserve */ || some(result.statements, isExternalModuleIndicator)) {
+        return result;
+      }
+      return factory2.updateSourceFile(
+        result,
+        setTextRange(factory2.createNodeArray([...result.statements, createEmptyExports(factory2)]), result.statements)
+      );
+    }
+    return node;
+  }
+  function updateExternalModule(node) {
+    const externalHelpersImportDeclaration = createExternalHelpersImportDeclarationIfNeeded(factory2, emitHelpers(), node, compilerOptions);
+    if (externalHelpersImportDeclaration) {
+      const statements = [];
+      const statementOffset = factory2.copyPrologue(node.statements, statements);
+      append(statements, externalHelpersImportDeclaration);
+      addRange(statements, visitNodes2(node.statements, visitor, isStatement, statementOffset));
+      return factory2.updateSourceFile(
+        node,
+        setTextRange(factory2.createNodeArray(statements), node.statements)
+      );
+    } else {
+      return visitEachChild(node, visitor, context);
+    }
+  }
+  function visitor(node) {
+    switch (node.kind) {
+      case 271 /* ImportEqualsDeclaration */:
+        return getEmitModuleKind(compilerOptions) >= 100 /* Node16 */ ? visitImportEqualsDeclaration(node) : void 0;
+      case 277 /* ExportAssignment */:
+        return visitExportAssignment(node);
+      case 278 /* ExportDeclaration */:
+        const exportDecl = node;
+        return visitExportDeclaration(exportDecl);
+    }
+    return node;
+  }
+  function createRequireCall(importNode) {
+    const moduleName = getExternalModuleNameLiteral(factory2, importNode, Debug.checkDefined(currentSourceFile), host, resolver, compilerOptions);
+    const args = [];
+    if (moduleName) {
+      args.push(moduleName);
+    }
+    if (getEmitModuleKind(compilerOptions) === 200 /* Preserve */) {
+      return factory2.createCallExpression(
+        factory2.createIdentifier("require"),
+        /*typeArguments*/
+        void 0,
+        args
+      );
+    }
+    if (!importRequireStatements) {
+      const createRequireName = factory2.createUniqueName("_createRequire", 16 /* Optimistic */ | 32 /* FileLevel */);
+      const importStatement = factory2.createImportDeclaration(
+        /*modifiers*/
+        void 0,
+        factory2.createImportClause(
+          /*isTypeOnly*/
+          false,
+          /*name*/
+          void 0,
+          factory2.createNamedImports([
+            factory2.createImportSpecifier(
+              /*isTypeOnly*/
+              false,
+              factory2.createIdentifier("createRequire"),
+              createRequireName
+            )
+          ])
+        ),
+        factory2.createStringLiteral("module"),
+        /*attributes*/
+        void 0
+      );
+      const requireHelperName = factory2.createUniqueName("__require", 16 /* Optimistic */ | 32 /* FileLevel */);
+      const requireStatement = factory2.createVariableStatement(
+        /*modifiers*/
+        void 0,
+        factory2.createVariableDeclarationList(
+          [
+            factory2.createVariableDeclaration(
+              requireHelperName,
+              /*exclamationToken*/
+              void 0,
+              /*type*/
+              void 0,
+              factory2.createCallExpression(
+                factory2.cloneNode(createRequireName),
+                /*typeArguments*/
+                void 0,
+                [
+                  factory2.createPropertyAccessExpression(factory2.createMetaProperty(102 /* ImportKeyword */, factory2.createIdentifier("meta")), factory2.createIdentifier("url"))
+                ]
+              )
+            )
+          ],
+          /*flags*/
+          languageVersion >= 2 /* ES2015 */ ? 2 /* Const */ : 0 /* None */
+        )
+      );
+      importRequireStatements = [importStatement, requireStatement];
+    }
+    const name = importRequireStatements[1].declarationList.declarations[0].name;
+    Debug.assertNode(name, isIdentifier);
+    return factory2.createCallExpression(
+      factory2.cloneNode(name),
+      /*typeArguments*/
+      void 0,
+      args
+    );
+  }
+  function visitImportEqualsDeclaration(node) {
+    Debug.assert(isExternalModuleImportEqualsDeclaration(node), "import= for internal module references should be handled in an earlier transformer.");
+    let statements;
+    statements = append(
+      statements,
+      setOriginalNode(
+        setTextRange(
+          factory2.createVariableStatement(
+            /*modifiers*/
+            void 0,
+            factory2.createVariableDeclarationList(
+              [
+                factory2.createVariableDeclaration(
+                  factory2.cloneNode(node.name),
+                  /*exclamationToken*/
+                  void 0,
+                  /*type*/
+                  void 0,
+                  createRequireCall(node)
+                )
+              ],
+              /*flags*/
+              languageVersion >= 2 /* ES2015 */ ? 2 /* Const */ : 0 /* None */
+            )
+          ),
+          node
+        ),
+        node
+      )
+    );
+    statements = appendExportsOfImportEqualsDeclaration(statements, node);
+    return singleOrMany(statements);
+  }
+  function appendExportsOfImportEqualsDeclaration(statements, node) {
+    if (hasSyntacticModifier(node, 32 /* Export */)) {
+      statements = append(
+        statements,
+        factory2.createExportDeclaration(
+          /*modifiers*/
+          void 0,
+          node.isTypeOnly,
+          factory2.createNamedExports([factory2.createExportSpecifier(
+            /*isTypeOnly*/
+            false,
+            /*propertyName*/
+            void 0,
+            idText(node.name)
+          )])
+        )
+      );
+    }
+    return statements;
+  }
+  function visitExportAssignment(node) {
+    if (node.isExportEquals) {
+      if (getEmitModuleKind(compilerOptions) === 200 /* Preserve */) {
+        const statement = setOriginalNode(
+          factory2.createExpressionStatement(
+            factory2.createAssignment(
+              factory2.createPropertyAccessExpression(
+                factory2.createIdentifier("module"),
+                "exports"
+              ),
+              node.expression
+            )
+          ),
+          node
+        );
+        return statement;
+      }
+      return void 0;
+    }
+    return node;
+  }
+  function visitExportDeclaration(node) {
+    if (compilerOptions.module !== void 0 && compilerOptions.module > 5 /* ES2015 */) {
+      return node;
+    }
+    if (!node.exportClause || !isNamespaceExport(node.exportClause) || !node.moduleSpecifier) {
+      return node;
+    }
+    const oldIdentifier = node.exportClause.name;
+    const synthName = factory2.getGeneratedNameForNode(oldIdentifier);
+    const importDecl = factory2.createImportDeclaration(
+      /*modifiers*/
+      void 0,
+      factory2.createImportClause(
+        /*isTypeOnly*/
+        false,
+        /*name*/
+        void 0,
+        factory2.createNamespaceImport(
+          synthName
+        )
+      ),
+      node.moduleSpecifier,
+      node.attributes
+    );
+    setOriginalNode(importDecl, node.exportClause);
+    const exportDecl = isExportNamespaceAsDefaultDeclaration(node) ? factory2.createExportDefault(synthName) : factory2.createExportDeclaration(
+      /*modifiers*/
+      void 0,
+      /*isTypeOnly*/
+      false,
+      factory2.createNamedExports([factory2.createExportSpecifier(
+        /*isTypeOnly*/
+        false,
+        synthName,
+        oldIdentifier
+      )])
+    );
+    setOriginalNode(exportDecl, node);
+    return [importDecl, exportDecl];
+  }
+  function onEmitNode(hint, node, emitCallback) {
+    if (isSourceFile(node)) {
+      if ((isExternalModule(node) || getIsolatedModules(compilerOptions)) && compilerOptions.importHelpers) {
+        helperNameSubstitutions = /* @__PURE__ */ new Map();
+      }
+      previousOnEmitNode(hint, node, emitCallback);
+      helperNameSubstitutions = void 0;
+    } else {
+      previousOnEmitNode(hint, node, emitCallback);
+    }
+  }
+  function onSubstituteNode(hint, node) {
+    node = previousOnSubstituteNode(hint, node);
+    if (helperNameSubstitutions && isIdentifier(node) && getEmitFlags(node) & 8192 /* HelperName */) {
+      return substituteHelperName(node);
+    }
+    return node;
+  }
+  function substituteHelperName(node) {
+    const name = idText(node);
+    let substitution = helperNameSubstitutions.get(name);
+    if (!substitution) {
+      helperNameSubstitutions.set(name, substitution = factory2.createUniqueName(name, 16 /* Optimistic */ | 32 /* FileLevel */));
+    }
+    return substitution;
+  }
+}
+
+// src/compiler/transformers/module/node.ts
+function transformNodeModule(context) {
+  const previousOnSubstituteNode = context.onSubstituteNode;
+  const previousOnEmitNode = context.onEmitNode;
+  const esmTransform = transformECMAScriptModule(context);
+  const esmOnSubstituteNode = context.onSubstituteNode;
+  const esmOnEmitNode = context.onEmitNode;
+  context.onSubstituteNode = previousOnSubstituteNode;
+  context.onEmitNode = previousOnEmitNode;
+  const cjsTransform = transformModule(context);
+  const cjsOnSubstituteNode = context.onSubstituteNode;
+  const cjsOnEmitNode = context.onEmitNode;
+  context.onSubstituteNode = onSubstituteNode;
+  context.onEmitNode = onEmitNode;
+  context.enableSubstitution(312 /* SourceFile */);
+  context.enableEmitNotification(312 /* SourceFile */);
+  let currentSourceFile;
+  return transformSourceFileOrBundle;
+  function onSubstituteNode(hint, node) {
+    if (isSourceFile(node)) {
+      currentSourceFile = node;
+      return previousOnSubstituteNode(hint, node);
+    } else {
+      if (!currentSourceFile) {
+        return previousOnSubstituteNode(hint, node);
+      }
+      if (currentSourceFile.impliedNodeFormat === 99 /* ESNext */) {
+        return esmOnSubstituteNode(hint, node);
+      }
+      return cjsOnSubstituteNode(hint, node);
+    }
+  }
+  function onEmitNode(hint, node, emitCallback) {
+    if (isSourceFile(node)) {
+      currentSourceFile = node;
+    }
+    if (!currentSourceFile) {
+      return previousOnEmitNode(hint, node, emitCallback);
+    }
+    if (currentSourceFile.impliedNodeFormat === 99 /* ESNext */) {
+      return esmOnEmitNode(hint, node, emitCallback);
+    }
+    return cjsOnEmitNode(hint, node, emitCallback);
+  }
+  function getModuleTransformForFile(file) {
+    return file.impliedNodeFormat === 99 /* ESNext */ ? esmTransform : cjsTransform;
+  }
+  function transformSourceFile(node) {
+    if (node.isDeclarationFile) {
+      return node;
+    }
+    currentSourceFile = node;
+    const result = getModuleTransformForFile(node)(node);
+    currentSourceFile = void 0;
+    Debug.assert(isSourceFile(result));
+    return result;
+  }
+  function transformSourceFileOrBundle(node) {
+    return node.kind === 312 /* SourceFile */ ? transformSourceFile(node) : transformBundle(node);
+  }
+  function transformBundle(node) {
+    return context.factory.createBundle(map(node.sourceFiles, transformSourceFile), node.prepends);
+  }
+}
+
+// src/compiler/transformers/declarations/diagnostics.ts
+function canProduceDiagnostics(node) {
+  return isVariableDeclaration(node) || isPropertyDeclaration(node) || isPropertySignature(node) || isBindingElement(node) || isSetAccessor(node) || isGetAccessor(node) || isConstructSignatureDeclaration(node) || isCallSignatureDeclaration(node) || isMethodDeclaration(node) || isMethodSignature(node) || isFunctionDeclaration(node) || isParameter(node) || isTypeParameterDeclaration(node) || isExpressionWithTypeArguments(node) || isImportEqualsDeclaration(node) || isTypeAliasDeclaration(node) || isConstructorDeclaration(node) || isIndexSignatureDeclaration(node) || isPropertyAccessExpression(node) || isElementAccessExpression(node) || isBinaryExpression(node) || isJSDocTypeAlias(node);
+}
+function createGetSymbolAccessibilityDiagnosticForNodeName(node) {
+  if (isSetAccessor(node) || isGetAccessor(node)) {
+    return getAccessorNameVisibilityError;
+  } else if (isMethodSignature(node) || isMethodDeclaration(node)) {
+    return getMethodNameVisibilityError;
+  } else {
+    return createGetSymbolAccessibilityDiagnosticForNode(node);
+  }
+  function getAccessorNameVisibilityError(symbolAccessibilityResult) {
+    const diagnosticMessage = getAccessorNameVisibilityDiagnosticMessage(symbolAccessibilityResult);
+    return diagnosticMessage !== void 0 ? {
+      diagnosticMessage,
+      errorNode: node,
+      typeName: node.name
+    } : void 0;
+  }
+  function getAccessorNameVisibilityDiagnosticMessage(symbolAccessibilityResult) {
+    if (isStatic(node)) {
+      return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Public_static_property_0_of_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Public_static_property_0_of_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Public_static_property_0_of_exported_class_has_or_is_using_private_name_1;
+    } else if (node.parent.kind === 263 /* ClassDeclaration */) {
+      return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Public_property_0_of_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Public_property_0_of_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Public_property_0_of_exported_class_has_or_is_using_private_name_1;
+    } else {
+      return symbolAccessibilityResult.errorModuleName ? Diagnostics.Property_0_of_exported_interface_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Property_0_of_exported_interface_has_or_is_using_private_name_1;
+    }
+  }
+  function getMethodNameVisibilityError(symbolAccessibilityResult) {
+    const diagnosticMessage = getMethodNameVisibilityDiagnosticMessage(symbolAccessibilityResult);
+    return diagnosticMessage !== void 0 ? {
+      diagnosticMessage,
+      errorNode: node,
+      typeName: node.name
+    } : void 0;
+  }
+  function getMethodNameVisibilityDiagnosticMessage(symbolAccessibilityResult) {
+    if (isStatic(node)) {
+      return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Public_static_method_0_of_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Public_static_method_0_of_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Public_static_method_0_of_exported_class_has_or_is_using_private_name_1;
+    } else if (node.parent.kind === 263 /* ClassDeclaration */) {
+      return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Public_method_0_of_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Public_method_0_of_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Public_method_0_of_exported_class_has_or_is_using_private_name_1;
+    } else {
+      return symbolAccessibilityResult.errorModuleName ? Diagnostics.Method_0_of_exported_interface_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Method_0_of_exported_interface_has_or_is_using_private_name_1;
+    }
+  }
+}
+function createGetSymbolAccessibilityDiagnosticForNode(node) {
+  if (isVariableDeclaration(node) || isPropertyDeclaration(node) || isPropertySignature(node) || isPropertyAccessExpression(node) || isElementAccessExpression(node) || isBinaryExpression(node) || isBindingElement(node) || isConstructorDeclaration(node)) {
+    return getVariableDeclarationTypeVisibilityError;
+  } else if (isSetAccessor(node) || isGetAccessor(node)) {
+    return getAccessorDeclarationTypeVisibilityError;
+  } else if (isConstructSignatureDeclaration(node) || isCallSignatureDeclaration(node) || isMethodDeclaration(node) || isMethodSignature(node) || isFunctionDeclaration(node) || isIndexSignatureDeclaration(node)) {
+    return getReturnTypeVisibilityError;
+  } else if (isParameter(node)) {
+    if (isParameterPropertyDeclaration(node, node.parent) && hasSyntacticModifier(node.parent, 2 /* Private */)) {
+      return getVariableDeclarationTypeVisibilityError;
+    }
+    return getParameterDeclarationTypeVisibilityError;
+  } else if (isTypeParameterDeclaration(node)) {
+    return getTypeParameterConstraintVisibilityError;
+  } else if (isExpressionWithTypeArguments(node)) {
+    return getHeritageClauseVisibilityError;
+  } else if (isImportEqualsDeclaration(node)) {
+    return getImportEntityNameVisibilityError;
+  } else if (isTypeAliasDeclaration(node) || isJSDocTypeAlias(node)) {
+    return getTypeAliasDeclarationVisibilityError;
+  } else {
+    return Debug.assertNever(node, `Attempted to set a declaration diagnostic context for unhandled node kind: ${Debug.formatSyntaxKind(node.kind)}`);
+  }
+  function getVariableDeclarationTypeVisibilityDiagnosticMessage(symbolAccessibilityResult) {
+    if (node.kind === 260 /* VariableDeclaration */ || node.kind === 208 /* BindingElement */) {
+      return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Exported_variable_0_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Exported_variable_0_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Exported_variable_0_has_or_is_using_private_name_1;
+    } else if (node.kind === 172 /* PropertyDeclaration */ || node.kind === 211 /* PropertyAccessExpression */ || node.kind === 212 /* ElementAccessExpression */ || node.kind === 226 /* BinaryExpression */ || node.kind === 171 /* PropertySignature */ || node.kind === 169 /* Parameter */ && hasSyntacticModifier(node.parent, 2 /* Private */)) {
+      if (isStatic(node)) {
+        return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Public_static_property_0_of_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Public_static_property_0_of_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Public_static_property_0_of_exported_class_has_or_is_using_private_name_1;
+      } else if (node.parent.kind === 263 /* ClassDeclaration */ || node.kind === 169 /* Parameter */) {
+        return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Public_property_0_of_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Public_property_0_of_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Public_property_0_of_exported_class_has_or_is_using_private_name_1;
+      } else {
+        return symbolAccessibilityResult.errorModuleName ? Diagnostics.Property_0_of_exported_interface_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Property_0_of_exported_interface_has_or_is_using_private_name_1;
+      }
+    }
+  }
+  function getVariableDeclarationTypeVisibilityError(symbolAccessibilityResult) {
+    const diagnosticMessage = getVariableDeclarationTypeVisibilityDiagnosticMessage(symbolAccessibilityResult);
+    return diagnosticMessage !== void 0 ? {
+      diagnosticMessage,
+      errorNode: node,
+      typeName: node.name
+    } : void 0;
+  }
+  function getAccessorDeclarationTypeVisibilityError(symbolAccessibilityResult) {
+    let diagnosticMessage;
+    if (node.kind === 178 /* SetAccessor */) {
+      if (isStatic(node)) {
+        diagnosticMessage = symbolAccessibilityResult.errorModuleName ? Diagnostics.Parameter_type_of_public_static_setter_0_from_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_type_of_public_static_setter_0_from_exported_class_has_or_is_using_private_name_1;
+      } else {
+        diagnosticMessage = symbolAccessibilityResult.errorModuleName ? Diagnostics.Parameter_type_of_public_setter_0_from_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_type_of_public_setter_0_from_exported_class_has_or_is_using_private_name_1;
+      }
+    } else {
+      if (isStatic(node)) {
+        diagnosticMessage = symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Return_type_of_public_static_getter_0_from_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Return_type_of_public_static_getter_0_from_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Return_type_of_public_static_getter_0_from_exported_class_has_or_is_using_private_name_1;
+      } else {
+        diagnosticMessage = symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Return_type_of_public_getter_0_from_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Return_type_of_public_getter_0_from_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Return_type_of_public_getter_0_from_exported_class_has_or_is_using_private_name_1;
+      }
+    }
+    return {
+      diagnosticMessage,
+      errorNode: node.name,
+      typeName: node.name
+    };
+  }
+  function getReturnTypeVisibilityError(symbolAccessibilityResult) {
+    let diagnosticMessage;
+    switch (node.kind) {
+      case 180 /* ConstructSignature */:
+        diagnosticMessage = symbolAccessibilityResult.errorModuleName ? Diagnostics.Return_type_of_constructor_signature_from_exported_interface_has_or_is_using_name_0_from_private_module_1 : Diagnostics.Return_type_of_constructor_signature_from_exported_interface_has_or_is_using_private_name_0;
+        break;
+      case 179 /* CallSignature */:
+        diagnosticMessage = symbolAccessibilityResult.errorModuleName ? Diagnostics.Return_type_of_call_signature_from_exported_interface_has_or_is_using_name_0_from_private_module_1 : Diagnostics.Return_type_of_call_signature_from_exported_interface_has_or_is_using_private_name_0;
+        break;
+      case 181 /* IndexSignature */:
+        diagnosticMessage = symbolAccessibilityResult.errorModuleName ? Diagnostics.Return_type_of_index_signature_from_exported_interface_has_or_is_using_name_0_from_private_module_1 : Diagnostics.Return_type_of_index_signature_from_exported_interface_has_or_is_using_private_name_0;
+        break;
+      case 174 /* MethodDeclaration */:
+      case 173 /* MethodSignature */:
+        if (isStatic(node)) {
+          diagnosticMessage = symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Return_type_of_public_static_method_from_exported_class_has_or_is_using_name_0_from_external_module_1_but_cannot_be_named : Diagnostics.Return_type_of_public_static_method_from_exported_class_has_or_is_using_name_0_from_private_module_1 : Diagnostics.Return_type_of_public_static_method_from_exported_class_has_or_is_using_private_name_0;
+        } else if (node.parent.kind === 263 /* ClassDeclaration */) {
+          diagnosticMessage = symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Return_type_of_public_method_from_exported_class_has_or_is_using_name_0_from_external_module_1_but_cannot_be_named : Diagnostics.Return_type_of_public_method_from_exported_class_has_or_is_using_name_0_from_private_module_1 : Diagnostics.Return_type_of_public_method_from_exported_class_has_or_is_using_private_name_0;
+        } else {
+          diagnosticMessage = symbolAccessibilityResult.errorModuleName ? Diagnostics.Return_type_of_method_from_exported_interface_has_or_is_using_name_0_from_private_module_1 : Diagnostics.Return_type_of_method_from_exported_interface_has_or_is_using_private_name_0;
+        }
+        break;
+      case 262 /* FunctionDeclaration */:
+        diagnosticMessage = symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Return_type_of_exported_function_has_or_is_using_name_0_from_external_module_1_but_cannot_be_named : Diagnostics.Return_type_of_exported_function_has_or_is_using_name_0_from_private_module_1 : Diagnostics.Return_type_of_exported_function_has_or_is_using_private_name_0;
+        break;
+      default:
+        return Debug.fail("This is unknown kind for signature: " + node.kind);
+    }
+    return {
+      diagnosticMessage,
+      errorNode: node.name || node
+    };
+  }
+  function getParameterDeclarationTypeVisibilityError(symbolAccessibilityResult) {
+    const diagnosticMessage = getParameterDeclarationTypeVisibilityDiagnosticMessage(symbolAccessibilityResult);
+    return diagnosticMessage !== void 0 ? {
+      diagnosticMessage,
+      errorNode: node,
+      typeName: node.name
+    } : void 0;
+  }
+  function getParameterDeclarationTypeVisibilityDiagnosticMessage(symbolAccessibilityResult) {
+    switch (node.parent.kind) {
+      case 176 /* Constructor */:
+        return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Parameter_0_of_constructor_from_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Parameter_0_of_constructor_from_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_0_of_constructor_from_exported_class_has_or_is_using_private_name_1;
+      case 180 /* ConstructSignature */:
+      case 185 /* ConstructorType */:
+        return symbolAccessibilityResult.errorModuleName ? Diagnostics.Parameter_0_of_constructor_signature_from_exported_interface_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_0_of_constructor_signature_from_exported_interface_has_or_is_using_private_name_1;
+      case 179 /* CallSignature */:
+        return symbolAccessibilityResult.errorModuleName ? Diagnostics.Parameter_0_of_call_signature_from_exported_interface_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_0_of_call_signature_from_exported_interface_has_or_is_using_private_name_1;
+      case 181 /* IndexSignature */:
+        return symbolAccessibilityResult.errorModuleName ? Diagnostics.Parameter_0_of_index_signature_from_exported_interface_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_0_of_index_signature_from_exported_interface_has_or_is_using_private_name_1;
+      case 174 /* MethodDeclaration */:
+      case 173 /* MethodSignature */:
+        if (isStatic(node.parent)) {
+          return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Parameter_0_of_public_static_method_from_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Parameter_0_of_public_static_method_from_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_0_of_public_static_method_from_exported_class_has_or_is_using_private_name_1;
+        } else if (node.parent.parent.kind === 263 /* ClassDeclaration */) {
+          return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Parameter_0_of_public_method_from_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Parameter_0_of_public_method_from_exported_class_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_0_of_public_method_from_exported_class_has_or_is_using_private_name_1;
+        } else {
+          return symbolAccessibilityResult.errorModuleName ? Diagnostics.Parameter_0_of_method_from_exported_interface_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_0_of_method_from_exported_interface_has_or_is_using_private_name_1;
+        }
+      case 262 /* FunctionDeclaration */:
+      case 184 /* FunctionType */:
+        return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Parameter_0_of_exported_function_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Parameter_0_of_exported_function_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_0_of_exported_function_has_or_is_using_private_name_1;
+      case 178 /* SetAccessor */:
+      case 177 /* GetAccessor */:
+        return symbolAccessibilityResult.errorModuleName ? symbolAccessibilityResult.accessibility === 2 /* CannotBeNamed */ ? Diagnostics.Parameter_0_of_accessor_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named : Diagnostics.Parameter_0_of_accessor_has_or_is_using_name_1_from_private_module_2 : Diagnostics.Parameter_0_of_accessor_has_or_is_using_private_name_1;
+      default:
+        return Debug.fail(`Unknown parent for parameter: ${Debug.formatSyntaxKind(node.parent.kind)}`);
+    }
+  }
+  function getTypeParameterConstraintVisibilityError() {
+    let diagnosticMessage;
+    switch (node.parent.kind) {
+      case 263 /* ClassDeclaration */:
+        diagnosticMessage = Diagnostics.Type_parameter_0_of_exported_class_has_or_is_using_private_name_1;
+        break;
+      case 264 /* InterfaceDeclaration */:
+        diagnosticMessage = Diagnostics.Type_parameter_0_of_exported_interface_has_or_is_using_private_name_1;
+        break;
+      case 200 /* MappedType */:
+        diagnosticMessage = Diagnostics.Type_parameter_0_of_exported_mapped_object_type_is_using_private_name_1;
+        break;
+      case 185 /* ConstructorType */:
+      case 180 /* ConstructSignature */:
+        diagnosticMessage = Diagnostics.Type_parameter_0_of_constructor_signature_from_exported_interface_has_or_is_using_private_name_1;
+        break;
+      case 179 /* CallSignature */:
+        diagnosticMessage = Diagnostics.Type_parameter_0_of_call_signature_from_exported_interface_has_or_is_using_private_name_1;
+        break;
+      case 174 /* MethodDeclaration */:
+      case 173 /* MethodSignature */:
+        if (isStatic(node.parent)) {
+          diagnosticMessage = Diagnostics.Type_parameter_0_of_public_static_method_from_exported_class_has_or_is_using_private_name_1;
+        } else if (node.parent.parent.kind === 263 /* ClassDeclaration */) {
+          diagnosticMessage = Diagnostics.Type_parameter_0_of_public_method_from_exported_class_has_or_is_using_private_name_1;
+        } else {
+          diagnosticMessage = Diagnostics.Type_parameter_0_of_method_from_exported_interface_has_or_is_using_private_name_1;
+        }
+        break;
+      case 184 /* FunctionType */:
+      case 262 /* FunctionDeclaration */:
+        diagnosticMessage = Diagnostics.Type_parameter_0_of_exported_function_has_or_is_using_private_name_1;
+        break;
+      case 195 /* InferType */:
+        diagnosticMessage = Diagnostics.Extends_clause_for_inferred_type_0_has_or_is_using_private_name_1;
+        break;
+      case 265 /* TypeAliasDeclaration */:
+        diagnosticMessage = Diagnostics.Type_parameter_0_of_exported_type_alias_has_or_is_using_private_name_1;
+        break;
+      default:
+        return Debug.fail("This is unknown parent for type parameter: " + node.parent.kind);
+    }
+    return {
+      diagnosticMessage,
+      errorNode: node,
+      typeName: node.name
+    };
+  }
+  function getHeritageClauseVisibilityError() {
+    let diagnosticMessage;
+    if (isClassDeclaration(node.parent.parent)) {
+      diagnosticMessage = isHeritageClause(node.parent) && node.parent.token === 119 /* ImplementsKeyword */ ? Diagnostics.Implements_clause_of_exported_class_0_has_or_is_using_private_name_1 : node.parent.parent.name ? Diagnostics.extends_clause_of_exported_class_0_has_or_is_using_private_name_1 : Diagnostics.extends_clause_of_exported_class_has_or_is_using_private_name_0;
+    } else {
+      diagnosticMessage = Diagnostics.extends_clause_of_exported_interface_0_has_or_is_using_private_name_1;
+    }
+    return {
+      diagnosticMessage,
+      errorNode: node,
+      typeName: getNameOfDeclaration(node.parent.parent)
+    };
+  }
+  function getImportEntityNameVisibilityError() {
+    return {
+      diagnosticMessage: Diagnostics.Import_declaration_0_is_using_private_name_1,
+      errorNode: node,
+      typeName: node.name
+    };
+  }
+  function getTypeAliasDeclarationVisibilityError(symbolAccessibilityResult) {
+    return {
+      diagnosticMessage: symbolAccessibilityResult.errorModuleName ? Diagnostics.Exported_type_alias_0_has_or_is_using_private_name_1_from_module_2 : Diagnostics.Exported_type_alias_0_has_or_is_using_private_name_1,
+      errorNode: isJSDocTypeAlias(node) ? Debug.checkDefined(node.typeExpression) : node.type,
+      typeName: isJSDocTypeAlias(node) ? getNameOfDeclaration(node) : node.name
+    };
+  }
+}
+
+// src/compiler/transformers/declarations.ts
+function getDeclarationDiagnostics(host, resolver, file) {
+  const compilerOptions = host.getCompilerOptions();
+  const result = transformNodes(
+    resolver,
+    host,
+    factory,
+    compilerOptions,
+    file ? [file] : filter(host.getSourceFiles(), isSourceFileNotJson),
+    [transformDeclarations],
+    /*allowDtsFiles*/
+    false
+  );
+  return result.diagnostics;
+}
+var declarationEmitNodeBuilderFlags = 1024 /* MultilineObjectLiterals */ | 2048 /* WriteClassExpressionAsTypeLiteral */ | 4096 /* UseTypeOfFunction */ | 8 /* UseStructuralFallback */ | 524288 /* AllowEmptyTuple */ | 4 /* GenerateNamesForShadowedTypeParams */ | 1 /* NoTruncation */;
+function transformDeclarations(context) {
+  const throwDiagnostic = () => Debug.fail("Diagnostic emitted without context");
+  let getSymbolAccessibilityDiagnostic = throwDiagnostic;
+  let needsDeclare = true;
+  let isBundledEmit = false;
+  let resultHasExternalModuleIndicator = false;
+  let needsScopeFixMarker = false;
+  let resultHasScopeMarker = false;
+  let enclosingDeclaration;
+  let necessaryTypeReferences;
+  let lateMarkedStatements;
+  let lateStatementReplacementMap;
+  let suppressNewDiagnosticContexts;
+  let exportedModulesFromDeclarationEmit;
+  const { factory: factory2 } = context;
+  const host = context.getEmitHost();
+  const symbolTracker = {
+    trackSymbol,
+    reportInaccessibleThisError,
+    reportInaccessibleUniqueSymbolError,
+    reportCyclicStructureError,
+    reportPrivateInBaseOfClassExpression,
+    reportLikelyUnsafeImportRequiredError,
+    reportTruncationError,
+    moduleResolverHost: host,
+    trackReferencedAmbientModule,
+    trackExternalModuleSymbolOfImportTypeNode,
+    reportNonlocalAugmentation,
+    reportNonSerializableProperty
+  };
+  let errorNameNode;
+  let errorFallbackNode;
+  let currentSourceFile;
+  let refs;
+  let libs2;
+  let emittedImports;
+  const resolver = context.getEmitResolver();
+  const options = context.getCompilerOptions();
+  const { noResolve, stripInternal } = options;
+  return transformRoot;
+  function recordTypeReferenceDirectivesIfNecessary(typeReferenceDirectives) {
+    if (!typeReferenceDirectives) {
+      return;
+    }
+    necessaryTypeReferences = necessaryTypeReferences || /* @__PURE__ */ new Set();
+    for (const ref of typeReferenceDirectives) {
+      necessaryTypeReferences.add(ref);
+    }
+  }
+  function trackReferencedAmbientModule(node, symbol) {
+    const directives = resolver.getTypeReferenceDirectivesForSymbol(symbol, -1 /* All */);
+    if (length(directives)) {
+      return recordTypeReferenceDirectivesIfNecessary(directives);
+    }
+    const container = getSourceFileOfNode(node);
+    refs.set(getOriginalNodeId(container), container);
+  }
+  function trackReferencedAmbientModuleFromImport(node) {
+    const moduleSpecifier = tryGetModuleSpecifierFromDeclaration(node);
+    const symbol = moduleSpecifier && resolver.tryFindAmbientModule(moduleSpecifier);
+    if (symbol == null ? void 0 : symbol.declarations) {
+      for (const decl of symbol.declarations) {
+        if (isAmbientModule(decl) && getSourceFileOfNode(decl) !== currentSourceFile) {
+          trackReferencedAmbientModule(decl, symbol);
+        }
+      }
+    }
+  }
+  function handleSymbolAccessibilityError(symbolAccessibilityResult) {
+    if (symbolAccessibilityResult.accessibility === 0 /* Accessible */) {
+      if (symbolAccessibilityResult.aliasesToMakeVisible) {
+        if (!lateMarkedStatements) {
+          lateMarkedStatements = symbolAccessibilityResult.aliasesToMakeVisible;
+        } else {
+          for (const ref of symbolAccessibilityResult.aliasesToMakeVisible) {
+            pushIfUnique(lateMarkedStatements, ref);
+          }
+        }
+      }
+    } else {
+      const errorInfo = getSymbolAccessibilityDiagnostic(symbolAccessibilityResult);
+      if (errorInfo) {
+        if (errorInfo.typeName) {
+          context.addDiagnostic(createDiagnosticForNode(symbolAccessibilityResult.errorNode || errorInfo.errorNode, errorInfo.diagnosticMessage, getTextOfNode(errorInfo.typeName), symbolAccessibilityResult.errorSymbolName, symbolAccessibilityResult.errorModuleName));
+        } else {
+          context.addDiagnostic(createDiagnosticForNode(symbolAccessibilityResult.errorNode || errorInfo.errorNode, errorInfo.diagnosticMessage, symbolAccessibilityResult.errorSymbolName, symbolAccessibilityResult.errorModuleName));
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+  function trackExternalModuleSymbolOfImportTypeNode(symbol) {
+    if (!isBundledEmit) {
+      (exportedModulesFromDeclarationEmit || (exportedModulesFromDeclarationEmit = [])).push(symbol);
+    }
+  }
+  function trackSymbol(symbol, enclosingDeclaration2, meaning) {
+    if (symbol.flags & 262144 /* TypeParameter */)
+      return false;
+    const issuedDiagnostic = handleSymbolAccessibilityError(resolver.isSymbolAccessible(
+      symbol,
+      enclosingDeclaration2,
+      meaning,
+      /*shouldComputeAliasToMarkVisible*/
+      true
+    ));
+    recordTypeReferenceDirectivesIfNecessary(resolver.getTypeReferenceDirectivesForSymbol(symbol, meaning));
+    return issuedDiagnostic;
+  }
+  function reportPrivateInBaseOfClassExpression(propertyName) {
+    if (errorNameNode || errorFallbackNode) {
+      context.addDiagnostic(
+        createDiagnosticForNode(errorNameNode || errorFallbackNode, Diagnostics.Property_0_of_exported_class_expression_may_not_be_private_or_protected, propertyName)
+      );
+    }
+  }
+  function errorDeclarationNameWithFallback() {
+    return errorNameNode ? declarationNameToString(errorNameNode) : errorFallbackNode && getNameOfDeclaration(errorFallbackNode) ? declarationNameToString(getNameOfDeclaration(errorFallbackNode)) : errorFallbackNode && isExportAssignment(errorFallbackNode) ? errorFallbackNode.isExportEquals ? "export=" : "default" : "(Missing)";
+  }
+  function reportInaccessibleUniqueSymbolError() {
+    if (errorNameNode || errorFallbackNode) {
+      context.addDiagnostic(createDiagnosticForNode(errorNameNode || errorFallbackNode, Diagnostics.The_inferred_type_of_0_references_an_inaccessible_1_type_A_type_annotation_is_necessary, errorDeclarationNameWithFallback(), "unique symbol"));
+    }
+  }
+  function reportCyclicStructureError() {
+    if (errorNameNode || errorFallbackNode) {
+      context.addDiagnostic(createDiagnosticForNode(errorNameNode || errorFallbackNode, Diagnostics.The_inferred_type_of_0_references_a_type_with_a_cyclic_structure_which_cannot_be_trivially_serialized_A_type_annotation_is_necessary, errorDeclarationNameWithFallback()));
+    }
+  }
+  function reportInaccessibleThisError() {
+    if (errorNameNode || errorFallbackNode) {
+      context.addDiagnostic(createDiagnosticForNode(errorNameNode || errorFallbackNode, Diagnostics.The_inferred_type_of_0_references_an_inaccessible_1_type_A_type_annotation_is_necessary, errorDeclarationNameWithFallback(), "this"));
+    }
+  }
+  function reportLikelyUnsafeImportRequiredError(specifier) {
+    if (errorNameNode || errorFallbackNode) {
+      context.addDiagnostic(createDiagnosticForNode(errorNameNode || errorFallbackNode, Diagnostics.The_inferred_type_of_0_cannot_be_named_without_a_reference_to_1_This_is_likely_not_portable_A_type_annotation_is_necessary, errorDeclarationNameWithFallback(), specifier));
+    }
+  }
+  function reportTruncationError() {
+    if (errorNameNode || errorFallbackNode) {
+      context.addDiagnostic(createDiagnosticForNode(errorNameNode || errorFallbackNode, Diagnostics.The_inferred_type_of_this_node_exceeds_the_maximum_length_the_compiler_will_serialize_An_explicit_type_annotation_is_needed));
+    }
+  }
+  function reportNonlocalAugmentation(containingFile, parentSymbol, symbol) {
+    var _a;
+    const primaryDeclaration = (_a = parentSymbol.declarations) == null ? void 0 : _a.find((d) => getSourceFileOfNode(d) === containingFile);
+    const augmentingDeclarations = filter(symbol.declarations, (d) => getSourceFileOfNode(d) !== containingFile);
+    if (primaryDeclaration && augmentingDeclarations) {
+      for (const augmentations of augmentingDeclarations) {
+        context.addDiagnostic(addRelatedInfo(
+          createDiagnosticForNode(augmentations, Diagnostics.Declaration_augments_declaration_in_another_file_This_cannot_be_serialized),
+          createDiagnosticForNode(primaryDeclaration, Diagnostics.This_is_the_declaration_being_augmented_Consider_moving_the_augmenting_declaration_into_the_same_file)
+        ));
+      }
+    }
+  }
+  function reportNonSerializableProperty(propertyName) {
+    if (errorNameNode || errorFallbackNode) {
+      context.addDiagnostic(createDiagnosticForNode(errorNameNode || errorFallbackNode, Diagnostics.The_type_of_this_node_cannot_be_serialized_because_its_property_0_cannot_be_serialized, propertyName));
+    }
+  }
+  function transformDeclarationsForJS(sourceFile, bundled) {
+    const oldDiag = getSymbolAccessibilityDiagnostic;
+    getSymbolAccessibilityDiagnostic = (s) => s.errorNode && canProduceDiagnostics(s.errorNode) ? createGetSymbolAccessibilityDiagnosticForNode(s.errorNode)(s) : {
+      diagnosticMessage: s.errorModuleName ? Diagnostics.Declaration_emit_for_this_file_requires_using_private_name_0_from_module_1_An_explicit_type_annotation_may_unblock_declaration_emit : Diagnostics.Declaration_emit_for_this_file_requires_using_private_name_0_An_explicit_type_annotation_may_unblock_declaration_emit,
+      errorNode: s.errorNode || sourceFile
+    };
+    const result = resolver.getDeclarationStatementsForSourceFile(sourceFile, declarationEmitNodeBuilderFlags, symbolTracker, bundled);
+    getSymbolAccessibilityDiagnostic = oldDiag;
+    return result;
+  }
+  function transformRoot(node) {
+    if (node.kind === 312 /* SourceFile */ && node.isDeclarationFile) {
+      return node;
+    }
+    if (node.kind === 313 /* Bundle */) {
+      isBundledEmit = true;
+      refs = /* @__PURE__ */ new Map();
+      libs2 = /* @__PURE__ */ new Map();
+      let hasNoDefaultLib = false;
+      const bundle = factory2.createBundle(
+        map(node.sourceFiles, (sourceFile) => {
+          if (sourceFile.isDeclarationFile)
+            return void 0;
+          hasNoDefaultLib = hasNoDefaultLib || sourceFile.hasNoDefaultLib;
+          currentSourceFile = sourceFile;
+          enclosingDeclaration = sourceFile;
+          lateMarkedStatements = void 0;
+          suppressNewDiagnosticContexts = false;
+          lateStatementReplacementMap = /* @__PURE__ */ new Map();
+          getSymbolAccessibilityDiagnostic = throwDiagnostic;
+          needsScopeFixMarker = false;
+          resultHasScopeMarker = false;
+          collectReferences(sourceFile, refs);
+          collectLibs(sourceFile, libs2);
+          if (isExternalOrCommonJsModule(sourceFile) || isJsonSourceFile(sourceFile)) {
+            resultHasExternalModuleIndicator = false;
+            needsDeclare = false;
+            const statements = isSourceFileJS(sourceFile) ? factory2.createNodeArray(transformDeclarationsForJS(
+              sourceFile,
+              /*bundled*/
+              true
+            )) : visitNodes2(sourceFile.statements, visitDeclarationStatements, isStatement);
+            const newFile = factory2.updateSourceFile(
+              sourceFile,
+              [factory2.createModuleDeclaration(
+                [factory2.createModifier(138 /* DeclareKeyword */)],
+                factory2.createStringLiteral(getResolvedExternalModuleName(context.getEmitHost(), sourceFile)),
+                factory2.createModuleBlock(setTextRange(factory2.createNodeArray(transformAndReplaceLatePaintedStatements(statements)), sourceFile.statements))
+              )],
+              /*isDeclarationFile*/
+              true,
+              /*referencedFiles*/
+              [],
+              /*typeReferences*/
+              [],
+              /*hasNoDefaultLib*/
+              false,
+              /*libReferences*/
+              []
+            );
+            return newFile;
+          }
+          needsDeclare = true;
+          const updated2 = isSourceFileJS(sourceFile) ? factory2.createNodeArray(transformDeclarationsForJS(sourceFile)) : visitNodes2(sourceFile.statements, visitDeclarationStatements, isStatement);
+          return factory2.updateSourceFile(
+            sourceFile,
+            transformAndReplaceLatePaintedStatements(updated2),
+            /*isDeclarationFile*/
+            true,
+            /*referencedFiles*/
+            [],
+            /*typeReferences*/
+            [],
+            /*hasNoDefaultLib*/
+            false,
+            /*libReferences*/
+            []
+          );
+        }),
+        mapDefined(node.prepends, (prepend) => {
+          if (prepend.kind === 315 /* InputFiles */) {
+            const sourceFile = createUnparsedSourceFile(prepend, "dts", stripInternal);
+            hasNoDefaultLib = hasNoDefaultLib || !!sourceFile.hasNoDefaultLib;
+            collectReferences(sourceFile, refs);
+            recordTypeReferenceDirectivesIfNecessary(map(sourceFile.typeReferenceDirectives, (ref) => [ref.fileName, ref.resolutionMode]));
+            collectLibs(sourceFile, libs2);
+            return sourceFile;
+          }
+          return prepend;
+        })
+      );
+      bundle.syntheticFileReferences = [];
+      bundle.syntheticTypeReferences = getFileReferencesForUsedTypeReferences();
+      bundle.syntheticLibReferences = getLibReferences();
+      bundle.hasNoDefaultLib = hasNoDefaultLib;
+      const outputFilePath2 = getDirectoryPath(normalizeSlashes(getOutputPathsFor(
+        node,
+        host,
+        /*forceDtsPaths*/
+        true
+      ).declarationFilePath));
+      const referenceVisitor2 = mapReferencesIntoArray(bundle.syntheticFileReferences, outputFilePath2);
+      refs.forEach(referenceVisitor2);
+      return bundle;
+    }
+    needsDeclare = true;
+    needsScopeFixMarker = false;
+    resultHasScopeMarker = false;
+    enclosingDeclaration = node;
+    currentSourceFile = node;
+    getSymbolAccessibilityDiagnostic = throwDiagnostic;
+    isBundledEmit = false;
+    resultHasExternalModuleIndicator = false;
+    suppressNewDiagnosticContexts = false;
+    lateMarkedStatements = void 0;
+    lateStatementReplacementMap = /* @__PURE__ */ new Map();
+    necessaryTypeReferences = void 0;
+    refs = collectReferences(currentSourceFile, /* @__PURE__ */ new Map());
+    libs2 = collectLibs(currentSourceFile, /* @__PURE__ */ new Map());
+    const references = [];
+    const outputFilePath = getDirectoryPath(normalizeSlashes(getOutputPathsFor(
+      node,
+      host,
+      /*forceDtsPaths*/
+      true
+    ).declarationFilePath));
+    const referenceVisitor = mapReferencesIntoArray(references, outputFilePath);
+    let combinedStatements;
+    if (isSourceFileJS(currentSourceFile)) {
+      combinedStatements = factory2.createNodeArray(transformDeclarationsForJS(node));
+      refs.forEach(referenceVisitor);
+      emittedImports = filter(combinedStatements, isAnyImportSyntax);
+    } else {
+      const statements = visitNodes2(node.statements, visitDeclarationStatements, isStatement);
+      combinedStatements = setTextRange(factory2.createNodeArray(transformAndReplaceLatePaintedStatements(statements)), node.statements);
+      refs.forEach(referenceVisitor);
+      emittedImports = filter(combinedStatements, isAnyImportSyntax);
+      if (isExternalModule(node) && (!resultHasExternalModuleIndicator || needsScopeFixMarker && !resultHasScopeMarker)) {
+        combinedStatements = setTextRange(factory2.createNodeArray([...combinedStatements, createEmptyExports(factory2)]), combinedStatements);
+      }
+    }
+    const updated = factory2.updateSourceFile(
+      node,
+      combinedStatements,
+      /*isDeclarationFile*/
+      true,
+      references,
+      getFileReferencesForUsedTypeReferences(),
+      node.hasNoDefaultLib,
+      getLibReferences()
+    );
+    updated.exportedModulesFromDeclarationEmit = exportedModulesFromDeclarationEmit;
+    return updated;
+    function getLibReferences() {
+      return arrayFrom(libs2.keys(), (lib) => ({ fileName: lib, pos: -1, end: -1 }));
+    }
+    function getFileReferencesForUsedTypeReferences() {
+      return necessaryTypeReferences ? mapDefined(arrayFrom(necessaryTypeReferences.keys()), getFileReferenceForSpecifierModeTuple) : [];
+    }
+    function getFileReferenceForSpecifierModeTuple([typeName, mode]) {
+      if (emittedImports) {
+        for (const importStatement of emittedImports) {
+          if (isImportEqualsDeclaration(importStatement) && isExternalModuleReference(importStatement.moduleReference)) {
+            const expr = importStatement.moduleReference.expression;
+            if (isStringLiteralLike(expr) && expr.text === typeName) {
+              return void 0;
+            }
+          } else if (isImportDeclaration(importStatement) && isStringLiteral(importStatement.moduleSpecifier) && importStatement.moduleSpecifier.text === typeName) {
+            return void 0;
+          }
+        }
+      }
+      return { fileName: typeName, pos: -1, end: -1, ...mode ? { resolutionMode: mode } : void 0 };
+    }
+    function mapReferencesIntoArray(references2, outputFilePath2) {
+      return (file) => {
+        if (exportedModulesFromDeclarationEmit == null ? void 0 : exportedModulesFromDeclarationEmit.includes(file.symbol)) {
+          return;
+        }
+        let declFileName;
+        if (file.isDeclarationFile) {
+          declFileName = file.fileName;
+        } else {
+          if (isBundledEmit && contains(node.sourceFiles, file))
+            return;
+          const paths = getOutputPathsFor(
+            file,
+            host,
+            /*forceDtsPaths*/
+            true
+          );
+          declFileName = paths.declarationFilePath || paths.jsFilePath || file.fileName;
+        }
+        if (declFileName) {
+          const specifier = getModuleSpecifier(
+            options,
+            currentSourceFile,
+            getNormalizedAbsolutePath(outputFilePath2, host.getCurrentDirectory()),
+            getNormalizedAbsolutePath(declFileName, host.getCurrentDirectory()),
+            host
+          );
+          if (!pathIsRelative(specifier)) {
+            recordTypeReferenceDirectivesIfNecessary([[
+              specifier,
+              /*mode*/
+              void 0
+            ]]);
+            return;
+          }
+          let fileName = getRelativePathToDirectoryOrUrl(
+            outputFilePath2,
+            declFileName,
+            host.getCurrentDirectory(),
+            host.getCanonicalFileName,
+            /*isAbsolutePathAnUrl*/
+            false
+          );
+          if (startsWith(fileName, "./") && hasExtension(fileName)) {
+            fileName = fileName.substring(2);
+          }
+          if (startsWith(fileName, "node_modules/") || pathContainsNodeModules(fileName)) {
+            return;
+          }
+          references2.push({ pos: -1, end: -1, fileName });
+        }
+      };
+    }
+  }
+  function collectReferences(sourceFile, ret) {
+    if (noResolve || !isUnparsedSource(sourceFile) && isSourceFileJS(sourceFile))
+      return ret;
+    forEach(sourceFile.referencedFiles, (f) => {
+      const elem = host.getSourceFileFromReference(sourceFile, f);
+      if (elem) {
+        ret.set(getOriginalNodeId(elem), elem);
+      }
+    });
+    return ret;
+  }
+  function collectLibs(sourceFile, ret) {
+    forEach(sourceFile.libReferenceDirectives, (ref) => {
+      const lib = host.getLibFileFromReference(ref);
+      if (lib) {
+        ret.set(toFileNameLowerCase(ref.fileName), true);
+      }
+    });
+    return ret;
+  }
+  function filterBindingPatternInitializers(name) {
+    if (name.kind === 80 /* Identifier */) {
+      return name;
+    } else {
+      if (name.kind === 207 /* ArrayBindingPattern */) {
+        return factory2.updateArrayBindingPattern(name, visitNodes2(name.elements, visitBindingElement, isArrayBindingElement));
+      } else {
+        return factory2.updateObjectBindingPattern(name, visitNodes2(name.elements, visitBindingElement, isBindingElement));
+      }
+    }
+    function visitBindingElement(elem) {
+      if (elem.kind === 232 /* OmittedExpression */) {
+        return elem;
+      }
+      if (elem.propertyName && isComputedPropertyName(elem.propertyName) && isEntityNameExpression(elem.propertyName.expression)) {
+        checkEntityNameVisibility(elem.propertyName.expression, enclosingDeclaration);
+      }
+      return factory2.updateBindingElement(
+        elem,
+        elem.dotDotDotToken,
+        elem.propertyName,
+        filterBindingPatternInitializers(elem.name),
+        shouldPrintWithInitializer(elem) ? elem.initializer : void 0
+      );
+    }
+  }
+  function ensureParameter(p, modifierMask, type) {
+    let oldDiag;
+    if (!suppressNewDiagnosticContexts) {
+      oldDiag = getSymbolAccessibilityDiagnostic;
+      getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNode(p);
+    }
+    const newParam = factory2.updateParameterDeclaration(
+      p,
+      maskModifiers(factory2, p, modifierMask),
+      p.dotDotDotToken,
+      filterBindingPatternInitializers(p.name),
+      resolver.isOptionalParameter(p) ? p.questionToken || factory2.createToken(58 /* QuestionToken */) : void 0,
+      ensureType(
+        p,
+        type || p.type,
+        /*ignorePrivate*/
+        true
+      ),
+      // Ignore private param props, since this type is going straight back into a param
+      ensureNoInitializer(p)
+    );
+    if (!suppressNewDiagnosticContexts) {
+      getSymbolAccessibilityDiagnostic = oldDiag;
+    }
+    return newParam;
+  }
+  function shouldPrintWithInitializer(node) {
+    return canHaveLiteralInitializer(node) && resolver.isLiteralConstDeclaration(getParseTreeNode(node));
+  }
+  function ensureNoInitializer(node) {
+    if (shouldPrintWithInitializer(node)) {
+      return resolver.createLiteralConstValue(getParseTreeNode(node), symbolTracker);
+    }
+    return void 0;
+  }
+  function ensureType(node, type, ignorePrivate) {
+    if (!ignorePrivate && hasEffectiveModifier(node, 2 /* Private */)) {
+      return;
+    }
+    if (shouldPrintWithInitializer(node)) {
+      return;
+    }
+    const shouldUseResolverType = node.kind === 169 /* Parameter */ && (resolver.isRequiredInitializedParameter(node) || resolver.isOptionalUninitializedParameterProperty(node));
+    if (type && !shouldUseResolverType) {
+      return visitNode(type, visitDeclarationSubtree, isTypeNode);
+    }
+    if (!getParseTreeNode(node)) {
+      return type ? visitNode(type, visitDeclarationSubtree, isTypeNode) : factory2.createKeywordTypeNode(133 /* AnyKeyword */);
+    }
+    if (node.kind === 178 /* SetAccessor */) {
+      return factory2.createKeywordTypeNode(133 /* AnyKeyword */);
+    }
+    errorNameNode = node.name;
+    let oldDiag;
+    if (!suppressNewDiagnosticContexts) {
+      oldDiag = getSymbolAccessibilityDiagnostic;
+      getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNode(node);
+    }
+    if (node.kind === 260 /* VariableDeclaration */ || node.kind === 208 /* BindingElement */) {
+      return cleanup(resolver.createTypeOfDeclaration(node, enclosingDeclaration, declarationEmitNodeBuilderFlags, symbolTracker));
+    }
+    if (node.kind === 169 /* Parameter */ || node.kind === 172 /* PropertyDeclaration */ || node.kind === 171 /* PropertySignature */) {
+      if (isPropertySignature(node) || !node.initializer)
+        return cleanup(resolver.createTypeOfDeclaration(node, enclosingDeclaration, declarationEmitNodeBuilderFlags, symbolTracker, shouldUseResolverType));
+      return cleanup(resolver.createTypeOfDeclaration(node, enclosingDeclaration, declarationEmitNodeBuilderFlags, symbolTracker, shouldUseResolverType) || resolver.createTypeOfExpression(node.initializer, enclosingDeclaration, declarationEmitNodeBuilderFlags, symbolTracker));
+    }
+    return cleanup(resolver.createReturnTypeOfSignatureDeclaration(node, enclosingDeclaration, declarationEmitNodeBuilderFlags, symbolTracker));
+    function cleanup(returnValue) {
+      errorNameNode = void 0;
+      if (!suppressNewDiagnosticContexts) {
+        getSymbolAccessibilityDiagnostic = oldDiag;
+      }
+      return returnValue || factory2.createKeywordTypeNode(133 /* AnyKeyword */);
+    }
+  }
+  function isDeclarationAndNotVisible(node) {
+    node = getParseTreeNode(node);
+    switch (node.kind) {
+      case 262 /* FunctionDeclaration */:
+      case 267 /* ModuleDeclaration */:
+      case 264 /* InterfaceDeclaration */:
+      case 263 /* ClassDeclaration */:
+      case 265 /* TypeAliasDeclaration */:
+      case 266 /* EnumDeclaration */:
+        return !resolver.isDeclarationVisible(node);
+      case 260 /* VariableDeclaration */:
+        return !getBindingNameVisible(node);
+      case 271 /* ImportEqualsDeclaration */:
+      case 272 /* ImportDeclaration */:
+      case 278 /* ExportDeclaration */:
+      case 277 /* ExportAssignment */:
+        return false;
+      case 175 /* ClassStaticBlockDeclaration */:
+        return true;
+    }
+    return false;
+  }
+  function shouldEmitFunctionProperties(input) {
+    var _a;
+    if (input.body) {
+      return true;
+    }
+    const overloadSignatures = (_a = input.symbol.declarations) == null ? void 0 : _a.filter((decl) => isFunctionDeclaration(decl) && !decl.body);
+    return !overloadSignatures || overloadSignatures.indexOf(input) === overloadSignatures.length - 1;
+  }
+  function getBindingNameVisible(elem) {
+    if (isOmittedExpression(elem)) {
+      return false;
+    }
+    if (isBindingPattern(elem.name)) {
+      return some(elem.name.elements, getBindingNameVisible);
+    } else {
+      return resolver.isDeclarationVisible(elem);
+    }
+  }
+  function updateParamsList(node, params, modifierMask) {
+    if (hasEffectiveModifier(node, 2 /* Private */)) {
+      return factory2.createNodeArray();
+    }
+    const newParams = map(params, (p) => ensureParameter(p, modifierMask));
+    if (!newParams) {
+      return factory2.createNodeArray();
+    }
+    return factory2.createNodeArray(newParams, params.hasTrailingComma);
+  }
+  function updateAccessorParamsList(input, isPrivate) {
+    let newParams;
+    if (!isPrivate) {
+      const thisParameter = getThisParameter(input);
+      if (thisParameter) {
+        newParams = [ensureParameter(thisParameter)];
+      }
+    }
+    if (isSetAccessorDeclaration(input)) {
+      let newValueParameter;
+      if (!isPrivate) {
+        const valueParameter = getSetAccessorValueParameter(input);
+        if (valueParameter) {
+          const accessorType = getTypeAnnotationFromAllAccessorDeclarations(input, resolver.getAllAccessorDeclarations(input));
+          newValueParameter = ensureParameter(
+            valueParameter,
+            /*modifierMask*/
+            void 0,
+            accessorType
+          );
+        }
+      }
+      if (!newValueParameter) {
+        newValueParameter = factory2.createParameterDeclaration(
+          /*modifiers*/
+          void 0,
+          /*dotDotDotToken*/
+          void 0,
+          "value"
+        );
+      }
+      newParams = append(newParams, newValueParameter);
+    }
+    return factory2.createNodeArray(newParams || emptyArray);
+  }
+  function ensureTypeParams(node, params) {
+    return hasEffectiveModifier(node, 2 /* Private */) ? void 0 : visitNodes2(params, visitDeclarationSubtree, isTypeParameterDeclaration);
+  }
+  function isEnclosingDeclaration(node) {
+    return isSourceFile(node) || isTypeAliasDeclaration(node) || isModuleDeclaration(node) || isClassDeclaration(node) || isInterfaceDeclaration(node) || isFunctionLike(node) || isIndexSignatureDeclaration(node) || isMappedTypeNode(node);
+  }
+  function checkEntityNameVisibility(entityName, enclosingDeclaration2) {
+    const visibilityResult = resolver.isEntityNameVisible(entityName, enclosingDeclaration2);
+    handleSymbolAccessibilityError(visibilityResult);
+    recordTypeReferenceDirectivesIfNecessary(resolver.getTypeReferenceDirectivesForEntityName(entityName));
+  }
+  function preserveJsDoc(updated, original) {
+    if (hasJSDocNodes(updated) && hasJSDocNodes(original)) {
+      updated.jsDoc = original.jsDoc;
+    }
+    return setCommentRange(updated, getCommentRange(original));
+  }
+  function rewriteModuleSpecifier(parent, input) {
+    if (!input)
+      return void 0;
+    resultHasExternalModuleIndicator = resultHasExternalModuleIndicator || parent.kind !== 267 /* ModuleDeclaration */ && parent.kind !== 205 /* ImportType */;
+    if (isStringLiteralLike(input)) {
+      if (isBundledEmit) {
+        const newName = getExternalModuleNameFromDeclaration(context.getEmitHost(), resolver, parent);
+        if (newName) {
+          return factory2.createStringLiteral(newName);
+        }
+      } else {
+        const symbol = resolver.getSymbolOfExternalModuleSpecifier(input);
+        if (symbol) {
+          (exportedModulesFromDeclarationEmit || (exportedModulesFromDeclarationEmit = [])).push(symbol);
+        }
+      }
+    }
+    return input;
+  }
+  function transformImportEqualsDeclaration(decl) {
+    if (!resolver.isDeclarationVisible(decl))
+      return;
+    if (decl.moduleReference.kind === 283 /* ExternalModuleReference */) {
+      const specifier = getExternalModuleImportEqualsDeclarationExpression(decl);
+      return factory2.updateImportEqualsDeclaration(
+        decl,
+        decl.modifiers,
+        decl.isTypeOnly,
+        decl.name,
+        factory2.updateExternalModuleReference(decl.moduleReference, rewriteModuleSpecifier(decl, specifier))
+      );
+    } else {
+      const oldDiag = getSymbolAccessibilityDiagnostic;
+      getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNode(decl);
+      checkEntityNameVisibility(decl.moduleReference, enclosingDeclaration);
+      getSymbolAccessibilityDiagnostic = oldDiag;
+      return decl;
+    }
+  }
+  function transformImportDeclaration(decl) {
+    if (!decl.importClause) {
+      return factory2.updateImportDeclaration(
+        decl,
+        decl.modifiers,
+        decl.importClause,
+        rewriteModuleSpecifier(decl, decl.moduleSpecifier),
+        tryGetResolutionModeOverride(decl.attributes)
+      );
+    }
+    const visibleDefaultBinding = decl.importClause && decl.importClause.name && resolver.isDeclarationVisible(decl.importClause) ? decl.importClause.name : void 0;
+    if (!decl.importClause.namedBindings) {
+      return visibleDefaultBinding && factory2.updateImportDeclaration(
+        decl,
+        decl.modifiers,
+        factory2.updateImportClause(
+          decl.importClause,
+          decl.importClause.isTypeOnly,
+          visibleDefaultBinding,
+          /*namedBindings*/
+          void 0
+        ),
+        rewriteModuleSpecifier(decl, decl.moduleSpecifier),
+        tryGetResolutionModeOverride(decl.attributes)
+      );
+    }
+    if (decl.importClause.namedBindings.kind === 274 /* NamespaceImport */) {
+      const namedBindings = resolver.isDeclarationVisible(decl.importClause.namedBindings) ? decl.importClause.namedBindings : (
+        /*namedBindings*/
+        void 0
+      );
+      return visibleDefaultBinding || namedBindings ? factory2.updateImportDeclaration(
+        decl,
+        decl.modifiers,
+        factory2.updateImportClause(
+          decl.importClause,
+          decl.importClause.isTypeOnly,
+          visibleDefaultBinding,
+          namedBindings
+        ),
+        rewriteModuleSpecifier(decl, decl.moduleSpecifier),
+        tryGetResolutionModeOverride(decl.attributes)
+      ) : void 0;
+    }
+    const bindingList = mapDefined(decl.importClause.namedBindings.elements, (b) => resolver.isDeclarationVisible(b) ? b : void 0);
+    if (bindingList && bindingList.length || visibleDefaultBinding) {
+      return factory2.updateImportDeclaration(
+        decl,
+        decl.modifiers,
+        factory2.updateImportClause(
+          decl.importClause,
+          decl.importClause.isTypeOnly,
+          visibleDefaultBinding,
+          bindingList && bindingList.length ? factory2.updateNamedImports(decl.importClause.namedBindings, bindingList) : void 0
+        ),
+        rewriteModuleSpecifier(decl, decl.moduleSpecifier),
+        tryGetResolutionModeOverride(decl.attributes)
+      );
+    }
+    if (resolver.isImportRequiredByAugmentation(decl)) {
+      return factory2.updateImportDeclaration(
+        decl,
+        decl.modifiers,
+        /*importClause*/
+        void 0,
+        rewriteModuleSpecifier(decl, decl.moduleSpecifier),
+        tryGetResolutionModeOverride(decl.attributes)
+      );
+    }
+  }
+  function tryGetResolutionModeOverride(node) {
+    const mode = getResolutionModeOverride(node);
+    return node && mode !== void 0 ? node : void 0;
+  }
+  function transformAndReplaceLatePaintedStatements(statements) {
+    while (length(lateMarkedStatements)) {
+      const i = lateMarkedStatements.shift();
+      if (!isLateVisibilityPaintedStatement(i)) {
+        return Debug.fail(`Late replaced statement was found which is not handled by the declaration transformer!: ${Debug.formatSyntaxKind(i.kind)}`);
+      }
+      const priorNeedsDeclare = needsDeclare;
+      needsDeclare = i.parent && isSourceFile(i.parent) && !(isExternalModule(i.parent) && isBundledEmit);
+      const result = transformTopLevelDeclaration(i);
+      needsDeclare = priorNeedsDeclare;
+      lateStatementReplacementMap.set(getOriginalNodeId(i), result);
+    }
+    return visitNodes2(statements, visitLateVisibilityMarkedStatements, isStatement);
+    function visitLateVisibilityMarkedStatements(statement) {
+      if (isLateVisibilityPaintedStatement(statement)) {
+        const key = getOriginalNodeId(statement);
+        if (lateStatementReplacementMap.has(key)) {
+          const result = lateStatementReplacementMap.get(key);
+          lateStatementReplacementMap.delete(key);
+          if (result) {
+            if (isArray(result) ? some(result, needsScopeMarker) : needsScopeMarker(result)) {
+              needsScopeFixMarker = true;
+            }
+            if (isSourceFile(statement.parent) && (isArray(result) ? some(result, isExternalModuleIndicator) : isExternalModuleIndicator(result))) {
+              resultHasExternalModuleIndicator = true;
+            }
+          }
+          return result;
+        }
+      }
+      return statement;
+    }
+  }
+  function visitDeclarationSubtree(input) {
+    if (shouldStripInternal(input))
+      return;
+    if (isDeclaration(input)) {
+      if (isDeclarationAndNotVisible(input))
+        return;
+      if (hasDynamicName(input) && !resolver.isLateBound(getParseTreeNode(input))) {
+        return;
+      }
+    }
+    if (isFunctionLike(input) && resolver.isImplementationOfOverload(input))
+      return;
+    if (isSemicolonClassElement(input))
+      return;
+    let previousEnclosingDeclaration;
+    if (isEnclosingDeclaration(input)) {
+      previousEnclosingDeclaration = enclosingDeclaration;
+      enclosingDeclaration = input;
+    }
+    const oldDiag = getSymbolAccessibilityDiagnostic;
+    const canProduceDiagnostic = canProduceDiagnostics(input);
+    const oldWithinObjectLiteralType = suppressNewDiagnosticContexts;
+    let shouldEnterSuppressNewDiagnosticsContextContext = (input.kind === 187 /* TypeLiteral */ || input.kind === 200 /* MappedType */) && input.parent.kind !== 265 /* TypeAliasDeclaration */;
+    if (isMethodDeclaration(input) || isMethodSignature(input)) {
+      if (hasEffectiveModifier(input, 2 /* Private */)) {
+        if (input.symbol && input.symbol.declarations && input.symbol.declarations[0] !== input)
+          return;
+        return cleanup(factory2.createPropertyDeclaration(
+          ensureModifiers(input),
+          input.name,
+          /*questionOrExclamationToken*/
+          void 0,
+          /*type*/
+          void 0,
+          /*initializer*/
+          void 0
+        ));
+      }
+    }
+    if (canProduceDiagnostic && !suppressNewDiagnosticContexts) {
+      getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNode(input);
+    }
+    if (isTypeQueryNode(input)) {
+      checkEntityNameVisibility(input.exprName, enclosingDeclaration);
+    }
+    if (shouldEnterSuppressNewDiagnosticsContextContext) {
+      suppressNewDiagnosticContexts = true;
+    }
+    if (isProcessedComponent(input)) {
+      switch (input.kind) {
+        case 233 /* ExpressionWithTypeArguments */: {
+          if (isEntityName(input.expression) || isEntityNameExpression(input.expression)) {
+            checkEntityNameVisibility(input.expression, enclosingDeclaration);
+          }
+          const node = visitEachChild(input, visitDeclarationSubtree, context);
+          return cleanup(factory2.updateExpressionWithTypeArguments(node, node.expression, node.typeArguments));
+        }
+        case 183 /* TypeReference */: {
+          checkEntityNameVisibility(input.typeName, enclosingDeclaration);
+          const node = visitEachChild(input, visitDeclarationSubtree, context);
+          return cleanup(factory2.updateTypeReferenceNode(node, node.typeName, node.typeArguments));
+        }
+        case 180 /* ConstructSignature */:
+          return cleanup(factory2.updateConstructSignature(
+            input,
+            ensureTypeParams(input, input.typeParameters),
+            updateParamsList(input, input.parameters),
+            ensureType(input, input.type)
+          ));
+        case 176 /* Constructor */: {
+          const ctor = factory2.createConstructorDeclaration(
+            /*modifiers*/
+            ensureModifiers(input),
+            updateParamsList(input, input.parameters, 0 /* None */),
+            /*body*/
+            void 0
+          );
+          return cleanup(ctor);
+        }
+        case 174 /* MethodDeclaration */: {
+          if (isPrivateIdentifier(input.name)) {
+            return cleanup(
+              /*returnValue*/
+              void 0
+            );
+          }
+          const sig = factory2.createMethodDeclaration(
+            ensureModifiers(input),
+            /*asteriskToken*/
+            void 0,
+            input.name,
+            input.questionToken,
+            ensureTypeParams(input, input.typeParameters),
+            updateParamsList(input, input.parameters),
+            ensureType(input, input.type),
+            /*body*/
+            void 0
+          );
+          return cleanup(sig);
+        }
+        case 177 /* GetAccessor */: {
+          if (isPrivateIdentifier(input.name)) {
+            return cleanup(
+              /*returnValue*/
+              void 0
+            );
+          }
+          const accessorType = getTypeAnnotationFromAllAccessorDeclarations(input, resolver.getAllAccessorDeclarations(input));
+          return cleanup(factory2.updateGetAccessorDeclaration(
+            input,
+            ensureModifiers(input),
+            input.name,
+            updateAccessorParamsList(input, hasEffectiveModifier(input, 2 /* Private */)),
+            ensureType(input, accessorType),
+            /*body*/
+            void 0
+          ));
+        }
+        case 178 /* SetAccessor */: {
+          if (isPrivateIdentifier(input.name)) {
+            return cleanup(
+              /*returnValue*/
+              void 0
+            );
+          }
+          return cleanup(factory2.updateSetAccessorDeclaration(
+            input,
+            ensureModifiers(input),
+            input.name,
+            updateAccessorParamsList(input, hasEffectiveModifier(input, 2 /* Private */)),
+            /*body*/
+            void 0
+          ));
+        }
+        case 172 /* PropertyDeclaration */:
+          if (isPrivateIdentifier(input.name)) {
+            return cleanup(
+              /*returnValue*/
+              void 0
+            );
+          }
+          return cleanup(factory2.updatePropertyDeclaration(
+            input,
+            ensureModifiers(input),
+            input.name,
+            input.questionToken,
+            ensureType(input, input.type),
+            ensureNoInitializer(input)
+          ));
+        case 171 /* PropertySignature */:
+          if (isPrivateIdentifier(input.name)) {
+            return cleanup(
+              /*returnValue*/
+              void 0
+            );
+          }
+          return cleanup(factory2.updatePropertySignature(
+            input,
+            ensureModifiers(input),
+            input.name,
+            input.questionToken,
+            ensureType(input, input.type)
+          ));
+        case 173 /* MethodSignature */: {
+          if (isPrivateIdentifier(input.name)) {
+            return cleanup(
+              /*returnValue*/
+              void 0
+            );
+          }
+          return cleanup(factory2.updateMethodSignature(
+            input,
+            ensureModifiers(input),
+            input.name,
+            input.questionToken,
+            ensureTypeParams(input, input.typeParameters),
+            updateParamsList(input, input.parameters),
+            ensureType(input, input.type)
+          ));
+        }
+        case 179 /* CallSignature */: {
+          return cleanup(
+            factory2.updateCallSignature(
+              input,
+              ensureTypeParams(input, input.typeParameters),
+              updateParamsList(input, input.parameters),
+              ensureType(input, input.type)
+            )
+          );
+        }
+        case 181 /* IndexSignature */: {
+          return cleanup(factory2.updateIndexSignature(
+            input,
+            ensureModifiers(input),
+            updateParamsList(input, input.parameters),
+            visitNode(input.type, visitDeclarationSubtree, isTypeNode) || factory2.createKeywordTypeNode(133 /* AnyKeyword */)
+          ));
+        }
+        case 260 /* VariableDeclaration */: {
+          if (isBindingPattern(input.name)) {
+            return recreateBindingPattern(input.name);
+          }
+          shouldEnterSuppressNewDiagnosticsContextContext = true;
+          suppressNewDiagnosticContexts = true;
+          return cleanup(factory2.updateVariableDeclaration(
+            input,
+            input.name,
+            /*exclamationToken*/
+            void 0,
+            ensureType(input, input.type),
+            ensureNoInitializer(input)
+          ));
+        }
+        case 168 /* TypeParameter */: {
+          if (isPrivateMethodTypeParameter(input) && (input.default || input.constraint)) {
+            return cleanup(factory2.updateTypeParameterDeclaration(
+              input,
+              input.modifiers,
+              input.name,
+              /*constraint*/
+              void 0,
+              /*defaultType*/
+              void 0
+            ));
+          }
+          return cleanup(visitEachChild(input, visitDeclarationSubtree, context));
+        }
+        case 194 /* ConditionalType */: {
+          const checkType = visitNode(input.checkType, visitDeclarationSubtree, isTypeNode);
+          const extendsType = visitNode(input.extendsType, visitDeclarationSubtree, isTypeNode);
+          const oldEnclosingDecl = enclosingDeclaration;
+          enclosingDeclaration = input.trueType;
+          const trueType = visitNode(input.trueType, visitDeclarationSubtree, isTypeNode);
+          enclosingDeclaration = oldEnclosingDecl;
+          const falseType = visitNode(input.falseType, visitDeclarationSubtree, isTypeNode);
+          Debug.assert(checkType);
+          Debug.assert(extendsType);
+          Debug.assert(trueType);
+          Debug.assert(falseType);
+          return cleanup(factory2.updateConditionalTypeNode(input, checkType, extendsType, trueType, falseType));
+        }
+        case 184 /* FunctionType */: {
+          return cleanup(factory2.updateFunctionTypeNode(
+            input,
+            visitNodes2(input.typeParameters, visitDeclarationSubtree, isTypeParameterDeclaration),
+            updateParamsList(input, input.parameters),
+            Debug.checkDefined(visitNode(input.type, visitDeclarationSubtree, isTypeNode))
+          ));
+        }
+        case 185 /* ConstructorType */: {
+          return cleanup(factory2.updateConstructorTypeNode(
+            input,
+            ensureModifiers(input),
+            visitNodes2(input.typeParameters, visitDeclarationSubtree, isTypeParameterDeclaration),
+            updateParamsList(input, input.parameters),
+            Debug.checkDefined(visitNode(input.type, visitDeclarationSubtree, isTypeNode))
+          ));
+        }
+        case 205 /* ImportType */: {
+          if (!isLiteralImportTypeNode(input))
+            return cleanup(input);
+          trackReferencedAmbientModuleFromImport(input);
+          return cleanup(factory2.updateImportTypeNode(
+            input,
+            factory2.updateLiteralTypeNode(input.argument, rewriteModuleSpecifier(input, input.argument.literal)),
+            input.attributes,
+            input.qualifier,
+            visitNodes2(input.typeArguments, visitDeclarationSubtree, isTypeNode),
+            input.isTypeOf
+          ));
+        }
+        default:
+          Debug.assertNever(input, `Attempted to process unhandled node kind: ${Debug.formatSyntaxKind(input.kind)}`);
+      }
+    }
+    if (isTupleTypeNode(input) && getLineAndCharacterOfPosition(currentSourceFile, input.pos).line === getLineAndCharacterOfPosition(currentSourceFile, input.end).line) {
+      setEmitFlags(input, 1 /* SingleLine */);
+    }
+    return cleanup(visitEachChild(input, visitDeclarationSubtree, context));
+    function cleanup(returnValue) {
+      if (returnValue && canProduceDiagnostic && hasDynamicName(input)) {
+        checkName(input);
+      }
+      if (isEnclosingDeclaration(input)) {
+        enclosingDeclaration = previousEnclosingDeclaration;
+      }
+      if (canProduceDiagnostic && !suppressNewDiagnosticContexts) {
+        getSymbolAccessibilityDiagnostic = oldDiag;
+      }
+      if (shouldEnterSuppressNewDiagnosticsContextContext) {
+        suppressNewDiagnosticContexts = oldWithinObjectLiteralType;
+      }
+      if (returnValue === input) {
+        return returnValue;
+      }
+      return returnValue && setOriginalNode(preserveJsDoc(returnValue, input), input);
+    }
+  }
+  function isPrivateMethodTypeParameter(node) {
+    return node.parent.kind === 174 /* MethodDeclaration */ && hasEffectiveModifier(node.parent, 2 /* Private */);
+  }
+  function visitDeclarationStatements(input) {
+    if (!isPreservedDeclarationStatement(input)) {
+      return;
+    }
+    if (shouldStripInternal(input))
+      return;
+    switch (input.kind) {
+      case 278 /* ExportDeclaration */: {
+        if (isSourceFile(input.parent)) {
+          resultHasExternalModuleIndicator = true;
+        }
+        resultHasScopeMarker = true;
+        trackReferencedAmbientModuleFromImport(input);
+        return factory2.updateExportDeclaration(
+          input,
+          input.modifiers,
+          input.isTypeOnly,
+          input.exportClause,
+          rewriteModuleSpecifier(input, input.moduleSpecifier),
+          tryGetResolutionModeOverride(input.attributes)
+        );
+      }
+      case 277 /* ExportAssignment */: {
+        if (isSourceFile(input.parent)) {
+          resultHasExternalModuleIndicator = true;
+        }
+        resultHasScopeMarker = true;
+        if (input.expression.kind === 80 /* Identifier */) {
+          return input;
+        } else {
+          const newId = factory2.createUniqueName("_default", 16 /* Optimistic */);
+          getSymbolAccessibilityDiagnostic = () => ({
+            diagnosticMessage: Diagnostics.Default_export_of_the_module_has_or_is_using_private_name_0,
+            errorNode: input
+          });
+          errorFallbackNode = input;
+          const varDecl = factory2.createVariableDeclaration(
+            newId,
+            /*exclamationToken*/
+            void 0,
+            resolver.createTypeOfExpression(input.expression, input, declarationEmitNodeBuilderFlags, symbolTracker),
+            /*initializer*/
+            void 0
+          );
+          errorFallbackNode = void 0;
+          const statement = factory2.createVariableStatement(needsDeclare ? [factory2.createModifier(138 /* DeclareKeyword */)] : [], factory2.createVariableDeclarationList([varDecl], 2 /* Const */));
+          preserveJsDoc(statement, input);
+          removeAllComments(input);
+          return [statement, factory2.updateExportAssignment(input, input.modifiers, newId)];
+        }
+      }
+    }
+    const result = transformTopLevelDeclaration(input);
+    lateStatementReplacementMap.set(getOriginalNodeId(input), result);
+    return input;
+  }
+  function stripExportModifiers(statement) {
+    if (isImportEqualsDeclaration(statement) || hasEffectiveModifier(statement, 2048 /* Default */) || !canHaveModifiers(statement)) {
+      return statement;
+    }
+    const modifiers = factory2.createModifiersFromModifierFlags(getEffectiveModifierFlags(statement) & (131071 /* All */ ^ 32 /* Export */));
+    return factory2.replaceModifiers(statement, modifiers);
+  }
+  function updateModuleDeclarationAndKeyword(node, modifiers, name, body) {
+    const updated = factory2.updateModuleDeclaration(node, modifiers, name, body);
+    if (isAmbientModule(updated) || updated.flags & 32 /* Namespace */) {
+      return updated;
+    }
+    const fixed = factory2.createModuleDeclaration(
+      updated.modifiers,
+      updated.name,
+      updated.body,
+      updated.flags | 32 /* Namespace */
+    );
+    setOriginalNode(fixed, updated);
+    setTextRange(fixed, updated);
+    return fixed;
+  }
+  function transformTopLevelDeclaration(input) {
+    if (lateMarkedStatements) {
+      while (orderedRemoveItem(lateMarkedStatements, input))
+        ;
+    }
+    if (shouldStripInternal(input))
+      return;
+    switch (input.kind) {
+      case 271 /* ImportEqualsDeclaration */: {
+        const transformed = transformImportEqualsDeclaration(input);
+        if (transformed) {
+          trackReferencedAmbientModuleFromImport(input);
+        }
+        return transformed;
+      }
+      case 272 /* ImportDeclaration */: {
+        const transformed = transformImportDeclaration(input);
+        if (transformed) {
+          trackReferencedAmbientModuleFromImport(input);
+        }
+        return transformed;
+      }
+    }
+    if (isDeclaration(input) && isDeclarationAndNotVisible(input))
+      return;
+    if (isFunctionLike(input) && resolver.isImplementationOfOverload(input))
+      return;
+    let previousEnclosingDeclaration;
+    if (isEnclosingDeclaration(input)) {
+      previousEnclosingDeclaration = enclosingDeclaration;
+      enclosingDeclaration = input;
+    }
+    const canProdiceDiagnostic = canProduceDiagnostics(input);
+    const oldDiag = getSymbolAccessibilityDiagnostic;
+    if (canProdiceDiagnostic) {
+      getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNode(input);
+    }
+    const previousNeedsDeclare = needsDeclare;
+    switch (input.kind) {
+      case 265 /* TypeAliasDeclaration */: {
+        needsDeclare = false;
+        const clean2 = cleanup(factory2.updateTypeAliasDeclaration(
+          input,
+          ensureModifiers(input),
+          input.name,
+          visitNodes2(input.typeParameters, visitDeclarationSubtree, isTypeParameterDeclaration),
+          Debug.checkDefined(visitNode(input.type, visitDeclarationSubtree, isTypeNode))
+        ));
+        needsDeclare = previousNeedsDeclare;
+        return clean2;
+      }
+      case 264 /* InterfaceDeclaration */: {
+        return cleanup(factory2.updateInterfaceDeclaration(
+          input,
+          ensureModifiers(input),
+          input.name,
+          ensureTypeParams(input, input.typeParameters),
+          transformHeritageClauses(input.heritageClauses),
+          visitNodes2(input.members, visitDeclarationSubtree, isTypeElement)
+        ));
+      }
+      case 262 /* FunctionDeclaration */: {
+        const clean2 = cleanup(factory2.updateFunctionDeclaration(
+          input,
+          ensureModifiers(input),
+          /*asteriskToken*/
+          void 0,
+          input.name,
+          ensureTypeParams(input, input.typeParameters),
+          updateParamsList(input, input.parameters),
+          ensureType(input, input.type),
+          /*body*/
+          void 0
+        ));
+        if (clean2 && resolver.isExpandoFunctionDeclaration(input) && shouldEmitFunctionProperties(input)) {
+          const props = resolver.getPropertiesOfContainerFunction(input);
+          const fakespace = parseNodeFactory.createModuleDeclaration(
+            /*modifiers*/
+            void 0,
+            clean2.name || factory2.createIdentifier("_default"),
+            factory2.createModuleBlock([]),
+            32 /* Namespace */
+          );
+          setParent(fakespace, enclosingDeclaration);
+          fakespace.locals = createSymbolTable(props);
+          fakespace.symbol = props[0].parent;
+          const exportMappings = [];
+          let declarations = mapDefined(props, (p) => {
+            if (!isExpandoPropertyDeclaration(p.valueDeclaration)) {
+              return void 0;
+            }
+            const nameStr = unescapeLeadingUnderscores(p.escapedName);
+            if (!isIdentifierText(nameStr, 99 /* ESNext */)) {
+              return void 0;
+            }
+            getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNode(p.valueDeclaration);
+            const type = resolver.createTypeOfDeclaration(p.valueDeclaration, fakespace, declarationEmitNodeBuilderFlags, symbolTracker);
+            getSymbolAccessibilityDiagnostic = oldDiag;
+            const isNonContextualKeywordName = isStringANonContextualKeyword(nameStr);
+            const name = isNonContextualKeywordName ? factory2.getGeneratedNameForNode(p.valueDeclaration) : factory2.createIdentifier(nameStr);
+            if (isNonContextualKeywordName) {
+              exportMappings.push([name, nameStr]);
+            }
+            const varDecl = factory2.createVariableDeclaration(
+              name,
+              /*exclamationToken*/
+              void 0,
+              type,
+              /*initializer*/
+              void 0
+            );
+            return factory2.createVariableStatement(isNonContextualKeywordName ? void 0 : [factory2.createToken(95 /* ExportKeyword */)], factory2.createVariableDeclarationList([varDecl]));
+          });
+          if (!exportMappings.length) {
+            declarations = mapDefined(declarations, (declaration) => factory2.replaceModifiers(declaration, 0 /* None */));
+          } else {
+            declarations.push(factory2.createExportDeclaration(
+              /*modifiers*/
+              void 0,
+              /*isTypeOnly*/
+              false,
+              factory2.createNamedExports(map(exportMappings, ([gen, exp]) => {
+                return factory2.createExportSpecifier(
+                  /*isTypeOnly*/
+                  false,
+                  gen,
+                  exp
+                );
+              }))
+            ));
+          }
+          const namespaceDecl = factory2.createModuleDeclaration(ensureModifiers(input), input.name, factory2.createModuleBlock(declarations), 32 /* Namespace */);
+          if (!hasEffectiveModifier(clean2, 2048 /* Default */)) {
+            return [clean2, namespaceDecl];
+          }
+          const modifiers = factory2.createModifiersFromModifierFlags(getEffectiveModifierFlags(clean2) & ~2080 /* ExportDefault */ | 128 /* Ambient */);
+          const cleanDeclaration = factory2.updateFunctionDeclaration(
+            clean2,
+            modifiers,
+            /*asteriskToken*/
+            void 0,
+            clean2.name,
+            clean2.typeParameters,
+            clean2.parameters,
+            clean2.type,
+            /*body*/
+            void 0
+          );
+          const namespaceDeclaration = factory2.updateModuleDeclaration(
+            namespaceDecl,
+            modifiers,
+            namespaceDecl.name,
+            namespaceDecl.body
+          );
+          const exportDefaultDeclaration = factory2.createExportAssignment(
+            /*modifiers*/
+            void 0,
+            /*isExportEquals*/
+            false,
+            namespaceDecl.name
+          );
+          if (isSourceFile(input.parent)) {
+            resultHasExternalModuleIndicator = true;
+          }
+          resultHasScopeMarker = true;
+          return [cleanDeclaration, namespaceDeclaration, exportDefaultDeclaration];
+        } else {
+          return clean2;
+        }
+      }
+      case 267 /* ModuleDeclaration */: {
+        needsDeclare = false;
+        const inner = input.body;
+        if (inner && inner.kind === 268 /* ModuleBlock */) {
+          const oldNeedsScopeFix = needsScopeFixMarker;
+          const oldHasScopeFix = resultHasScopeMarker;
+          resultHasScopeMarker = false;
+          needsScopeFixMarker = false;
+          const statements = visitNodes2(inner.statements, visitDeclarationStatements, isStatement);
+          let lateStatements = transformAndReplaceLatePaintedStatements(statements);
+          if (input.flags & 33554432 /* Ambient */) {
+            needsScopeFixMarker = false;
+          }
+          if (!isGlobalScopeAugmentation(input) && !hasScopeMarker2(lateStatements) && !resultHasScopeMarker) {
+            if (needsScopeFixMarker) {
+              lateStatements = factory2.createNodeArray([...lateStatements, createEmptyExports(factory2)]);
+            } else {
+              lateStatements = visitNodes2(lateStatements, stripExportModifiers, isStatement);
+            }
+          }
+          const body = factory2.updateModuleBlock(inner, lateStatements);
+          needsDeclare = previousNeedsDeclare;
+          needsScopeFixMarker = oldNeedsScopeFix;
+          resultHasScopeMarker = oldHasScopeFix;
+          const mods = ensureModifiers(input);
+          return cleanup(updateModuleDeclarationAndKeyword(
+            input,
+            mods,
+            isExternalModuleAugmentation(input) ? rewriteModuleSpecifier(input, input.name) : input.name,
+            body
+          ));
+        } else {
+          needsDeclare = previousNeedsDeclare;
+          const mods = ensureModifiers(input);
+          needsDeclare = false;
+          visitNode(inner, visitDeclarationStatements);
+          const id = getOriginalNodeId(inner);
+          const body = lateStatementReplacementMap.get(id);
+          lateStatementReplacementMap.delete(id);
+          return cleanup(updateModuleDeclarationAndKeyword(
+            input,
+            mods,
+            input.name,
+            body
+          ));
+        }
+      }
+      case 263 /* ClassDeclaration */: {
+        errorNameNode = input.name;
+        errorFallbackNode = input;
+        const modifiers = factory2.createNodeArray(ensureModifiers(input));
+        const typeParameters = ensureTypeParams(input, input.typeParameters);
+        const ctor = getFirstConstructorWithBody(input);
+        let parameterProperties;
+        if (ctor) {
+          const oldDiag2 = getSymbolAccessibilityDiagnostic;
+          parameterProperties = compact(flatMap(ctor.parameters, (param) => {
+            if (!hasSyntacticModifier(param, 31 /* ParameterPropertyModifier */) || shouldStripInternal(param))
+              return;
+            getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNode(param);
+            if (param.name.kind === 80 /* Identifier */) {
+              return preserveJsDoc(
+                factory2.createPropertyDeclaration(
+                  ensureModifiers(param),
+                  param.name,
+                  param.questionToken,
+                  ensureType(param, param.type),
+                  ensureNoInitializer(param)
+                ),
+                param
+              );
+            } else {
+              return walkBindingPattern(param.name);
+            }
+            function walkBindingPattern(pattern) {
+              let elems;
+              for (const elem of pattern.elements) {
+                if (isOmittedExpression(elem))
+                  continue;
+                if (isBindingPattern(elem.name)) {
+                  elems = concatenate(elems, walkBindingPattern(elem.name));
+                }
+                elems = elems || [];
+                elems.push(factory2.createPropertyDeclaration(
+                  ensureModifiers(param),
+                  elem.name,
+                  /*questionOrExclamationToken*/
+                  void 0,
+                  ensureType(
+                    elem,
+                    /*type*/
+                    void 0
+                  ),
+                  /*initializer*/
+                  void 0
+                ));
+              }
+              return elems;
+            }
+          }));
+          getSymbolAccessibilityDiagnostic = oldDiag2;
+        }
+        const hasPrivateIdentifier = some(input.members, (member) => !!member.name && isPrivateIdentifier(member.name));
+        const privateIdentifier = hasPrivateIdentifier ? [
+          factory2.createPropertyDeclaration(
+            /*modifiers*/
+            void 0,
+            factory2.createPrivateIdentifier("#private"),
+            /*questionOrExclamationToken*/
+            void 0,
+            /*type*/
+            void 0,
+            /*initializer*/
+            void 0
+          )
+        ] : void 0;
+        const memberNodes = concatenate(concatenate(privateIdentifier, parameterProperties), visitNodes2(input.members, visitDeclarationSubtree, isClassElement));
+        const members = factory2.createNodeArray(memberNodes);
+        const extendsClause = getEffectiveBaseTypeNode(input);
+        if (extendsClause && !isEntityNameExpression(extendsClause.expression) && extendsClause.expression.kind !== 106 /* NullKeyword */) {
+          const oldId = input.name ? unescapeLeadingUnderscores(input.name.escapedText) : "default";
+          const newId = factory2.createUniqueName(`${oldId}_base`, 16 /* Optimistic */);
+          getSymbolAccessibilityDiagnostic = () => ({
+            diagnosticMessage: Diagnostics.extends_clause_of_exported_class_0_has_or_is_using_private_name_1,
+            errorNode: extendsClause,
+            typeName: input.name
+          });
+          const varDecl = factory2.createVariableDeclaration(
+            newId,
+            /*exclamationToken*/
+            void 0,
+            resolver.createTypeOfExpression(extendsClause.expression, input, declarationEmitNodeBuilderFlags, symbolTracker),
+            /*initializer*/
+            void 0
+          );
+          const statement = factory2.createVariableStatement(needsDeclare ? [factory2.createModifier(138 /* DeclareKeyword */)] : [], factory2.createVariableDeclarationList([varDecl], 2 /* Const */));
+          const heritageClauses = factory2.createNodeArray(map(input.heritageClauses, (clause) => {
+            if (clause.token === 96 /* ExtendsKeyword */) {
+              const oldDiag2 = getSymbolAccessibilityDiagnostic;
+              getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNode(clause.types[0]);
+              const newClause = factory2.updateHeritageClause(clause, map(clause.types, (t) => factory2.updateExpressionWithTypeArguments(t, newId, visitNodes2(t.typeArguments, visitDeclarationSubtree, isTypeNode))));
+              getSymbolAccessibilityDiagnostic = oldDiag2;
+              return newClause;
+            }
+            return factory2.updateHeritageClause(clause, visitNodes2(factory2.createNodeArray(filter(clause.types, (t) => isEntityNameExpression(t.expression) || t.expression.kind === 106 /* NullKeyword */)), visitDeclarationSubtree, isExpressionWithTypeArguments));
+          }));
+          return [
+            statement,
+            cleanup(factory2.updateClassDeclaration(
+              input,
+              modifiers,
+              input.name,
+              typeParameters,
+              heritageClauses,
+              members
+            ))
+          ];
+        } else {
+          const heritageClauses = transformHeritageClauses(input.heritageClauses);
+          return cleanup(factory2.updateClassDeclaration(
+            input,
+            modifiers,
+            input.name,
+            typeParameters,
+            heritageClauses,
+            members
+          ));
+        }
+      }
+      case 243 /* VariableStatement */: {
+        return cleanup(transformVariableStatement(input));
+      }
+      case 266 /* EnumDeclaration */: {
+        return cleanup(factory2.updateEnumDeclaration(
+          input,
+          factory2.createNodeArray(ensureModifiers(input)),
+          input.name,
+          factory2.createNodeArray(mapDefined(input.members, (m) => {
+            if (shouldStripInternal(m))
+              return;
+            const constValue = resolver.getConstantValue(m);
+            const newInitializer = constValue === void 0 ? void 0 : typeof constValue === "string" ? factory2.createStringLiteral(constValue) : constValue < 0 ? factory2.createPrefixUnaryExpression(41 /* MinusToken */, factory2.createNumericLiteral(-constValue)) : factory2.createNumericLiteral(constValue);
+            return preserveJsDoc(factory2.updateEnumMember(m, m.name, newInitializer), m);
+          }))
+        ));
+      }
+    }
+    return Debug.assertNever(input, `Unhandled top-level node in declaration emit: ${Debug.formatSyntaxKind(input.kind)}`);
+    function cleanup(node) {
+      if (isEnclosingDeclaration(input)) {
+        enclosingDeclaration = previousEnclosingDeclaration;
+      }
+      if (canProdiceDiagnostic) {
+        getSymbolAccessibilityDiagnostic = oldDiag;
+      }
+      if (input.kind === 267 /* ModuleDeclaration */) {
+        needsDeclare = previousNeedsDeclare;
+      }
+      if (node === input) {
+        return node;
+      }
+      errorFallbackNode = void 0;
+      errorNameNode = void 0;
+      return node && setOriginalNode(preserveJsDoc(node, input), input);
+    }
+  }
+  function transformVariableStatement(input) {
+    if (!forEach(input.declarationList.declarations, getBindingNameVisible))
+      return;
+    const nodes = visitNodes2(input.declarationList.declarations, visitDeclarationSubtree, isVariableDeclaration);
+    if (!length(nodes))
+      return;
+    const modifiers = factory2.createNodeArray(ensureModifiers(input));
+    let declList;
+    if (isVarUsing(input.declarationList) || isVarAwaitUsing(input.declarationList)) {
+      declList = factory2.createVariableDeclarationList(nodes, 2 /* Const */);
+      setOriginalNode(declList, input.declarationList);
+      setTextRange(declList, input.declarationList);
+      setCommentRange(declList, input.declarationList);
+    } else {
+      declList = factory2.updateVariableDeclarationList(input.declarationList, nodes);
+    }
+    return factory2.updateVariableStatement(input, modifiers, declList);
+  }
+  function recreateBindingPattern(d) {
+    return flatten(mapDefined(d.elements, (e) => recreateBindingElement(e)));
+  }
+  function recreateBindingElement(e) {
+    if (e.kind === 232 /* OmittedExpression */) {
+      return;
+    }
+    if (e.name) {
+      if (!getBindingNameVisible(e))
+        return;
+      if (isBindingPattern(e.name)) {
+        return recreateBindingPattern(e.name);
+      } else {
+        return factory2.createVariableDeclaration(
+          e.name,
+          /*exclamationToken*/
+          void 0,
+          ensureType(
+            e,
+            /*type*/
+            void 0
+          ),
+          /*initializer*/
+          void 0
+        );
+      }
+    }
+  }
+  function checkName(node) {
+    let oldDiag;
+    if (!suppressNewDiagnosticContexts) {
+      oldDiag = getSymbolAccessibilityDiagnostic;
+      getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNodeName(node);
+    }
+    errorNameNode = node.name;
+    Debug.assert(resolver.isLateBound(getParseTreeNode(node)));
+    const decl = node;
+    const entityName = decl.name.expression;
+    checkEntityNameVisibility(entityName, enclosingDeclaration);
+    if (!suppressNewDiagnosticContexts) {
+      getSymbolAccessibilityDiagnostic = oldDiag;
+    }
+    errorNameNode = void 0;
+  }
+  function shouldStripInternal(node) {
+    return !!stripInternal && !!node && isInternalDeclaration(node, currentSourceFile);
+  }
+  function isScopeMarker2(node) {
+    return isExportAssignment(node) || isExportDeclaration(node);
+  }
+  function hasScopeMarker2(statements) {
+    return some(statements, isScopeMarker2);
+  }
+  function ensureModifiers(node) {
+    const currentFlags = getEffectiveModifierFlags(node);
+    const newFlags = ensureModifierFlags(node);
+    if (currentFlags === newFlags) {
+      return visitArray(node.modifiers, (n) => tryCast(n, isModifier), isModifier);
+    }
+    return factory2.createModifiersFromModifierFlags(newFlags);
+  }
+  function ensureModifierFlags(node) {
+    let mask = 131071 /* All */ ^ (1 /* Public */ | 1024 /* Async */ | 16 /* Override */);
+    let additions = needsDeclare && !isAlwaysType(node) ? 128 /* Ambient */ : 0 /* None */;
+    const parentIsFile = node.parent.kind === 312 /* SourceFile */;
+    if (!parentIsFile || isBundledEmit && parentIsFile && isExternalModule(node.parent)) {
+      mask ^= 128 /* Ambient */;
+      additions = 0 /* None */;
+    }
+    return maskModifierFlags(node, mask, additions);
+  }
+  function getTypeAnnotationFromAllAccessorDeclarations(node, accessors) {
+    let accessorType = getTypeAnnotationFromAccessor(node);
+    if (!accessorType && node !== accessors.firstAccessor) {
+      accessorType = getTypeAnnotationFromAccessor(accessors.firstAccessor);
+      getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNode(accessors.firstAccessor);
+    }
+    if (!accessorType && accessors.secondAccessor && node !== accessors.secondAccessor) {
+      accessorType = getTypeAnnotationFromAccessor(accessors.secondAccessor);
+      getSymbolAccessibilityDiagnostic = createGetSymbolAccessibilityDiagnosticForNode(accessors.secondAccessor);
+    }
+    return accessorType;
+  }
+  function transformHeritageClauses(nodes) {
+    return factory2.createNodeArray(filter(
+      map(nodes, (clause) => factory2.updateHeritageClause(
+        clause,
+        visitNodes2(
+          factory2.createNodeArray(filter(clause.types, (t) => {
+            return isEntityNameExpression(t.expression) || clause.token === 96 /* ExtendsKeyword */ && t.expression.kind === 106 /* NullKeyword */;
+          })),
+          visitDeclarationSubtree,
+          isExpressionWithTypeArguments
+        )
+      )),
+      (clause) => clause.types && !!clause.types.length
+    ));
+  }
+}
+function isAlwaysType(node) {
+  if (node.kind === 264 /* InterfaceDeclaration */) {
+    return true;
+  }
+  return false;
+}
+function maskModifiers(factory2, node, modifierMask, modifierAdditions) {
+  return factory2.createModifiersFromModifierFlags(maskModifierFlags(node, modifierMask, modifierAdditions));
+}
+function maskModifierFlags(node, modifierMask = 131071 /* All */ ^ 1 /* Public */, modifierAdditions = 0 /* None */) {
+  let flags = getEffectiveModifierFlags(node) & modifierMask | modifierAdditions;
+  if (flags & 2048 /* Default */ && !(flags & 32 /* Export */)) {
+    flags ^= 32 /* Export */;
+  }
+  if (flags & 2048 /* Default */ && flags & 128 /* Ambient */) {
+    flags ^= 128 /* Ambient */;
+  }
+  return flags;
+}
+function getTypeAnnotationFromAccessor(accessor) {
+  if (accessor) {
+    return accessor.kind === 177 /* GetAccessor */ ? accessor.type : accessor.parameters.length > 0 ? accessor.parameters[0].type : void 0;
+  }
+}
+function canHaveLiteralInitializer(node) {
+  switch (node.kind) {
+    case 172 /* PropertyDeclaration */:
+    case 171 /* PropertySignature */:
+      return !hasEffectiveModifier(node, 2 /* Private */);
+    case 169 /* Parameter */:
+    case 260 /* VariableDeclaration */:
+      return true;
+  }
+  return false;
+}
+function isPreservedDeclarationStatement(node) {
+  switch (node.kind) {
+    case 262 /* FunctionDeclaration */:
+    case 267 /* ModuleDeclaration */:
+    case 271 /* ImportEqualsDeclaration */:
+    case 264 /* InterfaceDeclaration */:
+    case 263 /* ClassDeclaration */:
+    case 265 /* TypeAliasDeclaration */:
+    case 266 /* EnumDeclaration */:
+    case 243 /* VariableStatement */:
+    case 272 /* ImportDeclaration */:
+    case 278 /* ExportDeclaration */:
+    case 277 /* ExportAssignment */:
+      return true;
+  }
+  return false;
+}
+function isProcessedComponent(node) {
+  switch (node.kind) {
+    case 180 /* ConstructSignature */:
+    case 176 /* Constructor */:
+    case 174 /* MethodDeclaration */:
+    case 177 /* GetAccessor */:
+    case 178 /* SetAccessor */:
+    case 172 /* PropertyDeclaration */:
+    case 171 /* PropertySignature */:
+    case 173 /* MethodSignature */:
+    case 179 /* CallSignature */:
+    case 181 /* IndexSignature */:
+    case 260 /* VariableDeclaration */:
+    case 168 /* TypeParameter */:
+    case 233 /* ExpressionWithTypeArguments */:
+    case 183 /* TypeReference */:
+    case 194 /* ConditionalType */:
+    case 184 /* FunctionType */:
+    case 185 /* ConstructorType */:
+    case 205 /* ImportType */:
+      return true;
+  }
+  return false;
+}
+
+// src/compiler/transformer.ts
+function getModuleTransformer(moduleKind) {
+  switch (moduleKind) {
+    case 99 /* ESNext */:
+    case 7 /* ES2022 */:
+    case 6 /* ES2020 */:
+    case 5 /* ES2015 */:
+    case 200 /* Preserve */:
+      return transformECMAScriptModule;
+    case 4 /* System */:
+      return transformSystemModule;
+    case 100 /* Node16 */:
+    case 199 /* NodeNext */:
+      return transformNodeModule;
+    default:
+      return transformModule;
+  }
+}
+var noTransformers = { scriptTransformers: emptyArray, declarationTransformers: emptyArray };
+function getTransformers(compilerOptions, customTransformers, emitOnly) {
+  return {
+    scriptTransformers: getScriptTransformers(compilerOptions, customTransformers, emitOnly),
+    declarationTransformers: getDeclarationTransformers(customTransformers)
+  };
+}
+function getScriptTransformers(compilerOptions, customTransformers, emitOnly) {
+  if (emitOnly)
+    return emptyArray;
+  const languageVersion = getEmitScriptTarget(compilerOptions);
+  const moduleKind = getEmitModuleKind(compilerOptions);
+  const useDefineForClassFields = getUseDefineForClassFields(compilerOptions);
+  const transformers = [];
+  addRange(transformers, customTransformers && map(customTransformers.before, wrapScriptTransformerFactory));
+  transformers.push(transformTypeScript);
+  if (compilerOptions.experimentalDecorators) {
+    transformers.push(transformLegacyDecorators);
+  }
+  if (getJSXTransformEnabled(compilerOptions)) {
+    transformers.push(transformJsx);

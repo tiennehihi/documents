@@ -1,0 +1,11 @@
+'use strict';
+/**
+ * @typedef {object} Plugin
+ * @prop {Set<string>} targets
+ * @prop {Set<string>} nodeTypes
+ * @prop {(node: import('postcss').Node) => void} detectAndResolve
+ * @prop {(node: import('postcss').Node) => void} detectAndWarn
+ */
+
+/** 
+ * @typedef {import

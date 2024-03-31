@@ -1,0 +1,36 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+/**
+ * @param {string} str string
+ * @returns {string} quoted meta
+ */
+const quoteMeta = str => {
+	return str.replace(/[-[\]\\/{}()*+?.^$|]/g, "\\$&");
+};
+
+/**
+ * @param {string} str string
+ * @returns {string} string
+ */
+const toSimpleString = str => {
+	if (`${+str}` === str) {
+		return str;
+	}
+	return JSON.stringify(str);
+};
+
+/**
+ * @param {Record<string|number, boolean>} map value map
+ * @returns {boolean|(function(string): string)} true/false, when unconditionally true/false, or a template function to determine the value at runtime
+ */
+const compileBooleanMatcher = map => {
+	const positiveItems = Object.keys(map).filter(i => map[i]);
+	const negativeItems = Object.keys(map).filter(i => !map[i]);
+	if (positiveItems.length === 0) return false;
+	if (negativeItems.length === 0) return true;
+	return compil

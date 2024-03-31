@@ -1,0 +1,13 @@
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.default = defaultResolver;
+
+function _path() {
+  const data = require('path');
+
+  _path = function () {
+    return data;
+  

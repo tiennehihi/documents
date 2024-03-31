@@ -1,0 +1,13 @@
+();
+		this.requestShortener = compiler.requestShortener;
+		this.compilerPath = compiler.compilerPath;
+
+		this.logger = this.getLogger("webpack.Compilation");
+
+		const options = compiler.options;
+		this.options = options;
+		this.outputOptions = options && options.output;
+		/** @type {boolean} */
+		this.bail = (options && options.bail) || false;
+		/** @type {boolean} */
+		t

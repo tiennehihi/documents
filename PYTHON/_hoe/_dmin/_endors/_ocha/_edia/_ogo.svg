@@ -1,0 +1,22 @@
+/**
+ * @fileoverview Main CLI object.
+ * @author Nicholas C. Zakas
+ */
+
+"use strict";
+
+/*
+ * NOTE: The CLI object should *not* call process.exit() directly. It should only return
+ * exit codes. This allows other programs to use the CLI object and still control
+ * when the program exits.
+ */
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const fs = require("fs"),
+    path = require("path"),
+    { promisify } = require("util"),
+    { ESLint } = require("./eslint"),
+    { FlatESLint, shouldUseFlatConfig } = require("./eslint/

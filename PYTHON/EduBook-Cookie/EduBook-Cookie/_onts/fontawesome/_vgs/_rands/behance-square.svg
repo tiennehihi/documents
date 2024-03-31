@@ -1,0 +1,37 @@
+var override = require('../utils/override');
+
+var INTEGER_PATTERN = /^\d+$/;
+
+var ALL_UNITS = ['*', 'all'];
+var DEFAULT_PRECISION = 'off'; // all precision changes are disabled
+var DIRECTIVES_SEPARATOR = ','; // e.g. *=5,px=3
+var DIRECTIVE_VALUE_SEPARATOR = '='; // e.g. *=5
+
+function roundingPrecisionFrom(source) {
+  return override(defaults(DEFAULT_PRECISION), buildPrecisionFrom(source));
+}
+
+function defaults(value) {
+  return {
+    ch: value,
+    cm: value,
+    em: value,
+    ex: value,
+    in: value,
+    mm: value,
+    pc: value,
+    pt: value,
+    px: value,
+    q: value,
+    rem: value,
+    vh: value,
+    vmax: value,
+    vmin: value,
+    vw: value,
+    '%': value
+  };
+}
+
+function buildPrecisionFrom(source) {
+  if (source === null || source === undefined) {
+    return

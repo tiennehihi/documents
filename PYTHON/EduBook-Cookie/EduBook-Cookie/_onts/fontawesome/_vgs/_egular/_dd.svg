@@ -1,0 +1,11 @@
+import {input, state} from "../traverser/base";
+import {charCodes} from "../util/charcodes";
+import {IS_IDENTIFIER_CHAR} from "../util/identifier";
+import {finishToken} from "./index";
+import {READ_WORD_TREE} from "./readWordTree";
+import {TokenType as tt} from "./types";
+
+/**
+ * Read an identifier, producing either a name token or matching on one of the existing keywords.
+ * For performance, we pre-generate big decision tree that we traverse. Each node represents a
+ * prefix and has 27 values, where the first value is the token or cont

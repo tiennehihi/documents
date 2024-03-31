@@ -1,0 +1,39 @@
+CSS/text-decoration"
+    },
+    "example": "p {\n  text-decoration: green wavy underline 2px;\n}",
+    "polyfills": [
+      {
+        "type": "PostCSS Plugin",
+        "link": "https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-text-decoration-shorthand"
+      }
+    ],
+    "vendors_implementations": 2
+  },
+  {
+    "id": "trigonometric-functions",
+    "title": "`sin()`, `cos()`, `tan()`, `asin()`, `acos()`, `atan()` and `atan2()` functions",
+    "description": "Functions to calculate various basic trigonometric relationships",
+    "specification": "https://www.w3.org/TR/css-values-4/#trig-funcs",
+    "stage": 2,
+    "browser_support": {
+      "and_chr": "111",
+      "and_ff": "108",
+      "android": "111",
+      "chrome": "111",
+      "edge": "111",
+      "firefox": "108",
+      "ios_saf": "15.4",
+      "op_mob": "75",
+      "opera": "97",
+      "safari": "15.4",
+      "samsung": "22.0"
+    },
+    "docs": {
+      "mdn": "https://developer.mozilla.org/en-US/docs/Web/CSS/sin"
+    },
+    "example": "body {\n  left: sin(45deg);\n  left: cos(45deg);\n  left: tan(45deg);\n  left: asin(0.5);\n  left: acos(0.5);\n  left: atan(10);\n  left: atan2(-1, 1);\n}",
+    "interoperable_at": 1678665600,
+    "polyfills": [
+      {
+        "type": "PostCSS Plugin",
+        "link": "https://github.co

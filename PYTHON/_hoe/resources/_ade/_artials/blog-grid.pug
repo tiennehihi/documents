@@ -1,0 +1,38 @@
+
+
+
+import XHTMLEntities from "../parser/plugins/jsx/xhtml";
+import {JSXRole} from "../parser/tokenizer";
+import {TokenType as tt} from "../parser/tokenizer/types";
+import {charCodes} from "../parser/util/charcodes";
+
+import getJSXPragmaInfo, {} from "../util/getJSXPragmaInfo";
+
+import Transformer from "./Transformer";
+
+export default class JSXTransformer extends Transformer {
+  
+  
+  
+
+  // State for calculating the line number of each JSX tag in development.
+  __init() {this.lastLineNumber = 1}
+  __init2() {this.lastIndex = 0}
+
+  // In development, variable name holding the name of the current file.
+  __init3() {this.filenameVarName = null}
+  // Mapping of claimed names for imports in the automatic transform, e,g.
+  // {jsx: "_jsx"}. This determines which imports to generate in the prefix.
+  __init4() {this.esmAutomaticImportNameResolutions = {}}
+  // When automatically adding imports in CJS mode, we store the variable name
+  // holding the imported CJS module so we can require it in the prefix.
+  __init5() {this.cjsAutomaticModuleNameResolutions = {}}
+
+  constructor(
+     rootTransformer,
+     tokens,
+     importProcessor,
+     nameManager,
+     options,
+  ) {
+    super();this.rootTransformer = rootTransformer;this.tokens = tokens;this.importProcessor = importProcessor;this.nameManager = nameManager;this.options = options;JSXTransformer.prototype.__init.call(this);JSXTransformer.prototype.__init2.call(this);JSXTransformer.prototype.__init3.call(this);JSX

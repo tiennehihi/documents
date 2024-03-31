@@ -1,0 +1,1 @@
+{"version":3,"file":"Scope.js","sourceRoot":"","sources":["../../src/ts-eslint-scope/Scope.ts"],"names":[],"mappings":";AAAA,8FAA8F;;;AAE9F,kDAYgC;AA+GhC,MAAM,KAAK,GAAG,aAA+B,CAAC;AA4D5C,sBAAK;AAjDP,MAAM,WAAW,GAAG,mBAEnB,CAAC;AAgDA,kCAAW;AA7Cb,MAAM,WAAW,GAAG,mBAC8B,CAAC;AA6CjD,kCAAW;AA1Cb,MAAM,2BAA2B,GAC/B,mCACkE,CAAC;AAyCnE,kEAA2B;AAtC7B,MAAM,UAAU,GAAG,kBAC8B,CAAC;AAsChD

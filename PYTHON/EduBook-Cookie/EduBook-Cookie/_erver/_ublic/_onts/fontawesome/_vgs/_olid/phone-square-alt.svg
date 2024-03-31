@@ -1,0 +1,20 @@
+ [
+          "10f53b"
+        ]
+      }
+    },
+    "changes": [
+      "5.0.13",
+      "6.0.0-beta1",
+      "6.0.0-beta3",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f53b",
+    "label": "Money bill 1 wave",
+    "voted": true,
+    "svgs": {
+      "classic": {
+        "solid": {
+          "lastModified": 1660321844,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 576 512\"><path d=\"M0 112.5V422.3c0 18 10.1 35 27 41.3c87 32.5 174 10.3 261-11.9c79.8-20.3 159.6-40.7 239.3-18.9c23 6.3 48.7-9.5 48.7-3

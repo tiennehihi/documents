@@ -1,0 +1,852 @@
+  errorNode,
+          isJs ? Diagnostics.This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_its_containing_class_0_does_not_extend_another_class : Diagnostics.This_member_cannot_have_an_override_modifier_because_its_containing_class_0_does_not_extend_another_class,
+          className
+        );
+      }
+      return 2 /* HasInvalidOverride */;
+    }
+    return 0 /* Ok */;
+  }
+  function issueMemberSpecificError(node, typeWithThis, baseWithThis, broadDiag) {
+    let issuedMemberError = false;
+    for (const member of node.members) {
+      if (isStatic(member)) {
+        continue;
+      }
+      const declaredProp = member.name && getSymbolAtLocation(member.name) || getSymbolAtLocation(member);
+      if (declaredProp) {
+        const prop = getPropertyOfType(typeWithThis, declaredProp.escapedName);
+        const baseProp = getPropertyOfType(baseWithThis, declaredProp.escapedName);
+        if (prop && baseProp) {
+          const rootChain = () => chainDiagnosticMessages(
+            /*details*/
+            void 0,
+            Diagnostics.Property_0_in_type_1_is_not_assignable_to_the_same_property_in_base_type_2,
+            symbolToString(declaredProp),
+            typeToString(typeWithThis),
+            typeToString(baseWithThis)
+          );
+          if (!checkTypeAssignableTo(
+            getTypeOfSymbol(prop),
+            getTypeOfSymbol(baseProp),
+            member.name || member,
+            /*headMessage*/
+            void 0,
+            rootChain
+          )) {
+            issuedMemberError = true;
+          }
+        }
+      }
+    }
+    if (!issuedMemberError) {
+      checkTypeAssignableTo(typeWithThis, baseWithThis, node.name || node, broadDiag);
+    }
+  }
+  function checkBaseTypeAccessibility(type, node) {
+    const signatures = getSignaturesOfType(type, 1 /* Construct */);
+    if (signatures.length) {
+      const declaration = signatures[0].declaration;
+      if (declaration && hasEffectiveModifier(declaration, 2 /* Private */)) {
+        const typeClassDeclaration = getClassLikeDeclarationOfSymbol(type.symbol);
+        if (!isNodeWithinClass(node, typeClassDeclaration)) {
+          error2(node, Diagnostics.Cannot_extend_a_class_0_Class_constructor_is_marked_as_private, getFullyQualifiedName(type.symbol));
+        }
+      }
+    }
+  }
+  function getMemberOverrideModifierStatus(node, member, memberSymbol) {
+    if (!member.name) {
+      return 0 /* Ok */;
+    }
+    const classSymbol = getSymbolOfDeclaration(node);
+    const type = getDeclaredTypeOfSymbol(classSymbol);
+    const typeWithThis = getTypeWithThisArgument(type);
+    const staticType = getTypeOfSymbol(classSymbol);
+    const baseTypeNode = getEffectiveBaseTypeNode(node);
+    const baseTypes = baseTypeNode && getBaseTypes(type);
+    const baseWithThis = (baseTypes == null ? void 0 : baseTypes.length) ? getTypeWithThisArgument(first(baseTypes), type.thisType) : void 0;
+    const baseStaticType = getBaseConstructorTypeOfClass(type);
+    const memberHasOverrideModifier = member.parent ? hasOverrideModifier(member) : hasSyntacticModifier(member, 16 /* Override */);
+    return checkMemberForOverrideModifier(
+      node,
+      staticType,
+      baseStaticType,
+      baseWithThis,
+      type,
+      typeWithThis,
+      memberHasOverrideModifier,
+      hasAbstractModifier(member),
+      isStatic(member),
+      /*memberIsParameterProperty*/
+      false,
+      symbolName(memberSymbol)
+    );
+  }
+  function getTargetSymbol(s) {
+    return getCheckFlags(s) & 1 /* Instantiated */ ? s.links.target : s;
+  }
+  function getClassOrInterfaceDeclarationsOfSymbol(symbol) {
+    return filter(symbol.declarations, (d) => d.kind === 263 /* ClassDeclaration */ || d.kind === 264 /* InterfaceDeclaration */);
+  }
+  function checkKindsOfPropertyMemberOverrides(type, baseType) {
+    var _a, _b, _c, _d;
+    const baseProperties = getPropertiesOfType(baseType);
+    let inheritedAbstractMemberNotImplementedError;
+    basePropertyCheck:
+      for (const baseProperty of baseProperties) {
+        const base = getTargetSymbol(baseProperty);
+        if (base.flags & 4194304 /* Prototype */) {
+          continue;
+        }
+        const baseSymbol = getPropertyOfObjectType(type, base.escapedName);
+        if (!baseSymbol) {
+          continue;
+        }
+        const derived = getTargetSymbol(baseSymbol);
+        const baseDeclarationFlags = getDeclarationModifierFlagsFromSymbol(base);
+        Debug.assert(!!derived, "derived should point to something, even if it is the base class' declaration.");
+        if (derived === base) {
+          const derivedClassDecl = getClassLikeDeclarationOfSymbol(type.symbol);
+          if (baseDeclarationFlags & 64 /* Abstract */ && (!derivedClassDecl || !hasSyntacticModifier(derivedClassDecl, 64 /* Abstract */))) {
+            for (const otherBaseType of getBaseTypes(type)) {
+              if (otherBaseType === baseType)
+                continue;
+              const baseSymbol2 = getPropertyOfObjectType(otherBaseType, base.escapedName);
+              const derivedElsewhere = baseSymbol2 && getTargetSymbol(baseSymbol2);
+              if (derivedElsewhere && derivedElsewhere !== base) {
+                continue basePropertyCheck;
+              }
+            }
+            if (!inheritedAbstractMemberNotImplementedError) {
+              inheritedAbstractMemberNotImplementedError = error2(
+                derivedClassDecl,
+                Diagnostics.Non_abstract_class_0_does_not_implement_all_abstract_members_of_1,
+                typeToString(type),
+                typeToString(baseType)
+              );
+            }
+            if (derivedClassDecl.kind === 231 /* ClassExpression */) {
+              addRelatedInfo(
+                inheritedAbstractMemberNotImplementedError,
+                createDiagnosticForNode(
+                  baseProperty.valueDeclaration ?? (baseProperty.declarations && first(baseProperty.declarations)) ?? derivedClassDecl,
+                  Diagnostics.Non_abstract_class_expression_does_not_implement_inherited_abstract_member_0_from_class_1,
+                  symbolToString(baseProperty),
+                  typeToString(baseType)
+                )
+              );
+            } else {
+              addRelatedInfo(
+                inheritedAbstractMemberNotImplementedError,
+                createDiagnosticForNode(
+                  baseProperty.valueDeclaration ?? (baseProperty.declarations && first(baseProperty.declarations)) ?? derivedClassDecl,
+                  Diagnostics.Non_abstract_class_0_does_not_implement_inherited_abstract_member_1_from_class_2,
+                  typeToString(type),
+                  symbolToString(baseProperty),
+                  typeToString(baseType)
+                )
+              );
+            }
+          }
+        } else {
+          const derivedDeclarationFlags = getDeclarationModifierFlagsFromSymbol(derived);
+          if (baseDeclarationFlags & 2 /* Private */ || derivedDeclarationFlags & 2 /* Private */) {
+            continue;
+          }
+          let errorMessage;
+          const basePropertyFlags = base.flags & 98308 /* PropertyOrAccessor */;
+          const derivedPropertyFlags = derived.flags & 98308 /* PropertyOrAccessor */;
+          if (basePropertyFlags && derivedPropertyFlags) {
+            if ((getCheckFlags(base) & 6 /* Synthetic */ ? (_a = base.declarations) == null ? void 0 : _a.some((d) => isPropertyAbstractOrInterface(d, baseDeclarationFlags)) : (_b = base.declarations) == null ? void 0 : _b.every((d) => isPropertyAbstractOrInterface(d, baseDeclarationFlags))) || getCheckFlags(base) & 262144 /* Mapped */ || derived.valueDeclaration && isBinaryExpression(derived.valueDeclaration)) {
+              continue;
+            }
+            const overriddenInstanceProperty = basePropertyFlags !== 4 /* Property */ && derivedPropertyFlags === 4 /* Property */;
+            const overriddenInstanceAccessor = basePropertyFlags === 4 /* Property */ && derivedPropertyFlags !== 4 /* Property */;
+            if (overriddenInstanceProperty || overriddenInstanceAccessor) {
+              const errorMessage2 = overriddenInstanceProperty ? Diagnostics._0_is_defined_as_an_accessor_in_class_1_but_is_overridden_here_in_2_as_an_instance_property : Diagnostics._0_is_defined_as_a_property_in_class_1_but_is_overridden_here_in_2_as_an_accessor;
+              error2(getNameOfDeclaration(derived.valueDeclaration) || derived.valueDeclaration, errorMessage2, symbolToString(base), typeToString(baseType), typeToString(type));
+            } else if (useDefineForClassFields) {
+              const uninitialized = (_c = derived.declarations) == null ? void 0 : _c.find((d) => d.kind === 172 /* PropertyDeclaration */ && !d.initializer);
+              if (uninitialized && !(derived.flags & 33554432 /* Transient */) && !(baseDeclarationFlags & 64 /* Abstract */) && !(derivedDeclarationFlags & 64 /* Abstract */) && !((_d = derived.declarations) == null ? void 0 : _d.some((d) => !!(d.flags & 33554432 /* Ambient */)))) {
+                const constructor = findConstructorDeclaration(getClassLikeDeclarationOfSymbol(type.symbol));
+                const propName = uninitialized.name;
+                if (uninitialized.exclamationToken || !constructor || !isIdentifier(propName) || !strictNullChecks || !isPropertyInitializedInConstructor(propName, type, constructor)) {
+                  const errorMessage2 = Diagnostics.Property_0_will_overwrite_the_base_property_in_1_If_this_is_intentional_add_an_initializer_Otherwise_add_a_declare_modifier_or_remove_the_redundant_declaration;
+                  error2(getNameOfDeclaration(derived.valueDeclaration) || derived.valueDeclaration, errorMessage2, symbolToString(base), typeToString(baseType));
+                }
+              }
+            }
+            continue;
+          } else if (isPrototypeProperty(base)) {
+            if (isPrototypeProperty(derived) || derived.flags & 4 /* Property */) {
+              continue;
+            } else {
+              Debug.assert(!!(derived.flags & 98304 /* Accessor */));
+              errorMessage = Diagnostics.Class_0_defines_instance_member_function_1_but_extended_class_2_defines_it_as_instance_member_accessor;
+            }
+          } else if (base.flags & 98304 /* Accessor */) {
+            errorMessage = Diagnostics.Class_0_defines_instance_member_accessor_1_but_extended_class_2_defines_it_as_instance_member_function;
+          } else {
+            errorMessage = Diagnostics.Class_0_defines_instance_member_property_1_but_extended_class_2_defines_it_as_instance_member_function;
+          }
+          error2(getNameOfDeclaration(derived.valueDeclaration) || derived.valueDeclaration, errorMessage, typeToString(baseType), symbolToString(base), typeToString(type));
+        }
+      }
+  }
+  function isPropertyAbstractOrInterface(declaration, baseDeclarationFlags) {
+    return baseDeclarationFlags & 64 /* Abstract */ && (!isPropertyDeclaration(declaration) || !declaration.initializer) || isInterfaceDeclaration(declaration.parent);
+  }
+  function getNonInheritedProperties(type, baseTypes, properties) {
+    if (!length(baseTypes)) {
+      return properties;
+    }
+    const seen = /* @__PURE__ */ new Map();
+    forEach(properties, (p) => {
+      seen.set(p.escapedName, p);
+    });
+    for (const base of baseTypes) {
+      const properties2 = getPropertiesOfType(getTypeWithThisArgument(base, type.thisType));
+      for (const prop of properties2) {
+        const existing = seen.get(prop.escapedName);
+        if (existing && prop.parent === existing.parent) {
+          seen.delete(prop.escapedName);
+        }
+      }
+    }
+    return arrayFrom(seen.values());
+  }
+  function checkInheritedPropertiesAreIdentical(type, typeNode) {
+    const baseTypes = getBaseTypes(type);
+    if (baseTypes.length < 2) {
+      return true;
+    }
+    const seen = /* @__PURE__ */ new Map();
+    forEach(resolveDeclaredMembers(type).declaredProperties, (p) => {
+      seen.set(p.escapedName, { prop: p, containingType: type });
+    });
+    let ok = true;
+    for (const base of baseTypes) {
+      const properties = getPropertiesOfType(getTypeWithThisArgument(base, type.thisType));
+      for (const prop of properties) {
+        const existing = seen.get(prop.escapedName);
+        if (!existing) {
+          seen.set(prop.escapedName, { prop, containingType: base });
+        } else {
+          const isInheritedProperty = existing.containingType !== type;
+          if (isInheritedProperty && !isPropertyIdenticalTo(existing.prop, prop)) {
+            ok = false;
+            const typeName1 = typeToString(existing.containingType);
+            const typeName2 = typeToString(base);
+            let errorInfo = chainDiagnosticMessages(
+              /*details*/
+              void 0,
+              Diagnostics.Named_property_0_of_types_1_and_2_are_not_identical,
+              symbolToString(prop),
+              typeName1,
+              typeName2
+            );
+            errorInfo = chainDiagnosticMessages(errorInfo, Diagnostics.Interface_0_cannot_simultaneously_extend_types_1_and_2, typeToString(type), typeName1, typeName2);
+            diagnostics.add(createDiagnosticForNodeFromMessageChain(getSourceFileOfNode(typeNode), typeNode, errorInfo));
+          }
+        }
+      }
+    }
+    return ok;
+  }
+  function checkPropertyInitialization(node) {
+    if (!strictNullChecks || !strictPropertyInitialization || node.flags & 33554432 /* Ambient */) {
+      return;
+    }
+    const constructor = findConstructorDeclaration(node);
+    for (const member of node.members) {
+      if (getEffectiveModifierFlags(member) & 128 /* Ambient */) {
+        continue;
+      }
+      if (!isStatic(member) && isPropertyWithoutInitializer(member)) {
+        const propName = member.name;
+        if (isIdentifier(propName) || isPrivateIdentifier(propName) || isComputedPropertyName(propName)) {
+          const type = getTypeOfSymbol(getSymbolOfDeclaration(member));
+          if (!(type.flags & 3 /* AnyOrUnknown */ || containsUndefinedType(type))) {
+            if (!constructor || !isPropertyInitializedInConstructor(propName, type, constructor)) {
+              error2(member.name, Diagnostics.Property_0_has_no_initializer_and_is_not_definitely_assigned_in_the_constructor, declarationNameToString(propName));
+            }
+          }
+        }
+      }
+    }
+  }
+  function isPropertyWithoutInitializer(node) {
+    return node.kind === 172 /* PropertyDeclaration */ && !hasAbstractModifier(node) && !node.exclamationToken && !node.initializer;
+  }
+  function isPropertyInitializedInStaticBlocks(propName, propType, staticBlocks, startPos, endPos) {
+    for (const staticBlock of staticBlocks) {
+      if (staticBlock.pos >= startPos && staticBlock.pos <= endPos) {
+        const reference = factory.createPropertyAccessExpression(factory.createThis(), propName);
+        setParent(reference.expression, reference);
+        setParent(reference, staticBlock);
+        reference.flowNode = staticBlock.returnFlowNode;
+        const flowType = getFlowTypeOfReference(reference, propType, getOptionalType(propType));
+        if (!containsUndefinedType(flowType)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  function isPropertyInitializedInConstructor(propName, propType, constructor) {
+    const reference = isComputedPropertyName(propName) ? factory.createElementAccessExpression(factory.createThis(), propName.expression) : factory.createPropertyAccessExpression(factory.createThis(), propName);
+    setParent(reference.expression, reference);
+    setParent(reference, constructor);
+    reference.flowNode = constructor.returnFlowNode;
+    const flowType = getFlowTypeOfReference(reference, propType, getOptionalType(propType));
+    return !containsUndefinedType(flowType);
+  }
+  function checkInterfaceDeclaration(node) {
+    if (!checkGrammarModifiers(node))
+      checkGrammarInterfaceDeclaration(node);
+    checkTypeParameters(node.typeParameters);
+    addLazyDiagnostic(() => {
+      checkTypeNameIsReserved(node.name, Diagnostics.Interface_name_cannot_be_0);
+      checkExportsOnMergedDeclarations(node);
+      const symbol = getSymbolOfDeclaration(node);
+      checkTypeParameterListsIdentical(symbol);
+      const firstInterfaceDecl = getDeclarationOfKind(symbol, 264 /* InterfaceDeclaration */);
+      if (node === firstInterfaceDecl) {
+        const type = getDeclaredTypeOfSymbol(symbol);
+        const typeWithThis = getTypeWithThisArgument(type);
+        if (checkInheritedPropertiesAreIdentical(type, node.name)) {
+          for (const baseType of getBaseTypes(type)) {
+            checkTypeAssignableTo(typeWithThis, getTypeWithThisArgument(baseType, type.thisType), node.name, Diagnostics.Interface_0_incorrectly_extends_interface_1);
+          }
+          checkIndexConstraints(type, symbol);
+        }
+      }
+      checkObjectTypeForDuplicateDeclarations(node);
+    });
+    forEach(getInterfaceBaseTypeNodes(node), (heritageElement) => {
+      if (!isEntityNameExpression(heritageElement.expression) || isOptionalChain(heritageElement.expression)) {
+        error2(heritageElement.expression, Diagnostics.An_interface_can_only_extend_an_identifier_Slashqualified_name_with_optional_type_arguments);
+      }
+      checkTypeReferenceNode(heritageElement);
+    });
+    forEach(node.members, checkSourceElement);
+    addLazyDiagnostic(() => {
+      checkTypeForDuplicateIndexSignatures(node);
+      registerForUnusedIdentifiersCheck(node);
+    });
+  }
+  function checkTypeAliasDeclaration(node) {
+    checkGrammarModifiers(node);
+    checkTypeNameIsReserved(node.name, Diagnostics.Type_alias_name_cannot_be_0);
+    checkExportsOnMergedDeclarations(node);
+    checkTypeParameters(node.typeParameters);
+    if (node.type.kind === 141 /* IntrinsicKeyword */) {
+      if (!intrinsicTypeKinds.has(node.name.escapedText) || length(node.typeParameters) !== 1) {
+        error2(node.type, Diagnostics.The_intrinsic_keyword_can_only_be_used_to_declare_compiler_provided_intrinsic_types);
+      }
+    } else {
+      checkSourceElement(node.type);
+      registerForUnusedIdentifiersCheck(node);
+    }
+  }
+  function computeEnumMemberValues(node) {
+    const nodeLinks2 = getNodeLinks(node);
+    if (!(nodeLinks2.flags & 1024 /* EnumValuesComputed */)) {
+      nodeLinks2.flags |= 1024 /* EnumValuesComputed */;
+      let autoValue = 0;
+      for (const member of node.members) {
+        const value = computeMemberValue(member, autoValue);
+        getNodeLinks(member).enumMemberValue = value;
+        autoValue = typeof value === "number" ? value + 1 : void 0;
+      }
+    }
+  }
+  function computeMemberValue(member, autoValue) {
+    if (isComputedNonLiteralName(member.name)) {
+      error2(member.name, Diagnostics.Computed_property_names_are_not_allowed_in_enums);
+    } else {
+      const text = getTextOfPropertyName(member.name);
+      if (isNumericLiteralName(text)) {
+        error2(member.name, Diagnostics.An_enum_member_cannot_have_a_numeric_name);
+      }
+    }
+    if (member.initializer) {
+      return computeConstantValue(member);
+    }
+    if (member.parent.flags & 33554432 /* Ambient */ && !isEnumConst(member.parent)) {
+      return void 0;
+    }
+    if (autoValue !== void 0) {
+      return autoValue;
+    }
+    error2(member.name, Diagnostics.Enum_member_must_have_initializer);
+    return void 0;
+  }
+  function computeConstantValue(member) {
+    const isConstEnum = isEnumConst(member.parent);
+    const initializer = member.initializer;
+    const value = evaluate(initializer, member);
+    if (value !== void 0) {
+      if (isConstEnum && typeof value === "number" && !isFinite(value)) {
+        error2(
+          initializer,
+          isNaN(value) ? Diagnostics.const_enum_member_initializer_was_evaluated_to_disallowed_value_NaN : Diagnostics.const_enum_member_initializer_was_evaluated_to_a_non_finite_value
+        );
+      }
+    } else if (isConstEnum) {
+      error2(initializer, Diagnostics.const_enum_member_initializers_must_be_constant_expressions);
+    } else if (member.parent.flags & 33554432 /* Ambient */) {
+      error2(initializer, Diagnostics.In_ambient_enum_declarations_member_initializer_must_be_constant_expression);
+    } else {
+      checkTypeAssignableTo(checkExpression(initializer), numberType, initializer, Diagnostics.Type_0_is_not_assignable_to_type_1_as_required_for_computed_enum_member_values);
+    }
+    return value;
+  }
+  function evaluate(expr, location) {
+    switch (expr.kind) {
+      case 224 /* PrefixUnaryExpression */:
+        const value = evaluate(expr.operand, location);
+        if (typeof value === "number") {
+          switch (expr.operator) {
+            case 40 /* PlusToken */:
+              return value;
+            case 41 /* MinusToken */:
+              return -value;
+            case 55 /* TildeToken */:
+              return ~value;
+          }
+        }
+        break;
+      case 226 /* BinaryExpression */:
+        const left = evaluate(expr.left, location);
+        const right = evaluate(expr.right, location);
+        if (typeof left === "number" && typeof right === "number") {
+          switch (expr.operatorToken.kind) {
+            case 52 /* BarToken */:
+              return left | right;
+            case 51 /* AmpersandToken */:
+              return left & right;
+            case 49 /* GreaterThanGreaterThanToken */:
+              return left >> right;
+            case 50 /* GreaterThanGreaterThanGreaterThanToken */:
+              return left >>> right;
+            case 48 /* LessThanLessThanToken */:
+              return left << right;
+            case 53 /* CaretToken */:
+              return left ^ right;
+            case 42 /* AsteriskToken */:
+              return left * right;
+            case 44 /* SlashToken */:
+              return left / right;
+            case 40 /* PlusToken */:
+              return left + right;
+            case 41 /* MinusToken */:
+              return left - right;
+            case 45 /* PercentToken */:
+              return left % right;
+            case 43 /* AsteriskAsteriskToken */:
+              return left ** right;
+          }
+        } else if ((typeof left === "string" || typeof left === "number") && (typeof right === "string" || typeof right === "number") && expr.operatorToken.kind === 40 /* PlusToken */) {
+          return "" + left + right;
+        }
+        break;
+      case 11 /* StringLiteral */:
+      case 15 /* NoSubstitutionTemplateLiteral */:
+        return expr.text;
+      case 228 /* TemplateExpression */:
+        return evaluateTemplateExpression(expr, location);
+      case 9 /* NumericLiteral */:
+        checkGrammarNumericLiteral(expr);
+        return +expr.text;
+      case 217 /* ParenthesizedExpression */:
+        return evaluate(expr.expression, location);
+      case 80 /* Identifier */: {
+        const identifier = expr;
+        if (isInfinityOrNaNString(identifier.escapedText) && resolveEntityName(
+          identifier,
+          111551 /* Value */,
+          /*ignoreErrors*/
+          true
+        ) === getGlobalSymbol(
+          identifier.escapedText,
+          111551 /* Value */,
+          /*diagnostic*/
+          void 0
+        )) {
+          return +identifier.escapedText;
+        }
+      }
+      case 211 /* PropertyAccessExpression */:
+        if (isEntityNameExpression(expr)) {
+          const symbol = resolveEntityName(
+            expr,
+            111551 /* Value */,
+            /*ignoreErrors*/
+            true
+          );
+          if (symbol) {
+            if (symbol.flags & 8 /* EnumMember */) {
+              return location ? evaluateEnumMember(expr, symbol, location) : getEnumMemberValue(symbol.valueDeclaration);
+            }
+            if (isConstantVariable(symbol)) {
+              const declaration = symbol.valueDeclaration;
+              if (declaration && isVariableDeclaration(declaration) && !declaration.type && declaration.initializer && (!location || declaration !== location && isBlockScopedNameDeclaredBeforeUse(declaration, location))) {
+                return evaluate(declaration.initializer, declaration);
+              }
+            }
+          }
+        }
+        break;
+      case 212 /* ElementAccessExpression */:
+        const root = expr.expression;
+        if (isEntityNameExpression(root) && isStringLiteralLike(expr.argumentExpression)) {
+          const rootSymbol = resolveEntityName(
+            root,
+            111551 /* Value */,
+            /*ignoreErrors*/
+            true
+          );
+          if (rootSymbol && rootSymbol.flags & 384 /* Enum */) {
+            const name = escapeLeadingUnderscores(expr.argumentExpression.text);
+            const member = rootSymbol.exports.get(name);
+            if (member) {
+              return location ? evaluateEnumMember(expr, member, location) : getEnumMemberValue(member.valueDeclaration);
+            }
+          }
+        }
+        break;
+    }
+    return void 0;
+  }
+  function evaluateEnumMember(expr, symbol, location) {
+    const declaration = symbol.valueDeclaration;
+    if (!declaration || declaration === location) {
+      error2(expr, Diagnostics.Property_0_is_used_before_being_assigned, symbolToString(symbol));
+      return void 0;
+    }
+    if (!isBlockScopedNameDeclaredBeforeUse(declaration, location)) {
+      error2(expr, Diagnostics.A_member_initializer_in_a_enum_declaration_cannot_reference_members_declared_after_it_including_members_defined_in_other_enums);
+      return 0;
+    }
+    return getEnumMemberValue(declaration);
+  }
+  function evaluateTemplateExpression(expr, location) {
+    let result = expr.head.text;
+    for (const span of expr.templateSpans) {
+      const value = evaluate(span.expression, location);
+      if (value === void 0) {
+        return void 0;
+      }
+      result += value;
+      result += span.literal.text;
+    }
+    return result;
+  }
+  function checkEnumDeclaration(node) {
+    addLazyDiagnostic(() => checkEnumDeclarationWorker(node));
+  }
+  function checkEnumDeclarationWorker(node) {
+    checkGrammarModifiers(node);
+    checkCollisionsForDeclarationName(node, node.name);
+    checkExportsOnMergedDeclarations(node);
+    node.members.forEach(checkEnumMember);
+    computeEnumMemberValues(node);
+    const enumSymbol = getSymbolOfDeclaration(node);
+    const firstDeclaration = getDeclarationOfKind(enumSymbol, node.kind);
+    if (node === firstDeclaration) {
+      if (enumSymbol.declarations && enumSymbol.declarations.length > 1) {
+        const enumIsConst = isEnumConst(node);
+        forEach(enumSymbol.declarations, (decl) => {
+          if (isEnumDeclaration(decl) && isEnumConst(decl) !== enumIsConst) {
+            error2(getNameOfDeclaration(decl), Diagnostics.Enum_declarations_must_all_be_const_or_non_const);
+          }
+        });
+      }
+      let seenEnumMissingInitialInitializer = false;
+      forEach(enumSymbol.declarations, (declaration) => {
+        if (declaration.kind !== 266 /* EnumDeclaration */) {
+          return false;
+        }
+        const enumDeclaration = declaration;
+        if (!enumDeclaration.members.length) {
+          return false;
+        }
+        const firstEnumMember = enumDeclaration.members[0];
+        if (!firstEnumMember.initializer) {
+          if (seenEnumMissingInitialInitializer) {
+            error2(firstEnumMember.name, Diagnostics.In_an_enum_with_multiple_declarations_only_one_declaration_can_omit_an_initializer_for_its_first_enum_element);
+          } else {
+            seenEnumMissingInitialInitializer = true;
+          }
+        }
+      });
+    }
+  }
+  function checkEnumMember(node) {
+    if (isPrivateIdentifier(node.name)) {
+      error2(node, Diagnostics.An_enum_member_cannot_be_named_with_a_private_identifier);
+    }
+    if (node.initializer) {
+      checkExpression(node.initializer);
+    }
+  }
+  function getFirstNonAmbientClassOrFunctionDeclaration(symbol) {
+    const declarations = symbol.declarations;
+    if (declarations) {
+      for (const declaration of declarations) {
+        if ((declaration.kind === 263 /* ClassDeclaration */ || declaration.kind === 262 /* FunctionDeclaration */ && nodeIsPresent(declaration.body)) && !(declaration.flags & 33554432 /* Ambient */)) {
+          return declaration;
+        }
+      }
+    }
+    return void 0;
+  }
+  function inSameLexicalScope(node1, node2) {
+    const container1 = getEnclosingBlockScopeContainer(node1);
+    const container2 = getEnclosingBlockScopeContainer(node2);
+    if (isGlobalSourceFile(container1)) {
+      return isGlobalSourceFile(container2);
+    } else if (isGlobalSourceFile(container2)) {
+      return false;
+    } else {
+      return container1 === container2;
+    }
+  }
+  function checkModuleDeclaration(node) {
+    if (node.body) {
+      checkSourceElement(node.body);
+      if (!isGlobalScopeAugmentation(node)) {
+        registerForUnusedIdentifiersCheck(node);
+      }
+    }
+    addLazyDiagnostic(checkModuleDeclarationDiagnostics);
+    function checkModuleDeclarationDiagnostics() {
+      var _a, _b;
+      const isGlobalAugmentation = isGlobalScopeAugmentation(node);
+      const inAmbientContext = node.flags & 33554432 /* Ambient */;
+      if (isGlobalAugmentation && !inAmbientContext) {
+        error2(node.name, Diagnostics.Augmentations_for_the_global_scope_should_have_declare_modifier_unless_they_appear_in_already_ambient_context);
+      }
+      const isAmbientExternalModule = isAmbientModule(node);
+      const contextErrorMessage = isAmbientExternalModule ? Diagnostics.An_ambient_module_declaration_is_only_allowed_at_the_top_level_in_a_file : Diagnostics.A_namespace_declaration_is_only_allowed_at_the_top_level_of_a_namespace_or_module;
+      if (checkGrammarModuleElementContext(node, contextErrorMessage)) {
+        return;
+      }
+      if (!checkGrammarModifiers(node)) {
+        if (!inAmbientContext && node.name.kind === 11 /* StringLiteral */) {
+          grammarErrorOnNode(node.name, Diagnostics.Only_ambient_modules_can_use_quoted_names);
+        }
+      }
+      if (isIdentifier(node.name)) {
+        checkCollisionsForDeclarationName(node, node.name);
+      }
+      checkExportsOnMergedDeclarations(node);
+      const symbol = getSymbolOfDeclaration(node);
+      if (symbol.flags & 512 /* ValueModule */ && !inAmbientContext && isInstantiatedModule(node, shouldPreserveConstEnums(compilerOptions))) {
+        if (getIsolatedModules(compilerOptions) && !getSourceFileOfNode(node).externalModuleIndicator) {
+          error2(node.name, Diagnostics.Namespaces_are_not_allowed_in_global_script_files_when_0_is_enabled_If_this_file_is_not_intended_to_be_a_global_script_set_moduleDetection_to_force_or_add_an_empty_export_statement, isolatedModulesLikeFlagName);
+        }
+        if (((_a = symbol.declarations) == null ? void 0 : _a.length) > 1) {
+          const firstNonAmbientClassOrFunc = getFirstNonAmbientClassOrFunctionDeclaration(symbol);
+          if (firstNonAmbientClassOrFunc) {
+            if (getSourceFileOfNode(node) !== getSourceFileOfNode(firstNonAmbientClassOrFunc)) {
+              error2(node.name, Diagnostics.A_namespace_declaration_cannot_be_in_a_different_file_from_a_class_or_function_with_which_it_is_merged);
+            } else if (node.pos < firstNonAmbientClassOrFunc.pos) {
+              error2(node.name, Diagnostics.A_namespace_declaration_cannot_be_located_prior_to_a_class_or_function_with_which_it_is_merged);
+            }
+          }
+          const mergedClass = getDeclarationOfKind(symbol, 263 /* ClassDeclaration */);
+          if (mergedClass && inSameLexicalScope(node, mergedClass)) {
+            getNodeLinks(node).flags |= 2048 /* LexicalModuleMergesWithClass */;
+          }
+        }
+        if (compilerOptions.verbatimModuleSyntax && node.parent.kind === 312 /* SourceFile */ && (moduleKind === 1 /* CommonJS */ || node.parent.impliedNodeFormat === 1 /* CommonJS */)) {
+          const exportModifier = (_b = node.modifiers) == null ? void 0 : _b.find((m) => m.kind === 95 /* ExportKeyword */);
+          if (exportModifier) {
+            error2(exportModifier, Diagnostics.A_top_level_export_modifier_cannot_be_used_on_value_declarations_in_a_CommonJS_module_when_verbatimModuleSyntax_is_enabled);
+          }
+        }
+      }
+      if (isAmbientExternalModule) {
+        if (isExternalModuleAugmentation(node)) {
+          const checkBody = isGlobalAugmentation || getSymbolOfDeclaration(node).flags & 33554432 /* Transient */;
+          if (checkBody && node.body) {
+            for (const statement of node.body.statements) {
+              checkModuleAugmentationElement(statement, isGlobalAugmentation);
+            }
+          }
+        } else if (isGlobalSourceFile(node.parent)) {
+          if (isGlobalAugmentation) {
+            error2(node.name, Diagnostics.Augmentations_for_the_global_scope_can_only_be_directly_nested_in_external_modules_or_ambient_module_declarations);
+          } else if (isExternalModuleNameRelative(getTextOfIdentifierOrLiteral(node.name))) {
+            error2(node.name, Diagnostics.Ambient_module_declaration_cannot_specify_relative_module_name);
+          }
+        } else {
+          if (isGlobalAugmentation) {
+            error2(node.name, Diagnostics.Augmentations_for_the_global_scope_can_only_be_directly_nested_in_external_modules_or_ambient_module_declarations);
+          } else {
+            error2(node.name, Diagnostics.Ambient_modules_cannot_be_nested_in_other_modules_or_namespaces);
+          }
+        }
+      }
+    }
+  }
+  function checkModuleAugmentationElement(node, isGlobalAugmentation) {
+    switch (node.kind) {
+      case 243 /* VariableStatement */:
+        for (const decl of node.declarationList.declarations) {
+          checkModuleAugmentationElement(decl, isGlobalAugmentation);
+        }
+        break;
+      case 277 /* ExportAssignment */:
+      case 278 /* ExportDeclaration */:
+        grammarErrorOnFirstToken(node, Diagnostics.Exports_and_export_assignments_are_not_permitted_in_module_augmentations);
+        break;
+      case 271 /* ImportEqualsDeclaration */:
+      case 272 /* ImportDeclaration */:
+        grammarErrorOnFirstToken(node, Diagnostics.Imports_are_not_permitted_in_module_augmentations_Consider_moving_them_to_the_enclosing_external_module);
+        break;
+      case 208 /* BindingElement */:
+      case 260 /* VariableDeclaration */:
+        const name = node.name;
+        if (isBindingPattern(name)) {
+          for (const el of name.elements) {
+            checkModuleAugmentationElement(el, isGlobalAugmentation);
+          }
+          break;
+        }
+      case 263 /* ClassDeclaration */:
+      case 266 /* EnumDeclaration */:
+      case 262 /* FunctionDeclaration */:
+      case 264 /* InterfaceDeclaration */:
+      case 267 /* ModuleDeclaration */:
+      case 265 /* TypeAliasDeclaration */:
+        if (isGlobalAugmentation) {
+          return;
+        }
+        break;
+    }
+  }
+  function getFirstNonModuleExportsIdentifier(node) {
+    switch (node.kind) {
+      case 80 /* Identifier */:
+        return node;
+      case 166 /* QualifiedName */:
+        do {
+          node = node.left;
+        } while (node.kind !== 80 /* Identifier */);
+        return node;
+      case 211 /* PropertyAccessExpression */:
+        do {
+          if (isModuleExportsAccessExpression(node.expression) && !isPrivateIdentifier(node.name)) {
+            return node.name;
+          }
+          node = node.expression;
+        } while (node.kind !== 80 /* Identifier */);
+        return node;
+    }
+  }
+  function checkExternalImportOrExportDeclaration(node) {
+    const moduleName = getExternalModuleName(node);
+    if (!moduleName || nodeIsMissing(moduleName)) {
+      return false;
+    }
+    if (!isStringLiteral(moduleName)) {
+      error2(moduleName, Diagnostics.String_literal_expected);
+      return false;
+    }
+    const inAmbientExternalModule = node.parent.kind === 268 /* ModuleBlock */ && isAmbientModule(node.parent.parent);
+    if (node.parent.kind !== 312 /* SourceFile */ && !inAmbientExternalModule) {
+      error2(
+        moduleName,
+        node.kind === 278 /* ExportDeclaration */ ? Diagnostics.Export_declarations_are_not_permitted_in_a_namespace : Diagnostics.Import_declarations_in_a_namespace_cannot_reference_a_module
+      );
+      return false;
+    }
+    if (inAmbientExternalModule && isExternalModuleNameRelative(moduleName.text)) {
+      if (!isTopLevelInExternalModuleAugmentation(node)) {
+        error2(node, Diagnostics.Import_or_export_declaration_in_an_ambient_module_declaration_cannot_reference_module_through_relative_module_name);
+        return false;
+      }
+    }
+    if (!isImportEqualsDeclaration(node) && node.attributes) {
+      const diagnostic = node.attributes.token === 118 /* WithKeyword */ ? Diagnostics.Import_attribute_values_must_be_string_literal_expressions : Diagnostics.Import_assertion_values_must_be_string_literal_expressions;
+      let hasError = false;
+      for (const attr of node.attributes.elements) {
+        if (!isStringLiteral(attr.value)) {
+          hasError = true;
+          error2(attr.value, diagnostic);
+        }
+      }
+      return !hasError;
+    }
+    return true;
+  }
+  function checkAliasSymbol(node) {
+    var _a, _b, _c, _d;
+    let symbol = getSymbolOfDeclaration(node);
+    const target = resolveAlias(symbol);
+    if (target !== unknownSymbol) {
+      symbol = getMergedSymbol(symbol.exportSymbol || symbol);
+      if (isInJSFile(node) && !(target.flags & 111551 /* Value */) && !isTypeOnlyImportOrExportDeclaration(node)) {
+        const errorNode = isImportOrExportSpecifier(node) ? node.propertyName || node.name : isNamedDeclaration(node) ? node.name : node;
+        Debug.assert(node.kind !== 280 /* NamespaceExport */);
+        if (node.kind === 281 /* ExportSpecifier */) {
+          const diag2 = error2(errorNode, Diagnostics.Types_cannot_appear_in_export_declarations_in_JavaScript_files);
+          const alreadyExportedSymbol = (_b = (_a = getSourceFileOfNode(node).symbol) == null ? void 0 : _a.exports) == null ? void 0 : _b.get((node.propertyName || node.name).escapedText);
+          if (alreadyExportedSymbol === target) {
+            const exportingDeclaration = (_c = alreadyExportedSymbol.declarations) == null ? void 0 : _c.find(isJSDocNode);
+            if (exportingDeclaration) {
+              addRelatedInfo(
+                diag2,
+                createDiagnosticForNode(
+                  exportingDeclaration,
+                  Diagnostics._0_is_automatically_exported_here,
+                  unescapeLeadingUnderscores(alreadyExportedSymbol.escapedName)
+                )
+              );
+            }
+          }
+        } else {
+          Debug.assert(node.kind !== 260 /* VariableDeclaration */);
+          const importDeclaration = findAncestor(node, or(isImportDeclaration, isImportEqualsDeclaration));
+          const moduleSpecifier = (importDeclaration && ((_d = tryGetModuleSpecifierFromDeclaration(importDeclaration)) == null ? void 0 : _d.text)) ?? "...";
+          const importedIdentifier = unescapeLeadingUnderscores(isIdentifier(errorNode) ? errorNode.escapedText : symbol.escapedName);
+          error2(
+            errorNode,
+            Diagnostics._0_is_a_type_and_cannot_be_imported_in_JavaScript_files_Use_1_in_a_JSDoc_type_annotation,
+            importedIdentifier,
+            `import("${moduleSpecifier}").${importedIdentifier}`
+          );
+        }
+        return;
+      }
+      const targetFlags = getSymbolFlags(target);
+      const excludedMeanings = (symbol.flags & (111551 /* Value */ | 1048576 /* ExportValue */) ? 111551 /* Value */ : 0) | (symbol.flags & 788968 /* Type */ ? 788968 /* Type */ : 0) | (symbol.flags & 1920 /* Namespace */ ? 1920 /* Namespace */ : 0);
+      if (targetFlags & excludedMeanings) {
+        const message = node.kind === 281 /* ExportSpecifier */ ? Diagnostics.Export_declaration_conflicts_with_exported_declaration_of_0 : Diagnostics.Import_declaration_conflicts_with_local_declaration_of_0;
+        error2(node, message, symbolToString(symbol));
+      } else if (node.kind !== 281 /* ExportSpecifier */) {
+        const appearsValueyToTranspiler = compilerOptions.isolatedModules && !findAncestor(node, isTypeOnlyImportOrExportDeclaration);
+        if (appearsValueyToTranspiler && symbol.flags & (111551 /* Value */ | 1048576 /* ExportValue */)) {
+          error2(
+            node,
+            Diagnostics.Import_0_conflicts_with_local_value_so_must_be_declared_with_a_type_only_import_when_isolatedModules_is_enabled,
+            symbolToString(symbol),
+            isolatedModulesLikeFlagName
+          );
+        }
+      }
+      if (getIsolatedModules(compilerOptions) && !isTypeOnlyImportOrExportDeclaration(node) && !(node.flags & 33554432 /* Ambient */)) {
+        const typeOnlyAlias = getTypeOnlyAliasDeclaration(symbol);
+        const isType = !(targetFlags & 111551 /* Value */);
+        if (isType || typeOnlyAlias) {
+          switch (node.kind) {
+            case 273 /* ImportClause */:
+            case 276 /* ImportSpecifier */:
+            case 271 /* ImportEqualsDeclaration */: {
+              if (compilerOptions.preserveValueImports || compilerOptions.verbatimModuleSyntax) {
+                Debug.assertIsDefined(node.name, "An ImportClause with a symbol should have a name");
+                const message = compilerOptions.verbatimModuleSyntax && isInte

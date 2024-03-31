@@ -1,0 +1,18 @@
+    return highPollingIntervalQueue;
+    }
+  }
+  function addToPollingIntervalQueue(file, pollingInterval) {
+    pollingIntervalQueue(pollingInterval).push(file);
+    scheduleNextPollIfNotAlreadyScheduled(pollingInterval);
+  }
+  function addChangedFileToLowPollingIntervalQueue(file) {
+    changedFilesInLastPoll.push(file);
+    scheduleNextPollIfNotAlreadyScheduled(250 /* Low */);
+  }
+  function scheduleNextPollIfNotAlreadyScheduled(pollingInterval) {
+    if (!pollingIntervalQueue(pollingInterval).pollScheduled) {
+      scheduleNextPoll(pollingInterval);
+    }
+  }
+  function scheduleNextPoll(pollingInterval) {
+    pollingIntervalQueue(pollingInterval).pollScheduled = host.setTimeout(pollingInterval === 250 /* Low */ ? pollLowPollingIntervalQueue : pollPollingIntervalQueue, pollingInterval, pollingInterval === 250 /* Low */ ? "pollLowPollingIntervalQueue" : "pollPolli

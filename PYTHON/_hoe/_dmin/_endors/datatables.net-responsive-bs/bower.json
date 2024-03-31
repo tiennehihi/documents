@@ -1,0 +1,35 @@
+inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Backgrounds and Borders"
+    ],
+    "initial": "none",
+    "appliesto": "allElements",
+    "computed": "asSpecifiedURLsAbsolute",
+    "order": "uniqueOrder",
+    "alsoAppliesTo": [
+      "::first-letter",
+      "::first-line",
+      "::placeholder"
+    ],
+    "status": "standard",
+    "mdn_url": "https://developer.mozilla.org/docs/Web/CSS/background-image"
+  },
+  "background-origin": {
+    "syntax": "<box>#",
+    "media": "visual",
+    "inherited": false,
+    "animationType": "discrete",
+    "percentages": "no",
+    "groups": [
+      "CSS Backgrounds and Borders"
+    ],
+    "initial": "padding-box",
+    "appliesto": "allElements",
+    "computed": "asSpecified",
+    "order": "uniqueOrder",
+    "alsoAppliesTo": [
+      "::first-letter",
+      "::first-line",
+      "::pla

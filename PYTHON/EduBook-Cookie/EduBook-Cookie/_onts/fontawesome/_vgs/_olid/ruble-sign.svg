@@ -1,0 +1,6 @@
+ object | null | undefined, opts?: object | null): node is FunctionParent;
+export function assertFunctionParent(node: object | null | undefined, opts?: object | null): void;
+export function isFunctionTypeAnnotation(node: object | null | undefined, opts?: object | null): node is FunctionTypeAnnotation;
+export function assertFunctionTypeAnnotation(node: object | null | undefined, opts?: object | null): void;
+export function isFunctionTypeParam(node: object | null | undefined, opts?: object | null): node is FunctionTypeParam;
+ex

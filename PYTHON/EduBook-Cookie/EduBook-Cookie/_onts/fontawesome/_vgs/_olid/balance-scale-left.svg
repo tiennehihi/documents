@@ -1,0 +1,37 @@
+/**
+ * @fileoverview Rule to check the spacing around the * in generator functions.
+ * @author Jamund Ferguson
+ * @deprecated in ESLint v8.53.0
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Rule Definition
+//------------------------------------------------------------------------------
+
+const OVERRIDE_SCHEMA = {
+    oneOf: [
+        {
+            enum: ["before", "after", "both", "neither"]
+        },
+        {
+            type: "object",
+            properties: {
+                before: { type: "boolean" },
+                after: { type: "boolean" }
+            },
+            additionalProperties: false
+        }
+    ]
+};
+
+/** @type {import('../shared/types').Rule} */
+module.exports = {
+    meta: {
+        deprecated: true,
+        replacedBy: [],
+        type: "layout",
+
+        docs: {
+            description: "Enforce consistent spaci

@@ -1,0 +1,67 @@
+          // in the long run.
+            this.tokens.appendCode(keyCode.replace(/[^\n]/g, ""));
+          }
+          // key
+          this.tokens.removeToken();
+          // =
+          this.tokens.removeToken();
+          const snapshot = this.tokens.snapshot();
+          this.processPropValue();
+          keyCode = this.tokens.dangerouslyGetAndRemoveCodeSinceSnapshot(snapshot);
+          // Don't add a comma
+          continue;
+        } else {
+          this.processPropName(propName);
+          this.tokens.replaceToken(": ");
+          this.processPropValue();
+        }
+      } else if (this.tokens.matches1(_types.TokenType.jsxName)) {
+        // This is a shorthand prop like <input disabled />.
+        const propName = this.tokens.identifierName();
+        this.processPropName(propName);
+        this.tokens.appendCode(": true");
+      } else if (this.tokens.matches1(_types.TokenType.braceL)) {
+        // This is prop spread, like <div {...getProps()}>, which we can pass
+        // through fairly directly as an object spread.
+        this.tokens.replaceToken("");
+        this.rootTransformer.processBalancedCode();
+        this.tokens.replaceToken("");
+      } else {
+        break;
+      }
+      this.tokens.appendCode(",");
+    }
+    return keyCode;
+  }
+
+  processPropName(propName) {
+    if (propName.includes("-")) {
+      this.tokens.replaceToken(`'${propName}'`);
+    } else {
+      this.tokens.copyToken();
+    }
+  }
+
+  processPropValue() {
+    if (this.tokens.matches1(_types.TokenType.braceL)) {
+      this.tokens.replaceToken("");
+      this.rootTransformer.processBalancedCode();
+      this.tokens.replaceToken("");
+    } else if (this.tokens.matches1(_types.TokenType.jsxTagStart)) {
+      this.processJSXTag();
+    } else {
+      this.processStringPropValue();
+    }
+  }
+
+  processStringPropValue() {
+    const token = this.tokens.currentToken();
+    const valueCode = this.tokens.code.slice(token.start + 1, token.end - 1);
+    const replacementCode = formatJSXTextReplacement(valueCode);
+    const literalCode = formatJSXStringValueLiteral(valueCode);
+    this.tokens.replaceToken(literalCode + replacementCode);
+  }
+
+  /**
+   * Starting in the middle of the props object literal, produce an additional
+   * prop for the children and close the object litera

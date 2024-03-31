@@ -1,0 +1,19 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+const { fileURLToPath } = require("url");
+const CommentCompilationWarning = require("../CommentCompilationWarning");
+const RuntimeGlobals = require("../RuntimeGlobals");
+const UnsupportedFeatureWarning = require("../UnsupportedFeatureWarning");
+const WebpackError = require("../WebpackError");
+const BasicEvaluatedExpression = require("../javascript/BasicEvaluatedExpression");
+const {
+	evaluateToIdentifier,
+	evaluateToString,
+	expressionIsUnsupported,
+	toConstantDependency
+} = require("../jav

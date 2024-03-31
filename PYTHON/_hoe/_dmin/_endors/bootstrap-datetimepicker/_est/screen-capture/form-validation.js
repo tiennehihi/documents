@@ -1,0 +1,9 @@
+/**!
+ * easyPieChart
+ * Lightweight plugin to render simple, animated and retina optimized pie charts
+ *
+ * @license 
+ * @author Robert Fleischmann <rendro87@gmail.com> (http://robert-fleischmann.de)
+ * @version 2.1.6
+ **/
+!function(a,b){"object"==typeof exports?module.exports=b(require("angular")):"function"==typeof define&&define.amd?define(["angular"],b):b(a.angular)}(this,function(a){!function(a){"use strict";return a.module("easypiechart",[]).directive("easypiechart",[function(){return{restrict:"A",require:"?ngModel",scope:{percent:"=",options:"="},link:function(b,d){b.percent=b.percent||0;var e={barColor:"#ef1e25",trackColor:"#f9f9f9",scaleColor:"#dfe0e0",scaleLength:5,lineCap:"round",lineWidth:3,size:110,rotate:0,animate:{duration:1e3,enabled:!0}};b.options=a.extend(e,b.options);var f=new c(d[0],e);b.$watch("percent",function(a){f.update(a)})}}}])}(a);var b=function(a,b){var c,d=document.createElement("canvas");a.appendChild(d),"undefined"!=typeof G_vmlCanvasManager&&G_vmlCanvasManager.initElement(d);var e=d.getContext("2d");d.width=d.height=b.size;var f=1;window.devicePixelRatio>1&&(f=window.devicePixelRatio,d.style.width=d.style.height=[b.size,"px"].join(""),d.width=d.height=b.size*f,e.scale(f,f)),e.translate(b.size/2,b.size/2),e.rotate((-0.5+b.rotate/180)*Math.PI);var g=(b.size-b.lineWidth)/2;b.scaleColor&&b.scaleLength&&(g-=b.scaleLength+2),Date.now=Date.now||function(){return+new Date};var h=function(a,b,c){c=Math.min(Math.max(-1,c||0),1);var d=0>=c?!0:!1;e.beginPath(),e.arc(0,0,g,0,2*Math.PI*c,d),e.strokeStyle=a,e.lineWidth=b,e.stroke()},i=function(){var a,c;e.lineWidth=1,e.fillStyle=b.scaleColor,e.save();for(var d=24;d>0;--

@@ -1,0 +1,12 @@
+ // first unknown option and remaining unknown args
+    let dest = operands;
+    const args = argv.slice();
+
+    function maybeOption(arg) {
+      return arg.length > 1 && arg[0] === '-';
+    }
+
+    // parse options
+    let activeVariadicOption = null;
+    while (args.length) {
+      const arg = ar

@@ -1,0 +1,11 @@
+e.storingStartTime,
+					profile.storingEndTime,
+					f => (profile.storingParallelismFactor = f)
+				);
+				p.range(
+					profile.restoringStartTime,
+					profile.restoringEndTime,
+					f => (profile.restoringParallelismFactor = f)
+				);
+				if (profile.additionalFactoryTimes) {
+					for (const { start, end

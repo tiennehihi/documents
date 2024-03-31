@@ -1,0 +1,7 @@
+ns);
+    let exclamationToken;
+    if (allowExclamation && name.kind === 80 /* Identifier */ && token() === 54 /* ExclamationToken */ && !scanner.hasPrecedingLineBreak()) {
+      exclamationToken = parseTokenNode();
+    }
+    const type = parseTypeAnnotation();
+    const initi

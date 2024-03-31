@@ -1,0 +1,12 @@
+"use strict";Object.defineProperty(exports, "__esModule", {value: true});// Generated file, do not edit! Run "yarn generate" to re-generate this file.
+var _keywords = require('./keywords');
+var _types = require('./types');
+
+// prettier-ignore
+ const READ_WORD_TREE = new Int32Array([
+  // ""
+  -1, 27, 783, 918, 1755, 2376, 2862, 3483, -1, 3699, -1, 4617, 4752, 4833, 5130, 5508, 5940, -1, 6480, 6939, 7749, 8181, 8451, 8613, -1, 8829, -1,
+  // "a"
+  -1, -1, 54, 243, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 432, -1, -1, -1, 675, -1, -1, -1,
+  // "ab"
+  -1, -1, -1, -1, -1,

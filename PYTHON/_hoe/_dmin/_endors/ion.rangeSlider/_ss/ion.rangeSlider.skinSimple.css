@@ -1,0 +1,57 @@
+ void;
+    private lchownBase;
+    lchownSync(path: PathLike, uid: number, gid: number): void;
+    lchown(path: PathLike, uid: number, gid: number, callback: TCallback<void>): void;
+    private statWatchers;
+    watchFile(path: PathLike, listener: (curr: Stats, prev: Stats) => void): StatWatcher;
+    watchFile(path: PathLike, options: IWatchFileOptions, listener: (curr: Stats, prev: Stats) => void): StatWatcher;
+    unwatchFile(path: PathLike, listener?: (curr: Stats, prev: Stats) => void): void;
+    createReadStream(path: PathLike, options?: IReadStreamOptions | string): IReadStream;
+    createWriteStream(path: PathLike, options?: IWriteStreamOptions | string): IWriteStream;
+    watch(path: PathLike, options?: IWatchOptions | string, listener?: (eventType: string, filename: string) => void): FSWatcher;
+}
+export declare class StatWatcher extends EventEmitter {
+    vol: Volume;
+    filename: string;
+    interval: number;
+    timeoutRef?: any;
+    setTimeout: TSetTimeout;
+    prev: Stats;
+    constructor(vol: Volume);
+    private loop;
+    private hasChanged;
+    private onInterval;
+    start(path: string, persistent?: boolean, interval?: number): void;
+    stop(): void;
+}
+export interface IReadStream extends Readable {
+    new (path: PathLike, options: IReadStreamOptions): any;
+    open(): any;
+    close(callback: TCallback<void>): any;
+    bytesRead: number;
+    path: string;
+}
+export interface IWriteStream extends Writable {
+    bytesWritten: number;
+    path: string;
+    new (path: PathLike, options: IWriteStreamOptions): any;
+    open(): any;
+    close(): any;
+}
+export declare class FSWatcher extends EventEmitter {
+    _vol: Volume;
+    _filename: string;
+    _steps: string[];
+    _filenameEncoded: TDataOut;
+    _recursive: boolean;
+    _encoding: BufferEncoding;
+    _link: Link;
+    _timer: any;
+    private _listenerRemovers;
+    constructor(vol: Volume);
+    private _getName;
+    private _onParentChild;
+    private _emit;
+    private _persist;
+    start(path: PathLike, persistent?: boolean, recursive?: boolean, encoding?: BufferEncoding): void;
+    close(): vo

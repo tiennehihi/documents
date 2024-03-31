@@ -1,0 +1,403 @@
+ration) & 7 /* BlockScoped */;
+            const name = getNameOfDeclaration(declaration);
+            if (blockScopeKind !== 4 /* Using */ && blockScopeKind !== 6 /* AwaitUsing */ || !name || !isIdentifierThatStartsWithUnderscore(name)) {
+              addToGroup(unusedVariables, declaration.parent, declaration, getNodeId);
+            }
+          } else {
+            const parameter = local.valueDeclaration && tryGetRootParameterDeclaration(local.valueDeclaration);
+            const name = local.valueDeclaration && getNameOfDeclaration(local.valueDeclaration);
+            if (parameter && name) {
+              if (!isParameterPropertyDeclaration(parameter, parameter.parent) && !parameterIsThisKeyword(parameter) && !isIdentifierThatStartsWithUnderscore(name)) {
+                if (isBindingElement(declaration) && isArrayBindingPattern(declaration.parent)) {
+                  addToGroup(unusedDestructures, declaration.parent, declaration, getNodeId);
+                } else {
+                  addDiagnostic(parameter, 1 /* Parameter */, createDiagnosticForNode(name, Diagnostics._0_is_declared_but_its_value_is_never_read, symbolName(local)));
+                }
+              }
+            } else {
+              errorUnusedLocal(declaration, symbolName(local), addDiagnostic);
+            }
+          }
+        }
+      }
+    });
+    unusedImports.forEach(([importClause, unuseds]) => {
+      const importDecl = importClause.parent;
+      const nDeclarations = (importClause.name ? 1 : 0) + (importClause.namedBindings ? importClause.namedBindings.kind === 274 /* NamespaceImport */ ? 1 : importClause.namedBindings.elements.length : 0);
+      if (nDeclarations === unuseds.length) {
+        addDiagnostic(
+          importDecl,
+          0 /* Local */,
+          unuseds.length === 1 ? createDiagnosticForNode(importDecl, Diagnostics._0_is_declared_but_its_value_is_never_read, idText(first(unuseds).name)) : createDiagnosticForNode(importDecl, Diagnostics.All_imports_in_import_declaration_are_unused)
+        );
+      } else {
+        for (const unused of unuseds)
+          errorUnusedLocal(unused, idText(unused.name), addDiagnostic);
+      }
+    });
+    unusedDestructures.forEach(([bindingPattern, bindingElements]) => {
+      const kind = tryGetRootParameterDeclaration(bindingPattern.parent) ? 1 /* Parameter */ : 0 /* Local */;
+      if (bindingPattern.elements.length === bindingElements.length) {
+        if (bindingElements.length === 1 && bindingPattern.parent.kind === 260 /* VariableDeclaration */ && bindingPattern.parent.parent.kind === 261 /* VariableDeclarationList */) {
+          addToGroup(unusedVariables, bindingPattern.parent.parent, bindingPattern.parent, getNodeId);
+        } else {
+          addDiagnostic(
+            bindingPattern,
+            kind,
+            bindingElements.length === 1 ? createDiagnosticForNode(bindingPattern, Diagnostics._0_is_declared_but_its_value_is_never_read, bindingNameText(first(bindingElements).name)) : createDiagnosticForNode(bindingPattern, Diagnostics.All_destructured_elements_are_unused)
+          );
+        }
+      } else {
+        for (const e of bindingElements) {
+          addDiagnostic(e, kind, createDiagnosticForNode(e, Diagnostics._0_is_declared_but_its_value_is_never_read, bindingNameText(e.name)));
+        }
+      }
+    });
+    unusedVariables.forEach(([declarationList, declarations]) => {
+      if (declarationList.declarations.length === declarations.length) {
+        addDiagnostic(
+          declarationList,
+          0 /* Local */,
+          declarations.length === 1 ? createDiagnosticForNode(first(declarations).name, Diagnostics._0_is_declared_but_its_value_is_never_read, bindingNameText(first(declarations).name)) : createDiagnosticForNode(declarationList.parent.kind === 243 /* VariableStatement */ ? declarationList.parent : declarationList, Diagnostics.All_variables_are_unused)
+        );
+      } else {
+        for (const decl of declarations) {
+          addDiagnostic(decl, 0 /* Local */, createDiagnosticForNode(decl, Diagnostics._0_is_declared_but_its_value_is_never_read, bindingNameText(decl.name)));
+        }
+      }
+    });
+  }
+  function checkPotentialUncheckedRenamedBindingElementsInTypes() {
+    var _a;
+    for (const node of potentialUnusedRenamedBindingElementsInTypes) {
+      if (!((_a = getSymbolOfDeclaration(node)) == null ? void 0 : _a.isReferenced)) {
+        const wrappingDeclaration = walkUpBindingElementsAndPatterns(node);
+        Debug.assert(isParameterDeclaration(wrappingDeclaration), "Only parameter declaration should be checked here");
+        const diagnostic = createDiagnosticForNode(node.name, Diagnostics._0_is_an_unused_renaming_of_1_Did_you_intend_to_use_it_as_a_type_annotation, declarationNameToString(node.name), declarationNameToString(node.propertyName));
+        if (!wrappingDeclaration.type) {
+          addRelatedInfo(
+            diagnostic,
+            createFileDiagnostic(getSourceFileOfNode(wrappingDeclaration), wrappingDeclaration.end, 1, Diagnostics.We_can_only_write_a_type_for_0_by_adding_a_type_for_the_entire_parameter_here, declarationNameToString(node.propertyName))
+          );
+        }
+        diagnostics.add(diagnostic);
+      }
+    }
+  }
+  function bindingNameText(name) {
+    switch (name.kind) {
+      case 80 /* Identifier */:
+        return idText(name);
+      case 207 /* ArrayBindingPattern */:
+      case 206 /* ObjectBindingPattern */:
+        return bindingNameText(cast(first(name.elements), isBindingElement).name);
+      default:
+        return Debug.assertNever(name);
+    }
+  }
+  function isImportedDeclaration(node) {
+    return node.kind === 273 /* ImportClause */ || node.kind === 276 /* ImportSpecifier */ || node.kind === 274 /* NamespaceImport */;
+  }
+  function importClauseFromImported(decl) {
+    return decl.kind === 273 /* ImportClause */ ? decl : decl.kind === 274 /* NamespaceImport */ ? decl.parent : decl.parent.parent;
+  }
+  function checkBlock(node) {
+    if (node.kind === 241 /* Block */) {
+      checkGrammarStatementInAmbientContext(node);
+    }
+    if (isFunctionOrModuleBlock(node)) {
+      const saveFlowAnalysisDisabled = flowAnalysisDisabled;
+      forEach(node.statements, checkSourceElement);
+      flowAnalysisDisabled = saveFlowAnalysisDisabled;
+    } else {
+      forEach(node.statements, checkSourceElement);
+    }
+    if (node.locals) {
+      registerForUnusedIdentifiersCheck(node);
+    }
+  }
+  function checkCollisionWithArgumentsInGeneratedCode(node) {
+    if (languageVersion >= 2 /* ES2015 */ || !hasRestParameter(node) || node.flags & 33554432 /* Ambient */ || nodeIsMissing(node.body)) {
+      return;
+    }
+    forEach(node.parameters, (p) => {
+      if (p.name && !isBindingPattern(p.name) && p.name.escapedText === argumentsSymbol.escapedName) {
+        errorSkippedOn("noEmit", p, Diagnostics.Duplicate_identifier_arguments_Compiler_uses_arguments_to_initialize_rest_parameters);
+      }
+    });
+  }
+  function needCollisionCheckForIdentifier(node, identifier, name) {
+    if ((identifier == null ? void 0 : identifier.escapedText) !== name) {
+      return false;
+    }
+    if (node.kind === 172 /* PropertyDeclaration */ || node.kind === 171 /* PropertySignature */ || node.kind === 174 /* MethodDeclaration */ || node.kind === 173 /* MethodSignature */ || node.kind === 177 /* GetAccessor */ || node.kind === 178 /* SetAccessor */ || node.kind === 303 /* PropertyAssignment */) {
+      return false;
+    }
+    if (node.flags & 33554432 /* Ambient */) {
+      return false;
+    }
+    if (isImportClause(node) || isImportEqualsDeclaration(node) || isImportSpecifier(node)) {
+      if (isTypeOnlyImportOrExportDeclaration(node)) {
+        return false;
+      }
+    }
+    const root = getRootDeclaration(node);
+    if (isParameter(root) && nodeIsMissing(root.parent.body)) {
+      return false;
+    }
+    return true;
+  }
+  function checkIfThisIsCapturedInEnclosingScope(node) {
+    findAncestor(node, (current) => {
+      if (getNodeCheckFlags(current) & 4 /* CaptureThis */) {
+        const isDeclaration2 = node.kind !== 80 /* Identifier */;
+        if (isDeclaration2) {
+          error2(getNameOfDeclaration(node), Diagnostics.Duplicate_identifier_this_Compiler_uses_variable_declaration_this_to_capture_this_reference);
+        } else {
+          error2(node, Diagnostics.Expression_resolves_to_variable_declaration_this_that_compiler_uses_to_capture_this_reference);
+        }
+        return true;
+      }
+      return false;
+    });
+  }
+  function checkIfNewTargetIsCapturedInEnclosingScope(node) {
+    findAncestor(node, (current) => {
+      if (getNodeCheckFlags(current) & 8 /* CaptureNewTarget */) {
+        const isDeclaration2 = node.kind !== 80 /* Identifier */;
+        if (isDeclaration2) {
+          error2(getNameOfDeclaration(node), Diagnostics.Duplicate_identifier_newTarget_Compiler_uses_variable_declaration_newTarget_to_capture_new_target_meta_property_reference);
+        } else {
+          error2(node, Diagnostics.Expression_resolves_to_variable_declaration_newTarget_that_compiler_uses_to_capture_new_target_meta_property_reference);
+        }
+        return true;
+      }
+      return false;
+    });
+  }
+  function checkCollisionWithRequireExportsInGeneratedCode(node, name) {
+    if (moduleKind >= 5 /* ES2015 */ && !(moduleKind >= 100 /* Node16 */ && getSourceFileOfNode(node).impliedNodeFormat === 1 /* CommonJS */)) {
+      return;
+    }
+    if (!name || !needCollisionCheckForIdentifier(node, name, "require") && !needCollisionCheckForIdentifier(node, name, "exports")) {
+      return;
+    }
+    if (isModuleDeclaration(node) && getModuleInstanceState(node) !== 1 /* Instantiated */) {
+      return;
+    }
+    const parent2 = getDeclarationContainer(node);
+    if (parent2.kind === 312 /* SourceFile */ && isExternalOrCommonJsModule(parent2)) {
+      errorSkippedOn("noEmit", name, Diagnostics.Duplicate_identifier_0_Compiler_reserves_name_1_in_top_level_scope_of_a_module, declarationNameToString(name), declarationNameToString(name));
+    }
+  }
+  function checkCollisionWithGlobalPromiseInGeneratedCode(node, name) {
+    if (!name || languageVersion >= 4 /* ES2017 */ || !needCollisionCheckForIdentifier(node, name, "Promise")) {
+      return;
+    }
+    if (isModuleDeclaration(node) && getModuleInstanceState(node) !== 1 /* Instantiated */) {
+      return;
+    }
+    const parent2 = getDeclarationContainer(node);
+    if (parent2.kind === 312 /* SourceFile */ && isExternalOrCommonJsModule(parent2) && parent2.flags & 4096 /* HasAsyncFunctions */) {
+      errorSkippedOn("noEmit", name, Diagnostics.Duplicate_identifier_0_Compiler_reserves_name_1_in_top_level_scope_of_a_module_containing_async_functions, declarationNameToString(name), declarationNameToString(name));
+    }
+  }
+  function recordPotentialCollisionWithWeakMapSetInGeneratedCode(node, name) {
+    if (languageVersion <= 8 /* ES2021 */ && (needCollisionCheckForIdentifier(node, name, "WeakMap") || needCollisionCheckForIdentifier(node, name, "WeakSet"))) {
+      potentialWeakMapSetCollisions.push(node);
+    }
+  }
+  function checkWeakMapSetCollision(node) {
+    const enclosingBlockScope = getEnclosingBlockScopeContainer(node);
+    if (getNodeCheckFlags(enclosingBlockScope) & 1048576 /* ContainsClassWithPrivateIdentifiers */) {
+      Debug.assert(isNamedDeclaration(node) && isIdentifier(node.name) && typeof node.name.escapedText === "string", "The target of a WeakMap/WeakSet collision check should be an identifier");
+      errorSkippedOn("noEmit", node, Diagnostics.Compiler_reserves_name_0_when_emitting_private_identifier_downlevel, node.name.escapedText);
+    }
+  }
+  function recordPotentialCollisionWithReflectInGeneratedCode(node, name) {
+    if (name && languageVersion >= 2 /* ES2015 */ && languageVersion <= 8 /* ES2021 */ && needCollisionCheckForIdentifier(node, name, "Reflect")) {
+      potentialReflectCollisions.push(node);
+    }
+  }
+  function checkReflectCollision(node) {
+    let hasCollision = false;
+    if (isClassExpression(node)) {
+      for (const member of node.members) {
+        if (getNodeCheckFlags(member) & 2097152 /* ContainsSuperPropertyInStaticInitializer */) {
+          hasCollision = true;
+          break;
+        }
+      }
+    } else if (isFunctionExpression(node)) {
+      if (getNodeCheckFlags(node) & 2097152 /* ContainsSuperPropertyInStaticInitializer */) {
+        hasCollision = true;
+      }
+    } else {
+      const container = getEnclosingBlockScopeContainer(node);
+      if (container && getNodeCheckFlags(container) & 2097152 /* ContainsSuperPropertyInStaticInitializer */) {
+        hasCollision = true;
+      }
+    }
+    if (hasCollision) {
+      Debug.assert(isNamedDeclaration(node) && isIdentifier(node.name), "The target of a Reflect collision check should be an identifier");
+      errorSkippedOn("noEmit", node, Diagnostics.Duplicate_identifier_0_Compiler_reserves_name_1_when_emitting_super_references_in_static_initializers, declarationNameToString(node.name), "Reflect");
+    }
+  }
+  function checkCollisionsForDeclarationName(node, name) {
+    if (!name)
+      return;
+    checkCollisionWithRequireExportsInGeneratedCode(node, name);
+    checkCollisionWithGlobalPromiseInGeneratedCode(node, name);
+    recordPotentialCollisionWithWeakMapSetInGeneratedCode(node, name);
+    recordPotentialCollisionWithReflectInGeneratedCode(node, name);
+    if (isClassLike(node)) {
+      checkTypeNameIsReserved(name, Diagnostics.Class_name_cannot_be_0);
+      if (!(node.flags & 33554432 /* Ambient */)) {
+        checkClassNameCollisionWithObject(name);
+      }
+    } else if (isEnumDeclaration(node)) {
+      checkTypeNameIsReserved(name, Diagnostics.Enum_name_cannot_be_0);
+    }
+  }
+  function checkVarDeclaredNamesNotShadowed(node) {
+    if ((getCombinedNodeFlagsCached(node) & 7 /* BlockScoped */) !== 0 || isParameterDeclaration(node)) {
+      return;
+    }
+    const symbol = getSymbolOfDeclaration(node);
+    if (symbol.flags & 1 /* FunctionScopedVariable */) {
+      if (!isIdentifier(node.name))
+        return Debug.fail();
+      const localDeclarationSymbol = resolveName(
+        node,
+        node.name.escapedText,
+        3 /* Variable */,
+        /*nameNotFoundMessage*/
+        void 0,
+        /*nameArg*/
+        void 0,
+        /*isUse*/
+        false
+      );
+      if (localDeclarationSymbol && localDeclarationSymbol !== symbol && localDeclarationSymbol.flags & 2 /* BlockScopedVariable */) {
+        if (getDeclarationNodeFlagsFromSymbol(localDeclarationSymbol) & 7 /* BlockScoped */) {
+          const varDeclList = getAncestor(localDeclarationSymbol.valueDeclaration, 261 /* VariableDeclarationList */);
+          const container = varDeclList.parent.kind === 243 /* VariableStatement */ && varDeclList.parent.parent ? varDeclList.parent.parent : void 0;
+          const namesShareScope = container && (container.kind === 241 /* Block */ && isFunctionLike(container.parent) || container.kind === 268 /* ModuleBlock */ || container.kind === 267 /* ModuleDeclaration */ || container.kind === 312 /* SourceFile */);
+          if (!namesShareScope) {
+            const name = symbolToString(localDeclarationSymbol);
+            error2(node, Diagnostics.Cannot_initialize_outer_scoped_variable_0_in_the_same_scope_as_block_scoped_declaration_1, name, name);
+          }
+        }
+      }
+    }
+  }
+  function convertAutoToAny(type) {
+    return type === autoType ? anyType : type === autoArrayType ? anyArrayType : type;
+  }
+  function checkVariableLikeDeclaration(node) {
+    var _a;
+    checkDecorators(node);
+    if (!isBindingElement(node)) {
+      checkSourceElement(node.type);
+    }
+    if (!node.name) {
+      return;
+    }
+    if (node.name.kind === 167 /* ComputedPropertyName */) {
+      checkComputedPropertyName(node.name);
+      if (hasOnlyExpressionInitializer(node) && node.initializer) {
+        checkExpressionCached(node.initializer);
+      }
+    }
+    if (isBindingElement(node)) {
+      if (node.propertyName && isIdentifier(node.name) && isParameterDeclaration(node) && nodeIsMissing(getContainingFunction(node).body)) {
+        potentialUnusedRenamedBindingElementsInTypes.push(node);
+        return;
+      }
+      if (isObjectBindingPattern(node.parent) && node.dotDotDotToken && languageVersion < 5 /* ES2018 */) {
+        checkExternalEmitHelpers(node, 4 /* Rest */);
+      }
+      if (node.propertyName && node.propertyName.kind === 167 /* ComputedPropertyName */) {
+        checkComputedPropertyName(node.propertyName);
+      }
+      const parent2 = node.parent.parent;
+      const parentCheckMode = node.dotDotDotToken ? 32 /* RestBindingElement */ : 0 /* Normal */;
+      const parentType = getTypeForBindingElementParent(parent2, parentCheckMode);
+      const name = node.propertyName || node.name;
+      if (parentType && !isBindingPattern(name)) {
+        const exprType = getLiteralTypeFromPropertyName(name);
+        if (isTypeUsableAsPropertyName(exprType)) {
+          const nameText = getPropertyNameFromType(exprType);
+          const property = getPropertyOfType(parentType, nameText);
+          if (property) {
+            markPropertyAsReferenced(
+              property,
+              /*nodeForCheckWriteOnly*/
+              void 0,
+              /*isSelfTypeAccess*/
+              false
+            );
+            checkPropertyAccessibility(
+              node,
+              !!parent2.initializer && parent2.initializer.kind === 108 /* SuperKeyword */,
+              /*writing*/
+              false,
+              parentType,
+              property
+            );
+          }
+        }
+      }
+    }
+    if (isBindingPattern(node.name)) {
+      if (node.name.kind === 207 /* ArrayBindingPattern */ && languageVersion < 2 /* ES2015 */ && compilerOptions.downlevelIteration) {
+        checkExternalEmitHelpers(node, 512 /* Read */);
+      }
+      forEach(node.name.elements, checkSourceElement);
+    }
+    if (node.initializer && isParameterDeclaration(node) && nodeIsMissing(getContainingFunction(node).body)) {
+      error2(node, Diagnostics.A_parameter_initializer_is_only_allowed_in_a_function_or_constructor_implementation);
+      return;
+    }
+    if (isBindingPattern(node.name)) {
+      if (isInAmbientOrTypeNode(node)) {
+        return;
+      }
+      const needCheckInitializer = hasOnlyExpressionInitializer(node) && node.initializer && node.parent.parent.kind !== 249 /* ForInStatement */;
+      const needCheckWidenedType = !some(node.name.elements, not(isOmittedExpression));
+      if (needCheckInitializer || needCheckWidenedType) {
+        const widenedType = getWidenedTypeForVariableLikeDeclaration(node);
+        if (needCheckInitializer) {
+          const initializerType = checkExpressionCached(node.initializer);
+          if (strictNullChecks && needCheckWidenedType) {
+            checkNonNullNonVoidType(initializerType, node);
+          } else {
+            checkTypeAssignableToAndOptionallyElaborate(initializerType, getWidenedTypeForVariableLikeDeclaration(node), node, node.initializer);
+          }
+        }
+        if (needCheckWidenedType) {
+          if (isArrayBindingPattern(node.name)) {
+            checkIteratedTypeOrElementType(65 /* Destructuring */, widenedType, undefinedType, node);
+          } else if (strictNullChecks) {
+            checkNonNullNonVoidType(widenedType, node);
+          }
+        }
+      }
+      return;
+    }
+    const symbol = getSymbolOfDeclaration(node);
+    if (symbol.flags & 2097152 /* Alias */ && (isVariableDeclarationInitializedToBareOrAccessedRequire(node) || isBindingElementOfBareOrAccessedRequire(node))) {
+      checkAliasSymbol(node);
+      return;
+    }
+    const type = convertAutoToAny(getTypeOfSymbol(symbol));
+    if (node === symbol.valueDeclaration) {
+      const initializer = hasOnlyExpressionInitializer(node) && getEffectiveInitializer(node);
+      if (initializer) {
+        const isJSObjectLiteralInitializer = isInJSFile(node) && isObjectLiteralExpression(initializer) && (initializer.properties.length === 0 || isPrototypeAccess(node.name)) && !!((_a = symbol.exports) == null ? void 0 : _a.size);
+        if (!isJSObjectLiteralInitializer && node.parent.parent.kind !== 249 /* ForInStatement */) {
+          const initializerType = checkExpressionCached(initializer);
+          checkTypeAssignableToAndOptionallyElaborate(
+            initializerType,
+            type,
+   

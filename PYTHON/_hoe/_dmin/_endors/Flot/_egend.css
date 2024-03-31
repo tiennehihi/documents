@@ -1,0 +1,5 @@
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var noop = function() {};
+
+function ensureFunction(value) {
+    return typeof value === 'function' 

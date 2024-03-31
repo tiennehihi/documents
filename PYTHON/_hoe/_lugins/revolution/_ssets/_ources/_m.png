@@ -1,0 +1,592 @@
+eText) {
+  const { factory: factory2 } = context;
+  const assignedName = assignedNameText !== void 0 ? factory2.createStringLiteral(assignedNameText) : getAssignedNameOfIdentifier(factory2, node.left, node.right);
+  const right = finishTransformNamedEvaluation(context, node.right, assignedName, ignoreEmptyStringLiteral);
+  return factory2.updateBinaryExpression(
+    node,
+    node.left,
+    node.operatorToken,
+    right
+  );
+}
+function transformNamedEvaluationOfExportAssignment(context, node, ignoreEmptyStringLiteral, assignedNameText) {
+  const { factory: factory2 } = context;
+  const assignedName = assignedNameText !== void 0 ? factory2.createStringLiteral(assignedNameText) : factory2.createStringLiteral(node.isExportEquals ? "" : "default");
+  const expression = finishTransformNamedEvaluation(context, node.expression, assignedName, ignoreEmptyStringLiteral);
+  return factory2.updateExportAssignment(
+    node,
+    node.modifiers,
+    expression
+  );
+}
+function transformNamedEvaluation(context, node, ignoreEmptyStringLiteral, assignedName) {
+  switch (node.kind) {
+    case 303 /* PropertyAssignment */:
+      return transformNamedEvaluationOfPropertyAssignment(context, node, ignoreEmptyStringLiteral, assignedName);
+    case 304 /* ShorthandPropertyAssignment */:
+      return transformNamedEvaluationOfShorthandAssignmentProperty(context, node, ignoreEmptyStringLiteral, assignedName);
+    case 260 /* VariableDeclaration */:
+      return transformNamedEvaluationOfVariableDeclaration(context, node, ignoreEmptyStringLiteral, assignedName);
+    case 169 /* Parameter */:
+      return transformNamedEvaluationOfParameterDeclaration(context, node, ignoreEmptyStringLiteral, assignedName);
+    case 208 /* BindingElement */:
+      return transformNamedEvaluationOfBindingElement(context, node, ignoreEmptyStringLiteral, assignedName);
+    case 172 /* PropertyDeclaration */:
+      return transformNamedEvaluationOfPropertyDeclaration(context, node, ignoreEmptyStringLiteral, assignedName);
+    case 226 /* BinaryExpression */:
+      return transformNamedEvaluationOfAssignmentExpression(context, node, ignoreEmptyStringLiteral, assignedName);
+    case 277 /* ExportAssignment */:
+      return transformNamedEvaluationOfExportAssignment(context, node, ignoreEmptyStringLiteral, assignedName);
+  }
+}
+
+// src/compiler/transformers/taggedTemplate.ts
+function processTaggedTemplateExpression(context, node, visitor, currentSourceFile, recordTaggedTemplateString, level) {
+  const tag = visitNode(node.tag, visitor, isExpression);
+  Debug.assert(tag);
+  const templateArguments = [void 0];
+  const cookedStrings = [];
+  const rawStrings = [];
+  const template = node.template;
+  if (level === 0 /* LiftRestriction */ && !hasInvalidEscape(template)) {
+    return visitEachChild(node, visitor, context);
+  }
+  const { factory: factory2 } = context;
+  if (isNoSubstitutionTemplateLiteral(template)) {
+    cookedStrings.push(createTemplateCooked(factory2, template));
+    rawStrings.push(getRawLiteral(factory2, template, currentSourceFile));
+  } else {
+    cookedStrings.push(createTemplateCooked(factory2, template.head));
+    rawStrings.push(getRawLiteral(factory2, template.head, currentSourceFile));
+    for (const templateSpan of template.templateSpans) {
+      cookedStrings.push(createTemplateCooked(factory2, templateSpan.literal));
+      rawStrings.push(getRawLiteral(factory2, templateSpan.literal, currentSourceFile));
+      templateArguments.push(Debug.checkDefined(visitNode(templateSpan.expression, visitor, isExpression)));
+    }
+  }
+  const helperCall = context.getEmitHelperFactory().createTemplateObjectHelper(
+    factory2.createArrayLiteralExpression(cookedStrings),
+    factory2.createArrayLiteralExpression(rawStrings)
+  );
+  if (isExternalModule(currentSourceFile)) {
+    const tempVar = factory2.createUniqueName("templateObject");
+    recordTaggedTemplateString(tempVar);
+    templateArguments[0] = factory2.createLogicalOr(
+      tempVar,
+      factory2.createAssignment(
+        tempVar,
+        helperCall
+      )
+    );
+  } else {
+    templateArguments[0] = helperCall;
+  }
+  return factory2.createCallExpression(
+    tag,
+    /*typeArguments*/
+    void 0,
+    templateArguments
+  );
+}
+function createTemplateCooked(factory2, template) {
+  return template.templateFlags & 26656 /* IsInvalid */ ? factory2.createVoidZero() : factory2.createStringLiteral(template.text);
+}
+function getRawLiteral(factory2, node, currentSourceFile) {
+  let text = node.rawText;
+  if (text === void 0) {
+    Debug.assertIsDefined(currentSourceFile, "Template literal node is missing 'rawText' and does not have a source file. Possibly bad transform.");
+    text = getSourceTextOfNodeFromSourceFile(currentSourceFile, node);
+    const isLast = node.kind === 15 /* NoSubstitutionTemplateLiteral */ || node.kind === 18 /* TemplateTail */;
+    text = text.substring(1, text.length - (isLast ? 1 : 2));
+  }
+  text = text.replace(/\r\n?/g, "\n");
+  return setTextRange(factory2.createStringLiteral(text), node);
+}
+
+// src/compiler/transformers/ts.ts
+var USE_NEW_TYPE_METADATA_FORMAT = false;
+function transformTypeScript(context) {
+  const {
+    factory: factory2,
+    getEmitHelperFactory: emitHelpers,
+    startLexicalEnvironment,
+    resumeLexicalEnvironment,
+    endLexicalEnvironment,
+    hoistVariableDeclaration
+  } = context;
+  const resolver = context.getEmitResolver();
+  const compilerOptions = context.getCompilerOptions();
+  const languageVersion = getEmitScriptTarget(compilerOptions);
+  const moduleKind = getEmitModuleKind(compilerOptions);
+  const legacyDecorators = !!compilerOptions.experimentalDecorators;
+  const typeSerializer = compilerOptions.emitDecoratorMetadata ? createRuntimeTypeSerializer(context) : void 0;
+  const previousOnEmitNode = context.onEmitNode;
+  const previousOnSubstituteNode = context.onSubstituteNode;
+  context.onEmitNode = onEmitNode;
+  context.onSubstituteNode = onSubstituteNode;
+  context.enableSubstitution(211 /* PropertyAccessExpression */);
+  context.enableSubstitution(212 /* ElementAccessExpression */);
+  let currentSourceFile;
+  let currentNamespace;
+  let currentNamespaceContainerName;
+  let currentLexicalScope;
+  let currentScopeFirstDeclarationsOfName;
+  let currentClassHasParameterProperties;
+  let enabledSubstitutions;
+  let applicableSubstitutions;
+  return transformSourceFileOrBundle;
+  function transformSourceFileOrBundle(node) {
+    if (node.kind === 313 /* Bundle */) {
+      return transformBundle(node);
+    }
+    return transformSourceFile(node);
+  }
+  function transformBundle(node) {
+    return factory2.createBundle(
+      node.sourceFiles.map(transformSourceFile),
+      mapDefined(node.prepends, (prepend) => {
+        if (prepend.kind === 315 /* InputFiles */) {
+          return createUnparsedSourceFile(prepend, "js");
+        }
+        return prepend;
+      })
+    );
+  }
+  function transformSourceFile(node) {
+    if (node.isDeclarationFile) {
+      return node;
+    }
+    currentSourceFile = node;
+    const visited = saveStateAndInvoke(node, visitSourceFile);
+    addEmitHelpers(visited, context.readEmitHelpers());
+    currentSourceFile = void 0;
+    return visited;
+  }
+  function saveStateAndInvoke(node, f) {
+    const savedCurrentScope = currentLexicalScope;
+    const savedCurrentScopeFirstDeclarationsOfName = currentScopeFirstDeclarationsOfName;
+    const savedCurrentClassHasParameterProperties = currentClassHasParameterProperties;
+    onBeforeVisitNode(node);
+    const visited = f(node);
+    if (currentLexicalScope !== savedCurrentScope) {
+      currentScopeFirstDeclarationsOfName = savedCurrentScopeFirstDeclarationsOfName;
+    }
+    currentLexicalScope = savedCurrentScope;
+    currentClassHasParameterProperties = savedCurrentClassHasParameterProperties;
+    return visited;
+  }
+  function onBeforeVisitNode(node) {
+    switch (node.kind) {
+      case 312 /* SourceFile */:
+      case 269 /* CaseBlock */:
+      case 268 /* ModuleBlock */:
+      case 241 /* Block */:
+        currentLexicalScope = node;
+        currentScopeFirstDeclarationsOfName = void 0;
+        break;
+      case 263 /* ClassDeclaration */:
+      case 262 /* FunctionDeclaration */:
+        if (hasSyntacticModifier(node, 128 /* Ambient */)) {
+          break;
+        }
+        if (node.name) {
+          recordEmittedDeclarationInScope(node);
+        } else {
+          Debug.assert(node.kind === 263 /* ClassDeclaration */ || hasSyntacticModifier(node, 2048 /* Default */));
+        }
+        break;
+    }
+  }
+  function visitor(node) {
+    return saveStateAndInvoke(node, visitorWorker);
+  }
+  function visitorWorker(node) {
+    if (node.transformFlags & 1 /* ContainsTypeScript */) {
+      return visitTypeScript(node);
+    }
+    return node;
+  }
+  function sourceElementVisitor(node) {
+    return saveStateAndInvoke(node, sourceElementVisitorWorker);
+  }
+  function sourceElementVisitorWorker(node) {
+    switch (node.kind) {
+      case 272 /* ImportDeclaration */:
+      case 271 /* ImportEqualsDeclaration */:
+      case 277 /* ExportAssignment */:
+      case 278 /* ExportDeclaration */:
+        return visitElidableStatement(node);
+      default:
+        return visitorWorker(node);
+    }
+  }
+  function isElisionBlocked(node) {
+    const parsed = getParseTreeNode(node);
+    if (parsed === node || isExportAssignment(node)) {
+      return false;
+    }
+    if (!parsed || parsed.kind !== node.kind) {
+      return true;
+    }
+    switch (node.kind) {
+      case 272 /* ImportDeclaration */:
+        Debug.assertNode(parsed, isImportDeclaration);
+        if (node.importClause !== parsed.importClause) {
+          return true;
+        }
+        if (node.attributes !== parsed.attributes) {
+          return true;
+        }
+        break;
+      case 271 /* ImportEqualsDeclaration */:
+        Debug.assertNode(parsed, isImportEqualsDeclaration);
+        if (node.name !== parsed.name) {
+          return true;
+        }
+        if (node.isTypeOnly !== parsed.isTypeOnly) {
+          return true;
+        }
+        if (node.moduleReference !== parsed.moduleReference && (isEntityName(node.moduleReference) || isEntityName(parsed.moduleReference))) {
+          return true;
+        }
+        break;
+      case 278 /* ExportDeclaration */:
+        Debug.assertNode(parsed, isExportDeclaration);
+        if (node.exportClause !== parsed.exportClause) {
+          return true;
+        }
+        if (node.attributes !== parsed.attributes) {
+          return true;
+        }
+        break;
+    }
+    return false;
+  }
+  function visitElidableStatement(node) {
+    if (isElisionBlocked(node)) {
+      if (node.transformFlags & 1 /* ContainsTypeScript */) {
+        return visitEachChild(node, visitor, context);
+      }
+      return node;
+    }
+    switch (node.kind) {
+      case 272 /* ImportDeclaration */:
+        return visitImportDeclaration(node);
+      case 271 /* ImportEqualsDeclaration */:
+        return visitImportEqualsDeclaration(node);
+      case 277 /* ExportAssignment */:
+        return visitExportAssignment(node);
+      case 278 /* ExportDeclaration */:
+        return visitExportDeclaration(node);
+      default:
+        Debug.fail("Unhandled ellided statement");
+    }
+  }
+  function namespaceElementVisitor(node) {
+    return saveStateAndInvoke(node, namespaceElementVisitorWorker);
+  }
+  function namespaceElementVisitorWorker(node) {
+    if (node.kind === 278 /* ExportDeclaration */ || node.kind === 272 /* ImportDeclaration */ || node.kind === 273 /* ImportClause */ || node.kind === 271 /* ImportEqualsDeclaration */ && node.moduleReference.kind === 283 /* ExternalModuleReference */) {
+      return void 0;
+    } else if (node.transformFlags & 1 /* ContainsTypeScript */ || hasSyntacticModifier(node, 32 /* Export */)) {
+      return visitTypeScript(node);
+    }
+    return node;
+  }
+  function getClassElementVisitor(parent) {
+    return (node) => saveStateAndInvoke(node, (n) => classElementVisitorWorker(n, parent));
+  }
+  function classElementVisitorWorker(node, parent) {
+    switch (node.kind) {
+      case 176 /* Constructor */:
+        return visitConstructor(node);
+      case 172 /* PropertyDeclaration */:
+        return visitPropertyDeclaration(node, parent);
+      case 177 /* GetAccessor */:
+        return visitGetAccessor(node, parent);
+      case 178 /* SetAccessor */:
+        return visitSetAccessor(node, parent);
+      case 174 /* MethodDeclaration */:
+        return visitMethodDeclaration(node, parent);
+      case 175 /* ClassStaticBlockDeclaration */:
+        return visitEachChild(node, visitor, context);
+      case 240 /* SemicolonClassElement */:
+        return node;
+      case 181 /* IndexSignature */:
+        return;
+      default:
+        return Debug.failBadSyntaxKind(node);
+    }
+  }
+  function getObjectLiteralElementVisitor(parent) {
+    return (node) => saveStateAndInvoke(node, (n) => objectLiteralElementVisitorWorker(n, parent));
+  }
+  function objectLiteralElementVisitorWorker(node, parent) {
+    switch (node.kind) {
+      case 303 /* PropertyAssignment */:
+      case 304 /* ShorthandPropertyAssignment */:
+      case 305 /* SpreadAssignment */:
+        return visitor(node);
+      case 177 /* GetAccessor */:
+        return visitGetAccessor(node, parent);
+      case 178 /* SetAccessor */:
+        return visitSetAccessor(node, parent);
+      case 174 /* MethodDeclaration */:
+        return visitMethodDeclaration(node, parent);
+      default:
+        return Debug.failBadSyntaxKind(node);
+    }
+  }
+  function decoratorElidingVisitor(node) {
+    return isDecorator(node) ? void 0 : visitor(node);
+  }
+  function modifierElidingVisitor(node) {
+    return isModifier(node) ? void 0 : visitor(node);
+  }
+  function modifierVisitor(node) {
+    if (isDecorator(node))
+      return void 0;
+    if (modifierToFlag(node.kind) & 28895 /* TypeScriptModifier */) {
+      return void 0;
+    } else if (currentNamespace && node.kind === 95 /* ExportKeyword */) {
+      return void 0;
+    }
+    return node;
+  }
+  function visitTypeScript(node) {
+    if (isStatement(node) && hasSyntacticModifier(node, 128 /* Ambient */)) {
+      return factory2.createNotEmittedStatement(node);
+    }
+    switch (node.kind) {
+      case 95 /* ExportKeyword */:
+      case 90 /* DefaultKeyword */:
+        return currentNamespace ? void 0 : node;
+      case 125 /* PublicKeyword */:
+      case 123 /* PrivateKeyword */:
+      case 124 /* ProtectedKeyword */:
+      case 128 /* AbstractKeyword */:
+      case 164 /* OverrideKeyword */:
+      case 87 /* ConstKeyword */:
+      case 138 /* DeclareKeyword */:
+      case 148 /* ReadonlyKeyword */:
+      case 103 /* InKeyword */:
+      case 147 /* OutKeyword */:
+      case 188 /* ArrayType */:
+      case 189 /* TupleType */:
+      case 190 /* OptionalType */:
+      case 191 /* RestType */:
+      case 187 /* TypeLiteral */:
+      case 182 /* TypePredicate */:
+      case 168 /* TypeParameter */:
+      case 133 /* AnyKeyword */:
+      case 159 /* UnknownKeyword */:
+      case 136 /* BooleanKeyword */:
+      case 154 /* StringKeyword */:
+      case 150 /* NumberKeyword */:
+      case 146 /* NeverKeyword */:
+      case 116 /* VoidKeyword */:
+      case 155 /* SymbolKeyword */:
+      case 185 /* ConstructorType */:
+      case 184 /* FunctionType */:
+      case 186 /* TypeQuery */:
+      case 183 /* TypeReference */:
+      case 192 /* UnionType */:
+      case 193 /* IntersectionType */:
+      case 194 /* ConditionalType */:
+      case 196 /* ParenthesizedType */:
+      case 197 /* ThisType */:
+      case 198 /* TypeOperator */:
+      case 199 /* IndexedAccessType */:
+      case 200 /* MappedType */:
+      case 201 /* LiteralType */:
+      case 181 /* IndexSignature */:
+        return void 0;
+      case 265 /* TypeAliasDeclaration */:
+        return factory2.createNotEmittedStatement(node);
+      case 270 /* NamespaceExportDeclaration */:
+        return void 0;
+      case 264 /* InterfaceDeclaration */:
+        return factory2.createNotEmittedStatement(node);
+      case 263 /* ClassDeclaration */:
+        return visitClassDeclaration(node);
+      case 231 /* ClassExpression */:
+        return visitClassExpression(node);
+      case 298 /* HeritageClause */:
+        return visitHeritageClause(node);
+      case 233 /* ExpressionWithTypeArguments */:
+        return visitExpressionWithTypeArguments(node);
+      case 210 /* ObjectLiteralExpression */:
+        return visitObjectLiteralExpression(node);
+      case 176 /* Constructor */:
+      case 172 /* PropertyDeclaration */:
+      case 174 /* MethodDeclaration */:
+      case 177 /* GetAccessor */:
+      case 178 /* SetAccessor */:
+      case 175 /* ClassStaticBlockDeclaration */:
+        return Debug.fail("Class and object literal elements must be visited with their respective visitors");
+      case 262 /* FunctionDeclaration */:
+        return visitFunctionDeclaration(node);
+      case 218 /* FunctionExpression */:
+        return visitFunctionExpression(node);
+      case 219 /* ArrowFunction */:
+        return visitArrowFunction(node);
+      case 169 /* Parameter */:
+        return visitParameter(node);
+      case 217 /* ParenthesizedExpression */:
+        return visitParenthesizedExpression(node);
+      case 216 /* TypeAssertionExpression */:
+      case 234 /* AsExpression */:
+        return visitAssertionExpression(node);
+      case 238 /* SatisfiesExpression */:
+        return visitSatisfiesExpression(node);
+      case 213 /* CallExpression */:
+        return visitCallExpression(node);
+      case 214 /* NewExpression */:
+        return visitNewExpression(node);
+      case 215 /* TaggedTemplateExpression */:
+        return visitTaggedTemplateExpression(node);
+      case 235 /* NonNullExpression */:
+        return visitNonNullExpression(node);
+      case 266 /* EnumDeclaration */:
+        return visitEnumDeclaration(node);
+      case 243 /* VariableStatement */:
+        return visitVariableStatement(node);
+      case 260 /* VariableDeclaration */:
+        return visitVariableDeclaration(node);
+      case 267 /* ModuleDeclaration */:
+        return visitModuleDeclaration(node);
+      case 271 /* ImportEqualsDeclaration */:
+        return visitImportEqualsDeclaration(node);
+      case 285 /* JsxSelfClosingElement */:
+        return visitJsxSelfClosingElement(node);
+      case 286 /* JsxOpeningElement */:
+        return visitJsxJsxOpeningElement(node);
+      default:
+        return visitEachChild(node, visitor, context);
+    }
+  }
+  function visitSourceFile(node) {
+    const alwaysStrict = getStrictOptionValue(compilerOptions, "alwaysStrict") && !(isExternalModule(node) && moduleKind >= 5 /* ES2015 */) && !isJsonSourceFile(node);
+    return factory2.updateSourceFile(
+      node,
+      visitLexicalEnvironment(
+        node.statements,
+        sourceElementVisitor,
+        context,
+        /*start*/
+        0,
+        alwaysStrict
+      )
+    );
+  }
+  function visitObjectLiteralExpression(node) {
+    return factory2.updateObjectLiteralExpression(
+      node,
+      visitNodes2(node.properties, getObjectLiteralElementVisitor(node), isObjectLiteralElementLike)
+    );
+  }
+  function getClassFacts(node) {
+    let facts = 0 /* None */;
+    if (some(getProperties(
+      node,
+      /*requireInitializer*/
+      true,
+      /*isStatic*/
+      true
+    )))
+      facts |= 1 /* HasStaticInitializedProperties */;
+    const extendsClauseElement = getEffectiveBaseTypeNode(node);
+    if (extendsClauseElement && skipOuterExpressions(extendsClauseElement.expression).kind !== 106 /* NullKeyword */)
+      facts |= 64 /* IsDerivedClass */;
+    if (classOrConstructorParameterIsDecorated(legacyDecorators, node))
+      facts |= 2 /* HasClassOrConstructorParameterDecorators */;
+    if (childIsDecorated(legacyDecorators, node))
+      facts |= 4 /* HasMemberDecorators */;
+    if (isExportOfNamespace(node))
+      facts |= 8 /* IsExportOfNamespace */;
+    else if (isDefaultExternalModuleExport(node))
+      facts |= 32 /* IsDefaultExternalExport */;
+    else if (isNamedExternalModuleExport(node))
+      facts |= 16 /* IsNamedExternalExport */;
+    return facts;
+  }
+  function hasTypeScriptClassSyntax(node) {
+    return !!(node.transformFlags & 8192 /* ContainsTypeScriptClassSyntax */);
+  }
+  function isClassLikeDeclarationWithTypeScriptSyntax(node) {
+    return hasDecorators(node) || some(node.typeParameters) || some(node.heritageClauses, hasTypeScriptClassSyntax) || some(node.members, hasTypeScriptClassSyntax);
+  }
+  function visitClassDeclaration(node) {
+    const facts = getClassFacts(node);
+    const promoteToIIFE = languageVersion <= 1 /* ES5 */ && !!(facts & 7 /* MayNeedImmediatelyInvokedFunctionExpression */);
+    if (!isClassLikeDeclarationWithTypeScriptSyntax(node) && !classOrConstructorParameterIsDecorated(legacyDecorators, node) && !isExportOfNamespace(node)) {
+      return factory2.updateClassDeclaration(
+        node,
+        visitNodes2(node.modifiers, modifierVisitor, isModifier),
+        node.name,
+        /*typeParameters*/
+        void 0,
+        visitNodes2(node.heritageClauses, visitor, isHeritageClause),
+        visitNodes2(node.members, getClassElementVisitor(node), isClassElement)
+      );
+    }
+    if (promoteToIIFE) {
+      context.startLexicalEnvironment();
+    }
+    const moveModifiers = promoteToIIFE || facts & 8 /* IsExportOfNamespace */;
+    let modifiers = moveModifiers ? visitNodes2(node.modifiers, modifierElidingVisitor, isModifierLike) : visitNodes2(node.modifiers, visitor, isModifierLike);
+    if (facts & 2 /* HasClassOrConstructorParameterDecorators */) {
+      modifiers = injectClassTypeMetadata(modifiers, node);
+    }
+    const needsName = moveModifiers && !node.name || facts & 4 /* HasMemberDecorators */ || facts & 1 /* HasStaticInitializedProperties */;
+    const name = needsName ? node.name ?? factory2.getGeneratedNameForNode(node) : node.name;
+    const classDeclaration = factory2.updateClassDeclaration(
+      node,
+      modifiers,
+      name,
+      /*typeParameters*/
+      void 0,
+      visitNodes2(node.heritageClauses, visitor, isHeritageClause),
+      transformClassMembers(node)
+    );
+    let emitFlags = getEmitFlags(node);
+    if (facts & 1 /* HasStaticInitializedProperties */) {
+      emitFlags |= 64 /* NoTrailingSourceMap */;
+    }
+    setEmitFlags(classDeclaration, emitFlags);
+    let statement;
+    if (promoteToIIFE) {
+      const statements = [classDeclaration];
+      const closingBraceLocation = createTokenRange(skipTrivia(currentSourceFile.text, node.members.end), 20 /* CloseBraceToken */);
+      const localName = factory2.getInternalName(node);
+      const outer = factory2.createPartiallyEmittedExpression(localName);
+      setTextRangeEnd(outer, closingBraceLocation.end);
+      setEmitFlags(outer, 3072 /* NoComments */);
+      const returnStatement = factory2.createReturnStatement(outer);
+      setTextRangePos(returnStatement, closingBraceLocation.pos);
+      setEmitFlags(returnStatement, 3072 /* NoComments */ | 768 /* NoTokenSourceMaps */);
+      statements.push(returnStatement);
+      insertStatementsAfterStandardPrologue(statements, context.endLexicalEnvironment());
+      const iife = factory2.createImmediatelyInvokedArrowFunction(statements);
+      setInternalEmitFlags(iife, 1 /* TypeScriptClassWrapper */);
+      const varDecl = factory2.createVariableDeclaration(
+        factory2.getLocalName(
+          node,
+          /*allowComments*/
+          false,
+          /*allowSourceMaps*/
+          false
+        ),
+        /*exclamationToken*/
+        void 0,
+        /*type*/
+        void 0,
+        iife
+      );
+      setOriginalNode(varDecl, node);
+      const varStatement = factory2.createVariableStatement(
+        /*modifiers*/
+        void 0,
+        factory2.createVariableDeclarationList([varDecl], 1 /* Let */)
+      );
+      setOriginalNode(varStatement, 

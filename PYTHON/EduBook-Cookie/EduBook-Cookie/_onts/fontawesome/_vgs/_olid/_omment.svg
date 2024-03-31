@@ -1,0 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Variable = exports.ImplicitLibVariable = exports.ESLintScopeVariable = void 0;
+var ESLintScopeVariable_1 = require("./ESLintScopeVariable");
+Object.defineProperty(exports, "ESLintScopeVariable", { enumerable: true, 

@@ -1,0 +1,63 @@
+stead of `fs.lstat` for symbolic links when the [`followSymbolicLinks`](#followsymboliclinks) option is specified.
+>
+> :warning: Unlike [object mode](#objectmode) this mode requires additional calls to the file system. On average, this mode is slower at least twice. See [old and modern mode](#old-and-modern-mode) for more details.
+
+#### unique
+
+* Type: `boolean`
+* Default: `true`
+
+Ensures that the returned entries are unique.
+
+```js
+fg.sync(['*.json', 'package.json'], { unique: false }); // ['package.json', 'package.json']
+fg.sync(['*.json', 'package.json'], { unique: true });  // ['package.json']
+```
+
+If `true` and similar entries are found, the result is the first found.
+
+### Matching control
+
+#### braceExpansion
+
+* Type: `boolean`
+* Default: `true`
+
+Enables Bash-like brace expansion.
+
+> :1234: [Syntax description][bash_hackers_syntax_expansion_brace] or more [detailed description][micromatch_braces].
+
+```js
+dir/
+├── abd
+├── acd
+└── a{b,c}d
+```
+
+```js
+fg.sync('a{b,c}d', { braceExpansion: false }); // ['a{b,c}d']
+fg.sync('a{b,c}d', { braceExpansion: true });  // ['abd', 'acd']
+```
+
+#### caseSensitiveMatch
+
+* Type: `boolean`
+* Default: `true`
+
+Enables a [case-sensitive][wikipedia_case_sensitivity] mode for matching files.
+
+```js
+dir/
+├── file.txt
+└── File.txt
+```
+
+```js
+fg.sync('file.txt', { caseSensitiveMatch: false }); // ['file.txt', 'File.txt']
+fg.sync('file.txt', { caseSensitiveMatch: true });  // ['file.txt']
+```
+
+#### dot
+
+* Type: `boolean`
+* Default: `false

@@ -1,0 +1,15 @@
+ content: @fa-var-flag; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-mail-reply-all:before { content: @fa-var-reply-all; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-star-half-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-css-prefix}.@{fa-css-prefix}-star-half-o:before { content: @fa-var-star-half-stroke; }
+
+.@{fa-css-prefix}.@{fa-css-prefix}-star-half-empty {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.@{fa-css-pre

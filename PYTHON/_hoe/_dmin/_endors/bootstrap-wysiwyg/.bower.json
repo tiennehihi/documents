@@ -1,0 +1,32 @@
+/* -*- Mode: js; js-indent-level: 2; -*- */
+/*
+ * Copyright 2011 Mozilla Foundation and contributors
+ * Licensed under the New BSD license. See LICENSE or:
+ * http://opensource.org/licenses/BSD-3-Clause
+ */
+
+const util = require("./util");
+const binarySearch = require("./binary-search");
+const ArraySet = require("./array-set").ArraySet;
+const base64VLQ = require("./base64-vlq"); // eslint-disable-line no-unused-vars
+const readWasm = require("../lib/read-wasm");
+const wasm = require("./wasm");
+
+const INTERNAL = Symbol("smcInternal");
+
+class SourceMapConsumer {
+  constructor(aSourceMap, aSourceMapURL) {
+    // If the constructor was called by super(), just return Promise<this>.
+    // Yes, this is a hack to retain the pre-existing API of the base-class
+    // constructor also being an async factory function.
+    if (aSourceMap == INTERNAL) {
+      return Promise.resolve(this);
+    }
+
+    return _factory(aSourceMap, aSourceMapURL);
+  }
+
+  static initialize(opts) {
+    readWasm.initialize(opts["lib/mappings.wasm"]);
+  }
+

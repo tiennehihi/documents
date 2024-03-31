@@ -1,0 +1,55 @@
+import CJSImportProcessor from "./CJSImportProcessor";
+import computeSourceMap, {} from "./computeSourceMap";
+import {HelperManager} from "./HelperManager";
+import identifyShadowedGlobals from "./identifyShadowedGlobals";
+import NameManager from "./NameManager";
+import {validateOptions} from "./Options";
+
+import {parse} from "./parser";
+
+import TokenProcessor from "./TokenProcessor";
+import RootTransformer from "./transformers/RootTransformer";
+import formatTokens from "./util/formatTokens";
+import getTSImportedNames from "./util/getTSImportedNames";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;
+
+export function getVersion() {
+  /* istanbul ignore next */
+  return "3.35.0";
+}
+
+export function transform(code, options) {
+  validateOptions(options);
+  try {
+    const sucraseContext = getSucraseContext(code, options);
+    const transformer = new RootTransformer(
+      sucraseContext,
+      options.transforms,
+      Boolean(options.enableLegacyBabel5ModuleInterop),
+      options,
+    );
+    const transformerResult = transformer.transform();
+    let result = {code: transformerResult.code};
+    if (options.sourceMapOptions) {
+      if (!options.filePath) {
+        throw new Error("filePath must be specified when generating a source map.");
+      }
+      result = {
+        ...result,
+        sourceMap: computeSourceMap(
+          transformerResult,
+       

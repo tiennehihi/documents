@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+
+let { readFileSync } = require('fs')
+let { join } = require('path')
+
+require('./check-npm-version')
+let updateDb = require('./')
+
+const ROOT = __dirname
+
+function getPackage() {
+  return JSON.parse(readFileSync(join(ROOT, 'package.json')))
+}
+
+let args = process.argv.slice(2)
+
+let USAGE = 'Usage:\n  npx update-browserslist-db\n'
+

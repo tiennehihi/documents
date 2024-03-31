@@ -1,0 +1,34 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = retryable;
+
+var _retry = require('./retry.js');
+
+var _retry2 = _interopRequireDefault(_retry);
+
+var _initialParams = require('./internal/initialParams.js');
+
+var _initialParams2 = _interopRequireDefault(_initialParams);
+
+var _wrapAsync = require('./internal/wrapAsync.js');
+
+var _wrapAsync2 = _interopRequireDefault(_wrapAsync);
+
+var _promiseCallback = require('./internal/promiseCallback.js');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * A close relative of [`retry`]{@link module:ControlFlow.retry}.  This method
+ * wraps a task and makes it retryable, rather than immediately calling it
+ * with retries.
+ *
+ * @name retryable
+ * @static
+ * @memberOf module:ControlFlow
+ * @method
+ * @see [async.retry]{@link module:ControlFlow.retry}
+ * @category Co

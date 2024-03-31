@@ -1,0 +1,4 @@
+
+      var occurrenceThreshold = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 3;
+      var nodeValue = textVNode.actualNode.nodeValue.trim();
+      if (

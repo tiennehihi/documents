@@ -1,0 +1,1 @@
+h(e){const t=Object.keys(n.watchFiles);throw t.length>0&&(e.watchFiles=t),await n.pluginDriver.hookParallel("buildEnd",[e]),await n.pluginDriver.hookParallel("closeBundle",[]),e}await n.pluginDriver.hookParallel("buildEnd",[])})),tn("BUILD",1);const a={cache:r?n.getCache():void 0,async

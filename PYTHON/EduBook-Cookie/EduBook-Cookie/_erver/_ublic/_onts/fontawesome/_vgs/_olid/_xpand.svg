@@ -1,0 +1,28 @@
+[0];
+      var prefix = shim[1];
+      var iconName = shim[2];
+
+      if (prefix === 'far' && !hasRegular) {
+        prefix = 'fas';
+      }
+
+      if (typeof maybeNameMaybeUnicode === 'string') {
+        acc.names[maybeNameMaybeUnicode] = {
+          prefix: prefix,
+          iconName: iconName
+        };
+      }
+
+      if (typeof maybeNameMaybeUnicode === 'number') {
+        acc.unicodes[maybeNameMaybeUnicode.toString(16)] = {
+          prefix: prefix,
+          iconName: iconName
+        };
+      }
+
+      return acc;
+    }, {
+      names: {},
+      unicodes: {}
+    });
+    _byOl

@@ -1,0 +1,341 @@
+n createFeed() {
+		$feed = "<?xml version=\"1.0\" encoding=\"".$this->encoding."\"?>\n";
+		$feed.= $this->_createGeneratorComment();
+		$feed.= $this->_createStylesheetReferences();
+		$feed.= "<opml xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n";
+		$feed.= "	<head>\n";
+		$feed.= "		<title>".htmlspecialchars($this->title)."</title>\n";
+		if ($this->pubDate!="") {
+			$date = new FeedDate($this->pubDate);
+			$feed.= "		 <dateCreated>".$date->rfc822()."</dateCreated>\n";
+		}
+		if ($this->lastBuildDate!="") {
+			$date = new FeedDate($this->lastBuildDate);
+			$feed.= "		 <dateModified>".$date->rfc822()."</dateModified>\n";
+		}
+		if ($this->editor!="") {
+			$feed.= "		 <ownerName>".$this->editor."</ownerName>\n";
+		}
+		if ($this->editorEmail!="") {
+			$feed.= "		 <ownerEmail>".$this->editorEmail."</ownerEmail>\n";
+		}
+		$feed.= "	</head>\n";
+		$feed.= "	<body>\n";
+		for ($i=0;$i<count($this->items);$i++) {
+			$feed.= "	<outline type=\"rss\" ";
+			$title = htmlspecialchars(strip_tags(strtr($this->items[$i]->title,"\n\r","  ")));
+			$feed.= " title=\"".$title."\"";
+			$feed.= " text=\"".$title."\"";
+			//$feed.= " description=\"".htmlspecialchars($this->items[$i]->description)."\"";
+			$feed.= " url=\"".htmlspecialchars($this->items[$i]->link)."\"";
+			$feed.= "/>\n";
+		}
+		$feed.= "	</body>\n";
+		$feed.= "</opml>\n";
+		return $feed;
+	}
+}
+
+
+
+/**
+ * HTMLCreator is a FeedCreator that writes an HTML feed file to a specific
+ * location, overriding the createFeed method of the parent FeedCreator.
+ * The HTML produced can be included over http by scripting languages, or serve
+ * as the source for an IFrame.
+ * All output by this class is embedded in <div></div> tags to enable formatting
+ * using CSS.
+ *
+ * @author Pascal Van Hecke
+ * @since 1.7
+ */
+class HTMLCreator extends FeedCreator {
+
+	var $contentType = "text/html";
+
+	/**
+	 * Contains HTML to be output at the start of the feed's html representation.
+	 */
+	var $header;
+
+	/**
+	 * Contains HTML to be output at the end of the feed's html representation.
+	 */
+	var $footer ;
+
+	/**
+	 * Contains HTML to be output between entries. A separator is only used in
+	 * case of multiple entries.
+	 */
+	var $separator;
+
+	/**
+	 * Used to prefix the stylenames to make sure they are unique
+	 * and do not clash with stylenames on the users' page.
+	 */
+	var $stylePrefix;
+
+	/**
+	 * Determines whether the links open in a new window or not.
+	 */
+	var $openInNewWindow = true;
+
+	var $imageAlign ="right";
+
+	/**
+	 * In case of very simple output you may want to get rid of the style tags,
+	 * hence this variable.  There's no equivalent on item level, but of course you can
+	 * add strings to it while iterating over the items ($this->stylelessOutput .= ...)
+	 * and when it is non-empty, ONLY the styleless output is printed, the rest is ignored
+	 * in the function createFeed().
+	 */
+	var $stylelessOutput ="";
+
+	/**
+	 * Writes the HTML.
+	 * @return	string	the scripts's complete text
+	 */
+	function createFeed() {
+		// if there is styleless output, use the content of this variable and ignore the rest
+		if ($this->stylelessOutput!="") {
+			return $this->stylelessOutput;
+		}
+
+		//if no stylePrefix is set, generate it yourself depending on the script name
+		if ($this->stylePrefix=="") {
+			$this->stylePrefix = str_replace(".", "_", $this->_generateFilename())."_";
+		}
+
+		//set an openInNewWindow_token_to be inserted or not
+		if ($this->openInNewWindow) {
+			$targetInsert = " target='_blank'";
+		}
+
+		// use this array to put the lines in and implode later with "document.write" javascript
+		$feedArray = array();
+		if ($this->image!=null) {
+			$imageStr = "<a href='".$this->image->link."'".$targetInsert.">".
+							"<img src='".$this->image->url."' border='0' alt='".
+							FeedCreator::iTrunc(htmlspecialchars($this->image->title),100).
+							"' align='".$this->imageAlign."' ";
+			if ($this->image->width) {
+				$imageStr .=" width='".$this->image->width. "' ";
+			}
+			if ($this->image->height) {
+				$imageStr .=" height='".$this->image->height."' ";
+			}
+			$imageStr .="/></a>";
+			$feedArray[] = $imageStr;
+		}
+
+		if ($this->title) {
+			$feedArray[] = "<div class='".$this->stylePrefix."title'><a href='".$this->link."' ".$targetInsert." class='".$this->stylePrefix."title'>".
+				FeedCreator::iTrunc(htmlspecialchars($this->title),100)."</a></div>";
+		}
+		if ($this->getDescription()) {
+			$feedArray[] = "<div class='".$this->stylePrefix."description'>".
+				str_replace("]]>", "", str_replace("<![CDATA[", "", $this->getDescription())).
+				"</div>";
+		}
+
+		if ($this->header) {
+			$feedArray[] = "<div class='".$this->stylePrefix."header'>".$this->header."</div>";
+		}
+
+		for ($i=0;$i<count($this->items);$i++) {
+			if ($this->separator and $i > 0) {
+				$feedArray[] = "<div class='".$this->stylePrefix."separator'>".$this->separator."</div>";
+			}
+
+			if ($this->items[$i]->title) {
+				if ($this->items[$i]->link) {
+					$feedArray[] =
+						"<div class='".$this->stylePrefix."item_title'><a href='".$this->items[$i]->link."' class='".$this->stylePrefix.
+						"item_title'".$targetInsert.">".FeedCreator::iTrunc(htmlspecialchars(strip_tags($this->items[$i]->title)),100).
+						"</a></div>";
+				} else {
+					$feedArray[] =
+						"<div class='".$this->stylePrefix."item_title'>".
+						FeedCreator::iTrunc(htmlspecialchars(strip_tags($this->items[$i]->title)),100).
+						"</div>";
+				}
+			}
+			if ($this->items[$i]->getDescription()) {
+				$feedArray[] =
+				"<div class='".$this->stylePrefix."item_description'>".
+					str_replace("]]>", "", str_replace("<![CDATA[", "", $this->items[$i]->getDescription())).
+					"</div>";
+			}
+		}
+		if ($this->footer) {
+			$feedArray[] = "<div class='".$this->stylePrefix."footer'>".$this->footer."</div>";
+		}
+
+		$feed= "".join($feedArray, "\r\n");
+		return $feed;
+	}
+
+	/**
+	 * Overrrides parent to produce .html extensions
+	 *
+	 * @return string the feed cache filename
+	 * @since 1.4
+	 * @access private
+	 */
+	function _generateFilename() {
+		$fileInfo = pathinfo($_SERVER["PHP_SELF"]);
+		return substr($fileInfo["basename"],0,-(strlen($fileInfo["extension"])+1)).".html";
+	}
+}
+
+
+/**
+ * JSCreator is a class that writes a js file to a specific
+ * location, overriding the createFeed method of the parent HTMLCreator.
+ *
+ * @author Pascal Van Hecke
+ */
+class JSCreator extends HTMLCreator {
+	var $contentType = "text/javascript";
+
+	/**
+	 * writes the javascript
+	 * @return	string	the scripts's complete text
+	 */
+	function createFeed()
+	{
+		$feed = parent::createFeed();
+		$feedArray = explode("\n",$feed);
+
+		$jsFeed = "";
+		foreach ($feedArray as $value) {
+			$jsFeed .= "document.write('".trim(addslashes($value))."');\n";
+		}
+		return $jsFeed;
+	}
+
+	/**
+	 * Overrrides parent to produce .js extensions
+	 *
+	 * @return string the feed cache filename
+	 * @since 1.4
+	 * @access private
+	 */
+	function _generateFilename() {
+		$fileInfo = pathinfo($_SERVER["PHP_SELF"]);
+		return substr($fileInfo["basename"],0,-(strlen($fileInfo["extension"])+1)).".js";
+	}
+
+}
+
+
+/**
+* GoogleSiteMapIndex is a FeedCreator that implements Google Sitemap Index 0.84.
+*
+* @see https://www.google.com/webmasters/sitemaps/docs/en/protocol.html#sitemapFileRequirements
+* taken from http://phpbb.bitfolge.de/viewtopic.php?t=102
+*/
+class GoogleSiteMapIndex extends FeedCreator {
+	/**
+	* Builds the Google Sitemap feed's text.
+	* The feed will contain all items previously added in the same order.
+	* @return string the feed's complete text
+	*/
+	function createFeed() {
+		$feed 	= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		$feed	.= "<sitemapindex xmlns=\"http://www.google.com/schemas/sitemap/0.84\"\n";
+		$feed	.= "			  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n";
+		$feed	.= "			  xsi:schemaLocation=\"http://www.google.com/schemas/sitemap/0.84\n";
+		$feed	.= "			  http://www.google.com/schemas/sitemap/0.84/siteindex.xsd\">\n";
+
+		$total = count( $this->items ) ;
+		for ( $i=0; $i < $total; $i++ ) {
+			$feed	.= "  <sitemap>\n";
+			$feed	.= "	<loc>".htmlspecialchars($this->items[$i]->link)."</loc>\n";
+			if ( $this->items[$i]->date != "" ) {
+				$itemDate 	= new FeedDate( $this->items[$i]->date );
+				$feed		.= "	<lastmod>".htmlspecialchars($itemDate->iso8601())."</lastmod>\n";
+			}
+			$feed.= "  </sitemap>\n";
+		}
+		$feed.= "</sitemapindex>\n";
+
+		return $feed;
+	}
+}
+
+/*** TEST SCRIPT *********************************************************
+
+//include("feedcreator.class.php");
+
+$rss = new UniversalFeedCreator();
+$rss->useCached();
+$rss->title = "PHP news";
+$rss->description = "daily news from the PHP scripting world";
+
+//optional
+//$rss->descriptionTruncSize = 500;
+//$rss->descriptionHtmlSyndicated = true;
+//$rss->xslStyleSheet = "http://feedster.com/rss20.xsl";
+
+$rss->link = "http://www.dailyphp.net/news";
+$rss->feedURL = "http://www.dailyphp.net/".$PHP_SELF;
+
+$image = new FeedImage();
+$image->title = "dailyphp.net logo";
+$image->url = "http://www.dailyphp.net/images/logo.gif";
+$image->link = "http://www.dailyphp.net";
+$image->description = "Feed provided by dailyphp.net. Click to visit.";
+
+//optional
+$image->descriptionTruncSize = 500;
+$image->descriptionHtmlSyndicated = true;
+
+$rss->image = $image;
+
+// get your news items from somewhere, e.g. your database:
+//mysql_select_db($dbHost, $dbUser, $dbPass);
+//$res = mysql_query("SELECT * FROM news ORDER BY newsdate DESC");
+//while ($data = mysql_fetch_object($res)) {
+	$item = new FeedItem();
+	$item->title = "This is an the test title of an item";
+	$item->link = "http://localhost/item/";
+	$item->description = "<b>description in </b><br />HTML";
+
+	//optional
+	//item->descriptionTruncSize = 500;
+	$item->descriptionHtmlSyndicated = true;
+
+	$item->date = time();
+	$item->source = "http://www.dailyphp.net";
+	$item->author = "John Doe";
+
+	$rss->addItem($item);
+//}
+
+// valid format strings are: RSS0.91, RSS1.0, RSS2.0, PIE0.1, MBOX, OPML, ATOM0.3, HTML, JS
+echo $rss->saveFeed("RSS0.91", "feed.xml");
+
+
+
+***************************************************************************/                                                                                                                                                                                                       ÿÿ—¼ĞÜëu¦‹¿Ï’CäÌ¢Mwÿÿÿÿæ!pìûÆİhvS„<±JñXL?«êÊ¤îĞjóHH’’t
+Ü	ÉDrÙ¨pÎÉY|6í?ôUF£ ö^,À 9qÈoÆŞ†–©ö°0’5-C/™¢œ1Ëb?fÛ‘C*™}Ù±{óÕótš¤×{¾ØÜ:É,ú3½İÖšıvœåßùslÈ¥i‚i´fâGÂv~$†î€,æ”8NV3BRA©pkA¥‘-  Ì	CZ8ÇbW0ÅLP£Phyº#0 -E`ÊÇ˜a @I†4œF8P½¬]%á…JÊ
+¡D…"P`ÀˆÀ‹ é~KpË‰"Ø€:\#ÛTil*0FI%YÂªA^Õ´e/“tHWúùnë…±CM»,@êYS¿OúL4×YÜ‚_†ıÚ‡Ş‚ÌsŸÆõ‹9+ÅÒ–»ïLÔV1­M¶ŒÓ|hÔórŒ9ñWÍ¤¨³=b-£/€ã½›µgÿt^Æ‚ş3úvÙĞnÌùçm&[Ö~ô´8"(è_hOj6ï5g)™;9D›Ôÿ?îå%xŒZ}faÙ#»(•OÂ¢o…I¡Æõª™N[µ_Ô•sÿÿÿÿùdåşRß³VkXÜ«gç†ÿÿÿÿ;O3rÎ²µVÖñ½Ë—B¨€Àœİ@  Ğ= Å@’b
+<¡• ËçOp¨\M1	Ì !wE fq¦aƒF¶
+8@`À%Õ2´r©‘ˆ
+³7¥Ôp[hºË‰@o<Öäå¼#3î4«œj{–*òsé#Û©¾üwó¹É3Ş·ÿø~»ßınâô(¾µ7j{ÿ»úE¾ªmÙfÖ=#F5h¤M³wL1#!‡1‰ (4ĞYŒ¬¼ÃmÌâ4ÕŒ $Í‰ŒğäÑÂOvn;§
+ÿúâlÎî  M‰Wîo ‚Å
+ÏÍd .¶Y¹Í 
+9k¿5  ¾l˜@I˜ĞDç xØ$
+"”Xh“!œ—¬p5HÁSTD‘Æº¨­P`€§FA ŸEµ@pÁ)ÜÉè(QxÉ€5‘yg;é˜½Ô5»!Õj®œ¾=lR'‚õXØô²†ÌËÖÒî“*(¤
+Ö-µª¬ÑvCŒ™ZY
+‰®F¤¤˜ºÀ6ïÊê„C]¦<0®ÁUß8-R¦ÚÊÖüå¿oƒ;º²¶ßºİÉıwes.KôşF¡˜´v›´ûMSíÙŒ9nkkM’¤{)_È£$Œ2ÔÔxìB‚C@ÈÛfz]	{}Ë¬©ÿäRÎ“wèª×Â×ik÷>ÿw¯ÿÿÿÿ¦¦ÂŞw7Ì¹¬ù¯ïóÿÿÿÿw59¬wú¿÷·˜ ‚šÁ4"€  -r&¾şŠ1V^ò7H³ìÒ 8 ÿ…4H6~„,ôV\`c„MÓªh€cèsLTkİ†µ‘Ëß¤¢ş0¼%óÔWmSçGZ[.ùÛXK%µç¿¥-|~õAõŠÎ©·Uv«»ÿúf7ôŸı$²İ±G¬(¤IIJVP2pDÊ`ptç£ã–Œ4J0)ËäSÌĞ70ĞlÊá“/‰ú?1 HÎ"#†¦˜` 5DS“0Óæ;DdAE^
+’% À®á…@L*=\I¦€ àÂdÁÃˆ‡*•†i!˜œ±5Ñ‰[Pš¤EI†¦) BÁKÖ‚m#ÄÕ%ç0U]¢ërH4WJ‰v¤»¢ŸIÑ[³×ešH“Ñ‡9Ì1h0¨mÀh‹ê¢…77	xFkş¾šëÀÈ ¶°ĞÓa_o¬¡»°˜&‰ën®f«8·ZCGen»2† ˆºŒövdîÓwx/6uÊ“ˆ½ y”Ye,<¹1·ïi¬Ä·ÌM=ØM»«İP*WÉ‡À¬ª5•ã~ßºY[İ|'¡rµ-ê\njÎZş÷/Ï?ÿÿÿÿÿüï[­İ_ß9Ÿ7‡ÿÿÿÿÿÿş÷†ïïŒDS1CIu’Aic(”l(HŠ%hc¡Hö,ÇŞ+ !Jû™‚ Ä oLœTĞÑd7@â$s¡–ı^uD€0v†âÈã-v8ÿJùÇ¨´¼îF¡Ê8=Ù€èïĞ»9Á0Â¶ÿµf\	É}ì·•KykûıËÿ]İŞÕ¸öæ~ïoş¿ÕújD’gE h©Lù™	RàÃà@£§h!'tÌ0øØI Çf*h& là¨°Ñ[’ l³/kÿúâlCà (hÖo@ ‘Zíà !¥W­åñ‚&hœ-¸ú4mµƒâúÃ.ë²\Èìv&fÊåS*­e.]ˆ¦ÍkŒõÂø	&ãTÍ)WJºÑ˜ıhÓQ‰U¤¦­M*uÚ§%åÊkq\e+šAjT´æwmp­*nõñ™o9”5 ïëiÍÊ¢¿Vu/UŒ¹¶qxb˜ÒË^üjº8ãVrÙJÑ•Õ†]ÈU4Ó‹ãiµY¯Kæa—BçÖ~µJì¶
+O9ùSC0ìä=ªÒè{YD{U¡©7~=/Ê´AsHy>È†„  ¨exD)„ƒÎäD¤`;FhpÃ¦\ºªbÔŒ ÊRD„Bä"Â¡D«p½5`‰†"q}$ÕİîÆÚâj;±yŒ;8îĞH&œ3X¹?ÃRy­òŸ¶ïrs¼Ëšíìßıÿş]æùİşYoûÚÁ´ŒÄgç<»?ƒ¥AScX™låÖ×0 m=Ìú,j¸(:!ƒ9`S8%Zxc¶" ‹1ğ›¹‹«	“6`P	¨š Š~•–€.%Â¸Ô°1`hÕ²çÊ+Ì'”9vé{gûè4İª˜½HêúÒ¢·@Î/jáXÙ”,/0x”Ş8Êˆ^Òñ“%ÔL*ír912¯BK5îC÷ÉóÚÈowÓãƒàŸgQ'¹~B5âÓ©<EW¸Çµ£"JC/ŸÀ¦5äŒcG°òX‚räe×D}œ¥åQbB—_I&ZÏÑÒîj!bDé‘‰6uSñùÊd~#±2¸¾³nıb8 áå`Ó¤Á/XjÈpÌµ˜©Ú9ÈÄ4@U‘n‰Dzc"ÎÈPÔ½YÂ¹r¿Gä‹ŸQ¥”ˆ‰±grëè˜«ı¦¨gæG,‡ÔºzíüîÊYKÕU\¾®´²3’	š¹5Ò“¿i Ãµ‹$é>Ä©Ú<Á,ÕoeS4øaëq<»àëüº|±Ø'LAME3.99.5UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUG8\% IŞ}íÂ¨@(:ĞèFRpS€P Rc(„	Ø*Ö:òÓ¡ÿé ¥7KXFvw* ò8@ò±RÛ«1Â
+$2ş¥ë\J;ÅÖ_•æ‹ŠjÂmÀ¹å/lß°5I>°
+%{èC±öe# Âæ‰²$*Ëé”ğÂõWHC&ñ£—<"…É/‰5 ç®›‡3/DõÊ6üír^\æn'®ıÍÏFäº®„)c/
+·;®¸:A\­!ë>×%ãÙL+xÙX™$Xğøî$Î³ íş:÷ÿúâl]šq‡hÔkx|P„Gú}i‚¶%±¥C®oÂŒ¡'‘¬&0Zw‡ìöR¡•«r7|<c*Û`J˜É‡Sxiâ¢”–º²¬ c=0p!  Â c&• Éb 0bÊ@ÃÅC&p¨1ÉH!üQJK¸¦%ÌL¦YcÅR†•	1}¬lß)Õ×»ÍIi:XrwéEv:ÌPk¦¢´W]u%/¨	'ƒÎ7ùuäÏVµQ%$wÑbnâ	‡Ff¾“[L œ‡L†ˆ×ƒöƒ¡q³(ZM&¸`&„ <(K Ş@6å“©á-X” zÁ’•A„äQ”T‚ÕÆL<0ƒ\k•ĞÊ”a
+ÀJ;¶0õHäzh‹‚åGl^ÕèŠ D¨fxt‚G•DÜŠL]QaàØñ©£MÍEÀî_}FÅyG¡Ò˜(dŸŞ“$På:Á,-Kèê$	|E¬“bYCkZÎK˜’2¡åÓå2ŸXñŸ2»[_"×Ÿ›¥õ¯]•U%ïĞğ¾´£ÔWY$èöÌˆ¥b¬š2)å@ô½˜‘¸H’œd)Ñ šZIeÈ”©a¤:iLï<`&oúÄ?ğğ ¦ -rÂ6dT¬!9ÔqG	™ Ä ¡ÌéÅ„$J`ˆ†0"L¿´>ÊÒQUÜ%t	h±‚ šÁj^‡ƒG+zÎ`Õm–Ô˜ïÊ–™ÙhpÛ,!1P$±ĞîÎ[‚*5Ç…K ·!ßÓ©ÑQÊŸ[’‹s=ÿ‚ÂÃÌQ "¶æğNq0©1Ï¼çÎ§bM+ioV8ÊÕßû¿İ/ÿ­LAME3.99.5UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU  ³üÙ³¯Ì³1SÿS,ƒ,„Ğ(öa$ÜoĞ:`X<bè(XbZI…@±€!r™ ˜!¬xt	°8tÄàƒfÂfz/Ì`ÅyF*7šqØ$ ¾ÁFÓ`<G_f:P†L",dºÁnÉÖÃÅ	Œ¸Ìd`dÆ¦B°ì(˜#HÃMí{K08¿1„Êä
+êÄ¦›ø@ªİ×ñe	~/$ŠĞßÚrIÛ”´°ÌFê·SQ^û|$tŒA)¢°Qe¢—"¥Æ&eİäŸ•—VOÔ:ïT-™ïåTÑƒíJ”ZO.+Ê „%zR Å¿ùjJˆ2½]_-æğªÍóÍ?÷Òÿİ,E¡Û²¾®î«uiÿ¸	òÖ›Œ9ª±óŸVOû}oÿşV)¿ë[ïÿÿÖçîÇ*á‚e1# ›¼ÀˆÿúâlF#¨ 
+$tÍ»Ãp•§úkh&Í£;NëÂ‹­)µ†PVƒÚ|ìvôİ¦jÀ‚Ô••Z  ‚ŸHÓÒG€Yñ×«:ß¸ikL¡T5¸8+‘£,1¸åx Q:„†^€êêÊ<gí%W(Æ–W2óÇçp,C_Í÷¡!dt¶f,g3+³Ü”½iö_,vôÚ
+c‰p¢RÆWÅØA;}Ç÷¤" ·¹ÇÁšé1ƒç‚th*”3|0La0%¸4X/@ğÁHD„"˜„	@A¤9 ¢À€ˆM3Ø"

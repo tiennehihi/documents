@@ -1,0 +1,523 @@
+SegmentEnd()) {
+            hasName = true;
+            nameIndex += base64VLQFormatDecode();
+            if (hasReportedError())
+              return stopIterating();
+            if (nameIndex < 0)
+              return setErrorAndStopIterating("Invalid nameIndex found");
+            if (!isSourceMappingSegmentEnd())
+              return setErrorAndStopIterating("Unsupported Error Format: Entries after nameIndex");
+          }
+        }
+        return { value: captureMapping(hasSource, hasName), done };
+      }
+      return stopIterating();
+    },
+    [Symbol.iterator]() {
+      return this;
+    }
+  };
+  function captureMapping(hasSource, hasName) {
+    return {
+      generatedLine,
+      generatedCharacter,
+      sourceIndex: hasSource ? sourceIndex : void 0,
+      sourceLine: hasSource ? sourceLine : void 0,
+      sourceCharacter: hasSource ? sourceCharacter : void 0,
+      nameIndex: hasName ? nameIndex : void 0
+    };
+  }
+  function stopIterating() {
+    done = true;
+    return { value: void 0, done: true };
+  }
+  function setError(message) {
+    if (error === void 0) {
+      error = message;
+    }
+  }
+  function setErrorAndStopIterating(message) {
+    setError(message);
+    return stopIterating();
+  }
+  function hasReportedError() {
+    return error !== void 0;
+  }
+  function isSourceMappingSegmentEnd() {
+    return pos === mappings.length || mappings.charCodeAt(pos) === 44 /* comma */ || mappings.charCodeAt(pos) === 59 /* semicolon */;
+  }
+  function base64VLQFormatDecode() {
+    let moreDigits = true;
+    let shiftCount = 0;
+    let value = 0;
+    for (; moreDigits; pos++) {
+      if (pos >= mappings.length)
+        return setError("Error in decoding base64VLQFormatDecode, past the mapping string"), -1;
+      const currentByte = base64FormatDecode(mappings.charCodeAt(pos));
+      if (currentByte === -1)
+        return setError("Invalid character in VLQ"), -1;
+      moreDigits = (currentByte & 32) !== 0;
+      value = value | (currentByte & 31) << shiftCount;
+      shiftCount += 5;
+    }
+    if ((value & 1) === 0) {
+      value = value >> 1;
+    } else {
+      value = value >> 1;
+      value = -value;
+    }
+    return value;
+  }
+}
+function base64FormatEncode(value) {
+  return value >= 0 && value < 26 ? 65 /* A */ + value : value >= 26 && value < 52 ? 97 /* a */ + value - 26 : value >= 52 && value < 62 ? 48 /* _0 */ + value - 52 : value === 62 ? 43 /* plus */ : value === 63 ? 47 /* slash */ : Debug.fail(`${value}: not a base64 value`);
+}
+function base64FormatDecode(ch) {
+  return ch >= 65 /* A */ && ch <= 90 /* Z */ ? ch - 65 /* A */ : ch >= 97 /* a */ && ch <= 122 /* z */ ? ch - 97 /* a */ + 26 : ch >= 48 /* _0 */ && ch <= 57 /* _9 */ ? ch - 48 /* _0 */ + 52 : ch === 43 /* plus */ ? 62 : ch === 47 /* slash */ ? 63 : -1;
+}
+
+// src/compiler/transformers/utilities.ts
+function getOriginalNodeId(node) {
+  node = getOriginalNode(node);
+  return node ? getNodeId(node) : 0;
+}
+function containsDefaultReference(node) {
+  if (!node)
+    return false;
+  if (!isNamedImports(node))
+    return false;
+  return some(node.elements, isNamedDefaultReference);
+}
+function isNamedDefaultReference(e) {
+  return e.propertyName !== void 0 && e.propertyName.escapedText === "default" /* Default */;
+}
+function chainBundle(context, transformSourceFile) {
+  return transformSourceFileOrBundle;
+  function transformSourceFileOrBundle(node) {
+    return node.kind === 312 /* SourceFile */ ? transformSourceFile(node) : transformBundle(node);
+  }
+  function transformBundle(node) {
+    return context.factory.createBundle(map(node.sourceFiles, transformSourceFile), node.prepends);
+  }
+}
+function getExportNeedsImportStarHelper(node) {
+  return !!getNamespaceDeclarationNode(node);
+}
+function getImportNeedsImportStarHelper(node) {
+  if (!!getNamespaceDeclarationNode(node)) {
+    return true;
+  }
+  const bindings = node.importClause && node.importClause.namedBindings;
+  if (!bindings) {
+    return false;
+  }
+  if (!isNamedImports(bindings))
+    return false;
+  let defaultRefCount = 0;
+  for (const binding of bindings.elements) {
+    if (isNamedDefaultReference(binding)) {
+      defaultRefCount++;
+    }
+  }
+  return defaultRefCount > 0 && defaultRefCount !== bindings.elements.length || !!(bindings.elements.length - defaultRefCount) && isDefaultImport(node);
+}
+function getImportNeedsImportDefaultHelper(node) {
+  return !getImportNeedsImportStarHelper(node) && (isDefaultImport(node) || !!node.importClause && isNamedImports(node.importClause.namedBindings) && containsDefaultReference(node.importClause.namedBindings));
+}
+function collectExternalModuleInfo(context, sourceFile) {
+  const resolver = context.getEmitResolver();
+  const compilerOptions = context.getCompilerOptions();
+  const externalImports = [];
+  const exportSpecifiers = new IdentifierNameMultiMap();
+  const exportedBindings = [];
+  const uniqueExports = /* @__PURE__ */ new Map();
+  let exportedNames;
+  let hasExportDefault = false;
+  let exportEquals;
+  let hasExportStarsToExportValues = false;
+  let hasImportStar = false;
+  let hasImportDefault = false;
+  for (const node of sourceFile.statements) {
+    switch (node.kind) {
+      case 272 /* ImportDeclaration */:
+        externalImports.push(node);
+        if (!hasImportStar && getImportNeedsImportStarHelper(node)) {
+          hasImportStar = true;
+        }
+        if (!hasImportDefault && getImportNeedsImportDefaultHelper(node)) {
+          hasImportDefault = true;
+        }
+        break;
+      case 271 /* ImportEqualsDeclaration */:
+        if (node.moduleReference.kind === 283 /* ExternalModuleReference */) {
+          externalImports.push(node);
+        }
+        break;
+      case 278 /* ExportDeclaration */:
+        if (node.moduleSpecifier) {
+          if (!node.exportClause) {
+            externalImports.push(node);
+            hasExportStarsToExportValues = true;
+          } else {
+            externalImports.push(node);
+            if (isNamedExports(node.exportClause)) {
+              addExportedNamesForExportDeclaration(node);
+            } else {
+              const name = node.exportClause.name;
+              if (!uniqueExports.get(idText(name))) {
+                multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(node), name);
+                uniqueExports.set(idText(name), true);
+                exportedNames = append(exportedNames, name);
+              }
+              hasImportStar = true;
+            }
+          }
+        } else {
+          addExportedNamesForExportDeclaration(node);
+        }
+        break;
+      case 277 /* ExportAssignment */:
+        if (node.isExportEquals && !exportEquals) {
+          exportEquals = node;
+        }
+        break;
+      case 243 /* VariableStatement */:
+        if (hasSyntacticModifier(node, 32 /* Export */)) {
+          for (const decl of node.declarationList.declarations) {
+            exportedNames = collectExportedVariableInfo(decl, uniqueExports, exportedNames, exportedBindings);
+          }
+        }
+        break;
+      case 262 /* FunctionDeclaration */:
+        if (hasSyntacticModifier(node, 32 /* Export */)) {
+          if (hasSyntacticModifier(node, 2048 /* Default */)) {
+            if (!hasExportDefault) {
+              multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(node), context.factory.getDeclarationName(node));
+              hasExportDefault = true;
+            }
+          } else {
+            const name = node.name;
+            if (!uniqueExports.get(idText(name))) {
+              multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(node), name);
+              uniqueExports.set(idText(name), true);
+              exportedNames = append(exportedNames, name);
+            }
+          }
+        }
+        break;
+      case 263 /* ClassDeclaration */:
+        if (hasSyntacticModifier(node, 32 /* Export */)) {
+          if (hasSyntacticModifier(node, 2048 /* Default */)) {
+            if (!hasExportDefault) {
+              multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(node), context.factory.getDeclarationName(node));
+              hasExportDefault = true;
+            }
+          } else {
+            const name = node.name;
+            if (name && !uniqueExports.get(idText(name))) {
+              multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(node), name);
+              uniqueExports.set(idText(name), true);
+              exportedNames = append(exportedNames, name);
+            }
+          }
+        }
+        break;
+    }
+  }
+  const externalHelpersImportDeclaration = createExternalHelpersImportDeclarationIfNeeded(context.factory, context.getEmitHelperFactory(), sourceFile, compilerOptions, hasExportStarsToExportValues, hasImportStar, hasImportDefault);
+  if (externalHelpersImportDeclaration) {
+    externalImports.unshift(externalHelpersImportDeclaration);
+  }
+  return { externalImports, exportSpecifiers, exportEquals, hasExportStarsToExportValues, exportedBindings, exportedNames, externalHelpersImportDeclaration };
+  function addExportedNamesForExportDeclaration(node) {
+    for (const specifier of cast(node.exportClause, isNamedExports).elements) {
+      if (!uniqueExports.get(idText(specifier.name))) {
+        const name = specifier.propertyName || specifier.name;
+        if (!node.moduleSpecifier) {
+          exportSpecifiers.add(name, specifier);
+        }
+        const decl = resolver.getReferencedImportDeclaration(name) || resolver.getReferencedValueDeclaration(name);
+        if (decl) {
+          multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(decl), specifier.name);
+        }
+        uniqueExports.set(idText(specifier.name), true);
+        exportedNames = append(exportedNames, specifier.name);
+      }
+    }
+  }
+}
+function collectExportedVariableInfo(decl, uniqueExports, exportedNames, exportedBindings) {
+  if (isBindingPattern(decl.name)) {
+    for (const element of decl.name.elements) {
+      if (!isOmittedExpression(element)) {
+        exportedNames = collectExportedVariableInfo(element, uniqueExports, exportedNames, exportedBindings);
+      }
+    }
+  } else if (!isGeneratedIdentifier(decl.name)) {
+    const text = idText(decl.name);
+    if (!uniqueExports.get(text)) {
+      uniqueExports.set(text, true);
+      exportedNames = append(exportedNames, decl.name);
+      if (isLocalName(decl.name)) {
+        multiMapSparseArrayAdd(exportedBindings, getOriginalNodeId(decl), decl.name);
+      }
+    }
+  }
+  return exportedNames;
+}
+function multiMapSparseArrayAdd(map2, key, value) {
+  let values = map2[key];
+  if (values) {
+    values.push(value);
+  } else {
+    map2[key] = values = [value];
+  }
+  return values;
+}
+var IdentifierNameMap = class _IdentifierNameMap {
+  constructor() {
+    this._map = /* @__PURE__ */ new Map();
+  }
+  get size() {
+    return this._map.size;
+  }
+  has(key) {
+    return this._map.has(_IdentifierNameMap.toKey(key));
+  }
+  get(key) {
+    return this._map.get(_IdentifierNameMap.toKey(key));
+  }
+  set(key, value) {
+    this._map.set(_IdentifierNameMap.toKey(key), value);
+    return this;
+  }
+  delete(key) {
+    var _a;
+    return ((_a = this._map) == null ? void 0 : _a.delete(_IdentifierNameMap.toKey(key))) ?? false;
+  }
+  clear() {
+    this._map.clear();
+  }
+  values() {
+    return this._map.values();
+  }
+  static toKey(name) {
+    if (isGeneratedPrivateIdentifier(name) || isGeneratedIdentifier(name)) {
+      const autoGenerate = name.emitNode.autoGenerate;
+      if ((autoGenerate.flags & 7 /* KindMask */) === 4 /* Node */) {
+        const node = getNodeForGeneratedName(name);
+        const baseName = isMemberName(node) && node !== name ? _IdentifierNameMap.toKey(node) : `(generated@${getNodeId(node)})`;
+        return formatGeneratedName(
+          /*privateName*/
+          false,
+          autoGenerate.prefix,
+          baseName,
+          autoGenerate.suffix,
+          _IdentifierNameMap.toKey
+        );
+      } else {
+        const baseName = `(auto@${autoGenerate.id})`;
+        return formatGeneratedName(
+          /*privateName*/
+          false,
+          autoGenerate.prefix,
+          baseName,
+          autoGenerate.suffix,
+          _IdentifierNameMap.toKey
+        );
+      }
+    }
+    if (isPrivateIdentifier(name)) {
+      return idText(name).slice(1);
+    }
+    return idText(name);
+  }
+};
+var IdentifierNameMultiMap = class extends IdentifierNameMap {
+  add(key, value) {
+    let values = this.get(key);
+    if (values) {
+      values.push(value);
+    } else {
+      this.set(key, values = [value]);
+    }
+    return values;
+  }
+  remove(key, value) {
+    const values = this.get(key);
+    if (values) {
+      unorderedRemoveItem(values, value);
+      if (!values.length) {
+        this.delete(key);
+      }
+    }
+  }
+};
+function isSimpleCopiableExpression(expression) {
+  return isStringLiteralLike(expression) || expression.kind === 9 /* NumericLiteral */ || isKeyword(expression.kind) || isIdentifier(expression);
+}
+function isSimpleInlineableExpression(expression) {
+  return !isIdentifier(expression) && isSimpleCopiableExpression(expression);
+}
+function isCompoundAssignment(kind) {
+  return kind >= 65 /* FirstCompoundAssignment */ && kind <= 79 /* LastCompoundAssignment */;
+}
+function getNonAssignmentOperatorForCompoundAssignment(kind) {
+  switch (kind) {
+    case 65 /* PlusEqualsToken */:
+      return 40 /* PlusToken */;
+    case 66 /* MinusEqualsToken */:
+      return 41 /* MinusToken */;
+    case 67 /* AsteriskEqualsToken */:
+      return 42 /* AsteriskToken */;
+    case 68 /* AsteriskAsteriskEqualsToken */:
+      return 43 /* AsteriskAsteriskToken */;
+    case 69 /* SlashEqualsToken */:
+      return 44 /* SlashToken */;
+    case 70 /* PercentEqualsToken */:
+      return 45 /* PercentToken */;
+    case 71 /* LessThanLessThanEqualsToken */:
+      return 48 /* LessThanLessThanToken */;
+    case 72 /* GreaterThanGreaterThanEqualsToken */:
+      return 49 /* GreaterThanGreaterThanToken */;
+    case 73 /* GreaterThanGreaterThanGreaterThanEqualsToken */:
+      return 50 /* GreaterThanGreaterThanGreaterThanToken */;
+    case 74 /* AmpersandEqualsToken */:
+      return 51 /* AmpersandToken */;
+    case 75 /* BarEqualsToken */:
+      return 52 /* BarToken */;
+    case 79 /* CaretEqualsToken */:
+      return 53 /* CaretToken */;
+    case 76 /* BarBarEqualsToken */:
+      return 57 /* BarBarToken */;
+    case 77 /* AmpersandAmpersandEqualsToken */:
+      return 56 /* AmpersandAmpersandToken */;
+    case 78 /* QuestionQuestionEqualsToken */:
+      return 61 /* QuestionQuestionToken */;
+  }
+}
+function getSuperCallFromStatement(statement) {
+  if (!isExpressionStatement(statement)) {
+    return void 0;
+  }
+  const expression = skipParentheses(statement.expression);
+  return isSuperCall(expression) ? expression : void 0;
+}
+function findSuperStatementIndexPathWorker(statements, start, indices) {
+  for (let i = start; i < statements.length; i += 1) {
+    const statement = statements[i];
+    if (getSuperCallFromStatement(statement)) {
+      indices.unshift(i);
+      return true;
+    } else if (isTryStatement(statement) && findSuperStatementIndexPathWorker(statement.tryBlock.statements, 0, indices)) {
+      indices.unshift(i);
+      return true;
+    }
+  }
+  return false;
+}
+function findSuperStatementIndexPath(statements, start) {
+  const indices = [];
+  findSuperStatementIndexPathWorker(statements, start, indices);
+  return indices;
+}
+function getProperties(node, requireInitializer, isStatic2) {
+  return filter(node.members, (m) => isInitializedOrStaticProperty(m, requireInitializer, isStatic2));
+}
+function isStaticPropertyDeclarationOrClassStaticBlockDeclaration(element) {
+  return isStaticPropertyDeclaration(element) || isClassStaticBlockDeclaration(element);
+}
+function getStaticPropertiesAndClassStaticBlock(node) {
+  return filter(node.members, isStaticPropertyDeclarationOrClassStaticBlockDeclaration);
+}
+function isInitializedOrStaticProperty(member, requireInitializer, isStatic2) {
+  return isPropertyDeclaration(member) && (!!member.initializer || !requireInitializer) && hasStaticModifier(member) === isStatic2;
+}
+function isStaticPropertyDeclaration(member) {
+  return isPropertyDeclaration(member) && hasStaticModifier(member);
+}
+function isInitializedProperty(member) {
+  return member.kind === 172 /* PropertyDeclaration */ && member.initializer !== void 0;
+}
+function isNonStaticMethodOrAccessorWithPrivateName(member) {
+  return !isStatic(member) && (isMethodOrAccessor(member) || isAutoAccessorPropertyDeclaration(member)) && isPrivateIdentifier(member.name);
+}
+function getDecoratorsOfParameters(node) {
+  let decorators;
+  if (node) {
+    const parameters = node.parameters;
+    const firstParameterIsThis = parameters.length > 0 && parameterIsThisKeyword(parameters[0]);
+    const firstParameterOffset = firstParameterIsThis ? 1 : 0;
+    const numParameters = firstParameterIsThis ? parameters.length - 1 : parameters.length;
+    for (let i = 0; i < numParameters; i++) {
+      const parameter = parameters[i + firstParameterOffset];
+      if (decorators || hasDecorators(parameter)) {
+        if (!decorators) {
+          decorators = new Array(numParameters);
+        }
+        decorators[i] = getDecorators(parameter);
+      }
+    }
+  }
+  return decorators;
+}
+function getAllDecoratorsOfClass(node) {
+  const decorators = getDecorators(node);
+  const parameters = getDecoratorsOfParameters(getFirstConstructorWithBody(node));
+  if (!some(decorators) && !some(parameters)) {
+    return void 0;
+  }
+  return {
+    decorators,
+    parameters
+  };
+}
+function getAllDecoratorsOfClassElement(member, parent, useLegacyDecorators) {
+  switch (member.kind) {
+    case 177 /* GetAccessor */:
+    case 178 /* SetAccessor */:
+      if (!useLegacyDecorators) {
+        return getAllDecoratorsOfMethod(member);
+      }
+      return getAllDecoratorsOfAccessors(member, parent);
+    case 174 /* MethodDeclaration */:
+      return getAllDecoratorsOfMethod(member);
+    case 172 /* PropertyDeclaration */:
+      return getAllDecoratorsOfProperty(member);
+    default:
+      return void 0;
+  }
+}
+function getAllDecoratorsOfAccessors(accessor, parent) {
+  if (!accessor.body) {
+    return void 0;
+  }
+  const { firstAccessor, secondAccessor, getAccessor, setAccessor } = getAllAccessorDeclarations(parent.members, accessor);
+  const firstAccessorWithDecorators = hasDecorators(firstAccessor) ? firstAccessor : secondAccessor && hasDecorators(secondAccessor) ? secondAccessor : void 0;
+  if (!firstAccessorWithDecorators || accessor !== firstAccessorWithDecorators) {
+    return void 0;
+  }
+  const decorators = getDecorators(firstAccessorWithDecorators);
+  const parameters = getDecoratorsOfParameters(setAccessor);
+  if (!some(decorators) && !some(parameters)) {
+    return void 0;
+  }
+  return {
+    decorators,
+    parameters,
+    getDecorators: getAccessor && getDecorators(getAccessor),
+    setDecorators: setAccessor && getDecorators(setAccessor)
+  };
+}
+function getAllDecoratorsOfMethod(method) {
+  if (!method.body) {
+    return void 0;
+  }
+  const decorators = getDecorators(method);
+  const parameters = getDecoratorsOfParameters(method);
+  if (!some(decorators) && !some(parameters)) {
+    return void 0;
+  }
+  return { decorators, parameters };
+}
+function getAllDecoratorsOfPr

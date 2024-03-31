@@ -1,0 +1,44 @@
+ted: false
+creative-commons-pd-alt:
+  changes:
+    - 5.0.11
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: Alternate Creative Commons Public Domain
+  unicode: f4ed
+  voted: false
+creative-commons-remix:
+  changes:
+    - 5.0.11
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: Creative Commons Remix
+  unicode: f4ee
+  voted: false
+creative-commons-sa:
+  changes:
+    - 5.0.11
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: Creative Commons Share Alike
+  unicode: f4ef
+  voted: false
+creative-commons-sampling:
+  changes:
+    - 5.0.11
+  fam

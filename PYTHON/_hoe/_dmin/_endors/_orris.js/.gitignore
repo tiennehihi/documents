@@ -1,0 +1,5 @@
+cache:
+  key: "$CI_JOB_NAME"
+  untracked: true
+  paths:
+    - node_modules/

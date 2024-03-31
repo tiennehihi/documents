@@ -1,0 +1,1 @@
+module.exports={A:{A:{"2":"J D E F A B UC"},B:{"2":"C K","132":"L G M N O","322":"0 1 2 3 4 5 6 7 8 9 P Q R S T U V W X Y

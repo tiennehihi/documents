@@ -1,0 +1,27 @@
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+"use strict";
+
+/** @typedef {import("./Module")} Module */
+
+const MODULE_REFERENCE_REGEXP =
+	/^__WEBPACK_MODULE_REFERENCE__(\d+)_([\da-f]+|ns)(_call)?(_directImport)?(?:_asiSafe(\d))?__$/;
+
+const DEFAULT_EXPORT = "__WEBPACK_DEFAULT_EXPORT__";
+const NAMESPACE_OBJECT_EXPORT = "__WEBPACK_NAMESPACE_OBJECT__";
+
+/**
+ * @typedef {Object} ExternalModuleInfo
+ * @property {number} index
+ * @property {Module} module
+ */
+
+/**
+ * @typedef {Object} ConcatenatedModuleInfo
+ * @property {number} index
+ * @property {Module} module
+ * @property {Map<string, string>} exportMap mapping from export name to symbol
+ * @property {Map<string, string>} rawExportMap mapping from export n

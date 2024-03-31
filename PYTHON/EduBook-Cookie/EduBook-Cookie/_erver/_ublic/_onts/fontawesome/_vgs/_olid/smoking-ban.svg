@@ -1,0 +1,46 @@
+ Logo
+  unicode: f1aa
+  voted: false
+js:
+  changes:
+    - 5.0.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: JavaScript (JS)
+  unicode: f3b8
+  voted: false
+jsfiddle:
+  changes:
+    - 4.1.0
+    - 5.0.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: brands
+    pro:
+      - family: classic
+        style: brands
+  label: jsFiddle
+  unicode: f1cc
+  voted: false
+jug-detergent:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Jug Detergent
+  unicode: e519
+  voted: false
+k:
+  aliases:

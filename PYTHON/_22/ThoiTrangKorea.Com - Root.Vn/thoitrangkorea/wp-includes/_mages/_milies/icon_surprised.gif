@@ -1,0 +1,6 @@
+/// <reference types="node" />
+declare const g: typeof globalThis | NodeJS.Global;
+declare class AssertionError extends g.Error {
+    generatedMessage: any;
+    name: any;
+  

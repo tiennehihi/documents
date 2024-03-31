@@ -1,0 +1,10 @@
+'use strict';
+
+var $RangeError = require('es-errors/range');
+var $TypeError = require('es-errors/type');
+
+var CompletionRecord = require('es-abstract/2023/CompletionRecord');
+var CreateIteratorFromClosure = require('../aos/CreateIteratorFromClosure');
+var GetIteratorDirect = require('../aos/GetIteratorDirect');
+var IteratorClose = require('../aos/IteratorClose');
+var Itera

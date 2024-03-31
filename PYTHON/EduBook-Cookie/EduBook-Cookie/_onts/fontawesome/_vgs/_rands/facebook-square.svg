@@ -1,0 +1,12 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var isValidValue = function isValidValue(x) {
+  return x != null && !Number.isNaN(x) && typeof x !== 'boolean';
+};
+
+var removeNonPrintingValuesTransformer = function removeNonPrintingValuesTransformer() {
+  return {
+    onSubstitution: function onSubstitutio

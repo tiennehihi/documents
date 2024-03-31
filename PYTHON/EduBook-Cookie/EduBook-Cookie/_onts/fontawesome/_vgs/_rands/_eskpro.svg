@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+Object.defineProperty(exports, "default", {
+    enumerable: true,
+    get: function() {
+        return expandTailwindAtRules;
+    }
+});
+const _fs = /*#__PURE__*/ _interop_require_default(require("fs"));
+const _quicklru = /*#__PURE__*/ _interop_require_default(require("@alloc/quick-lru"));
+const _sharedState = /*#__PURE__*/ _interop_require_wildcard(require("./sharedState"));
+const _generateRules = require("./generateRules");
+const _log = /*#__PURE__*/ _interop_require_default(require("../util/log"));
+const _cloneNodes = /*#__PURE__*/ _interop_require_default(require("../util/cloneNodes"));
+const _de

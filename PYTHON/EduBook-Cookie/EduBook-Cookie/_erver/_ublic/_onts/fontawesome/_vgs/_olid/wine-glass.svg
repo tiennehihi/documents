@@ -1,0 +1,24 @@
+64 416c0 17.7 14.3 32 32 32h32V384H64v32z"
+      }
+    },
+    "free": [
+      "solid"
+    ]
+  },
+  "simplybuilt": {
+    "changes": [
+      "4.3.0",
+      "5.0.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "brands"
+    ],
+    "unicode": "f215",
+    "label": "SimplyBuilt",
+    "voted": false,
+    "svg": {
+    

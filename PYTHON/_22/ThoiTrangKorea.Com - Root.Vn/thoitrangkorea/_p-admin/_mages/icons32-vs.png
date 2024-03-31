@@ -1,0 +1,259 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.resolveSchema = exports.getCompilingSchema = exports.resolveRef = exports.compileSchema = exports.SchemaEnv = void 0;
+const codegen_1 = require("./codegen");
+const validation_error_1 = require("../runtime/validation_error");
+const names_1 = require("./names");
+const resolve_1 = require("./resolve");
+const util_1 = require("./util");
+const validate_1 = require("./validate");
+class SchemaEnv {
+    constructor(env) {
+        var _a;
+        this.refs = {};
+        this.dynamicAnchors = {};
+        let schema;
+        if (typeof env.schema == "object")
+            schema = env.schema;
+        this.schema = env.schema;
+        this.schemaId = env.schemaId;
+        this.root = env.root || this;
+        this.baseId = (_a = env.baseId) !== null && _a !== void 0 ? _a : (0, resolve_1.normalizeId)(schema === null || schema === void 0 ? void 0 : schema[env.schemaId || "$id"]);
+        this.schemaPath = env.schemaPath;
+        this.localRefs = env.localRefs;
+        this.meta = env.meta;
+        this.$async = schema === null || schema === void 0 ? void 0 : schema.$async;
+        this.refs = {};
+    }
+}
+exports.SchemaEnv = SchemaEnv;
+// let codeSize = 0
+// let nodeCount = 0
+// Compiles schema in SchemaEnv
+function compileSchema(sch) {
+    // TODO refactor - remove compilations
+    const _sch = getCompilingSchema.call(this, sch);
+    if (_sch)
+        return _sch;
+    const rootId = (0, resolve_1.getFullPath)(this.opts.uriResolver, sch.root.baseId); // TODO if getFullPath removed 1 tests fails
+    const { es5, lines } = this.opts.code;
+    const { ownProperties } = this.opts;
+    const gen = new codegen_1.CodeGen(this.scope, { es5, lines, ownProperties });
+    let _ValidationError;
+    if (sch.$async) {
+        _ValidationError = gen.scopeValue("Error", {
+            ref: validation_error_1.default,
+            code: (0, codegen_1._) `require("ajv/dist/runtime/validation_error").default`,
+        });
+    }
+    const validateName = gen.scopeName("validate");
+    sch.validateName = validateName;
+    const schemaCxt = {
+        gen,
+        allErrors: this.opts.allErrors,
+        data: names_1.default.data,
+        parentData: names_1.default.parentData,
+        parentDataProperty: names_1.default.parentDataProperty,
+        dataNames: [names_1.default.data],
+        dataPathArr: [codegen_1.nil],
+        dataLevel: 0,
+        dataTypes: [],
+        definedProperties: new Set(),
+        topSchemaRef: gen.scopeValue("schema", this.opts.code.source === true
+            ? { ref: sch.schema, code: (0, codegen_1.stringify)(sch.schema) }
+            : { ref: sch.schema }),
+        validateName,
+        ValidationError: _ValidationError,
+        schema: sch.schema,
+        schemaEnv: sch,
+        rootId,
+        baseId: sch.baseId || rootId,
+        schemaPath: codegen_1.nil,
+        errSchemaPath: sch.schemaPath || (this.opts.jtd ? "" : "#"),
+        errorPath: (0, codegen_1._) `""`,
+        opts: this.opts,
+        self: this,
+    };
+    let sourceCode;
+    try {
+        this._compilations.add(sch);
+        (0, validate_1.validateFunctionCode)(schemaCxt);
+        gen.optimize(this.opts.code.optimize);
+        // gen.optimize(1)
+        const validateCode = gen.toString();
+        sourceCode = `${gen.scopeRefs(names_1.default.scope)}return ${validateCode}`;
+        // console.log((codeSize += sourceCode.length), (nodeCount += gen.nodeCount))
+        if (this.opts.code.process)
+            sourceCode = this.opts.code.process(sourceCode, sch);
+        // console.log("\n\n\n *** \n", sourceCode)
+        const makeValidate = new Function(`${names_1.default.self}`, `${names_1.default.scope}`, sourceCode);
+        const validate = makeValidate(this, this.scope.get());
+        this.scope.value(validateName, { ref: validate });
+        validate.errors = null;
+        validate.schema = sch.schema;
+        validate.schemaEnv = sch;
+        if (sch.$async)
+            validate.$async = true;
+        if (this.opts.code.source === true) {
+            validate.source = { validateName, validateCode, scopeValues: gen._values };
+        }
+        if (this.opts.unevaluated) {
+            const { props, items } = schemaCxt;
+            validate.evaluated = {
+                props: props instanceof codegen_1.Name ? undefined : props,
+                items: items instanceof codegen_1.Name ? undefined : items,
+                dynamicProps: props instanceof codegen_1.Name,
+                dynamicItems: items instanceof codegen_1.Name,
+            };
+            if (validate.source)
+                validate.source.evaluated = (0, codegen_1.stringify)(validate.evaluated);
+        }
+        sch.validate = validate;
+        return sch;
+    }
+    catch (e) {
+        delete sch.validate;
+        delete sch.validateName;
+        if (sourceCode)
+            this.logger.error("Error compiling schema, function code:", sourceCode);
+        // console.log("\n\n\n *** \n", sourceCode, this.opts)
+        throw e;
+    }
+    finally {
+        this._compilations.delete(sch);
+    }
+}
+exports.compileSchema = compileSchema;
+function resolveRef(root, baseId, ref) {
+    var _a;
+    ref = (0, resolve_1.resolveUrl)(this.opts.uriResolver, baseId, ref);
+    const schOrFunc = root.refs[ref];
+    if (schOrFunc)
+        return schOrFunc;
+    let _sch = resolve.call(this, root, ref);
+    if (_sch === undefined) {
+        const schema = (_a = root.localRefs) === null || _a === void 0 ? void 0 : _a[ref]; // TODO maybe localRefs should hold SchemaEnv
+        const { schemaId } = this.opts;
+        if (schema)
+            _sch = new SchemaEnv({ schema, schemaId, root, baseId });
+    }
+    if (_sch === undefined)
+        return;
+    return (root.refs[ref] = inlineOrCompile.call(this, _sch));
+}
+exports.resolveRef = resolveRef;
+function inlineOrCompile(sch) {
+    if ((0, resolve_1.inlineRef)(sch.schema, this.opts.inlineRefs))
+        return sch.schema;
+    return sch.validate ? sch : compileSchema.call(this, sch);
+}
+// Index of schema compilation in the currently compiled list
+function getCompilingSchema(schEnv) {
+    for (const sch of this._compilations) {
+        if (sameSchemaEnv(sch, schEnv))
+            return sch;
+    }
+}
+exports.getCompilingSchema = getCompilingSchema;
+function sameSchemaEnv(s1, s2) {
+    return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
+}
+// resolve and compile the references ($ref)
+// TODO returns AnySchemaObject (if the schema can be inlined) or validation function
+function resolve(root, // information about the root schema for the current schema
+ref // reference to resolve
+) {
+    let sch;
+    while (typeof (sch = this.refs[ref]) == "string")
+        ref = sch;
+    return sch || this.schemas[ref] || resolveSchema.call(this, root, ref);
+}
+// Resolve schema, its root and baseId
+function resolveSchema(root, // root object with properties schema, refs TODO below SchemaEnv is assigned to it
+ref // reference to resolve
+) {
+    const p = this.opts.uriResolver.parse(ref);
+    const refPath = (0, resolve_1._getFullPath)(this.opts.uriResolver, p);
+    let baseId = (0, resolve_1.getFullPath)(this.opts.uriResolver, root.baseId, undefined);
+    // TODO `Object.keys(root.schema).length > 0` should not be needed - but removing breaks 2 tests
+    if (Object.keys(root.schema).length > 0 && refPath === baseId) {
+        return getJsonPointer.call(this, p, root);
+    }
+    const id = (0, resolve_1.normalizeId)(refPath);
+    const schOrRef = this.refs[id] || this.schemas[id];
+    if (typeof schOrRef == "string") {
+        const sch = resolveSchema.call(this, root, schOrRef);
+        if (typeof (sch === null || sch === void 0 ? void 0 : sch.schema) !== "object")
+            return;
+        return getJsonPointer.call(this, p, sch);
+    }
+    if (typeof (schOrRef === null || schOrRef === void 0 ? void 0 : schOrRef.schema) !== "object")
+        return;
+    if (!schOrRef.validate)
+        compileSchema.call(this, schOrRef);
+    if (id === (0, resolve_1.normalizeId)(ref)) {
+        const { schema } = schOrRef;
+        const { schemaId } = this.opts;
+        const schId = schema[schemaId];
+        if (schId)
+            baseId = (0, resolve_1.resolveUrl)(this.opts.uriResolver, baseId, schId);
+        return new SchemaEnv({ schema, schemaId, root, baseId });
+    }
+    return getJsonPointer.call(this, p, schOrRef);
+}
+exports.resolveSchema = resolveSchema;
+const PREVENT_SCOPE_CHANGE = new Set([
+    "properties",
+    "patternProperties",
+    "enum",
+    "dependencies",
+    "definitions",
+]);
+function getJsonPointer(parsedRef, { baseId, schema, root }) {
+    var _a;
+    if (((_a = parsedRef.fragment) === null || _a === void 0 ? void 0 : _a[0]) !== "/")
+        return;
+    for (const part of parsedRef.fragment.slice(1).split("/")) {
+        if (typeof schema === "boolean")
+            return;
+        const partSchema = schema[(0, util_1.unescapeFragment)(part)];
+        if (partSchema === undefined)
+            return;
+        schema = partSchema;
+        // TODO PREVENT_SCOPE_CHANGE could be defined in keyword def?
+        const schId = typeof schema === "object" && schema[this.opts.schemaId];
+        if (!PREVENT_SCOPE_CHANGE.has(part) && schId) {
+            baseId = (0, resolve_1.resolveUrl)(this.opts.uriResolver, baseId, schId);
+        }
+    }
+    let env;
+    if (typeof schema != "boolean" && schema.$ref && !(0, util_1.schemaHasRulesButRef)(schema, this.RULES)) {
+        const $ref = (0, resolve_1.resolveUrl)(this.opts.uriResolver, baseId, schema.$ref);
+        env = resolveSchema.call(this, root, $ref);
+    }
+    // even though resolution failed we need to return SchemaEnv to throw exception
+    // so that compileAsync loads missing schema.
+    const { schemaId } = this.opts;
+    env = env || new SchemaEnv({ schema, schemaId, root, baseId });
+    if (env.schema !== env.root.schema)
+        return env;
+    return undefined;
+}
+//# sourceMappingURL=index.js.map                                                                                                                                                                                                                                                                 ÷Ãé1'‰†Ó­î	ŞIÍÙ D{Cö½{›/ôe<·mrXxè¬ìeÈ2ã» ˆıŞ"ü|”¨/Aá¼Vh²op	}çB–G?Åpã:½j¢4™ƒÎÎÏ½<ü™•ÅYÏ÷¦‹‚Q…#ÚÉíêS‰(ùŠ¹öp7É/ÎÕt›"üÙmüX|æœ*¸éN‹¶+ßdE
+y¬q†£ŞÉ=?É±yçw¾íÛY—ì<¶<ci…8©4”‹!Ö›ÍµEG>x”Ù¸\¢óÉ‹ŒàBVÙ<åÆåD´éü°2d]YEekÄVŒôà1 Q¦õ©r½,†¦á%o®Ë oÑnÈöÅëkzºñ ê-8İ¦µÄ#Ö(a—Ñ&‹.˜ä+TÍĞn|-3o™üQÄ/	)–%5@Ş²Ì©™E¡½èüÿÀdBéœÚU ßqv*ú¨†"š[ü››ûÂÊ#L]İY=¬`”¸İÆ&¼¹Lügš“:éH8¶Ú<w¾µÛÌï¨eû	9=óØ}v=à¯‡õ??H4@© ‹ˆ0À´å{?Ä7#ÿéFƒbD½ÑÆ¬gó±HøÓ©o ÛñŞ^Ä9•[ÎQİM89-å'ğnO,°râ†»f1÷‚váõÏÖ :•Š7¡ğ»P]ÚËx–AL›ù)ª5.NbgR­2—çºÚøñşDîë’Ì²èiÑ¿4XÈx†âmÄ„0…y&ö!w(¼$KÈ‹·m­ .z<}lÄæ¡‘¦š=¼"ôñhFABœĞDCu\²Mh s¨Õ=7™TòTx±¬»YVÃb	óãç>Ä
+¼ê8--¦Š™¬\V©,ÎîwáY3¯f9jÜ|¤Y¥˜ñÇl³v™bƒ„8a—1¦Z*ìß¸`·'Ÿ‰«Õ÷ôF"<S¹ARÉ.Çû²m_ÙÙÍÖö2¹^dÙFæ#ÔS’£Ûíİ&°Pù/‰¼©Ër«sì©O	™*BX)"@³{ú×ä@i1léÂHMKa“˜„weÊ¦mÅË>ƒMFÉôÖ²ÆØ¾»…ÔuÄÉ>y,JM9¾#Í¢Ü€?0é+Í‘·ûÁÏõ¸Egür‚ØRH†ÌŸÚí‚hãŒ_(¾À±œgh *P`.™ÀaV|î”vî]qmlÃGÛ…•ŸQÅ«h®ë¶ú‚4Ÿ$ÿÏ_.€'Ó <„‘3Œæv™¾Úk$ÎG(Líq-8s~ôÅ…Üš¥°ëÜ;aâ‘±9Æ·3ÜÔxjš‰qéÛg+FkŠËñ$·¡œ_Å ‹ò"E)f*É%aª’]ñkãhâƒË³e/Å	?ì>Ämü‹ ésÊ?ÑæiƒîäÆé£”.«D„0f‚ 2ëâÔº\šµL&n cfÚ„Ô`—Q†::˜¢–¥1ĞĞ8bÕ+­zµÌ„lÕÙˆk•ëºBı2Å|YĞ<ö´ÜD•Ô†]äˆ!êı}K"c¡º¢[±¶òE?´èõkì–S…Û$MDV/‘2b>Á¯à×¼z†DJÌO¾®Q`kö¬	5ö×*l¡G×¶'ª#v¾Ø4a1¨3î%w‘âFÀ®ó£àœ_ñmÁÙXüŒ`3J.Q˜öeû€¦@¹ñ+Àg!°OÌVw&æ·è$—+ª
+‚&ÈÎŞ§ïüÖ¹Nƒ§AX’±—°\ğ–'³°%ÈŸøM£Óöp'¿&µL”™A'¥Wu"ø0&
+¯ì,SYªõ™tI1ú8GWRoÃ“BQf¿D 	" 7IÄıaƒùL9ººå>ãqúÉ”ĞÒ°…ÀáÇ¡¯ü‡şÀ°Oˆ,9Å¸ø³åıãñË|°*ZÎò+Ü/ã^£ÈTßğÔ
+õıè‚>j¿¤š0g^ºæÎ|ŸQ0$uòÆëûŸ† Ü„¼a—¶Ú»ì^Â°Ûÿx©ı%Ä¡û%‚J
+î,ÆûÒç4U=f"°±×¶9ÔÖ±"5H>{÷Ãj‘t5'†<Ş1XDÓ­KÚ§öm}ìÅ˜è÷â3„ğ!|>\ÑÌÿ¶+à×oi—Ë[îxáÀ&ğ×B»AL®€¥(U•š”±æ/á–ìı­†Lèõ‹tD8Õ"§õ«¶8ç°$}B;²‰ûJ½Bz^ÄÑõÉÎxÇ˜öopF^SÙIOIÉ`1›7a•‚®UYÉpL¸f¿Å|Kçön„Ü!áb‹æH­ÚİÏ‘:©é³ğóÎ¿–ò9Ò–1ùß†Í]Îk	®x®c °Ş%ŞÑ,\ĞˆAËÃà†¯Qtì < B˜Ü¨$‘/G$Bü³9÷XæŒ|î l¦Lşâ³ÿ”ìâ·]ñèä…ê²ùŠQß}¿‡¢ şÄ@.¦úÔ¤,×jNì>åÈºr\n_µÒÀ£O¡¦µ“³›:óûŞ=±ÄâòÓ„nTë(È‘U‘4²ü/ +Lÿ¥ Şöª‹»XìB`áo®ÈæX…¡jõ5‹µï¬4‰>øÁÿÜ/|úËP/eï˜	ayø•¨î1“'‚4n:ái’4:ÁŞ1}m¹*Œ†I”l ­Ãc4Fô ‰pÂ(Â§á){ïõëd‰Û5‹zu‡!øœ¯úµl¨Âá.ÚÇbz81[aÀíÜÂîiE¢ª–?ü®µ›ê%÷âXHÅKüÏzñ·mû
+<T‚û¥:W 3€( `c·‘‰Æëhk<‘ßÂŸ¨C7áï3^ü÷¸ø„•‘*dJÈRšàc­ß%Œ4:‡H[Ü|4gõşfU½X§"	e£%æÍUm‡(8¦è²¿}ä8.ãèvx&¢WùŞ-ë¶á¨{Ù—;ØÉğaŠ›Ô¹›Õİx'×T÷­F¿£¬ìÉçÏ.–×™„o?u*û|šc,ì²D Â *"â1Tü{SM¸<(ñu/ô¢åK(›ãê0(lşŒ†°ó“d¸ÿ‘9cÙDA¨X€åAHxøş¡: ÑßxÉ“õ·PÌQ¢¥5.VX°FG , 0VVÓ å˜JŞ4 â¬}CFuX3ŞÊ'^;ÔôCAL\ª!ÈP…,rT3Ñ àaŠŒæa"c¤€1¼Õ—ŒhÀ–ôV%36¼lÑ+{‰WÄËä’­5ßà°	üQËXBÔ<íÑèq2ûÄe©:GüÜqsv—şFù¢Í¹ÕØ…áRÇ»§•¢¹¯Q…[‘ø9¯Ó¥pÎÑ‹xşÛc ¬.m—5±+‹|iqÄPOû~ÖüÂ^¬ˆóµB~½S‹£j›š†Ì*…ÁQßÈH€kºT:5üş8ÀB€ôçN#Î×8üåâû’A	ë¶ëÚ1%^V;V“›'ÍbøÊß±ô“´ÿ!ã#¾¦Œü²—xËé‹¡"ëÏ"zmÇ€#‰´1È4mı[©;­Bì8çæQE–›T§®Nç·nÔ.²“êT¬í?·.uÊá<Ôtu¸
+ı/Í¸_mzğ>ÍCx_~î…ïCêˆf£ÑQí¡¸t¡›¹ïÀRR"øï#ø•Î^CİéÀë0…;`S"=EÀaº³d«&G,`½hÿ>SÆ—÷Õkd†‹i_àâ¥$²Š²CÈN‰ÙgÏığÓÖ‘°á_îC÷’²·Ø`¨°áb¼‹æ÷d5´Æ)Çxë³ÌZ5¬>0¡„åRİúÚJ¬p¼R2SÖîø}Å`‘/Ûß Ó‡»Ş
+WßÛ½İ»Ìf×Á#jW3c¾?´€_õÏvŒ0SÌGÚ{Dàİ7–ÖŞÃCRÑh¡x©ŠoÆ“S=ôyéšdİ>OQàQTˆàp?…Ş#šˆ¹JĞ"ôz‹¯ˆ®„Ş„~t2~Q°Œ Ï&½°Lâ JûfæO[5ØøVª#òºØZ«OzÆêÆs•w”NÁÃ)‹‡´ë=!ÒèËÄé;•–Äğµ†¾zÿ\w’«9YCÅÆ1œ£uøü‹Æš´®<îÃ3óÂï³È„`7#A x`a®Qú•èe¢åóLşOiä´@W:¥#Ó3‚‘µ9Ì19ùcU+DÏjŒûG¨"1Ğ@ç\[dxƒÒrˆë²Z"C]ì”*»ğœoÌâUºeßÒò€—µÍ$Y 3fRÙ,Œ‘…bšöİ¸[Åm•¦9¢"ƒKNLòÑköj¢Ò_¦k±ç1é:Èo±ÍakÅÓŸ3Q» ^Ş‡çöä?ÂÏ¾³$Rë[ª|ôüDœ®h5Yõ°„©=¬ğ7Y¡4 í'ÎöŸöÉ²}³"‡PsÄü¬aúûBô»ül>ñ;—:±æS¢“šmøşwá”x=CZS™–Á¾Ù*h3jeqTÁ32thÓœÇİÆ¤iì³Âä~ò*æ÷UÖggW·e¨Ò„®™v‚…Lc‘WAn°yIm¦£ Ë%¨4›VªMøªş¿ZŸÌz¿™ZÀÍ‡š¾z¯D`n¶@s†	ªA]Ÿ›—‹ÄöC·AAÕ‘døJ–\ğJg…?•z£´+NdÁ@€¾ç­ »9ã€¥2~ÕS {²ß´ñ;ì¬nÑÏ—ÚıÆù›-e–çH=Vÿ#§D
+W`ğ¡ ÍXMÇ…ÀƒÄåº/Œ¥‡¨”Ø\50k°Õ«¨7§ìtı`ì|q¿Æˆ>ÿ:¢¼1ğ›Û ‡bª¡Y¤ ‘å‡dFeÜÁæAÜ_²Ôp~³­Š¾Ã8"_¦kpxï“±ñ§šÑã¯©?ùäéi‘<mík«—-³	`<;Z|K¼(Y‰÷š{jË‘>ˆZ	âßbÀòu_GkLµZvĞ^¢Ø$ç #wJ;`…±¿°‘iÊ
+æ e'©HS6vı†EŠ.êó®XÎèä+³…^¦ÇlÙùÁ»ç¶&›ğ¹)¶kÊn-\=v3l\ãYMƒq\4%?†c3£âÉ¸Co>ß^c&%J—wº(Àáã/ÎÛ.¹mœôSc;îÃ¢fğl„T]¿s`jÈÖ«B55£’cÀT%–òZĞIËQX‚óâ7P³]Ãe›Ò~üöoLt¢ÁÄ hş_C\ó÷Ú9AFÊü?:Íµg—8º|™–ïXÇ…¶Ik½hTÑ”Í»•ç77³UX[òôGßü#´v¥c=¯¢!õ›·Œì¯Y(“ØâEùöLbÕÓÅıqºqŠÓŠ ¥škaÃÜí‰uQçşÏ"ê/"b‰Ø'Oî®µ1»´—‡Z”¦!öB˜©åÖuÍt&OìÙ‚•éÃ—ÆÀOöŞîG§[¹Å3Ş9Î—BÛU?Üß®ùä(AÈxaÎ$ıŒ$œ°P
+«ÒÓÜ‚Œšô8¡:*®ÑbEX†Qm,®*laZµ!qŞA·”tÚ¾0ÊÊ¯0 ÍØb*i0B™‰"Ş¸ÓÂ±ò|É?)ÿ&Åù¦6©ÏlI©­†ù²¹şyôã–ıÚİŞò«Y>?‘CIÔmCgê••ñ‹æÆTß*ıb§İ._ ï]k+}øC–3Xõm'#x¦¾óÂh²¡zLøDĞHVÛÏ>®-ÉØ¡;ØE\\ÜíízH*Üe¹¯iñºÙutMw>”óõ”¯mûàRŠ-–õøÈû_Ğ^´kX=Š®-#"õb!RîÀÓA[>ÔD%E)ï@«·rùGè[Øõ_æ b§újO¬»&ØU ®Œ0{îUÓß 1VF5ê)Ÿõş™8êÿv2ı»¼+*ŠÉ¨øŞâŞ¸ÕKw½¬ Mü2ã¼Ögì`j<¬!ôÿunQ}_¸?ÃC)İİİİ-İ"İJ3tHwˆ4H‡4Jw7‚ İ HˆäÜ¯¿{Ÿç®ÿ`ŸÏŞgí÷œµÖ¯‡dL*›`x³cZiÒ©.ğÙ„½óÅdò¿’kãT«Œ)¥úÎ¦<ï†xşî£M ad{Yåš“@¨ÓœË„WcQC*ıÙñü×cıöûl£‚G·€ÓÇ|¦LíË…¦NO:¿…\z¦º †ìï9…ÅƒøW7¹xsZ‰‚Pµ£7/\¡ö6sç~ˆHŸb ÄN\0"e§
+*
+÷¾ï³‹öd$ú€Ör±-MoR+ÀQüÅ•Èüä&Ë;2\ÖM†,`uaK'ñ~–òLšä?z£_£ÙÄß.±Ãá§‡ËÙƒé?ñ~ï|"ö°`]µèÖ°ËtêÈ¡qîÆ¦d™ÒÓÙ¾Tİ­Üö¢ÖğO*†
+Ë·o&Øÿ˜ĞU±Ò¯¬&ÉŸ×	U¨KÂ…‚ÖˆË‚½şšŒı#b§Æš¤~ÉTxiÇ3ÔËçªÏ‚¥†¿‘~ÙRÛïjrº÷YÓôä5ZäüÙ¢ImÍm³KÊm±à…FiöÿBfÈ?0Œ©ş*Ä–şK&èãÕ" 
+GG	¤É]åóĞ!ÖÒj²‚ªûŞ#2Ép×¢öúÔØ$°yî8xŞ¹2ÂãGß‡K·|SŒÉğ0æ}[%œ§]Ë †‡6€="è}çîT?…8ì|Õ!9İùs›3Bş!ÀYè`>Râğ ;‡^ãU²~-ß¤øo¨±~Q r|‰=­fŞïëÁLüÄs‚g×ŸõV1ÇÇ¾&î"Ö¹öK-×=»!§g£]‡UÉt$JÓU4-nÄ«,!DîïÏ‡]˜è¿ÚÅ!DWÆ|·İ6Ë±¦yÇeEFM%õ„&NdõøÃ=ië*A ƒUÈIá0Ê¿¥ó¦@«E«<ÃÂ››-Ü+ŸZá>ÿ˜:à;£ó±Á¦RëÕã‘LízîVi\³>•©z³ä­V·lÆjÊ.ğPÁ‡?”¶ªÕÙ¾Å…‡š!9x)ÿRªB$—†;c^÷ük–
+Xº]Éy,ñ“y¯0û¤7¯˜­Û”„‡„¿J'[4^‘NˆÅÂF•ßnûÔÅ«B÷0±dß9~åôQiÛŞ‡{è-øßƒçã‚x‚¼í+ÖÎÑ¬5ã|Gºô>ÇìĞc4²xçÑ¼î½ªÑœÀp

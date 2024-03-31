@@ -1,0 +1,215 @@
+                   }
+                }, {
+                    type: 'Identifier',
+                    name: 'y',
+                    range: [3, 4],
+                    loc: {
+                        start: { line: 1, column: 3 },
+                        end: { line: 1, column: 4 }
+                    }
+                }],
+                range: [0, 4],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 4 }
+                }
+            },
+            range: [0, 4],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 4 }
+            }
+        },
+
+        '\\u0061': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'Identifier',
+                name: 'a',
+                range: [0, 6],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 6 }
+                }
+            },
+            range: [0, 6],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 6 }
+            }
+        },
+
+        'a\\u0061': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'Identifier',
+                name: 'aa',
+                range: [0, 7],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 7 }
+                }
+            },
+            range: [0, 7],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 7 }
+            }
+        },
+
+        '\\u0061a': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'Identifier',
+                name: 'aa',
+                range: [0, 7],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 7 }
+                }
+            },
+            range: [0, 7],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 7 }
+            }
+        },
+
+        '\\u0061a ': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'Identifier',
+                name: 'aa',
+                range: [0, 7],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 7 }
+                }
+            },
+            range: [0, 8],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 8 }
+            }
+        }
+    },
+
+    'If Statement': {
+
+        'if (morning) goodMorning()': {
+            type: 'IfStatement',
+            test: {
+                type: 'Identifier',
+                name: 'morning',
+                range: [4, 11],
+                loc: {
+                    start: { line: 1, column: 4 },
+                    end: { line: 1, column: 11 }
+                }
+            },
+            consequent: {
+                type: 'ExpressionStatement',
+                expression: {
+                    type: 'CallExpression',
+                    callee: {
+                        type: 'Identifier',
+                        name: 'goodMorning',
+                        range: [13, 24],
+                        loc: {
+                            start: { line: 1, column: 13 },
+                            end: { line: 1, column: 24 }
+                        }
+                    },
+                    'arguments': [],
+                    range: [13, 26],
+                    loc: {
+                        start: { line: 1, column: 13 },
+                        end: { line: 1, column: 26 }
+                    }
+                },
+                range: [13, 26],
+                loc: {
+                    start: { line: 1, column: 13 },
+                    end: { line: 1, column: 26 }
+                }
+            },
+            alternate: null,
+            range: [0, 26],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 26 }
+            }
+        },
+
+        'if (morning) (function(){})': {
+            type: 'IfStatement',
+            test: {
+                type: 'Identifier',
+                name: 'morning',
+                range: [4, 11],
+                loc: {
+                    start: { line: 1, column: 4 },
+                    end: { line: 1, column: 11 }
+                }
+            },
+            consequent: {
+                type: 'ExpressionStatement',
+                expression: {
+                    type: 'FunctionExpression',
+                    id: null,
+                    params: [],
+                    defaults: [],
+                    body: {
+                        type: 'BlockStatement',
+                        body: [],
+                        range: [24, 26],
+                        loc: {
+                            start: { line: 1, column: 24 },
+                            end: { line: 1, column: 26 }
+                        }
+                    },
+                    rest: null,
+                    generator: false,
+                    expression: false,
+                    range: [14, 26],
+                    loc: {
+                        start: { line: 1, column: 14 },
+                        end: { line: 1, column: 26 }
+                    }
+                },
+                range: [13, 27],
+                loc: {
+                    start: { line: 1, column: 13 },
+                    end: { line: 1, column: 27 }
+                }
+            },
+            alternate: null,
+            range: [0, 27],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 27 }
+            }
+        },
+
+        'if (morning) var x = 0;': {
+            type: 'IfStatement',
+            test: {
+                type: 'Identifier',
+                name: 'morning',
+                range: [4, 11],
+                loc: {
+                    start: { line: 1, column: 4 },
+                    end: { line: 1, column: 11 }
+                }
+            },
+            consequent: {
+                type: 'VariableDeclaration',
+                declarations: [{
+                    type: 'VariableDeclarator',
+                    id: {
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [17, 18],
+                        loc: {
+                            start: { line: 1, column: 17 },
+                            end: { line: 1, column: 1

@@ -1,0 +1,21 @@
+ureDynamicPollingWatchFile()(
+          fileName,
+          callback,
+          pollingInterval,
+          /*options*/
+          void 0
+        );
+      case 3 /* FixedChunkSizePolling */:
+        return ensureFixedChunkSizePollingWatchFile()(
+          fileName,
+          callback,
+          /* pollingInterval */
+          void 0,
+          /*options*/
+          void 0
+        );
+      case 4 /* UseFsEvents */:
+        return fsWatch(
+          fileName,
+          0 /* File */,
+          createFsWatchCallbackForFileWatcherC

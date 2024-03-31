@@ -1,0 +1,4 @@
+dialog) {
+      _createGrid();
+      var grid = axe._tree[0]._grid;
+      v

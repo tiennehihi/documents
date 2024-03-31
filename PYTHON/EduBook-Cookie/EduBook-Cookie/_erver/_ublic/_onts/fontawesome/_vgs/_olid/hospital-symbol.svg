@@ -1,0 +1,9 @@
+
+  ruler-horizontal: @fa-var-ruler-horizontal;
+  people-robbery: @fa-var-people-robbery;
+  lightbulb: @fa-var-lightbulb;
+  caret-left: @fa-var-caret-left;
+  circle-exclamation: @fa-var-circle-exclamation;
+  exclamation-circle: @fa-var-exclamation-circle;
+  school-circle-xmark: @fa-var-school-circle-xmark;
+  arrow-right-from-bracket: @fa-va

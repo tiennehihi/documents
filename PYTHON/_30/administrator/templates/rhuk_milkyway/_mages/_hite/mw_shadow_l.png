@@ -1,0 +1,6 @@
+import * as t from "@babel/types";
+export import Node = t.Node;
+export import RemovePropertiesOptions = t.RemovePropertiesOptions;
+
+declare const traverse: {
+    <S>(parent: Node, opts: TraverseOptions<S>, scope: Scope | unde

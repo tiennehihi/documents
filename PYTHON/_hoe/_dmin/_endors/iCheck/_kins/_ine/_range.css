@@ -1,0 +1,78 @@
+e CLOSE_SYNTAX:
+                        matchResult.match.push({
+                            type: item.type,
+                            syntax: item.syntax
+                        });
+                        break;
+
+                    default:
+                        matchResult.match.push({
+                            token: item.token.value,
+                            node: item.token.node
+                        });
+                        break;
+                }
+
+                item = item.prev;
+            }
+        }
+
+        return matchResult;
+    }
+
+    function matchAsTree(tokens, matchGraph, syntaxes) {
+        var matchResult = internalMatch(tokens, matchGraph, syntaxes || {});
+
+        if (matchResult.match === null) {
+            return matchResult;
+        }
+
+        var item = matchResult.match;
+        var host = matchResult.match = {
+            syntax: matchGraph.syntax || null,
+            match: []
+        };
+        var hostStack = [host];
+
+        // revert a list and start with 2nd item since 1st is a stub item
+        item = reverseList(item).prev;
+
+        // build a tree
+        while (item !== null) {
+            switch (item.type) {
+                case OPEN_SYNTAX:
+                    host.match.push(host = {
+                        syntax: item.syntax,
+                        match: []
+                    });
+                    hostStack.push(host);
+                    break;
+
+                case CLOSE_SYNTAX:
+                    hostStack.pop();
+                    host = hostStack[hostStack.length - 1];
+                    break;
+
+                default:
+                    host.match.push({
+                        syntax: item.syntax || null,
+                        token: item.token.value,
+                        node: item.token.node
+                    });
+            }
+
+            item = item.prev;
+        }
+
+        return matchResult;
+    }
+
+    var match = {
+        matchAsList: matchAsList,
+        matchAsTree: matchAsTree,
+        getTotalIterationCount: function() {
+            return totalIterationCount;
+        }
+    };
+
+    function getTrace

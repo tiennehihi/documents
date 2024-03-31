@@ -1,0 +1,19 @@
+var parse = require('../definition-syntax/parse');
+
+var MATCH = { type: 'Match' };
+var MISMATCH = { type: 'Mismatch' };
+var DISALLOW_EMPTY = { type: 'DisallowEmpty' };
+var LEFTPARENTHESIS = 40;  // (
+var RIGHTPARENTHESIS = 41; // )
+
+function createCondition(match, thenBranch, elseBranch) {
+    // reduce node count
+    if (thenBranch === MATCH && elseBranch === MISMATCH) {
+        return match;
+    }
+
+    if (match === MATCH && thenBranch === MATCH && elseBranch === MATCH) {
+        return match;
+    }
+
+    if (match.type === 'If' && match.else === MISMATCH && thenBranch === MATC

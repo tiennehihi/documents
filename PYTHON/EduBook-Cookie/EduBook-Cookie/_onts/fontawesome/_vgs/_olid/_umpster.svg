@@ -1,0 +1,15 @@
+ut options to `transformBundle` plugin hook ([#1813](https://github.com/rollup/rollup/pull/1813))
+
+## 0.53.0
+
+_2017-12-22_
+
+- Experimental dynamic import support ([#1790](https://github.com/rollup/rollup/pull/1790))
+- Unify config validation ([#1805](https://github.com/rollup/rollup/pull/1805))
+
+## 0.52.3
+
+_2017-12-19_
+
+- Properly hoist default exported functions in more situations ([#1799](https://github.com/rollup/rollup/pull/1799))
+- Allow plugin transformations to not overwrite source maps by returning null ([#1797](https://githu

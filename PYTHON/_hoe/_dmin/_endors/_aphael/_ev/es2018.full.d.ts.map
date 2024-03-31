@@ -1,0 +1,11 @@
+'use strict';
+
+//This file contains the ES6 extensions to the core Promises/A+ API
+
+var Promise = require('./core.js');
+
+module.exports = Promise;
+
+/* Static Functions */
+
+var TRUE = valuePromise(true);

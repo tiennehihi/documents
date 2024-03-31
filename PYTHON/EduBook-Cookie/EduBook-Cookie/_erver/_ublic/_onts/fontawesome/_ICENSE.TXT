@@ -1,0 +1,50 @@
+: "lpc",
+        percentages: "referToWidthOfContainingBlock",
+        groups: [
+          "CSS Shapes"
+        ],
+        initial: "0",
+        appliesto: "floats",
+        computed: "asSpecifiedRelativeToAbsoluteLengths",
+        order: "uniqueOrder",
+        status: "standard",
+        mdn_url: "https://developer.mozilla.org/docs/Web/CSS/shape-margin"
+      },
+      "shape-outside": {
+        syntax: "none | [ <shape-box> || <basic-shape> ] | <image>",
+        media: "visual",
+        inherited: false,
+        animationType: "basicShapeOtherwiseNo",
+        percentages: "no",
+        groups: [
+          "CSS Shapes"
+        ],
+        initial: "none",
+        appliesto: "floats",
+        computed: "asDefinedForBasicShapeWithAbsoluteURIOtherwiseAsSpecified",
+        order: "uniqueOrder",
+        status: "standard",
+        mdn_url: "https://developer.mozilla.org/docs/Web/CSS/shape-outside"
+      },
+      "tab-size": {
+        syntax: "<integer> | <length>",
+        media: "visual",
+        inherited: true,
+        animationType: "length",
+        percentages: "no",
+        groups: [
+          "CSS Text"
+        ],
+        initial: "8",
+        appliesto: "blockContainers",
+        computed: "specifiedIntegerOrAbsoluteLength",
+        order: "uniqueOrder",
+        status: "standard",
+        mdn_url: "https://developer.mozilla.org/docs/Web/CSS/tab-size"
+      },
+      "table-layout": {
+        syntax: "auto | fixed",
+        media: "visual",
+        inherited: false,
+        animationType: "discrete",
+        percentages:

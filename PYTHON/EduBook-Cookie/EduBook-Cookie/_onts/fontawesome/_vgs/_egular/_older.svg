@@ -1,0 +1,2 @@
+ /* Error */, "An_import_alias_cannot_reference_a_declaration_that_was_exported_using_export_type_1379", "An import alias cannot reference a declaration that was exported using 'export type'."),
+  An_import_alias_cannot_reference_a_declaration_that_was_imported_using_import_type: diag(1380, 1 /* Error */, 

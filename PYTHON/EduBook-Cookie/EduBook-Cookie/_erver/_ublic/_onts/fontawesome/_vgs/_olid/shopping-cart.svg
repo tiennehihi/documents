@@ -1,0 +1,22 @@
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "brands"
+        }
+      ]
+    }
+  },
+  "wordpress-simple": {
+    "changes": [
+      "5.0.0"
+    ],
+    "ligatures": [],
+    "unicode": "f411",
+    "label": "Wordpress Simple",
+    "voted": false,
+    "svgs": {
+      "classic": {
+        "brands": {
+          "lastModified": 1660014459,
+          "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M256 8C119.3 8 8 119.2 8 256c0 136.7 111.3 248 248 248s248-111.3 248-248C504 119.2 392.7 8 256 8zM33 256c0-32.3 6.9-63 19.3-90.7l106.4 291.4C84.3 420.

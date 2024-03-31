@@ -1,0 +1,42 @@
+/**
+ * @fileoverview enforce "for" loop update clause moving the counter in the right direction.(for-direction)
+ * @author Aladdin-ADD<hh_2013@foxmail.com>
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const { getStaticValue } = require("@eslint-community/eslint-utils");
+
+//------------------------------------------------------------------------------
+// Rule Definition
+//------------------------------------------------------------------------------
+
+/** @type {import('../shared/types').Rule} */
+module.exports = {
+    meta: {
+        type: "problem",
+
+        docs: {
+            description: "Enforce \"for\" loop update clause moving the counter in the right direction",
+            recommended: true,
+            url: "https://eslint.org/docs/latest/rules/for-direction"
+        },
+
+        fixable: null,
+        schema: [],
+
+        messages: {
+            incorrectDirection: "The update clause in this loop moves the variable in the wrong direction."
+        }
+    },
+
+    create(context) {
+        const { sourceCode } = context;
+
+        /**
+         * report an error.
+       

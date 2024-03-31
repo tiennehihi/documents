@@ -1,0 +1,17 @@
+/**
+ * @fileoverview Prevent string definitions for references and prevent referencing this.refs
+ * @author Tom Hastjarjanto
+ */
+
+'use strict';
+
+const componentUtil = require('../util/componentUtil');
+const docsUrl = require('../util/docsUrl');
+const report = require('../util/report');
+
+// ------------------------------------------------------------------------------
+// Rule Definition
+// ------------------------------------------------------------------------------
+
+const messages = {
+  thisRefsDeprecated: 'Using this.refs is deprecate

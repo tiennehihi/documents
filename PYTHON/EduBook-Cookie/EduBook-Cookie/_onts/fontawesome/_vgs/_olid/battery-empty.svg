@@ -1,0 +1,5 @@
+import unsupportedIterableToArray from "./unsupportedIterableToArray.js";
+export default function _createForOfIteratorHelper(o, allowArrayLike) {
+  var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
+  if (!it) {
+    if (Array.isArray(o) || (it = unsupportedIterab

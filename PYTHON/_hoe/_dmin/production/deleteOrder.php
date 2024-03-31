@@ -1,0 +1,1 @@
+hed()}render(e,t){this.shorthand||this.key.render(e,t),this.value.render(e,t,{isShorthandProperty:this.shorthand})}applyDeoptimizations(){this.deoptimized=!0,null!==this.declarationInit&&(this.declarationInit.deoptimizePath([M,M]),this.context.requestTreeshakingPass())}},PropertyDefinition:class extends ut{deoptimizePath(e){var t;n

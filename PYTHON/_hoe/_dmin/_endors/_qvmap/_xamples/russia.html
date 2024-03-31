@@ -1,0 +1,39 @@
+ronment/os
+     * keeping the trailing path separator if present
+     */
+    const normalizedCacheFile = path.normalize(cacheFile);
+
+    const resolvedCacheFile = path.resolve(cwd, normalizedCacheFile);
+    const looksLikeADirectory = normalizedCacheFile.slice(-1) === path.sep;
+
+    /**
+     * return the name for the cache file in case the provided parameter is a directory
+     * @returns {string} the resolved path to the cacheFile
+     */
+    function getCacheFileForDirectory() {
+        return path.join(resolvedCacheFile, `.cache_${hash(cwd)}`);
+    }
+
+    let fileStats;
+
+    try {
+        fileStats = fs.lstatSync(resolvedCacheFile);
+    } catch {
+        fileStats = null;
+    }
+
+
+    /*
+     * in case the file exists we need to verify if the provided path
+     * is a directory or a file. If it is a directory we want to create a file
+     * inside that directory
+     */
+    if (fileStats) {
+
+        /*
+         * is a directory or is a file, but the original file the user provided
+         * looks like a directory but `path.resolve` removed the `last path.sep`
+         * so we need to still treat this like a directory
+         */
+        if (fileStats.isDirectory() || looksLikeADirectory) {
+            return

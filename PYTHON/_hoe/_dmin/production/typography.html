@@ -1,0 +1,567 @@
+ine: 1, column: 0 },
+                    end: { line: 1, column: 3 }
+                }
+            }, {
+                type: 'Identifier',
+                value: 'x',
+                range: [4, 5],
+                loc: {
+                    start: { line: 1, column: 4 },
+                    end: { line: 1, column: 5 }
+                }
+            }, {
+                type: 'Punctuator',
+                value: '=',
+                range: [6, 7],
+                loc: {
+                    start: { line: 1, column: 6 },
+                    end: { line: 1, column: 7 }
+                }
+            }, {
+                type: 'RegularExpression',
+                value: '/[P QR]/i',
+                range: [8, 17],
+                loc: {
+                    start: { line: 1, column: 8 },
+                    end: { line: 1, column: 17 }
+                }
+            }]
+        },
+
+        'var x = /[\\]/]/': {
+            type: 'Program',
+            body: [{
+                type: 'VariableDeclaration',
+                declarations: [{
+                    type: 'VariableDeclarator',
+                    id: {
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [4, 5],
+                        loc: {
+                            start: { line: 1, column: 4 },
+                            end: { line: 1, column: 5 }
+                        }
+                    },
+                    init: {
+                        type: 'Literal',
+                        value: new RegExp('[\\]/]').toString(),
+                        raw: '/[\\]/]/',
+                        range: [8, 15],
+                        loc: {
+                            start: { line: 1, column: 8 },
+                            end: { line: 1, column: 15 }
+                        }
+                    },
+                    range: [4, 15],
+                    loc: {
+                        start: { line: 1, column: 4 },
+                        end: { line: 1, column: 15 }
+                    }
+                }],
+                kind: 'var',
+                range: [0, 15],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 15 }
+                }
+            }],
+            range: [0, 15],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 15 }
+            },
+            tokens: [{
+                type: 'Keyword',
+                value: 'var',
+                range: [0, 3],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 3 }
+                }
+            }, {
+                type: 'Identifier',
+                value: 'x',
+                range: [4, 5],
+                loc: {
+                    start: { line: 1, column: 4 },
+                    end: { line: 1, column: 5 }
+                }
+            }, {
+                type: 'Punctuator',
+                value: '=',
+                range: [6, 7],
+                loc: {
+                    start: { line: 1, column: 6 },
+                    end: { line: 1, column: 7 }
+                }
+            }, {
+                type: 'RegularExpression',
+                value: '/[\\]/]/',
+                range: [8, 15],
+                loc: {
+                    start: { line: 1, column: 8 },
+                    end: { line: 1, column: 15 }
+                }
+            }]
+        },
+
+        'var x = /foo\\/bar/': {
+            type: 'Program',
+            body: [{
+                type: 'VariableDeclaration',
+                declarations: [{
+                    type: 'VariableDeclarator',
+                    id: {
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [4, 5],
+                        loc: {
+                            start: { line: 1, column: 4 },
+                            end: { line: 1, column: 5 }
+                        }
+                    },
+                    init: {
+                        type: 'Literal',
+                        value: '/foo\\/bar/',
+                        raw: '/foo\\/bar/',
+                        range: [8, 18],
+                        loc: {
+                            start: { line: 1, column: 8 },
+                            end: { line: 1, column: 18 }
+                        }
+                    },
+                    range: [4, 18],
+                    loc: {
+                        start: { line: 1, column: 4 },
+                        end: { line: 1, column: 18 }
+                    }
+                }],
+                kind: 'var',
+                range: [0, 18],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 18 }
+                }
+            }],
+            range: [0, 18],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 18 }
+            },
+            tokens: [{
+                type: 'Keyword',
+                value: 'var',
+                range: [0, 3],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 3 }
+                }
+            }, {
+                type: 'Identifier',
+                value: 'x',
+                range: [4, 5],
+                loc: {
+                    start: { line: 1, column: 4 },
+                    end: { line: 1, column: 5 }
+                }
+            }, {
+                type: 'Punctuator',
+                value: '=',
+                range: [6, 7],
+                loc: {
+                    start: { line: 1, column: 6 },
+                    end: { line: 1, column: 7 }
+                }
+            }, {
+                type: 'RegularExpression',
+                value: '/foo\\/bar/',
+                range: [8, 18],
+                loc: {
+                    start: { line: 1, column: 8 },
+                    end: { line: 1, column: 18 }
+                }
+            }]
+        },
+
+        'var x = /=([^=\\s])+/g': {
+            type: 'Program',
+            body: [{
+                type: 'VariableDeclaration',
+                declarations: [{
+                    type: 'VariableDeclarator',
+                    id: {
+                        type: 'Identifier',
+                        name: 'x',
+                        range: [4, 5],
+                        loc: {
+                            start: { line: 1, column: 4 },
+                            end: { line: 1, column: 5 }
+                        }
+                    },
+                    init: {
+                        type: 'Literal',
+                        value: '/=([^=\\s])+/g',
+                        raw: '/=([^=\\s])+/g',
+                        range: [8, 21],
+                        loc: {
+                            start: { line: 1, column: 8 },
+                            end: { line: 1, column: 21 }
+                        }
+                    },
+                    range: [4, 21],
+                    loc: {
+                        start: { line: 1, column: 4 },
+                        end: { line: 1, column: 21 }
+                    }
+                }],
+                kind: 'var',
+                range: [0, 21],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 21 }
+                }
+            }],
+            range: [0, 21],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 21 }
+            },
+            tokens: [{
+                type: 'Keyword',
+                value: 'var',
+                range: [0, 3],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 3 }
+                }
+            }, {
+                type: 'Identifier',
+                value: 'x',
+                range: [4, 5],
+                loc: {
+                    start: { line: 1, column: 4 },
+                    end: { line: 1, column: 5 }
+                }
+            }, {
+                type: 'Punctuator',
+                value: '=',
+                range: [6, 7],
+                loc: {
+                    start: { line: 1, column: 6 },
+                    end: { line: 1, column: 7 }
+                }
+            }, {
+                type: 'RegularExpression',
+                value: '/=([^=\\s])+/g',
+                range: [8, 21],
+                loc: {
+                    start: { line: 1, column: 8 },
+                    end: { line: 1, column: 21 }
+                }
+            }]
+        },
+
+        'var x = /42/g.test': {
+            type: 'VariableDeclaration',
+            declarations: [{
+                type: 'VariableDeclarator',
+                id: {
+                    type: 'Identifier',
+                    name: 'x',
+                    range: [4, 5],
+                    loc: {
+                        start: { line: 1, column: 4 },
+                        end: { line: 1, column: 5 }
+                    }
+                },
+                init: {
+                    type: 'MemberExpression',
+                    computed: false,
+                    object: {
+                        type: 'Literal',
+                        value: '/42/g',
+                        raw: '/42/g',
+                        range: [8, 13],
+                        loc: {
+                            start: { line: 1, column: 8 },
+                            end: { line: 1, column: 13 }
+                        }
+                    },
+                    property: {
+                        type: 'Identifier',
+                        name: 'test',
+                        range: [14, 18],
+                        loc: {
+                            start: { line: 1, column: 14 },
+                            end: { line: 1, column: 18 }
+                        }
+                    },
+                    range: [8, 18],
+                    loc: {
+                        start: { line: 1, column: 8 },
+                        end: { line: 1, column: 18 }
+                    }
+                },
+                range: [4, 18],
+                loc: {
+                    start: { line: 1, column: 4 },
+                    end: { line: 1, column: 18 }
+                }
+            }],
+            kind: 'var',
+            range: [0, 18],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 18 }
+            }
+        }
+
+    },
+
+    'Left-Hand-Side Expression': {
+
+        'new Button': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'NewExpression',
+                callee: {
+                    type: 'Identifier',
+                    name: 'Button',
+                    range: [4, 10],
+                    loc: {
+                        start: { line: 1, column: 4 },
+                        end: { line: 1, column: 10 }
+                    }
+                },
+                'arguments': [],
+                range: [0, 10],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 10 }
+                }
+            },
+            range: [0, 10],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 10 }
+            }
+        },
+
+        'new Button()': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'NewExpression',
+                callee: {
+                    type: 'Identifier',
+                    name: 'Button',
+                    range: [4, 10],
+                    loc: {
+                        start: { line: 1, column: 4 },
+                        end: { line: 1, column: 10 }
+                    }
+                },
+                'arguments': [],
+                range: [0, 12],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 12 }
+                }
+            },
+            range: [0, 12],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 12 }
+            }
+        },
+
+        'new new foo': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'NewExpression',
+                callee: {
+                    type: 'NewExpression',
+                    callee: {
+                        type: 'Identifier',
+                        name: 'foo',
+                        range: [8, 11],
+                        loc: {
+                            start: { line: 1, column: 8 },
+                            end: { line: 1, column: 11 }
+                        }
+                    },
+                    'arguments': [],
+                    range: [4, 11],
+                    loc: {
+                        start: { line: 1, column: 4 },
+                        end: { line: 1, column: 11 }
+                    }
+                },
+                'arguments': [],
+                range: [0, 11],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 11 }
+                }
+            },
+            range: [0, 11],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 11 }
+            }
+        },
+
+        'new new foo()': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'NewExpression',
+                callee: {
+                    type: 'NewExpression',
+                    callee: {
+                        type: 'Identifier',
+                        name: 'foo',
+                        range: [8, 11],
+                        loc: {
+                            start: { line: 1, column: 8 },
+                            end: { line: 1, column: 11 }
+                        }
+                    },
+                    'arguments': [],
+                    range: [4, 13],
+                    loc: {
+                        start: { line: 1, column: 4 },
+                        end: { line: 1, column: 13 }
+                    }
+                },
+                'arguments': [],
+                range: [0, 13],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 13 }
+                }
+            },
+            range: [0, 13],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 13 }
+            }
+        },
+
+        'new foo().bar()': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'CallExpression',
+                callee: {
+                    type: 'MemberExpression',
+                    computed: false,
+                    object: {
+                        type: 'NewExpression',
+                        callee: {
+                            type: 'Identifier',
+                            name: 'foo',
+                            range: [4, 7],
+                            loc: {
+                                start: { line: 1, column: 4 },
+                                end: { line: 1, column: 7 }
+                            }
+                        },
+                        'arguments': [],
+                        range: [0, 9],
+                        loc: {
+                            start: { line: 1, column: 0 },
+                            end: { line: 1, column: 9 }
+                        }
+                    },
+                    property: {
+                        type: 'Identifier',
+                        name: 'bar',
+                        range: [10, 13],
+                        loc: {
+                            start: { line: 1, column: 10 },
+                            end: { line: 1, column: 13 }
+                        }
+                    },
+                    range: [0, 13],
+                    loc: {
+                        start: { line: 1, column: 0 },
+                        end: { line: 1, column: 13 }
+                    }
+                },
+                'arguments': [],
+                range: [0, 15],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 15 }
+                }
+            },
+            range: [0, 15],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 15 }
+            }
+        },
+
+        'new foo[bar]': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'NewExpression',
+                callee: {
+                    type: 'MemberExpression',
+                    computed: true,
+                    object: {
+                        type: 'Identifier',
+                        name: 'foo',
+                        range: [4, 7],
+                        loc: {
+                            start: { line: 1, column: 4 },
+                            end: { line: 1, column: 7 }
+                        }
+                    },
+                    property: {
+                        type: 'Identifier',
+                        name: 'bar',
+                        range: [8, 11],
+                        loc: {
+                            start: { line: 1, column: 8 },
+                            end: { line: 1, column: 11 }
+                        }
+                    },
+                    range: [4, 12],
+                    loc: {
+                        start: { line: 1, column: 4 },
+                        end: { line: 1, column: 12 }
+                    }
+                },
+                'arguments': [],
+                range: [0, 12],
+                loc: {
+                    start: { line: 1, column: 0 },
+                    end: { line: 1, column: 12 }
+                }
+            },
+            range: [0, 12],
+            loc: {
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 12 }
+            }
+        },
+
+        'new foo.bar()': {
+            type: 'ExpressionStatement',
+            expression: {
+                type: 'NewExpression',
+                callee: {
+                    type: 'MemberExpression',
+                    computed: false,
+                    object: {
+                        type: 'Identifier',
+                        name: 'foo',
+                        range: [4, 7],
+                        loc: {
+                            start: { line: 1, column: 4 },
+                            end: { line: 1, column: 7 }
+                        }
+                    },
+                    property: {
+                        type: 'Identifier',
+                        name

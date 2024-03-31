@@ -1,0 +1,9 @@
+turn; // No mutation happened
+                        let modified = rule.selector;
+                        // Rebuild the base selector, this is what plugin authors would do
+                        // as well. E.g.: `${variant}${separator}${className}`.
+                        // However, plugin authors probably also prepend or append certain
+                        // classes, pseudos, ids, ...
+                        let rebuiltBase = (0, _postcssselectorparser.default)((selectors)=>{
+                            selectors.walkClasses((classNode)=>{
+                                classNode.value = `${variant}$

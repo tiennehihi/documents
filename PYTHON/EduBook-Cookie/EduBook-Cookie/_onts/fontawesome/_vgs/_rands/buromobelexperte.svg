@@ -1,0 +1,12 @@
+import type {MacroKeywordDefinition, SchemaObject, Schema} from "ajv"
+import type {DefinitionOptions} from "./_types"
+import {metaSchemaRef} from "./_util"
+
+export default function getDef(opts?: DefinitionOptions): MacroKeywordDefinition {
+  return {
+    keyword: "deepProperties",
+    type: "object",
+    schemaType: "object",
+    macro: function (schema: Record<string, SchemaObject>) {
+      const allOf = []
+      for (const pointer in schema) allOf.push(getSchema(point

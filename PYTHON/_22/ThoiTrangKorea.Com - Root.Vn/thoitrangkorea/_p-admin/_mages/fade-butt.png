@@ -1,0 +1,16 @@
+rn this._for(new ForRange(varKind, name, from, to), () => forBody(name));
+    }
+    // `for-of` statement (in es5 mode replace with a normal for loop)
+    forOf(nameOrPrefix, iterable, forBody, varKind = scope_1.varKinds.const) {
+        const name = this._scope.toName(nameOrPrefix);
+        if (this.opts.es5) {
+            const arr = iterable instanceof code_1.Name ? iterable : this.var("_arr", iterable);
+            return this.forRange("_i", 0, (0, code_1._) `${arr}.length`, (i) => {
+                this.var(name, (0, code_1._) `${arr}[${i}]`);
+                forBody(name);
+            });
+        }
+        return this._for(new ForIter("of", varKind, name, iterable), () => forBody(name));
+    }
+    // `for-in` statement.
+    // With option `ownProperties` replaced with 

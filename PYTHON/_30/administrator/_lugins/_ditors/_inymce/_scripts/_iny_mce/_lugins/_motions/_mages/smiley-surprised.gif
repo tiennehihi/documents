@@ -1,0 +1,1 @@
+var r=function(r){return"string"==typeof r?r.length>0:"number"==typeof r},n=function(r,n,t){return void 0===n&&(n=0),void 0===t&&(t=Math.pow(10,n)),Math.round(t*r)/t+0},t=function(r,n,t){return void 0===n&&(n=0),void 0===t&&(t=1),r>t?t:r>n?r:n},u=function(r){return{c:t(r.c,0,100),m:t(r.m,0,100),y:t(r.y,0,100),k:t(r.k,0,100),a:t(r.a)}},e=fun

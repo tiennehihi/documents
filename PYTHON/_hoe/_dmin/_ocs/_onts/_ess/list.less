@@ -1,0 +1,3 @@
+              */function captureTomDoc(comments) {// collect lines up to first paragraph break
+  var lines = [];for (var i = 0; i < comments.length; i++) {var comment = comments[i];if (comment.value.match(/^\s*$/)) {break;}lines.push(comment.value.trim());} // return doctrine-like object
+  var statusMatch = lines.join(' ').match(/^(Public|Internal|Deprecated):\s*(.+)/);if (s

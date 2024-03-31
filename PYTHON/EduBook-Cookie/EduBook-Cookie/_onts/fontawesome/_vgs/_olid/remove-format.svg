@@ -1,0 +1,21 @@
+var TYPE = require('../tokenizer').TYPE;
+var WHITESPACE = TYPE.WhiteSpace;
+var COMMENT = TYPE.Comment;
+
+module.exports = function readSequence(recognizer) {
+    var children = this.createList();
+    var child = null;
+    var context = {
+        recognizer: recognizer,
+        space: null,
+        ignoreWS: false,
+        ignoreWSAfter: false
+    };
+
+    this.scanner.skipSC();
+
+    while (!this.scanner.eof) {
+        switch (this.scanner.tokenType) {
+            case COMMENT:
+                this.scanner.next();
+ 

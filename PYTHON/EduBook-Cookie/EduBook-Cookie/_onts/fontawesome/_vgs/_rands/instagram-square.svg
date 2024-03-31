@@ -1,0 +1,11 @@
+eywords that are ignored, which can be confusing.
+  - `true` - validate all keywords in the schemas with `$ref` (the default behaviour in versions before 5.0.0).
+- _loadSchema_: asynchronous function that will be used to load remote schemas when `compileAsync` [method](#api-compileAsync) is used and some reference is missing (option `missingRefs` should NOT be 'fail' or 'ignore'). This function should accept remote schema uri as a parameter and return a Promise that resolves to a schema. See example in [Asynchronous compilation](#asynchronous-schema-compilation).
+
+
+##### Options to modify validated data
+
+- _removeAdditional_: remove additional properties - see example in [Filtering data](#filtering-data). This option is not used if schema is added with `addMetaSchema` method. Option values:
+  - `false` (default) - not to remove additional properties
+  - `"all"` - all additional properties are removed, regardless of `additionalProperties` keyword in schema (and no validation is made for them).
+  - `true` - only additional 

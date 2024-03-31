@@ -1,0 +1,28 @@
+import type { Slice } from './Slice';
+export interface IWriter {
+    /**
+     * Uint8Array view of the current memory buffer.
+     */
+    uint8: Uint8Array;
+    /**
+     * DataView view of the current memory buffer.
+     */
+    view: DataView;
+    /**
+     * Position where last flush happened.
+     */
+    x0: number;
+    /**
+     * Current position in the internal buffer.
+     */
+    x: number;
+    u8(char: number): void;
+    u16(word: number): void;
+    u32(dword: number): void;
+    i32(dword: number): void;
+    u64(qword: number | bigint): void;
+    u8u16(u8: number, u16: number): void;
+    u8u32(u8: number, u32: number): void;
+    u8u64(u8: number, u64: number | bigint): void;
+    u8f32(u8: number, f64: number): void;
+    u8f64(u8: number, f64: number): vo

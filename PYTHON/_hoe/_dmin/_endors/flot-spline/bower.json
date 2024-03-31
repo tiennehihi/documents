@@ -1,0 +1,15 @@
+'use strict'
+
+const fs = require('../fs')
+const path = require('path')
+const util = require('util')
+const atLeastNode = require('at-least-node')
+
+const nodeSupportsBigInt = atLeastNode('10.5.0')
+const stat = (file) => nodeSupportsBigInt ? fs.stat(file, { bigint: true }) : fs.stat(file)
+const statSync = (file) => nodeSupportsBigInt ? fs.statSync(file, { bigint: true }) : fs.statSync(file)
+
+function getStats (src, dest) {
+  return Promise.all([
+    stat(src),
+    stat(dest).catch(err => {

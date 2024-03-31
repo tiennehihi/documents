@@ -1,0 +1,4 @@
+rryWin32} on Windows systems, {@link PathScurryDarwin} on
+ * Darwin (macOS) systems, {@link PathScurryPosix} on all others.
+ */
+exports.PathScurry = process.pl

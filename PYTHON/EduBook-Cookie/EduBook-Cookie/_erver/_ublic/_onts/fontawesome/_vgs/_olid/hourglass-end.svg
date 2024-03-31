@@ -1,0 +1,30 @@
+accessibility:
+  icons:
+    - accessible-icon
+    - audio-description
+    - braille
+    - circle-info
+    - circle-question
+    - closed-captioning
+    - ear-deaf
+    - ear-listen
+    - eye
+    - eye-low-vision
+    - fingerprint
+    - hands
+    - hands-asl-interpreting
+    - handshake-angle
+    - person-cane
+    - person-walking-with-cane
+    - phone-volume
+    - question
+    - tty
+    - universal-access
+    - wheelchair
+    - wheelchair-move
+  label: Accessibility
+alert:
+  icons:
+    - bell
+    - bell-slash
+  

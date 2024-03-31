@@ -1,0 +1,51 @@
+);
+        var type = constants.valtypes[valtypeByte];
+        var args = [];
+
+        for (var _i2 = 0; _i2 < localCount; _i2++) {
+          args.push(t.valtypeLiteral(type));
+        }
+
+        var localNode = function () {
+          var endLoc = getPosition();
+          return t.withLoc(t.instruction("local", args), endLoc, _startLoc5);
+        }();
+
+        locals.push(localNode);
+        dump([valtypeByte], type);
+
+        if (typeof type === "undefined") {
+          throw new CompileError("Unexpected valtype: " + toHex(valtypeByte));
+        }
+      }
+
+      code.push.apply(code, locals); // Decode instructions until the end
+
+      parseInstructionBlock(code);
+      var endLoc = getPosition();
+      state.elementsInCodeSection.push({
+        code: code,
+        locals: locals,
+        endLoc: endLoc,
+        startLoc: _startLoc4,
+        bodySize: bodySizeU32.value
+      });
+    }
+  }
+
+  function parseInstructionBlock(code) {
+    while (true) {
+      var _startLoc6 = getPosition();
+
+      var instructionAlreadyCreated = false;
+      var instructionByte = readByte();
+      eatBytes(1);
+
+      if (instructionByte === 0xfe) {
+        instructionByte = 0xfe00 + readByte();
+        eatBytes(1);
+      }
+
+      var instruction = constants.symbolsByByte[instructionByte];
+
+      if (typeof i

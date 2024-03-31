@@ -1,0 +1,1 @@
+?arguments[0]:{}).autoReplaceSvgRoot,t=void 0===t?h:t;(0<Object.keys(ut.styles).length||J.autoFetchSvg)&&y&&J.autoReplaceSvg&&Kt.dom.i2svg({node:t})};function Qt(a,t){return Object.defineProperty(a,"abstract",{get:t}),Object.defineProperty(a,"html",{get:function(){return a.abstract.map(vt)}}),Object.defineProperty(a,"node",{get:function(){if(y)

@@ -1,0 +1,12 @@
+d,
+  end: number,
+  innerComments: ?Array<Comment>,
+  leadingComments: ?Array<Comment>,
+  loc: {
+    end: {column: number, line: number},
+    start: {column: number, line: number},
+  },
+  start: number,
+  trailingComments: ?Array<Comment>,
+} | {
+  type: 'S

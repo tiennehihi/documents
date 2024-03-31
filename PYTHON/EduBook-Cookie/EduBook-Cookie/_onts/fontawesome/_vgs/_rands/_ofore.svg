@@ -1,0 +1,17 @@
+import fs from 'fs'
+import LRU from '@alloc/quick-lru'
+import * as sharedState from './sharedState'
+import { generateRules } from './generateRules'
+import log from '../util/log'
+import cloneNodes from '../util/cloneNodes'
+import { defaultExtractor } from './defaultExtractor'
+
+let env = sharedState.env
+
+const builtInExtractors = {
+  DEFAULT: defaultExtractor,
+}
+
+const builtInTransformers = {
+  DEFAULT: (content) => content,
+  svelte: (co

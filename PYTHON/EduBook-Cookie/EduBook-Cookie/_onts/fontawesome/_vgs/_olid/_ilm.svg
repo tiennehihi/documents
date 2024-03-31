@@ -1,0 +1,40 @@
+hunk)) {
+				const moduleHash = createHash(hashFunction);
+				module.updateHash(moduleHash, {
+					chunkGraph,
+					runtime: chunk.runtime,
+					runtimeTemplate
+				});
+				const moduleHashDigest = /** @type {string} */ (
+					moduleHash.digest(hashDigest)
+				);
+				const oldHash = chunkGraph.getModuleHash(module, chunk.runtime);
+				chunkGraph.setModuleHashes(
+					module,
+					chunk.runtime,
+					moduleHashDigest,
+					moduleHashDigest.slice(0, hashDigestLength)
+				);
+				codeGenerationJobsMap.get(oldHash).get(module).hash = moduleHashDigest;
+			}
+			const chunkHash = createHash(hashFunction);
+			chunkHash.update(chunk.hash);
+			chunkHash.update(this.hash);
+			const chunkHashDigest = /** @type {string} */ (
+				chunkHash.digest(hashDigest)
+			);
+			chunk.hash = chunkHashDigest;
+			chunk.renderedHash = chunk.hash.slice(0, hashDigestLength);
+			this.hooks.contentHash.call(chunk);
+		}
+		this.logger.timeEnd("hashing: process full hash modules");
+		return codeGenerationJobs;
+	}
+
+	/**
+	 * @param {string} file file name
+	 * @param {Source} source asset source
+	 * @param {AssetInfo} assetInfo extra asset information
+	 * @returns {void}
+	 */
+	emitAsset(file, 

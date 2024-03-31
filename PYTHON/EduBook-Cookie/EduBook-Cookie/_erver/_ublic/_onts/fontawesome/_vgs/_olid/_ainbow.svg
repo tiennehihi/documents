@@ -1,0 +1,41 @@
+4 6.2-22.6 0s-6.2-16.4 0-22.6l160-160c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6zM384 384H256V512L384 384z"
+        }
+      }
+    },
+    "familyStylesByLicense": {
+      "free": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ]
+    }
+  },
+  "shekel-sign": {
+    "aliases": {
+      "names": [
+        "ils",
+        "shekel",
+        "sheqel",
+        "sheqel-sign"
+      ],
+      "unicodes": {
+        "composite": [
+          "20aa"
+        ],
+        "secondary": [
+          "10f20b"
+        ]
+      }
+    },
+    "changes": [
+      "4.2.0",
+      "5.0.0",
+      "6.0.0-beta1",
+      "6.0.0-beta3",

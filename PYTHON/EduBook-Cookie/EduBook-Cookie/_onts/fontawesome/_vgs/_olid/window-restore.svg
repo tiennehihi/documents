@@ -1,0 +1,18 @@
+"use strict";
+
+const {
+  isValidFloatingPointNumber,
+  isValidSimpleColor,
+  parseFloatingPointNumber,
+  stripLeadingAndTrailingASCIIWhitespace,
+  stripNewlines,
+  splitOnCommas
+} = require("./strings");
+const {
+  isValidDateString,
+  isValidMonthString,
+  isValidTimeString,
+  isValidWeekString,
+  parseLocalDateAndTimeString,
+  serializeNormalizedDateAndTime
+} = 

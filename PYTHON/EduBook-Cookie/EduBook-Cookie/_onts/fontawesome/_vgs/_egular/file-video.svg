@@ -1,0 +1,15 @@
+handle;
+        if (handle && handle.setBlocking) {
+          handle.setBlocking(true);
+        }
+      },
+      bufferFrom,
+      base64decode: (input) => bufferFrom(input, "base64").toString("utf8"),
+      base64encode: (input) => bufferFrom(input).toString("base64"),
+      require: (baseDir, moduleName) => {
+        try {
+          const modulePath = resolveJSModule(moduleName, baseDir, nodeSystem);
+          return { module: require(modulePath), modulePath, error: void 0 };
+        } catch (error2) {
+          return { module: void 0, modulePath: void 0, error: error2 };
+  

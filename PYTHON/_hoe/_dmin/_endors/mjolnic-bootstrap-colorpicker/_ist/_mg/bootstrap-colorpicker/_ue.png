@@ -1,0 +1,21 @@
+{
+  "name": "bfj",
+  "version": "7.1.0",
+  "description": "Big-friendly JSON. Asynchronous streaming functions for large JSON data sets.",
+  "homepage": "https://gitlab.com/philbooth/bfj",
+  "bugs": "https://gitlab.com/philbooth/bfj/issues",
+  "license": "MIT",
+  "author": "Phil Booth (https://gitlab.com/philbooth)",
+  "main": "./src",
+  "keywords": [
+    "json",
+    "streamify",
+    "stringify",
+    "walk",
+    "parse",
+    "parser",
+    "serialise",
+    "serialize",
+    "read",
+    "write",
+    "a

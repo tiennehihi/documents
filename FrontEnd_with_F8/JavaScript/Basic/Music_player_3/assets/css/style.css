@@ -1,0 +1,415 @@
+:root{
+    --primary-color: #ec1f55;
+    --text-color: #333;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: inherit;
+}
+
+html {
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    align-items: center;
+}
+
+header div i {
+    font-size: 24px;
+}
+
+.titleWeb {
+    font-family: "Lobster Two", cursive;
+    font-size: 40px;
+    display: inline-block;
+    position: relative;
+    font-weight: 300;
+    color: #ffa6c9;
+    transform: translateX(-50%);
+    top: 8%;
+    left: 50%;
+}
+
+.player {
+    position: relative;
+    max-width: 100%;
+    max-height: 100vh;
+    height: 100vh;
+    margin: 0 auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../images/backgroundMorning.png');
+    background-size: cover;
+    -webkit-animation: bgMove 110s linear infinite;
+    animation: bgMove 110s linear infinite;
+}
+
+@keyframes bgMove {
+    50% {
+        background-position: 100%;
+    }
+}
+
+.dashboard {
+    /* display: none; */
+    max-width: 50%;
+    height: 58%;
+    width: 400px;
+    background-image: linear-gradient( 45deg, rgb(65, 88, 208) 0%, rgb(200, 80, 192) 50%, rgb(255, 204, 112) 100% );
+    padding: 4px;
+    border-radius: 10px;
+    position: absolute;
+    text-align: center;
+    left: 50%; /* Đặt left ở giữa khối lớn */
+    top: 50%; /* Đặt top ở giữa khối lớn */
+    transform: translate(-50%, -50%); /* Dịch chuyển lên trên và sang trái 50% để căn giữa */
+    padding: 25px;
+    /* transition: 0.5s; */
+}
+
+.control {
+    margin: 0 50px;
+    padding: 8px 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.control .btn {
+    padding: 18px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.control .btn.active {
+    color: var(--primary-color);
+}
+
+/* .cd {
+    width: 200px;
+    height: 200px;
+    background-color: red;
+    border-radius: 50%;
+    margin: 20px auto;
+}
+
+.cd-thumb {
+    border-radius: 50%;
+} */
+
+.cd {
+    display: flex;
+    margin: auto;
+    width: 200px;
+}
+
+.cd-thumb {
+    width: 100%;
+    padding-top: 100%;
+    border-radius: 50%;
+    background-color: #333;
+    background-size: cover;
+    margin: 20px auto;
+}
+
+.change-volum {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.icon-volum .btn {
+    font-size: 20px;
+    cursor: pointer;
+    margin-right: 4px;
+}
+
+.volum-progress {
+    margin-left: 6px;
+    width: 200px;
+}
+
+/* .downVol.btn,
+.offVol.btn {
+    display: none;
+} */
+
+.progress {
+    max-width: 100%;
+    width: 70%;
+    margin: 20px 0 15px 0;
+    cursor: pointer;
+}
+
+.progress:hover {
+    cursor: pointer;
+}
+
+input[type="range"].progress {
+    -webkit-appearance: none; /* Ẩn giao diện mặc định */
+    width: 80%; /* Chiều rộng của thanh input */
+    background-color: #f0f0f0; /* Màu nền của thanh input */
+    height: 6px; /* Chiều cao của thanh input */
+    border-radius: 5px; /* Bo góc */
+    outline: none; /* Loại bỏ đường viền khi được focus */
+    opacity: 0.7; /* Độ mờ của thanh input */
+    transition: opacity 0.2s; /* Hiệu ứng thay đổi độ mờ */
+}
+
+input[type="range"].progress:hover {
+    opacity: 1; /* Khi hover, độ mờ tăng lên */
+}
+
+input[type="range"].progress::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Ẩn giao diện mặc định */
+    appearance: none;
+    width: 10px; /* Chiều rộng của thumb */
+    height: 6px; /* Chiều cao của thumb */
+    background-color: #d122ce; /* Màu nền của thumb */
+    /* border-radius: 50%; Làm cho thumb trở thành hình tròn */
+    cursor: pointer; /* Đổi con trỏ thành con trỏ chỉ vào */
+}
+
+.playlist {
+    display: none;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: none;
+    max-width: 50%;
+    height: 58vh;
+    width: 400px;
+    margin: 0 auto;
+    /* animation: slideFadeIn .5s linear; */
+    background-image: linear-gradient( 45deg, rgb(65, 88, 208) 0%, rgb(200, 80, 192) 50%, rgb(255, 204, 112) 100% );
+    padding: 4px;
+    border-radius: 10px;
+    position: absolute;
+    text-align: center;
+    padding: 0;
+    left: 50%; /* Đặt left ở giữa khối lớn */
+    top: 50%; /* Đặt top ở giữa khối lớn */
+    transform: translate(-50%, -50%); 
+    /* opacity: 0.5; */
+    /* transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; */
+    /* Dịch chuyển lên trên và sang trái 50% để căn giữa */
+    transition: opacity linear 0.5s;
+    /* Trượt + xuất hiện dần từ từ vào áp dụng cho thuộc tính transform ở trên */
+    /* animation: FadeIn .5s ease-in-out; */
+}
+
+@keyframes slideFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(100%);
+    }
+}
+
+@keyframes FadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes FadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.playlist_body::-webkit-scrollbar,
+.playlist::-webkit-scrollbar {
+    display: none;
+    /* bỏ thanh cuộn */
+}
+
+.authorSong {
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.closeList .btn {
+    font-size: 28px;
+}
+
+
+.rating:hover,
+.closeList:hover,
+.music-bar:hover {
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+.playlist_header {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    color: #fff;
+}
+
+.playlist_header h1 {
+    font-size: 24px;
+}
+
+.playlist_body {
+    display: block;
+    max-height: 470px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: none;
+}
+
+.player .icon-pause {
+    display: none;
+}
+
+.player.playing .icon-pause {
+    display: inline-block;
+}
+
+.player.playing .icon-play {
+    display: none;
+}
+
+.song {
+    /* display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    background-color: #fff;
+    padding: 8px 16px;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1); */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    line-height: 20px;
+    padding: 10px 14px;
+    border-radius: 5px;
+    /* box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05); */
+    cursor: pointer;
+    transition: all ease-in 0.3s;
+    position: relative;
+    z-index: 1;
+}
+
+.song.itemActive {
+    background-image: linear-gradient( 45deg, rgb(65, 88, 208) 0%, rgb(200, 80, 192) 50%, rgb(255, 204, 112) 100% );
+}
+
+.song:hover {
+    transform: scale(1.03);
+}
+
+/* .song:itemActive {
+    opacity: 0.8;
+} */
+
+.song.itemActive .option,
+.song.itemActive .author,
+.song.itemActive .title {
+    color: #fff;
+}
+
+.song .thumb {
+    width: 44px;
+    height: 44px;
+    /* border-radius: 50%; */
+    background-size: cover;
+}
+
+.song .body {
+    flex: 1;
+    padding: 0 16px;
+    /* left: 0;
+    position: absolute; */
+    text-align: left;
+}
+
+.song .title {
+    font-size: 18px;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.song .author {
+    font-size: 12px;
+    color: #000;
+}
+
+.song .option {
+    padding: 16px 8px;
+    color: #e8e8e8;
+    font-size: 18px;
+}
+
+.song.itemActive {
+    border: solid 2px #fff;
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: 10px;
+}
+
+.infoSong {
+    width: 252px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.titleSong {
+    animation: marquee 10s linear infinite;
+    white-space: nowrap;
+    /* text-overflow: ellipsis; */
+    /* max-width: 252px; */
+    /* width: 100%; */
+    margin: 0 auto;
+    position: relative;
+}
+
+@keyframes marquee {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+}
+
+.rating.rated {
+    color: red;
+}
+
+.quantitySong {
+    display: flex;
+    align-items: center;
+}
+
+.quantitySong p {
+    margin-left: 4px;
+}
+

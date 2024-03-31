@@ -1,0 +1,23 @@
+{
+	"name": "make-dir",
+	"version": "3.1.0",
+	"description": "Make a directory and its parents if needed - Think `mkdir -p`",
+	"license": "MIT",
+	"repository": "sindresorhus/make-dir",
+	"funding": "https://github.com/sponsors/sindresorhus",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "sindresorhus.com"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"scripts": {
+		"test": "xo && nyc ava && tsd"
+	},
+	"files": [
+		"index.js",
+		"index.d.ts"
+	],
+	"keywo

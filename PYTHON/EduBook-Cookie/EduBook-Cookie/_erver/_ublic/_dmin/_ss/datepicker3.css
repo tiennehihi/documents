@@ -1,0 +1,709 @@
+nerator */);
+      }
+    }
+    checkTypeParameters(getEffectiveTypeParameterDeclarations(node));
+    checkUnmatchedJSDocParameters(node);
+    forEach(node.parameters, checkParameter);
+    if (node.type) {
+      checkSourceElement(node.type);
+    }
+    addLazyDiagnostic(checkSignatureDeclarationDiagnostics);
+    function checkSignatureDeclarationDiagnostics() {
+      checkCollisionWithArgumentsInGeneratedCode(node);
+      let returnTypeNode = getEffectiveReturnTypeNode(node);
+      let returnTypeErrorLocation = returnTypeNode;
+      if (isInJSFile(node)) {
+        const typeTag = getJSDocTypeTag(node);
+        if (typeTag && typeTag.typeExpression && isTypeReferenceNode(typeTag.typeExpression.type)) {
+          const signature = getSingleCallSignature(getTypeFromTypeNode(typeTag.typeExpression));
+          if (signature && signature.declaration) {
+            returnTypeNode = getEffectiveReturnTypeNode(signature.declaration);
+            returnTypeErrorLocation = typeTag.typeExpression.type;
+          }
+        }
+      }
+      if (noImplicitAny && !returnTypeNode) {
+        switch (node.kind) {
+          case 180 /* ConstructSignature */:
+            error2(node, Diagnostics.Construct_signature_which_lacks_return_type_annotation_implicitly_has_an_any_return_type);
+            break;
+          case 179 /* CallSignature */:
+            error2(node, Diagnostics.Call_signature_which_lacks_return_type_annotation_implicitly_has_an_any_return_type);
+            break;
+        }
+      }
+      if (returnTypeNode && returnTypeErrorLocation) {
+        const functionFlags2 = getFunctionFlags(node);
+        if ((functionFlags2 & (4 /* Invalid */ | 1 /* Generator */)) === 1 /* Generator */) {
+          const returnType = getTypeFromTypeNode(returnTypeNode);
+          if (returnType === voidType) {
+            error2(returnTypeErrorLocation, Diagnostics.A_generator_cannot_have_a_void_type_annotation);
+          } else {
+            checkGeneratorInstantiationAssignabilityToReturnType(returnType, functionFlags2, returnTypeErrorLocation);
+          }
+        } else if ((functionFlags2 & 3 /* AsyncGenerator */) === 2 /* Async */) {
+          checkAsyncFunctionReturnType(node, returnTypeNode, returnTypeErrorLocation);
+        }
+      }
+      if (node.kind !== 181 /* IndexSignature */ && node.kind !== 324 /* JSDocFunctionType */) {
+        registerForUnusedIdentifiersCheck(node);
+      }
+    }
+  }
+  function checkGeneratorInstantiationAssignabilityToReturnType(returnType, functionFlags, errorNode) {
+    const generatorYieldType = getIterationTypeOfGeneratorFunctionReturnType(0 /* Yield */, returnType, (functionFlags & 2 /* Async */) !== 0) || anyType;
+    const generatorReturnType = getIterationTypeOfGeneratorFunctionReturnType(1 /* Return */, returnType, (functionFlags & 2 /* Async */) !== 0) || generatorYieldType;
+    const generatorNextType = getIterationTypeOfGeneratorFunctionReturnType(2 /* Next */, returnType, (functionFlags & 2 /* Async */) !== 0) || unknownType;
+    const generatorInstantiation = createGeneratorReturnType(generatorYieldType, generatorReturnType, generatorNextType, !!(functionFlags & 2 /* Async */));
+    return checkTypeAssignableTo(generatorInstantiation, returnType, errorNode);
+  }
+  function checkClassForDuplicateDeclarations(node) {
+    const instanceNames = /* @__PURE__ */ new Map();
+    const staticNames = /* @__PURE__ */ new Map();
+    const privateIdentifiers = /* @__PURE__ */ new Map();
+    for (const member of node.members) {
+      if (member.kind === 176 /* Constructor */) {
+        for (const param of member.parameters) {
+          if (isParameterPropertyDeclaration(param, member) && !isBindingPattern(param.name)) {
+            addName(instanceNames, param.name, param.name.escapedText, 3 /* GetOrSetAccessor */);
+          }
+        }
+      } else {
+        const isStaticMember = isStatic(member);
+        const name = member.name;
+        if (!name) {
+          continue;
+        }
+        const isPrivate = isPrivateIdentifier(name);
+        const privateStaticFlags = isPrivate && isStaticMember ? 16 /* PrivateStatic */ : 0;
+        const names = isPrivate ? privateIdentifiers : isStaticMember ? staticNames : instanceNames;
+        const memberName = name && getEffectivePropertyNameForPropertyNameNode(name);
+        if (memberName) {
+          switch (member.kind) {
+            case 177 /* GetAccessor */:
+              addName(names, name, memberName, 1 /* GetAccessor */ | privateStaticFlags);
+              break;
+            case 178 /* SetAccessor */:
+              addName(names, name, memberName, 2 /* SetAccessor */ | privateStaticFlags);
+              break;
+            case 172 /* PropertyDeclaration */:
+              addName(names, name, memberName, 3 /* GetOrSetAccessor */ | privateStaticFlags);
+              break;
+            case 174 /* MethodDeclaration */:
+              addName(names, name, memberName, 8 /* Method */ | privateStaticFlags);
+              break;
+          }
+        }
+      }
+    }
+    function addName(names, location, name, meaning) {
+      const prev = names.get(name);
+      if (prev) {
+        if ((prev & 16 /* PrivateStatic */) !== (meaning & 16 /* PrivateStatic */)) {
+          error2(location, Diagnostics.Duplicate_identifier_0_Static_and_instance_elements_cannot_share_the_same_private_name, getTextOfNode(location));
+        } else {
+          const prevIsMethod = !!(prev & 8 /* Method */);
+          const isMethod = !!(meaning & 8 /* Method */);
+          if (prevIsMethod || isMethod) {
+            if (prevIsMethod !== isMethod) {
+              error2(location, Diagnostics.Duplicate_identifier_0, getTextOfNode(location));
+            }
+          } else if (prev & meaning & ~16 /* PrivateStatic */) {
+            error2(location, Diagnostics.Duplicate_identifier_0, getTextOfNode(location));
+          } else {
+            names.set(name, prev | meaning);
+          }
+        }
+      } else {
+        names.set(name, meaning);
+      }
+    }
+  }
+  function checkClassForStaticPropertyNameConflicts(node) {
+    for (const member of node.members) {
+      const memberNameNode = member.name;
+      const isStaticMember = isStatic(member);
+      if (isStaticMember && memberNameNode) {
+        const memberName = getEffectivePropertyNameForPropertyNameNode(memberNameNode);
+        switch (memberName) {
+          case "name":
+          case "length":
+          case "caller":
+          case "arguments":
+            if (useDefineForClassFields) {
+              break;
+            }
+          case "prototype":
+            const message = Diagnostics.Static_property_0_conflicts_with_built_in_property_Function_0_of_constructor_function_1;
+            const className = getNameOfSymbolAsWritten(getSymbolOfDeclaration(node));
+            error2(memberNameNode, message, memberName, className);
+            break;
+        }
+      }
+    }
+  }
+  function checkObjectTypeForDuplicateDeclarations(node) {
+    const names = /* @__PURE__ */ new Map();
+    for (const member of node.members) {
+      if (member.kind === 171 /* PropertySignature */) {
+        let memberName;
+        const name = member.name;
+        switch (name.kind) {
+          case 11 /* StringLiteral */:
+          case 9 /* NumericLiteral */:
+            memberName = name.text;
+            break;
+          case 80 /* Identifier */:
+            memberName = idText(name);
+            break;
+          default:
+            continue;
+        }
+        if (names.get(memberName)) {
+          error2(getNameOfDeclaration(member.symbol.valueDeclaration), Diagnostics.Duplicate_identifier_0, memberName);
+          error2(member.name, Diagnostics.Duplicate_identifier_0, memberName);
+        } else {
+          names.set(memberName, true);
+        }
+      }
+    }
+  }
+  function checkTypeForDuplicateIndexSignatures(node) {
+    if (node.kind === 264 /* InterfaceDeclaration */) {
+      const nodeSymbol = getSymbolOfDeclaration(node);
+      if (nodeSymbol.declarations && nodeSymbol.declarations.length > 0 && nodeSymbol.declarations[0] !== node) {
+        return;
+      }
+    }
+    const indexSymbol = getIndexSymbol(getSymbolOfDeclaration(node));
+    if (indexSymbol == null ? void 0 : indexSymbol.declarations) {
+      const indexSignatureMap = /* @__PURE__ */ new Map();
+      for (const declaration of indexSymbol.declarations) {
+        if (declaration.parameters.length === 1 && declaration.parameters[0].type) {
+          forEachType(getTypeFromTypeNode(declaration.parameters[0].type), (type) => {
+            const entry = indexSignatureMap.get(getTypeId(type));
+            if (entry) {
+              entry.declarations.push(declaration);
+            } else {
+              indexSignatureMap.set(getTypeId(type), { type, declarations: [declaration] });
+            }
+          });
+        }
+      }
+      indexSignatureMap.forEach((entry) => {
+        if (entry.declarations.length > 1) {
+          for (const declaration of entry.declarations) {
+            error2(declaration, Diagnostics.Duplicate_index_signature_for_type_0, typeToString(entry.type));
+          }
+        }
+      });
+    }
+  }
+  function checkPropertyDeclaration(node) {
+    if (!checkGrammarModifiers(node) && !checkGrammarProperty(node))
+      checkGrammarComputedPropertyName(node.name);
+    checkVariableLikeDeclaration(node);
+    setNodeLinksForPrivateIdentifierScope(node);
+    if (hasSyntacticModifier(node, 64 /* Abstract */) && node.kind === 172 /* PropertyDeclaration */ && node.initializer) {
+      error2(node, Diagnostics.Property_0_cannot_have_an_initializer_because_it_is_marked_abstract, declarationNameToString(node.name));
+    }
+  }
+  function checkPropertySignature(node) {
+    if (isPrivateIdentifier(node.name)) {
+      error2(node, Diagnostics.Private_identifiers_are_not_allowed_outside_class_bodies);
+    }
+    return checkPropertyDeclaration(node);
+  }
+  function checkMethodDeclaration(node) {
+    if (!checkGrammarMethod(node))
+      checkGrammarComputedPropertyName(node.name);
+    if (isMethodDeclaration(node) && node.asteriskToken && isIdentifier(node.name) && idText(node.name) === "constructor") {
+      error2(node.name, Diagnostics.Class_constructor_may_not_be_a_generator);
+    }
+    checkFunctionOrMethodDeclaration(node);
+    if (hasSyntacticModifier(node, 64 /* Abstract */) && node.kind === 174 /* MethodDeclaration */ && node.body) {
+      error2(node, Diagnostics.Method_0_cannot_have_an_implementation_because_it_is_marked_abstract, declarationNameToString(node.name));
+    }
+    if (isPrivateIdentifier(node.name) && !getContainingClass(node)) {
+      error2(node, Diagnostics.Private_identifiers_are_not_allowed_outside_class_bodies);
+    }
+    setNodeLinksForPrivateIdentifierScope(node);
+  }
+  function setNodeLinksForPrivateIdentifierScope(node) {
+    if (isPrivateIdentifier(node.name) && languageVersion < 99 /* ESNext */) {
+      for (let lexicalScope = getEnclosingBlockScopeContainer(node); !!lexicalScope; lexicalScope = getEnclosingBlockScopeContainer(lexicalScope)) {
+        getNodeLinks(lexicalScope).flags |= 1048576 /* ContainsClassWithPrivateIdentifiers */;
+      }
+      if (isClassExpression(node.parent)) {
+        const enclosingIterationStatement = getEnclosingIterationStatement(node.parent);
+        if (enclosingIterationStatement) {
+          getNodeLinks(node.name).flags |= 32768 /* BlockScopedBindingInLoop */;
+          getNodeLinks(enclosingIterationStatement).flags |= 4096 /* LoopWithCapturedBlockScopedBinding */;
+        }
+      }
+    }
+  }
+  function checkClassStaticBlockDeclaration(node) {
+    checkGrammarModifiers(node);
+    forEachChild(node, checkSourceElement);
+  }
+  function checkConstructorDeclaration(node) {
+    checkSignatureDeclaration(node);
+    if (!checkGrammarConstructorTypeParameters(node))
+      checkGrammarConstructorTypeAnnotation(node);
+    checkSourceElement(node.body);
+    const symbol = getSymbolOfDeclaration(node);
+    const firstDeclaration = getDeclarationOfKind(symbol, node.kind);
+    if (node === firstDeclaration) {
+      checkFunctionOrConstructorSymbol(symbol);
+    }
+    if (nodeIsMissing(node.body)) {
+      return;
+    }
+    addLazyDiagnostic(checkConstructorDeclarationDiagnostics);
+    return;
+    function isInstancePropertyWithInitializerOrPrivateIdentifierProperty(n) {
+      if (isPrivateIdentifierClassElementDeclaration(n)) {
+        return true;
+      }
+      return n.kind === 172 /* PropertyDeclaration */ && !isStatic(n) && !!n.initializer;
+    }
+    function checkConstructorDeclarationDiagnostics() {
+      const containingClassDecl = node.parent;
+      if (getClassExtendsHeritageElement(containingClassDecl)) {
+        captureLexicalThis(node.parent, containingClassDecl);
+        const classExtendsNull = classDeclarationExtendsNull(containingClassDecl);
+        const superCall = findFirstSuperCall(node.body);
+        if (superCall) {
+          if (classExtendsNull) {
+            error2(superCall, Diagnostics.A_constructor_cannot_contain_a_super_call_when_its_class_extends_null);
+          }
+          const superCallShouldBeRootLevel = !emitStandardClassFields && (some(node.parent.members, isInstancePropertyWithInitializerOrPrivateIdentifierProperty) || some(node.parameters, (p) => hasSyntacticModifier(p, 31 /* ParameterPropertyModifier */)));
+          if (superCallShouldBeRootLevel) {
+            if (!superCallIsRootLevelInConstructor(superCall, node.body)) {
+              error2(superCall, Diagnostics.A_super_call_must_be_a_root_level_statement_within_a_constructor_of_a_derived_class_that_contains_initialized_properties_parameter_properties_or_private_identifiers);
+            } else {
+              let superCallStatement;
+              for (const statement of node.body.statements) {
+                if (isExpressionStatement(statement) && isSuperCall(skipOuterExpressions(statement.expression))) {
+                  superCallStatement = statement;
+                  break;
+                }
+                if (nodeImmediatelyReferencesSuperOrThis(statement)) {
+                  break;
+                }
+              }
+              if (superCallStatement === void 0) {
+                error2(node, Diagnostics.A_super_call_must_be_the_first_statement_in_the_constructor_to_refer_to_super_or_this_when_a_derived_class_contains_initialized_properties_parameter_properties_or_private_identifiers);
+              }
+            }
+          }
+        } else if (!classExtendsNull) {
+          error2(node, Diagnostics.Constructors_for_derived_classes_must_contain_a_super_call);
+        }
+      }
+    }
+  }
+  function superCallIsRootLevelInConstructor(superCall, body) {
+    const superCallParent = walkUpParenthesizedExpressions(superCall.parent);
+    return isExpressionStatement(superCallParent) && superCallParent.parent === body;
+  }
+  function nodeImmediatelyReferencesSuperOrThis(node) {
+    if (node.kind === 108 /* SuperKeyword */ || node.kind === 110 /* ThisKeyword */) {
+      return true;
+    }
+    if (isThisContainerOrFunctionBlock(node)) {
+      return false;
+    }
+    return !!forEachChild(node, nodeImmediatelyReferencesSuperOrThis);
+  }
+  function checkAccessorDeclaration(node) {
+    if (isIdentifier(node.name) && idText(node.name) === "constructor" && isClassLike(node.parent)) {
+      error2(node.name, Diagnostics.Class_constructor_may_not_be_an_accessor);
+    }
+    addLazyDiagnostic(checkAccessorDeclarationDiagnostics);
+    checkSourceElement(node.body);
+    setNodeLinksForPrivateIdentifierScope(node);
+    function checkAccessorDeclarationDiagnostics() {
+      if (!checkGrammarFunctionLikeDeclaration(node) && !checkGrammarAccessor(node))
+        checkGrammarComputedPropertyName(node.name);
+      checkDecorators(node);
+      checkSignatureDeclaration(node);
+      if (node.kind === 177 /* GetAccessor */) {
+        if (!(node.flags & 33554432 /* Ambient */) && nodeIsPresent(node.body) && node.flags & 512 /* HasImplicitReturn */) {
+          if (!(node.flags & 1024 /* HasExplicitReturn */)) {
+            error2(node.name, Diagnostics.A_get_accessor_must_return_a_value);
+          }
+        }
+      }
+      if (node.name.kind === 167 /* ComputedPropertyName */) {
+        checkComputedPropertyName(node.name);
+      }
+      if (hasBindableName(node)) {
+        const symbol = getSymbolOfDeclaration(node);
+        const getter = getDeclarationOfKind(symbol, 177 /* GetAccessor */);
+        const setter = getDeclarationOfKind(symbol, 178 /* SetAccessor */);
+        if (getter && setter && !(getNodeCheckFlags(getter) & 1 /* TypeChecked */)) {
+          getNodeLinks(getter).flags |= 1 /* TypeChecked */;
+          const getterFlags = getEffectiveModifierFlags(getter);
+          const setterFlags = getEffectiveModifierFlags(setter);
+          if ((getterFlags & 64 /* Abstract */) !== (setterFlags & 64 /* Abstract */)) {
+            error2(getter.name, Diagnostics.Accessors_must_both_be_abstract_or_non_abstract);
+            error2(setter.name, Diagnostics.Accessors_must_both_be_abstract_or_non_abstract);
+          }
+          if (getterFlags & 4 /* Protected */ && !(setterFlags & (4 /* Protected */ | 2 /* Private */)) || getterFlags & 2 /* Private */ && !(setterFlags & 2 /* Private */)) {
+            error2(getter.name, Diagnostics.A_get_accessor_must_be_at_least_as_accessible_as_the_setter);
+            error2(setter.name, Diagnostics.A_get_accessor_must_be_at_least_as_accessible_as_the_setter);
+          }
+        }
+      }
+      const returnType = getTypeOfAccessors(getSymbolOfDeclaration(node));
+      if (node.kind === 177 /* GetAccessor */) {
+        checkAllCodePathsInNonVoidFunctionReturnOrThrow(node, returnType);
+      }
+    }
+  }
+  function checkMissingDeclaration(node) {
+    checkDecorators(node);
+  }
+  function getEffectiveTypeArgumentAtIndex(node, typeParameters, index) {
+    if (node.typeArguments && index < node.typeArguments.length) {
+      return getTypeFromTypeNode(node.typeArguments[index]);
+    }
+    return getEffectiveTypeArguments2(node, typeParameters)[index];
+  }
+  function getEffectiveTypeArguments2(node, typeParameters) {
+    return fillMissingTypeArguments(map(node.typeArguments, getTypeFromTypeNode), typeParameters, getMinTypeArgumentCount(typeParameters), isInJSFile(node));
+  }
+  function checkTypeArgumentConstraints(node, typeParameters) {
+    let typeArguments;
+    let mapper;
+    let result = true;
+    for (let i = 0; i < typeParameters.length; i++) {
+      const constraint = getConstraintOfTypeParameter(typeParameters[i]);
+      if (constraint) {
+        if (!typeArguments) {
+          typeArguments = getEffectiveTypeArguments2(node, typeParameters);
+          mapper = createTypeMapper(typeParameters, typeArguments);
+        }
+        result = result && checkTypeAssignableTo(
+          typeArguments[i],
+          instantiateType(constraint, mapper),
+          node.typeArguments[i],
+          Diagnostics.Type_0_does_not_satisfy_the_constraint_1
+        );
+      }
+    }
+    return result;
+  }
+  function getTypeParametersForTypeAndSymbol(type, symbol) {
+    if (!isErrorType(type)) {
+      return symbol.flags & 524288 /* TypeAlias */ && getSymbolLinks(symbol).typeParameters || (getObjectFlags(type) & 4 /* Reference */ ? type.target.localTypeParameters : void 0);
+    }
+    return void 0;
+  }
+  function getTypeParametersForTypeReferenceOrImport(node) {
+    const type = getTypeFromTypeNode(node);
+    if (!isErrorType(type)) {
+      const symbol = getNodeLinks(node).resolvedSymbol;
+      if (symbol) {
+        return getTypeParametersForTypeAndSymbol(type, symbol);
+      }
+    }
+    return void 0;
+  }
+  function checkTypeReferenceNode(node) {
+    checkGrammarTypeArguments(node, node.typeArguments);
+    if (node.kind === 183 /* TypeReference */ && !isInJSFile(node) && !isInJSDoc(node) && node.typeArguments && node.typeName.end !== node.typeArguments.pos) {
+      const sourceFile = getSourceFileOfNode(node);
+      if (scanTokenAtPosition(sourceFile, node.typeName.end) === 25 /* DotToken */) {
+        grammarErrorAtPos(node, skipTrivia(sourceFile.text, node.typeName.end), 1, Diagnostics.JSDoc_types_can_only_be_used_inside_documentation_comments);
+      }
+    }
+    forEach(node.typeArguments, checkSourceElement);
+    checkTypeReferenceOrImport(node);
+  }
+  function checkTypeReferenceOrImport(node) {
+    const type = getTypeFromTypeNode(node);
+    if (!isErrorType(type)) {
+      if (node.typeArguments) {
+        addLazyDiagnostic(() => {
+          const typeParameters = getTypeParametersForTypeReferenceOrImport(node);
+          if (typeParameters) {
+            checkTypeArgumentConstraints(node, typeParameters);
+          }
+        });
+      }
+      const symbol = getNodeLinks(node).resolvedSymbol;
+      if (symbol) {
+        if (some(symbol.declarations, (d) => isTypeDeclaration(d) && !!(d.flags & 536870912 /* Deprecated */))) {
+          addDeprecatedSuggestion(
+            getDeprecatedSuggestionNode(node),
+            symbol.declarations,
+            symbol.escapedName
+          );
+        }
+      }
+    }
+  }
+  function getTypeArgumentConstraint(node) {
+    const typeReferenceNode = tryCast(node.parent, isTypeReferenceType);
+    if (!typeReferenceNode)
+      return void 0;
+    const typeParameters = getTypeParametersForTypeReferenceOrImport(typeReferenceNode);
+    if (!typeParameters)
+      return void 0;
+    const constraint = getConstraintOfTypeParameter(typeParameters[typeReferenceNode.typeArguments.indexOf(node)]);
+    return constraint && instantiateType(constraint, createTypeMapper(typeParameters, getEffectiveTypeArguments2(typeReferenceNode, typeParameters)));
+  }
+  function checkTypeQuery(node) {
+    getTypeFromTypeQueryNode(node);
+  }
+  function checkTypeLiteral(node) {
+    forEach(node.members, checkSourceElement);
+    addLazyDiagnostic(checkTypeLiteralDiagnostics);
+    function checkTypeLiteralDiagnostics() {
+      const type = getTypeFromTypeLiteralOrFunctionOrConstructorTypeNode(node);
+      checkIndexConstraints(type, type.symbol);
+      checkTypeForDuplicateIndexSignatures(node);
+      checkObjectTypeForDuplicateDeclarations(node);
+    }
+  }
+  function checkArrayType(node) {
+    checkSourceElement(node.elementType);
+  }
+  function checkTupleType(node) {
+    let seenOptionalElement = false;
+    let seenRestElement = false;
+    for (const e of node.elements) {
+      let flags = getTupleElementFlags(e);
+      if (flags & 8 /* Variadic */) {
+        const type = getTypeFromTypeNode(e.type);
+        if (!isArrayLikeType(type)) {
+          error2(e, Diagnostics.A_rest_element_type_must_be_an_array_type);
+          break;
+        }
+        if (isArrayType(type) || isTupleType(type) && type.target.combinedFlags & 4 /* Rest */) {
+          flags |= 4 /* Rest */;
+        }
+      }
+      if (flags & 4 /* Rest */) {
+        if (seenRestElement) {
+          grammarErrorOnNode(e, Diagnostics.A_rest_element_cannot_follow_another_rest_element);
+          break;
+        }
+        seenRestElement = true;
+      } else if (flags & 2 /* Optional */) {
+        if (seenRestElement) {
+          grammarErrorOnNode(e, Diagnostics.An_optional_element_cannot_follow_a_rest_element);
+          break;
+        }
+        seenOptionalElement = true;
+      } else if (flags & 1 /* Required */ && seenOptionalElement) {
+        grammarErrorOnNode(e, Diagnostics.A_required_element_cannot_follow_an_optional_element);
+        break;
+      }
+    }
+    forEach(node.elements, checkSourceElement);
+    getTypeFromTypeNode(node);
+  }
+  function checkUnionOrIntersectionType(node) {
+    forEach(node.types, checkSourceElement);
+    getTypeFromTypeNode(node);
+  }
+  function checkIndexedAccessIndexType(type, accessNode) {
+    if (!(type.flags & 8388608 /* IndexedAccess */)) {
+      return type;
+    }
+    const objectType = type.objectType;
+    const indexType = type.indexType;
+    const objectIndexType = isGenericMappedType(objectType) && getMappedTypeNameTypeKind(objectType) === 2 /* Remapping */ ? getIndexTypeForMappedType(objectType, 0 /* None */) : getIndexType(objectType, 0 /* None */);
+    const hasNumberIndexInfo = !!getIndexInfoOfType(objectType, numberType);
+    if (everyType(indexType, (t) => isTypeAssignableTo(t, objectIndexType) || hasNumberIndexInfo && isApplicableIndexType(t, numberType))) {
+      if (accessNode.kind === 212 /* ElementAccessExpression */ && isAssignmentTarget(accessNode) && getObjectFlags(objectType) & 32 /* Mapped */ && getMappedTypeModifiers(objectType) & 1 /* IncludeReadonly */) {
+        error2(accessNode, Diagnostics.Index_signature_in_type_0_only_permits_reading, typeToString(objectType));
+      }
+      return type;
+    }
+    if (isGenericObjectType(objectType)) {
+      const propertyName = getPropertyNameFromIndex(indexType, accessNode);
+      if (propertyName) {
+        const propertySymbol = forEachType(getApparentType(objectType), (t) => getPropertyOfType(t, propertyName));
+        if (propertySymbol && getDeclarationModifierFlagsFromSymbol(propertySymbol) & 6 /* NonPublicAccessibilityModifier */) {
+          error2(accessNode, Diagnostics.Private_or_protected_member_0_cannot_be_accessed_on_a_type_parameter, unescapeLeadingUnderscores(propertyName));
+          return errorType;
+        }
+      }
+    }
+    error2(accessNode, Diagnostics.Type_0_cannot_be_used_to_index_type_1, typeToString(indexType), typeToString(objectType));
+    return errorType;
+  }
+  function checkIndexedAccessType(node) {
+    checkSourceElement(node.objectType);
+    checkSourceElement(node.indexType);
+    checkIndexedAccessIndexType(getTypeFromIndexedAccessTypeNode(node), node);
+  }
+  function checkMappedType(node) {
+    checkGrammarMappedType(node);
+    checkSourceElement(node.typeParameter);
+    checkSourceElement(node.nameType);
+    checkSourceElement(node.type);
+    if (!node.type) {
+      reportImplicitAny(node, anyType);
+    }
+    const type = getTypeFromMappedTypeNode(node);
+    const nameType = getNameTypeFromMappedType(type);
+    if (nameType) {
+      checkTypeAssignableTo(nameType, keyofConstraintType, node.nameType);
+    } else {
+      const constraintType = getConstraintTypeFromMappedType(type);
+      checkTypeAssignableTo(constraintType, keyofConstraintType, getEffectiveConstraintOfTypeParameter(node.typeParameter));
+    }
+  }
+  function checkGrammarMappedType(node) {
+    var _a;
+    if ((_a = node.members) == null ? void 0 : _a.length) {
+      return grammarErrorOnNode(node.members[0], Diagnostics.A_mapped_type_may_not_declare_properties_or_methods);
+    }
+  }
+  function checkThisType(node) {
+    getTypeFromThisTypeNode(node);
+  }
+  function checkTypeOperator(node) {
+    checkGrammarTypeOperatorNode(node);
+    checkSourceElement(node.type);
+  }
+  function checkConditionalType(node) {
+    forEachChild(node, checkSourceElement);
+  }
+  function checkInferType(node) {
+    if (!findAncestor(node, (n) => n.parent && n.parent.kind === 194 /* ConditionalType */ && n.parent.extendsType === n)) {
+      grammarErrorOnNode(node, Diagnostics.infer_declarations_are_only_permitted_in_the_extends_clause_of_a_conditional_type);
+    }
+    checkSourceElement(node.typeParameter);
+    const symbol = getSymbolOfDeclaration(node.typeParameter);
+    if (symbol.declarations && symbol.declarations.length > 1) {
+      const links = getSymbolLinks(symbol);
+      if (!links.typeParametersChecked) {
+        links.typeParametersChecked = true;
+        const typeParameter = getDeclaredTypeOfTypeParameter(symbol);
+        const declarations = getDeclarationsOfKind(symbol, 168 /* TypeParameter */);
+        if (!areTypeParametersIdentical(declarations, [typeParameter], (decl) => [decl])) {
+          const name = symbolToString(symbol);
+          for (const declaration of declarations) {
+            error2(declaration.name, Diagnostics.All_declarations_of_0_must_have_identical_constraints, name);
+          }
+        }
+      }
+    }
+    registerForUnusedIdentifiersCheck(node);
+  }
+  function checkTemplateLiteralType(node) {
+    for (const span of node.templateSpans) {
+      checkSourceElement(span.type);
+      const type = getTypeFromTypeNode(span.type);
+      checkTypeAssignableTo(type, templateConstraintType, span.type);
+    }
+    getTypeFromTypeNode(node);
+  }
+  function checkImportType(node) {
+    checkSourceElement(node.argument);
+    if (node.attributes) {
+      getResolutionModeOverride(node.attributes, grammarErrorOnNode);
+    }
+    checkTypeReferenceOrImport(node);
+  }
+  function checkNamedTupleMember(node) {
+    if (node.dotDotDotToken && node.questionToken) {
+      grammarErrorOnNode(node, Diagnostics.A_tuple_member_cannot_be_both_optional_and_rest);
+    }
+    if (node.type.kind === 190 /* OptionalType */) {
+      grammarErrorOnNode(node.type, Diagnostics.A_labeled_tuple_element_is_declared_as_optional_with_a_question_mark_after_the_name_and_before_the_colon_rather_than_after_the_type);
+    }
+    if (node.type.kind === 191 /* RestType */) {
+      grammarErrorOnNode(node.type, Diagnostics.A_labeled_tuple_element_is_declared_as_rest_with_a_before_the_name_rather_than_before_the_type);
+    }
+    checkSourceElement(node.type);
+    getTypeFromTypeNode(node);
+  }
+  function isPrivateWithinAmbient(node) {
+    return (hasEffectiveModifier(node, 2 /* Private */) || isPrivateIdentifierClassElementDeclaration(node)) && !!(node.flags & 33554432 /* Ambient */);
+  }
+  function getEffectiveDeclarationFlags(n, flagsToCheck) {
+    let flags = getCombinedModifierFlagsCached(n);
+    if (n.parent.kind !== 264 /* InterfaceDeclaration */ && n.parent.kind !== 263 /* ClassDeclaration */ && n.parent.kind !== 231 /* ClassExpression */ && n.flags & 33554432 /* Ambient */) {
+      const container = getEnclosingContainer(n);
+      if (container && container.flags & 128 /* ExportContext */ && !(flags & 128 /* Ambient */) && !(isModuleBlock(n.parent) && isModuleDeclaration(n.parent.parent) && isGlobalScopeAugmentation(n.parent.parent))) {
+        flags |= 32 /* Export */;
+      }
+      flags |= 128 /* Ambient */;
+    }
+    return flags & flagsToCheck;
+  }
+  function checkFunctionOrConstructorSymbol(symbol) {
+    addLazyDiagnostic(() => checkFunctionOrConstructorSymbolWorker(symbol));
+  }
+  function checkFunctionOrConstructorSymbolWorker(symbol) {
+    function getCanonicalOverload(overloads, implementation) {
+      const implementationSharesContainerWithFirstOverload = implementation !== void 0 && implementation.parent === overloads[0].parent;
+      return implementationSharesContainerWithFirstOverload ? implementation : overloads[0];
+    }
+    function checkFlagAgreementBetweenOverloads(overloads, implementation, flagsToCheck2, someOverloadFlags, allOverloadFlags) {
+      const someButNotAllOverloadFlags = someOverloadFlags ^ allOverloadFlags;
+      if (someButNotAllOverloadFlags !== 0) {
+        const canonicalFlags = getEffectiveDeclarationFlags(getCanonicalOverload(overloads, implementation), flagsToCheck2);
+        forEach(overloads, (o) => {
+          const deviation = getEffectiveDeclarationFlags(o, flagsToCheck2) ^ canonicalFlags;
+          if (deviation & 32 /* Export */) {
+            error2(getNameOfDeclaration(o), Diagnostics.Overload_signatures_must_all_be_exported_or_non_exported);
+          } else if (deviation & 128 /* Ambient */) {
+            error2(getNameOfDeclaration(o), Diagnostics.Overload_signatures_must_all_be_ambient_or_non_ambient);
+          } else if (deviation & (2 /* Private */ | 4 /* Protected */)) {
+            error2(getNameOfDeclaration(o) || o, Diagnostics.Overload_signatures_must_all_be_public_private_or_protected);
+          } else if (deviation & 64 /* Abstract */) {
+            error2(getNameOfDeclaration(o), Diagnostics.Overload_signatures_must_all_be_abstract_or_non_abstract);
+          }
+        });
+      }
+    }
+    function checkQuestionTokenAgreementBetweenOverloads(overloads, implementation, someHaveQuestionToken2, allHaveQuestionToken2) {
+      if (someHaveQuestionToken2 !== allHaveQuestionToken2) {
+        const canonicalHasQuestionToken = hasQuestionToken(getCanonicalOverload(overloads, implementation));
+        forEach(overloads, (o) => {
+          const deviation = hasQuestionToken(o) !== canonicalHasQuestionToken;
+          if (deviation) {
+            error2(getNameOfDeclaration(o), Diagnostics.Overload_signatures_must_all_be_optional_or_required);
+          }
+        });
+      }
+    }
+    const flagsToCheck = 32 /* Export */ | 128 /* Ambient */ | 2 /* Private */ | 4 /* Protected */ | 64 /* Abstract */;
+    let someNodeFlags = 0 /* None */;
+    let allNodeFlags = flagsToCheck;
+    let someHaveQuestionToken = false;
+    let allHaveQuestionToken = true;
+    let hasOverloads = false;
+    let bodyDeclaration;
+    let lastSeenNonAmbientDeclaration;
+    let previousDeclaration;
+    const declarations = symbol.declarations;
+    const isConstructor = (symbol.flags & 16384 /* Constructor */) !== 0;
+    function reportImplementationExpectedError(node) {
+      if (node.name && nodeIsMissing(node.name)) {
+        return;
+      }
+      let seen = false;
+      const subsequentNode = forEachChild(node.parent, (c) => {
+        if (seen) {
+          return c;
+        } else {
+          seen = c === node;
+        }
+      });
+      if (subsequentNode && subsequentNode.pos === node.end) {
+        if (subsequentNode.kind === node.kind) {
+          const errorNode2 = subsequentNode.name || subsequentNode;
+          const subsequentName = subsequentNode.name;
+          if (node.name && subsequentName && // both are private identifiers
+          (isPrivateIdentifier(node.name) && isPrivateIdentifier(subsequentName) && node.name.escapedText === subsequentName.escapedText || // Both are computed property names
+          isComputedPropertyName(node.name) && isComputedPropertyName(subsequentName) && isTypeIdenticalTo(checkComputedPropertyName(node.name), checkComputedProperty

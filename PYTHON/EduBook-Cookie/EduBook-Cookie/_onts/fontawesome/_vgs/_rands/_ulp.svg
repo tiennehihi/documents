@@ -1,0 +1,39 @@
+p level) this method returns a Promise. See [Asynchronous validation](#asynchronous-validation).
+
+
+##### .addSchema(Array&lt;Object&gt;|Object schema [, String key]) -&gt; Ajv
+
+Add schema(s) to validator instance. This method does not compile schemas (but it still validates them). Because of that dependencies can be added in any order and circular dependencies are supported. It also prevents unnecessary compilation of schemas that are containers for other schemas but not used as a whole.
+
+Array of schemas can be passed (schemas should have ids), the second parameter will be ignored.
+
+Key can be passed that can be used to reference the schema and will be used as the schema id if there is no id inside the schema. If the key is not passed, the schema id will be used as the key.
+
+
+Once the schema is added, it (and all the references inside it) can be referenced in other schemas and used to validate data.
+
+Although `addSchema` does not compile schemas, explicit compilation is not required - the schema will be compiled when it is used first time.
+
+By default the schema is validated against meta-schema before it is added, and if the schema does not pass validation the exception is thrown. This behaviour is controlled by `validateSchema` option.
+
+__Please note__: Ajv uses the [method chaining syntax](https://en.wikipedia.org/wiki/Method_chaining) for all methods with the prefix `add*` and `remove*`.
+This allows you to do nice things like the following.
+
+```javascript
+var validate = new Ajv().addSchema(schema).addFormat(name, regex).getSchema(uri);
+```
+
+##### .addMetaSchema(Array&lt;Object&gt;|Object schema [, String key]) -&gt; Ajv
+
+Adds meta schema(s) that can be used to validate other schemas. That function should be used instead of `addSchema` because there may be instance options that would compile a meta schema incorrectly (at the moment it is `removeAdditional` option).
+
+There is no need to explicitly add draft-07 meta schema (http://json-schema.org/draft-07/schema) - it is added by default, unless option `meta` is set to `false`. You only need to use it if you have a changed meta-schema that you want to use to validate your schemas. See `validateSchema`.
+
+
+##### <a name="api-validateschema"></a>.validateSchema(Object schema) -&gt; Boolean
+
+Validates schema. This method should be used to validate schemas rather than `validate` due to the inconsistency of `uri` format in JSON Schema standard.
+
+By default this method is called automatically when the schema is added, so you rarely need to use it directly.
+
+If schema doesn't have `$schema` property, it is valid

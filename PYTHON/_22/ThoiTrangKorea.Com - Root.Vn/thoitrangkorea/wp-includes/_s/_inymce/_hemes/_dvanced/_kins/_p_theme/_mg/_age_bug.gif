@@ -1,0 +1,4 @@
+import type { CodeKeywordDefinition, ErrorObject, AnySchema } from "../../types";
+export type PropertyNamesError = ErrorObject<"propertyNames", {
+    propertyName: string;
+}, AnySc

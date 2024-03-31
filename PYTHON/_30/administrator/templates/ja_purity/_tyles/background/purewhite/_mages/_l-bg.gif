@@ -1,0 +1,9 @@
+.match(Selectors[expr].Expression))) {
+                  result = Selectors[expr].Callback(match, source, mode, callback);
+                  if ('match' in result) { match = result.match; }
+                  vars = result.modvar;
+                  if (mode) {
+                     // add extra select() vars
+                     vars && S_VARS.indexOf(vars) < 0 && (S_VARS[S_VARS.length] = vars);
+                  } else {
+         

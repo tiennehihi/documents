@@ -1,0 +1,554 @@
+eableExpression(innerExpression)) {
+        const generatedName = factory2.getGeneratedNameForNode(name);
+        hoistVariableDeclaration(generatedName);
+        return factory2.updateComputedPropertyName(name, factory2.createAssignment(generatedName, expression));
+      }
+    }
+    return Debug.checkDefined(visitNode(name, visitor, isPropertyName));
+  }
+  function visitHeritageClause(node) {
+    if (node.token === 119 /* ImplementsKeyword */) {
+      return void 0;
+    }
+    return visitEachChild(node, visitor, context);
+  }
+  function visitExpressionWithTypeArguments(node) {
+    return factory2.updateExpressionWithTypeArguments(
+      node,
+      Debug.checkDefined(visitNode(node.expression, visitor, isLeftHandSideExpression)),
+      /*typeArguments*/
+      void 0
+    );
+  }
+  function shouldEmitFunctionLikeDeclaration(node) {
+    return !nodeIsMissing(node.body);
+  }
+  function visitPropertyDeclaration(node, parent) {
+    const isAmbient = node.flags & 33554432 /* Ambient */ || hasSyntacticModifier(node, 64 /* Abstract */);
+    if (isAmbient && !(legacyDecorators && hasDecorators(node))) {
+      return void 0;
+    }
+    let modifiers = isClassLike(parent) ? !isAmbient ? visitNodes2(node.modifiers, visitor, isModifierLike) : visitNodes2(node.modifiers, modifierElidingVisitor, isModifierLike) : visitNodes2(node.modifiers, decoratorElidingVisitor, isModifierLike);
+    modifiers = injectClassElementTypeMetadata(modifiers, node, parent);
+    if (isAmbient) {
+      return factory2.updatePropertyDeclaration(
+        node,
+        concatenate(modifiers, factory2.createModifiersFromModifierFlags(128 /* Ambient */)),
+        Debug.checkDefined(visitNode(node.name, visitor, isPropertyName)),
+        /*questionOrExclamationToken*/
+        void 0,
+        /*type*/
+        void 0,
+        /*initializer*/
+        void 0
+      );
+    }
+    return factory2.updatePropertyDeclaration(
+      node,
+      modifiers,
+      visitPropertyNameOfClassElement(node),
+      /*questionOrExclamationToken*/
+      void 0,
+      /*type*/
+      void 0,
+      visitNode(node.initializer, visitor, isExpression)
+    );
+  }
+  function visitConstructor(node) {
+    if (!shouldEmitFunctionLikeDeclaration(node)) {
+      return void 0;
+    }
+    return factory2.updateConstructorDeclaration(
+      node,
+      /*modifiers*/
+      void 0,
+      visitParameterList(node.parameters, visitor, context),
+      transformConstructorBody(node.body, node)
+    );
+  }
+  function transformConstructorBodyWorker(statementsOut, statementsIn, statementOffset, superPath, superPathDepth, initializerStatements) {
+    const superStatementIndex = superPath[superPathDepth];
+    const superStatement = statementsIn[superStatementIndex];
+    addRange(statementsOut, visitNodes2(statementsIn, visitor, isStatement, statementOffset, superStatementIndex - statementOffset));
+    if (isTryStatement(superStatement)) {
+      const tryBlockStatements = [];
+      transformConstructorBodyWorker(
+        tryBlockStatements,
+        superStatement.tryBlock.statements,
+        /*statementOffset*/
+        0,
+        superPath,
+        superPathDepth + 1,
+        initializerStatements
+      );
+      const tryBlockStatementsArray = factory2.createNodeArray(tryBlockStatements);
+      setTextRange(tryBlockStatementsArray, superStatement.tryBlock.statements);
+      statementsOut.push(factory2.updateTryStatement(
+        superStatement,
+        factory2.updateBlock(superStatement.tryBlock, tryBlockStatements),
+        visitNode(superStatement.catchClause, visitor, isCatchClause),
+        visitNode(superStatement.finallyBlock, visitor, isBlock)
+      ));
+    } else {
+      addRange(statementsOut, visitNodes2(statementsIn, visitor, isStatement, superStatementIndex, 1));
+      addRange(statementsOut, initializerStatements);
+    }
+    addRange(statementsOut, visitNodes2(statementsIn, visitor, isStatement, superStatementIndex + 1));
+  }
+  function transformConstructorBody(body, constructor) {
+    const parametersWithPropertyAssignments = constructor && filter(constructor.parameters, (p) => isParameterPropertyDeclaration(p, constructor));
+    if (!some(parametersWithPropertyAssignments)) {
+      return visitFunctionBody(body, visitor, context);
+    }
+    let statements = [];
+    resumeLexicalEnvironment();
+    const prologueStatementCount = factory2.copyPrologue(
+      body.statements,
+      statements,
+      /*ensureUseStrict*/
+      false,
+      visitor
+    );
+    const superPath = findSuperStatementIndexPath(body.statements, prologueStatementCount);
+    const parameterPropertyAssignments = mapDefined(parametersWithPropertyAssignments, transformParameterWithPropertyAssignment);
+    if (superPath.length) {
+      transformConstructorBodyWorker(
+        statements,
+        body.statements,
+        prologueStatementCount,
+        superPath,
+        /*superPathDepth*/
+        0,
+        parameterPropertyAssignments
+      );
+    } else {
+      addRange(statements, parameterPropertyAssignments);
+      addRange(statements, visitNodes2(body.statements, visitor, isStatement, prologueStatementCount));
+    }
+    statements = factory2.mergeLexicalEnvironment(statements, endLexicalEnvironment());
+    const block = factory2.createBlock(
+      setTextRange(factory2.createNodeArray(statements), body.statements),
+      /*multiLine*/
+      true
+    );
+    setTextRange(
+      block,
+      /*location*/
+      body
+    );
+    setOriginalNode(block, body);
+    return block;
+  }
+  function transformParameterWithPropertyAssignment(node) {
+    const name = node.name;
+    if (!isIdentifier(name)) {
+      return void 0;
+    }
+    const propertyName = setParent(setTextRange(factory2.cloneNode(name), name), name.parent);
+    setEmitFlags(propertyName, 3072 /* NoComments */ | 96 /* NoSourceMap */);
+    const localName = setParent(setTextRange(factory2.cloneNode(name), name), name.parent);
+    setEmitFlags(localName, 3072 /* NoComments */);
+    return startOnNewLine(
+      removeAllComments(
+        setTextRange(
+          setOriginalNode(
+            factory2.createExpressionStatement(
+              factory2.createAssignment(
+                setTextRange(
+                  factory2.createPropertyAccessExpression(
+                    factory2.createThis(),
+                    propertyName
+                  ),
+                  node.name
+                ),
+                localName
+              )
+            ),
+            node
+          ),
+          moveRangePos(node, -1)
+        )
+      )
+    );
+  }
+  function visitMethodDeclaration(node, parent) {
+    if (!(node.transformFlags & 1 /* ContainsTypeScript */)) {
+      return node;
+    }
+    if (!shouldEmitFunctionLikeDeclaration(node)) {
+      return void 0;
+    }
+    let modifiers = isClassLike(parent) ? visitNodes2(node.modifiers, visitor, isModifierLike) : visitNodes2(node.modifiers, decoratorElidingVisitor, isModifierLike);
+    modifiers = injectClassElementTypeMetadata(modifiers, node, parent);
+    return factory2.updateMethodDeclaration(
+      node,
+      modifiers,
+      node.asteriskToken,
+      visitPropertyNameOfClassElement(node),
+      /*questionToken*/
+      void 0,
+      /*typeParameters*/
+      void 0,
+      visitParameterList(node.parameters, visitor, context),
+      /*type*/
+      void 0,
+      visitFunctionBody(node.body, visitor, context)
+    );
+  }
+  function shouldEmitAccessorDeclaration(node) {
+    return !(nodeIsMissing(node.body) && hasSyntacticModifier(node, 64 /* Abstract */));
+  }
+  function visitGetAccessor(node, parent) {
+    if (!(node.transformFlags & 1 /* ContainsTypeScript */)) {
+      return node;
+    }
+    if (!shouldEmitAccessorDeclaration(node)) {
+      return void 0;
+    }
+    let modifiers = isClassLike(parent) ? visitNodes2(node.modifiers, visitor, isModifierLike) : visitNodes2(node.modifiers, decoratorElidingVisitor, isModifierLike);
+    modifiers = injectClassElementTypeMetadata(modifiers, node, parent);
+    return factory2.updateGetAccessorDeclaration(
+      node,
+      modifiers,
+      visitPropertyNameOfClassElement(node),
+      visitParameterList(node.parameters, visitor, context),
+      /*type*/
+      void 0,
+      visitFunctionBody(node.body, visitor, context) || factory2.createBlock([])
+    );
+  }
+  function visitSetAccessor(node, parent) {
+    if (!(node.transformFlags & 1 /* ContainsTypeScript */)) {
+      return node;
+    }
+    if (!shouldEmitAccessorDeclaration(node)) {
+      return void 0;
+    }
+    let modifiers = isClassLike(parent) ? visitNodes2(node.modifiers, visitor, isModifierLike) : visitNodes2(node.modifiers, decoratorElidingVisitor, isModifierLike);
+    modifiers = injectClassElementTypeMetadata(modifiers, node, parent);
+    return factory2.updateSetAccessorDeclaration(
+      node,
+      modifiers,
+      visitPropertyNameOfClassElement(node),
+      visitParameterList(node.parameters, visitor, context),
+      visitFunctionBody(node.body, visitor, context) || factory2.createBlock([])
+    );
+  }
+  function visitFunctionDeclaration(node) {
+    if (!shouldEmitFunctionLikeDeclaration(node)) {
+      return factory2.createNotEmittedStatement(node);
+    }
+    const updated = factory2.updateFunctionDeclaration(
+      node,
+      visitNodes2(node.modifiers, modifierVisitor, isModifier),
+      node.asteriskToken,
+      node.name,
+      /*typeParameters*/
+      void 0,
+      visitParameterList(node.parameters, visitor, context),
+      /*type*/
+      void 0,
+      visitFunctionBody(node.body, visitor, context) || factory2.createBlock([])
+    );
+    if (isExportOfNamespace(node)) {
+      const statements = [updated];
+      addExportMemberAssignment(statements, node);
+      return statements;
+    }
+    return updated;
+  }
+  function visitFunctionExpression(node) {
+    if (!shouldEmitFunctionLikeDeclaration(node)) {
+      return factory2.createOmittedExpression();
+    }
+    const updated = factory2.updateFunctionExpression(
+      node,
+      visitNodes2(node.modifiers, modifierVisitor, isModifier),
+      node.asteriskToken,
+      node.name,
+      /*typeParameters*/
+      void 0,
+      visitParameterList(node.parameters, visitor, context),
+      /*type*/
+      void 0,
+      visitFunctionBody(node.body, visitor, context) || factory2.createBlock([])
+    );
+    return updated;
+  }
+  function visitArrowFunction(node) {
+    const updated = factory2.updateArrowFunction(
+      node,
+      visitNodes2(node.modifiers, modifierVisitor, isModifier),
+      /*typeParameters*/
+      void 0,
+      visitParameterList(node.parameters, visitor, context),
+      /*type*/
+      void 0,
+      node.equalsGreaterThanToken,
+      visitFunctionBody(node.body, visitor, context)
+    );
+    return updated;
+  }
+  function visitParameter(node) {
+    if (parameterIsThisKeyword(node)) {
+      return void 0;
+    }
+    const updated = factory2.updateParameterDeclaration(
+      node,
+      visitNodes2(node.modifiers, (node2) => isDecorator(node2) ? visitor(node2) : void 0, isModifierLike),
+      node.dotDotDotToken,
+      Debug.checkDefined(visitNode(node.name, visitor, isBindingName)),
+      /*questionToken*/
+      void 0,
+      /*type*/
+      void 0,
+      visitNode(node.initializer, visitor, isExpression)
+    );
+    if (updated !== node) {
+      setCommentRange(updated, node);
+      setTextRange(updated, moveRangePastModifiers(node));
+      setSourceMapRange(updated, moveRangePastModifiers(node));
+      setEmitFlags(updated.name, 64 /* NoTrailingSourceMap */);
+    }
+    return updated;
+  }
+  function visitVariableStatement(node) {
+    if (isExportOfNamespace(node)) {
+      const variables = getInitializedVariables(node.declarationList);
+      if (variables.length === 0) {
+        return void 0;
+      }
+      return setTextRange(
+        factory2.createExpressionStatement(
+          factory2.inlineExpressions(
+            map(variables, transformInitializedVariable)
+          )
+        ),
+        node
+      );
+    } else {
+      return visitEachChild(node, visitor, context);
+    }
+  }
+  function transformInitializedVariable(node) {
+    const name = node.name;
+    if (isBindingPattern(name)) {
+      return flattenDestructuringAssignment(
+        node,
+        visitor,
+        context,
+        0 /* All */,
+        /*needsValue*/
+        false,
+        createNamespaceExportExpression
+      );
+    } else {
+      return setTextRange(
+        factory2.createAssignment(
+          getNamespaceMemberNameWithSourceMapsAndWithoutComments(name),
+          Debug.checkDefined(visitNode(node.initializer, visitor, isExpression))
+        ),
+        /*location*/
+        node
+      );
+    }
+  }
+  function visitVariableDeclaration(node) {
+    const updated = factory2.updateVariableDeclaration(
+      node,
+      Debug.checkDefined(visitNode(node.name, visitor, isBindingName)),
+      /*exclamationToken*/
+      void 0,
+      /*type*/
+      void 0,
+      visitNode(node.initializer, visitor, isExpression)
+    );
+    if (node.type) {
+      setTypeNode(updated.name, node.type);
+    }
+    return updated;
+  }
+  function visitParenthesizedExpression(node) {
+    const innerExpression = skipOuterExpressions(node.expression, ~6 /* Assertions */);
+    if (isAssertionExpression(innerExpression)) {
+      const expression = visitNode(node.expression, visitor, isExpression);
+      Debug.assert(expression);
+      return factory2.createPartiallyEmittedExpression(expression, node);
+    }
+    return visitEachChild(node, visitor, context);
+  }
+  function visitAssertionExpression(node) {
+    const expression = visitNode(node.expression, visitor, isExpression);
+    Debug.assert(expression);
+    return factory2.createPartiallyEmittedExpression(expression, node);
+  }
+  function visitNonNullExpression(node) {
+    const expression = visitNode(node.expression, visitor, isLeftHandSideExpression);
+    Debug.assert(expression);
+    return factory2.createPartiallyEmittedExpression(expression, node);
+  }
+  function visitSatisfiesExpression(node) {
+    const expression = visitNode(node.expression, visitor, isExpression);
+    Debug.assert(expression);
+    return factory2.createPartiallyEmittedExpression(expression, node);
+  }
+  function visitCallExpression(node) {
+    return factory2.updateCallExpression(
+      node,
+      Debug.checkDefined(visitNode(node.expression, visitor, isExpression)),
+      /*typeArguments*/
+      void 0,
+      visitNodes2(node.arguments, visitor, isExpression)
+    );
+  }
+  function visitNewExpression(node) {
+    return factory2.updateNewExpression(
+      node,
+      Debug.checkDefined(visitNode(node.expression, visitor, isExpression)),
+      /*typeArguments*/
+      void 0,
+      visitNodes2(node.arguments, visitor, isExpression)
+    );
+  }
+  function visitTaggedTemplateExpression(node) {
+    return factory2.updateTaggedTemplateExpression(
+      node,
+      Debug.checkDefined(visitNode(node.tag, visitor, isExpression)),
+      /*typeArguments*/
+      void 0,
+      Debug.checkDefined(visitNode(node.template, visitor, isTemplateLiteral))
+    );
+  }
+  function visitJsxSelfClosingElement(node) {
+    return factory2.updateJsxSelfClosingElement(
+      node,
+      Debug.checkDefined(visitNode(node.tagName, visitor, isJsxTagNameExpression)),
+      /*typeArguments*/
+      void 0,
+      Debug.checkDefined(visitNode(node.attributes, visitor, isJsxAttributes))
+    );
+  }
+  function visitJsxJsxOpeningElement(node) {
+    return factory2.updateJsxOpeningElement(
+      node,
+      Debug.checkDefined(visitNode(node.tagName, visitor, isJsxTagNameExpression)),
+      /*typeArguments*/
+      void 0,
+      Debug.checkDefined(visitNode(node.attributes, visitor, isJsxAttributes))
+    );
+  }
+  function shouldEmitEnumDeclaration(node) {
+    return !isEnumConst(node) || shouldPreserveConstEnums(compilerOptions);
+  }
+  function visitEnumDeclaration(node) {
+    if (!shouldEmitEnumDeclaration(node)) {
+      return factory2.createNotEmittedStatement(node);
+    }
+    const statements = [];
+    let emitFlags = 4 /* AdviseOnEmitNode */;
+    const varAdded = addVarForEnumOrModuleDeclaration(statements, node);
+    if (varAdded) {
+      if (moduleKind !== 4 /* System */ || currentLexicalScope !== currentSourceFile) {
+        emitFlags |= 1024 /* NoLeadingComments */;
+      }
+    }
+    const parameterName = getNamespaceParameterName(node);
+    const containerName = getNamespaceContainerName(node);
+    const exportName = isExportOfNamespace(node) ? factory2.getExternalModuleOrNamespaceExportName(
+      currentNamespaceContainerName,
+      node,
+      /*allowComments*/
+      false,
+      /*allowSourceMaps*/
+      true
+    ) : factory2.getDeclarationName(
+      node,
+      /*allowComments*/
+      false,
+      /*allowSourceMaps*/
+      true
+    );
+    let moduleArg = factory2.createLogicalOr(
+      exportName,
+      factory2.createAssignment(
+        exportName,
+        factory2.createObjectLiteralExpression()
+      )
+    );
+    if (isExportOfNamespace(node)) {
+      const localName = factory2.getLocalName(
+        node,
+        /*allowComments*/
+        false,
+        /*allowSourceMaps*/
+        true
+      );
+      moduleArg = factory2.createAssignment(localName, moduleArg);
+    }
+    const enumStatement = factory2.createExpressionStatement(
+      factory2.createCallExpression(
+        factory2.createFunctionExpression(
+          /*modifiers*/
+          void 0,
+          /*asteriskToken*/
+          void 0,
+          /*name*/
+          void 0,
+          /*typeParameters*/
+          void 0,
+          [factory2.createParameterDeclaration(
+            /*modifiers*/
+            void 0,
+            /*dotDotDotToken*/
+            void 0,
+            parameterName
+          )],
+          /*type*/
+          void 0,
+          transformEnumBody(node, containerName)
+        ),
+        /*typeArguments*/
+        void 0,
+        [moduleArg]
+      )
+    );
+    setOriginalNode(enumStatement, node);
+    if (varAdded) {
+      setSyntheticLeadingComments(enumStatement, void 0);
+      setSyntheticTrailingComments(enumStatement, void 0);
+    }
+    setTextRange(enumStatement, node);
+    addEmitFlags(enumStatement, emitFlags);
+    statements.push(enumStatement);
+    return statements;
+  }
+  function transformEnumBody(node, localName) {
+    const savedCurrentNamespaceLocalName = currentNamespaceContainerName;
+    currentNamespaceContainerName = localName;
+    const statements = [];
+    startLexicalEnvironment();
+    const members = map(node.members, transformEnumMember);
+    insertStatementsAfterStandardPrologue(statements, endLexicalEnvironment());
+    addRange(statements, members);
+    currentNamespaceContainerName = savedCurrentNamespaceLocalName;
+    return factory2.createBlock(
+      setTextRange(
+        factory2.createNodeArray(statements),
+        /*location*/
+        node.members
+      ),
+      /*multiLine*/
+      true
+    );
+  }
+  function transformEnumMember(member) {
+    const name = getExpressionForPropertyName(
+      member,
+      /*generateNameForComputedPropertyName*/
+      false
+    );
+    const valueExpression = transformEnumMemberDeclarationValue(member);
+    const innerAssignment = factory2.createAssignment(
+      factory2.createElementAccessExpression(
+        currentNamespaceContainerName,
+    

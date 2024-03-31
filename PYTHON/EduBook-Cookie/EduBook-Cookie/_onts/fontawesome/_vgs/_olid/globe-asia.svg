@@ -1,0 +1,36 @@
+lassLike(node.parent) && isPropertyDeclaration(node) && !hasAccessorModifier(node);
+}
+function isMethodOrAccessor(node) {
+  switch (node.kind) {
+    case 174 /* MethodDeclaration */:
+    case 177 /* GetAccessor */:
+    case 178 /* SetAccessor */:
+      return true;
+    default:
+      return false;
+  }
+}
+function isNamedClassElement(node) {
+  switch (node.kind) {
+    case 174 /* MethodDeclaration */:
+    case 177 /* GetAccessor */:
+    case 178 /* SetAccessor */:
+    case 172 /* PropertyDeclaration */:
+      return true;
+    default:
+      return false;
+  }
+}
+function isModifierLike(node) {
+  return isModifier(node) || isDecorator(node);
+}
+function isTypeElement(node) {
+  const kind = node.kind;
+  return kind === 180 /* ConstructSignature */ || kind === 179 /* CallSignature */ || kind === 171 /* PropertySignature */ || kind === 173 /* MethodSignature */ || kind === 181 /* IndexSignature */ || kind === 177 /* GetAccessor */ || kind === 178 /* SetAccessor */;
+}
+function isClassOrTypeElement(node) {
+  return isTypeElement(node) || isClassElement(node);
+}
+function isObjectLiteralElementLike(node) {
+  const kind = node.kind;
+  return kind === 303 /* PropertyAssignment */ || kind === 304 /* ShorthandPropertyAssignment */ || kind === 305 /* SpreadAssignment */ || kind === 174 /* MethodDeclaration */ || kind === 177 /* GetAccessor */ || k

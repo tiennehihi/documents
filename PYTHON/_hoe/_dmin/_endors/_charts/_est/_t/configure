@@ -1,0 +1,1 @@
+avaScript engines don't self-host\n\t// `Array.prototype.sort`. This makes sense because C++ will likely remain\n\t// faster than JS when doing raw CPU-intensive sorting. However, when using a\n\t// custom comparator function, calling back and fort

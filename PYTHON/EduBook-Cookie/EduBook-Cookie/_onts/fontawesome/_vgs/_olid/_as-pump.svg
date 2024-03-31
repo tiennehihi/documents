@@ -1,0 +1,3 @@
+_recursive_file_watching_functionality_6714", "Specify how directories are watched on systems that lack recursive file-watching functionality."),
+  Specify_how_the_TypeScript_watch_mode_works: diag(6715, 3 /* Message */, "Specify_how_the_TypeScript_watch_mode_works_6715", "Specify how the TypeScript watch mode works."),
+  Require_undeclared_properties_from_index_signatures_to_use_element_accesses: diag(6717, 3 /* Message */, "Require_undeclared_properties_from_index_signatures_to_use_element_accesses_6717", "Require undeclared properties from index sig

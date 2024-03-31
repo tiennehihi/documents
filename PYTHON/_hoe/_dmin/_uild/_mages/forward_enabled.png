@@ -1,0 +1,46 @@
+'use strict'
+
+let { SourceMapConsumer, SourceMapGenerator } = require('source-map-js')
+let { dirname, relative, resolve, sep } = require('path')
+let { pathToFileURL } = require('url')
+
+let Input = require('./input')
+
+let sourceMapAvailable = Boolean(SourceMapConsumer && SourceMapGenerator)
+let pathAvailable = Boolean(dirname && resolve && relative && sep)
+
+class MapGenerator {
+  constructor(stringify, root, opts, cssString) {
+    this.stringify = stringify
+    this.mapOpts = opts.map || {}
+    this.root = root
+    this.opts = opts
+    this.css = cssString
+    this.originalCSS = cssString
+    this.usesFileUrls = !this.mapOpts.from && this.mapOpts.absolute
+
+    this.memoizedFileURLs = new Map()
+    this.memoizedPaths = new Map()
+    this.memoizedURLs = new Map()
+  }
+
+  addAnnotation() {
+    let content
+
+    if (this.isInline()) {
+      content =
+        'data:application/json;base64,' + this.toBase64(this.map.toString())
+    } else if (typeof this.mapOpts.annotation === 'string') {
+      content = this.mapOpts.annotation
+    } else if (typeof this.mapOpts.annotation === 'function') {
+      content = this.mapOpts.annotation(this.opts.to, this.root)
+    } else {
+      content = this.outputFile() + '.map'
+    }
+    let eol = '\n'
+    if (this.css.includes('\r\n')) eol = '\r\n'
+
+    this.css += eol + '/*# sourceMappingURL=' + content + ' */'
+  }
+
+  applyPrevMaps()

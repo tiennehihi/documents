@@ -1,0 +1,7 @@
+import { isPair } from '../nodes/identity.js';
+import { Pair } from '../nodes/Pair.js';
+import { YAMLMap } from '../nodes/YAMLMap.js';
+import { YAMLSeq } from '../nodes/YAMLSeq.js';
+import { resolveEnd } from './resolve-end.js';
+import { resolveProps } from './resolve-props.js';
+im

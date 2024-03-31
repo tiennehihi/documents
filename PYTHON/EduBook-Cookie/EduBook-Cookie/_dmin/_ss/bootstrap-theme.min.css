@@ -1,0 +1,541 @@
+  }
+  function createExportExpression(name, value, location, liveBinding) {
+    return setTextRange(
+      liveBinding && languageVersion !== 0 /* ES3 */ ? factory2.createCallExpression(
+        factory2.createPropertyAccessExpression(
+          factory2.createIdentifier("Object"),
+          "defineProperty"
+        ),
+        /*typeArguments*/
+        void 0,
+        [
+          factory2.createIdentifier("exports"),
+          factory2.createStringLiteralFromNode(name),
+          factory2.createObjectLiteralExpression([
+            factory2.createPropertyAssignment("enumerable", factory2.createTrue()),
+            factory2.createPropertyAssignment(
+              "get",
+              factory2.createFunctionExpression(
+                /*modifiers*/
+                void 0,
+                /*asteriskToken*/
+                void 0,
+                /*name*/
+                void 0,
+                /*typeParameters*/
+                void 0,
+                /*parameters*/
+                [],
+                /*type*/
+                void 0,
+                factory2.createBlock([factory2.createReturnStatement(value)])
+              )
+            )
+          ])
+        ]
+      ) : factory2.createAssignment(
+        factory2.createPropertyAccessExpression(
+          factory2.createIdentifier("exports"),
+          factory2.cloneNode(name)
+        ),
+        value
+      ),
+      location
+    );
+  }
+  function modifierVisitor(node) {
+    switch (node.kind) {
+      case 95 /* ExportKeyword */:
+      case 90 /* DefaultKeyword */:
+        return void 0;
+    }
+    return node;
+  }
+  function onEmitNode(hint, node, emitCallback) {
+    if (node.kind === 312 /* SourceFile */) {
+      currentSourceFile = node;
+      currentModuleInfo = moduleInfoMap[getOriginalNodeId(currentSourceFile)];
+      previousOnEmitNode(hint, node, emitCallback);
+      currentSourceFile = void 0;
+      currentModuleInfo = void 0;
+    } else {
+      previousOnEmitNode(hint, node, emitCallback);
+    }
+  }
+  function onSubstituteNode(hint, node) {
+    node = previousOnSubstituteNode(hint, node);
+    if (node.id && noSubstitution[node.id]) {
+      return node;
+    }
+    if (hint === 1 /* Expression */) {
+      return substituteExpression(node);
+    } else if (isShorthandPropertyAssignment(node)) {
+      return substituteShorthandPropertyAssignment(node);
+    }
+    return node;
+  }
+  function substituteShorthandPropertyAssignment(node) {
+    const name = node.name;
+    const exportedOrImportedName = substituteExpressionIdentifier(name);
+    if (exportedOrImportedName !== name) {
+      if (node.objectAssignmentInitializer) {
+        const initializer = factory2.createAssignment(exportedOrImportedName, node.objectAssignmentInitializer);
+        return setTextRange(factory2.createPropertyAssignment(name, initializer), node);
+      }
+      return setTextRange(factory2.createPropertyAssignment(name, exportedOrImportedName), node);
+    }
+    return node;
+  }
+  function substituteExpression(node) {
+    switch (node.kind) {
+      case 80 /* Identifier */:
+        return substituteExpressionIdentifier(node);
+      case 213 /* CallExpression */:
+        return substituteCallExpression(node);
+      case 215 /* TaggedTemplateExpression */:
+        return substituteTaggedTemplateExpression(node);
+      case 226 /* BinaryExpression */:
+        return substituteBinaryExpression(node);
+    }
+    return node;
+  }
+  function substituteCallExpression(node) {
+    if (isIdentifier(node.expression)) {
+      const expression = substituteExpressionIdentifier(node.expression);
+      noSubstitution[getNodeId(expression)] = true;
+      if (!isIdentifier(expression) && !(getEmitFlags(node.expression) & 8192 /* HelperName */)) {
+        return addInternalEmitFlags(
+          factory2.updateCallExpression(
+            node,
+            expression,
+            /*typeArguments*/
+            void 0,
+            node.arguments
+          ),
+          16 /* IndirectCall */
+        );
+      }
+    }
+    return node;
+  }
+  function substituteTaggedTemplateExpression(node) {
+    if (isIdentifier(node.tag)) {
+      const tag = substituteExpressionIdentifier(node.tag);
+      noSubstitution[getNodeId(tag)] = true;
+      if (!isIdentifier(tag) && !(getEmitFlags(node.tag) & 8192 /* HelperName */)) {
+        return addInternalEmitFlags(
+          factory2.updateTaggedTemplateExpression(
+            node,
+            tag,
+            /*typeArguments*/
+            void 0,
+            node.template
+          ),
+          16 /* IndirectCall */
+        );
+      }
+    }
+    return node;
+  }
+  function substituteExpressionIdentifier(node) {
+    var _a, _b;
+    if (getEmitFlags(node) & 8192 /* HelperName */) {
+      const externalHelpersModuleName = getExternalHelpersModuleName(currentSourceFile);
+      if (externalHelpersModuleName) {
+        return factory2.createPropertyAccessExpression(externalHelpersModuleName, node);
+      }
+      return node;
+    } else if (!(isGeneratedIdentifier(node) && !(node.emitNode.autoGenerate.flags & 64 /* AllowNameSubstitution */)) && !isLocalName(node)) {
+      const exportContainer = resolver.getReferencedExportContainer(node, isExportName(node));
+      if (exportContainer && exportContainer.kind === 312 /* SourceFile */) {
+        return setTextRange(
+          factory2.createPropertyAccessExpression(
+            factory2.createIdentifier("exports"),
+            factory2.cloneNode(node)
+          ),
+          /*location*/
+          node
+        );
+      }
+      const importDeclaration = resolver.getReferencedImportDeclaration(node);
+      if (importDeclaration) {
+        if (isImportClause(importDeclaration)) {
+          return setTextRange(
+            factory2.createPropertyAccessExpression(
+              factory2.getGeneratedNameForNode(importDeclaration.parent),
+              factory2.createIdentifier("default")
+            ),
+            /*location*/
+            node
+          );
+        } else if (isImportSpecifier(importDeclaration)) {
+          const name = importDeclaration.propertyName || importDeclaration.name;
+          return setTextRange(
+            factory2.createPropertyAccessExpression(
+              factory2.getGeneratedNameForNode(((_b = (_a = importDeclaration.parent) == null ? void 0 : _a.parent) == null ? void 0 : _b.parent) || importDeclaration),
+              factory2.cloneNode(name)
+            ),
+            /*location*/
+            node
+          );
+        }
+      }
+    }
+    return node;
+  }
+  function substituteBinaryExpression(node) {
+    if (isAssignmentOperator(node.operatorToken.kind) && isIdentifier(node.left) && (!isGeneratedIdentifier(node.left) || isFileLevelReservedGeneratedIdentifier(node.left)) && !isLocalName(node.left)) {
+      const exportedNames = getExports(node.left);
+      if (exportedNames) {
+        let expression = node;
+        for (const exportName of exportedNames) {
+          noSubstitution[getNodeId(expression)] = true;
+          expression = createExportExpression(
+            exportName,
+            expression,
+            /*location*/
+            node
+          );
+        }
+        return expression;
+      }
+    }
+    return node;
+  }
+  function getExports(name) {
+    if (!isGeneratedIdentifier(name)) {
+      const importDeclaration = resolver.getReferencedImportDeclaration(name);
+      if (importDeclaration) {
+        return currentModuleInfo == null ? void 0 : currentModuleInfo.exportedBindings[getOriginalNodeId(importDeclaration)];
+      }
+      const bindingsSet = /* @__PURE__ */ new Set();
+      const declarations = resolver.getReferencedValueDeclarations(name);
+      if (declarations) {
+        for (const declaration of declarations) {
+          const bindings = currentModuleInfo == null ? void 0 : currentModuleInfo.exportedBindings[getOriginalNodeId(declaration)];
+          if (bindings) {
+            for (const binding of bindings) {
+              bindingsSet.add(binding);
+            }
+          }
+        }
+        if (bindingsSet.size) {
+          return arrayFrom(bindingsSet);
+        }
+      }
+    } else if (isFileLevelReservedGeneratedIdentifier(name)) {
+      const exportSpecifiers = currentModuleInfo == null ? void 0 : currentModuleInfo.exportSpecifiers.get(name);
+      if (exportSpecifiers) {
+        const exportedNames = [];
+        for (const exportSpecifier of exportSpecifiers) {
+          exportedNames.push(exportSpecifier.name);
+        }
+        return exportedNames;
+      }
+    }
+  }
+}
+var dynamicImportUMDHelper = {
+  name: "typescript:dynamicimport-sync-require",
+  scoped: true,
+  text: `
+            var __syncRequire = typeof module === "object" && typeof module.exports === "object";`
+};
+
+// src/compiler/transformers/module/system.ts
+function transformSystemModule(context) {
+  const {
+    factory: factory2,
+    startLexicalEnvironment,
+    endLexicalEnvironment,
+    hoistVariableDeclaration
+  } = context;
+  const compilerOptions = context.getCompilerOptions();
+  const resolver = context.getEmitResolver();
+  const host = context.getEmitHost();
+  const previousOnSubstituteNode = context.onSubstituteNode;
+  const previousOnEmitNode = context.onEmitNode;
+  context.onSubstituteNode = onSubstituteNode;
+  context.onEmitNode = onEmitNode;
+  context.enableSubstitution(80 /* Identifier */);
+  context.enableSubstitution(304 /* ShorthandPropertyAssignment */);
+  context.enableSubstitution(226 /* BinaryExpression */);
+  context.enableSubstitution(236 /* MetaProperty */);
+  context.enableEmitNotification(312 /* SourceFile */);
+  const moduleInfoMap = [];
+  const exportFunctionsMap = [];
+  const noSubstitutionMap = [];
+  const contextObjectMap = [];
+  let currentSourceFile;
+  let moduleInfo;
+  let exportFunction;
+  let contextObject;
+  let hoistedStatements;
+  let enclosingBlockScopedContainer;
+  let noSubstitution;
+  return chainBundle(context, transformSourceFile);
+  function transformSourceFile(node) {
+    if (node.isDeclarationFile || !(isEffectiveExternalModule(node, compilerOptions) || node.transformFlags & 8388608 /* ContainsDynamicImport */)) {
+      return node;
+    }
+    const id = getOriginalNodeId(node);
+    currentSourceFile = node;
+    enclosingBlockScopedContainer = node;
+    moduleInfo = moduleInfoMap[id] = collectExternalModuleInfo(context, node);
+    exportFunction = factory2.createUniqueName("exports");
+    exportFunctionsMap[id] = exportFunction;
+    contextObject = contextObjectMap[id] = factory2.createUniqueName("context");
+    const dependencyGroups = collectDependencyGroups(moduleInfo.externalImports);
+    const moduleBodyBlock = createSystemModuleBody(node, dependencyGroups);
+    const moduleBodyFunction = factory2.createFunctionExpression(
+      /*modifiers*/
+      void 0,
+      /*asteriskToken*/
+      void 0,
+      /*name*/
+      void 0,
+      /*typeParameters*/
+      void 0,
+      [
+        factory2.createParameterDeclaration(
+          /*modifiers*/
+          void 0,
+          /*dotDotDotToken*/
+          void 0,
+          exportFunction
+        ),
+        factory2.createParameterDeclaration(
+          /*modifiers*/
+          void 0,
+          /*dotDotDotToken*/
+          void 0,
+          contextObject
+        )
+      ],
+      /*type*/
+      void 0,
+      moduleBodyBlock
+    );
+    const moduleName = tryGetModuleNameFromFile(factory2, node, host, compilerOptions);
+    const dependencies = factory2.createArrayLiteralExpression(map(dependencyGroups, (dependencyGroup) => dependencyGroup.name));
+    const updated = setEmitFlags(
+      factory2.updateSourceFile(
+        node,
+        setTextRange(
+          factory2.createNodeArray([
+            factory2.createExpressionStatement(
+              factory2.createCallExpression(
+                factory2.createPropertyAccessExpression(factory2.createIdentifier("System"), "register"),
+                /*typeArguments*/
+                void 0,
+                moduleName ? [moduleName, dependencies, moduleBodyFunction] : [dependencies, moduleBodyFunction]
+              )
+            )
+          ]),
+          node.statements
+        )
+      ),
+      2048 /* NoTrailingComments */
+    );
+    if (!outFile(compilerOptions)) {
+      moveEmitHelpers(updated, moduleBodyBlock, (helper) => !helper.scoped);
+    }
+    if (noSubstitution) {
+      noSubstitutionMap[id] = noSubstitution;
+      noSubstitution = void 0;
+    }
+    currentSourceFile = void 0;
+    moduleInfo = void 0;
+    exportFunction = void 0;
+    contextObject = void 0;
+    hoistedStatements = void 0;
+    enclosingBlockScopedContainer = void 0;
+    return updated;
+  }
+  function collectDependencyGroups(externalImports) {
+    const groupIndices = /* @__PURE__ */ new Map();
+    const dependencyGroups = [];
+    for (const externalImport of externalImports) {
+      const externalModuleName = getExternalModuleNameLiteral(factory2, externalImport, currentSourceFile, host, resolver, compilerOptions);
+      if (externalModuleName) {
+        const text = externalModuleName.text;
+        const groupIndex = groupIndices.get(text);
+        if (groupIndex !== void 0) {
+          dependencyGroups[groupIndex].externalImports.push(externalImport);
+        } else {
+          groupIndices.set(text, dependencyGroups.length);
+          dependencyGroups.push({
+            name: externalModuleName,
+            externalImports: [externalImport]
+          });
+        }
+      }
+    }
+    return dependencyGroups;
+  }
+  function createSystemModuleBody(node, dependencyGroups) {
+    const statements = [];
+    startLexicalEnvironment();
+    const ensureUseStrict = getStrictOptionValue(compilerOptions, "alwaysStrict") || !compilerOptions.noImplicitUseStrict && isExternalModule(currentSourceFile);
+    const statementOffset = factory2.copyPrologue(node.statements, statements, ensureUseStrict, topLevelVisitor);
+    statements.push(
+      factory2.createVariableStatement(
+        /*modifiers*/
+        void 0,
+        factory2.createVariableDeclarationList([
+          factory2.createVariableDeclaration(
+            "__moduleName",
+            /*exclamationToken*/
+            void 0,
+            /*type*/
+            void 0,
+            factory2.createLogicalAnd(
+              contextObject,
+              factory2.createPropertyAccessExpression(contextObject, "id")
+            )
+          )
+        ])
+      )
+    );
+    visitNode(moduleInfo.externalHelpersImportDeclaration, topLevelVisitor, isStatement);
+    const executeStatements = visitNodes2(node.statements, topLevelVisitor, isStatement, statementOffset);
+    addRange(statements, hoistedStatements);
+    insertStatementsAfterStandardPrologue(statements, endLexicalEnvironment());
+    const exportStarFunction = addExportStarIfNeeded(statements);
+    const modifiers = node.transformFlags & 2097152 /* ContainsAwait */ ? factory2.createModifiersFromModifierFlags(1024 /* Async */) : void 0;
+    const moduleObject = factory2.createObjectLiteralExpression(
+      [
+        factory2.createPropertyAssignment("setters", createSettersArray(exportStarFunction, dependencyGroups)),
+        factory2.createPropertyAssignment(
+          "execute",
+          factory2.createFunctionExpression(
+            modifiers,
+            /*asteriskToken*/
+            void 0,
+            /*name*/
+            void 0,
+            /*typeParameters*/
+            void 0,
+            /*parameters*/
+            [],
+            /*type*/
+            void 0,
+            factory2.createBlock(
+              executeStatements,
+              /*multiLine*/
+              true
+            )
+          )
+        )
+      ],
+      /*multiLine*/
+      true
+    );
+    statements.push(factory2.createReturnStatement(moduleObject));
+    return factory2.createBlock(
+      statements,
+      /*multiLine*/
+      true
+    );
+  }
+  function addExportStarIfNeeded(statements) {
+    if (!moduleInfo.hasExportStarsToExportValues) {
+      return;
+    }
+    if (!moduleInfo.exportedNames && moduleInfo.exportSpecifiers.size === 0) {
+      let hasExportDeclarationWithExportClause = false;
+      for (const externalImport of moduleInfo.externalImports) {
+        if (externalImport.kind === 278 /* ExportDeclaration */ && externalImport.exportClause) {
+          hasExportDeclarationWithExportClause = true;
+          break;
+        }
+      }
+      if (!hasExportDeclarationWithExportClause) {
+        const exportStarFunction2 = createExportStarFunction(
+          /*localNames*/
+          void 0
+        );
+        statements.push(exportStarFunction2);
+        return exportStarFunction2.name;
+      }
+    }
+    const exportedNames = [];
+    if (moduleInfo.exportedNames) {
+      for (const exportedLocalName of moduleInfo.exportedNames) {
+        if (exportedLocalName.escapedText === "default") {
+          continue;
+        }
+        exportedNames.push(
+          factory2.createPropertyAssignment(
+            factory2.createStringLiteralFromNode(exportedLocalName),
+            factory2.createTrue()
+          )
+        );
+      }
+    }
+    const exportedNamesStorageRef = factory2.createUniqueName("exportedNames");
+    statements.push(
+      factory2.createVariableStatement(
+        /*modifiers*/
+        void 0,
+        factory2.createVariableDeclarationList([
+          factory2.createVariableDeclaration(
+            exportedNamesStorageRef,
+            /*exclamationToken*/
+            void 0,
+            /*type*/
+            void 0,
+            factory2.createObjectLiteralExpression(
+              exportedNames,
+              /*multiLine*/
+              true
+            )
+          )
+        ])
+      )
+    );
+    const exportStarFunction = createExportStarFunction(exportedNamesStorageRef);
+    statements.push(exportStarFunction);
+    return exportStarFunction.name;
+  }
+  function createExportStarFunction(localNames) {
+    const exportStarFunction = factory2.createUniqueName("exportStar");
+    const m = factory2.createIdentifier("m");
+    const n = factory2.createIdentifier("n");
+    const exports2 = factory2.createIdentifier("exports");
+    let condition = factory2.createStrictInequality(n, factory2.createStringLiteral("default"));
+    if (localNames) {
+      condition = factory2.createLogicalAnd(
+        condition,
+        factory2.createLogicalNot(
+          factory2.createCallExpression(
+            factory2.createPropertyAccessExpression(localNames, "hasOwnProperty"),
+            /*typeArguments*/
+            void 0,
+            [n]
+          )
+        )
+      );
+    }
+    return factory2.createFunctionDeclaration(
+      /*modifiers*/
+      void 0,
+      /*asteriskToken*/
+      void 0,
+      exportStarFunction,
+      /*typeParameters*/
+      void 0,
+      [factory2.createParameterDeclaration(
+        /*modifiers*/
+        void 0,
+        /*dotDotDotToken*/
+        void 0,
+        m
+      )],
+      /*type*/
+      void 0,
+      factory2.createBlock(
+        [
+          factory2.createVariableStatement(
+            /*modifiers*/
+            void 0

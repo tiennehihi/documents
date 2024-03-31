@@ -1,0 +1,21 @@
+) === null || _a === void 0 ? void 0 : _a.range;
+            const innerScope = variable.scope;
+            const innerDef = variable.defs[0];
+            const inner = innerDef === null || innerDef === void 0 ? void 0 : innerDef.name.range;
+            return !!(outer &&
+                inner &&
+                outer[0] < inner[0] &&
+                inner[1] < outer[1] &&
+                ((innerDef.type === scope_manager_1.DefinitionType.FunctionName &&
+                    innerDef.node.type === utils_1.AST_NODE_TYPES.FunctionExpression) ||
+                    innerDef.node.type === utils_1.AST_NODE_TYPES.ClassExpression) &&
+                outerScope === innerScope.upper);
+        }
+        /**
+         * Get a range of a variable's identifier node.
+         * @param variable The variable to get.
+         * @returns The range of the variable's identifier node.
+         */
+        function getNameRange(variable) {
+            const def = variable.defs[0];
+      

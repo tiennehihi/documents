@@ -1,0 +1,35 @@
+
+import {ContextualKeyword} from "./keywords";
+import { TokenType as tt} from "./types";
+
+export class Scope {
+  
+  
+  
+
+  constructor(startTokenIndex, endTokenIndex, isFunctionScope) {
+    this.startTokenIndex = startTokenIndex;
+    this.endTokenIndex = endTokenIndex;
+    this.isFunctionScope = isFunctionScope;
+  }
+}
+
+export class StateSnapshot {
+  constructor(
+     potentialArrowAt,
+     noAnonFunctionType,
+     inDisallowConditionalTypesContext,
+     tokensLength,
+     scopesLength,
+     pos,
+     type,
+     contextualKeyword,
+     start,
+     end,
+     isType,
+     scopeDepth,
+     error,
+  ) {;this.potentialArrowAt = potentialArrowAt;this.noAnonFunctionType = noAnonFunctionType;this.inDisallowConditionalTypesContext = inDisallowConditionalTypesContext;this.tokensLength = tokensLength;this.scopesLength = scopesLength;this.pos = pos;this.type = type;this.contextualKeyword = contextualKeyword;this.start = start;this.end = end;this.isType = isType;this.scopeDepth = scopeDepth;this.error = error;}
+}
+
+export default class State {constructor() { State.prototype.__init.call(this);State.prototype.__init2.call(this);State.prototype.__init3.call(this);State.prototype.__init4.call(this);State.prototype._

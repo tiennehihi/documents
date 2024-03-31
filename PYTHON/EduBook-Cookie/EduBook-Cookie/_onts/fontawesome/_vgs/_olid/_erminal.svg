@@ -1,0 +1,3 @@
+rogram | StaticBlock | SwitchCase | TSModuleBlock | WhileStatement | WithStatement;
+    EmptyStatement: BlockStatement | DoWhileStatement | ForInStatement | ForOfStatement | ForStatement | IfStatement | LabeledStatement | Program | StaticBlock | SwitchCase | TSModuleBlock | WhileStatement | WithStatement;
+    EmptyTypeAnnotation: ArrayTypeAnnotation | DeclareExportDeclaration | DeclareOpaqueType | DeclareTypeAlias | DeclaredPredicate | FunctionTypeAnnotation | FunctionTypePara

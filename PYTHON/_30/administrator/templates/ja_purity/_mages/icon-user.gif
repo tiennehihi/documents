@@ -1,0 +1,29 @@
+/// <reference types="node" />
+
+import * as fs from "fs";
+import * as m from "mime";
+import * as stream from "stream";
+
+/**
+ * Create a new SendStream for the given path to send to a res.
+ * The req is the Node.js HTTP request and the path is a urlencoded path to send (urlencoded, not the actual file-system path).
+ */
+declare function send(req: stream.Readable, path: string, options?: send.SendOptions): send.SendStream;
+
+declare namespace send {
+    const mime: typeof m;
+    interface SendOptions {
+        /**
+         * Enable or disable accepting ranged requests, defaults to true.
+         * Disabling this will not send Accept-Ranges and ignore the contents of the Range request header.
+         */
+        acceptRanges?: boolean | undefined;
+
+        /**
+         * Enable or disable setting Cache-Control response header, defaults to true.
+         * Disabling this will ignore the maxAge option.
+         */
+        cacheControl?: boolean | undefined;
+
+        /**
+         * Set how "dotfil

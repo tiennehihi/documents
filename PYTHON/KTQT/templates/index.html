@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+        
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        
+        button[type="submit"],
+        button[type="reset"] {
+            padding: 10px 15px;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        button[type="reset"] {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Registration Form</h2>
+        <form>
+            <div class="form-group">
+                <label for="first-name">First Name:</label>
+                <input type="text" id="first-name" name="first-name" required>
+            </div>
+            <div class="form-group">
+                <label for="last-name">Last Name:</label>
+                <input type="text" id="last-name" name="last-name" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="re-password">Re-Password:</label>
+                <input type="password" id="re-password" name="re-password" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Your Email:</label>
+                <input type="text" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Sex:</label>
+                <input type="radio" id="male" name="sex" value="male" required>
+                <label for="male">Male</label>
+                <input type="radio" id="female" name="sex" value="female" required>
+                <label for="female">Female</label>
+            </div>
+            <div class="form-group">
+                <label for="birthdate">Birth of Date:</label>
+                <select id="birthdate" name="birthdate" required>
+                    <option value="">Select</option>
+                    <!-- Add your date options here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Your Language:</label>
+                <input type="checkbox" id="lang1" name="language" value="lang1">
+                <label for="lang1">Language 1</label>
+                <input type="checkbox" id="lang2" name="language" value="lang2">
+                <label for="lang2">Language 2</label>
+                <input type="checkbox" id="lang3" name="language" value="lang3">
+                <label for="lang3">Language 3</label>
+            </div>
+            <button type="submit">Submit</button>
+            <button type="reset">Reset</button>
+        </form>
+    </div>
+</body>
+</html>

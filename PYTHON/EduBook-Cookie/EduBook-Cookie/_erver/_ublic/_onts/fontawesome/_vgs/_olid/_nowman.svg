@@ -1,0 +1,74 @@
+
+    unicodes:
+      composite:
+        - 1f6d0
+      secondary:
+        - 10f683
+  changes:
+    - 5.3.0
+    - 6.0.0-beta1
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Person praying
+  unicode: f683
+  voted: false
+person-pregnant:
+  changes:
+    - 6.0.0-beta1
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Person Pregnant
+  unicode: e31e
+  voted: false
+person-rays:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Person Rays
+  unicode: e54d
+  voted: false
+person-rifle:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: Person Rifle
+  unicode: e54e
+  voted: false
+person-running:
+  aliases:
+    names:
+      - running
+    unicodes:
+      composite:
+        - 1f3c3
+      secondary:
+        - 10f70c
+  changes:
+   

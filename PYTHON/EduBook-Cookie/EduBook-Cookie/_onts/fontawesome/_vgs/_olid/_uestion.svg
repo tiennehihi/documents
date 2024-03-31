@@ -1,0 +1,7 @@
+n(types: Array<FlowType>): TupleTypeAnnotation;
+export function typeofTypeAnnotation(argument: FlowType): TypeofTypeAnnotation;
+export function typeAlias(id: Identifier, typeParameters: TypeParameterDeclaration | null | undefined, right: FlowType): TypeAlias;
+export function typeAnnotation(typeAnnotation: FlowType): TypeAnnotation;
+export function typeCastExpression(expression: Expression, typeAnnotation: TypeAnnotation): TypeCastExpression;
+export function typeParameter(bound?: TypeAnnotation | null, _default?: FlowType | null, variance?: Variance | null): TypeParameter;
+export function typeParameterDeclaration(params: Array<TypeParameter>): TypeParam

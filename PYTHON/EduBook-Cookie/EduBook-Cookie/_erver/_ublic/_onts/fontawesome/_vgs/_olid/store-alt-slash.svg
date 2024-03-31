@@ -1,0 +1,29 @@
+     "unicodes": {
+        "composite": [
+          "1f382"
+        ],
+        "secondary": [
+          "10f1fd"
+        ]
+      }
+    },
+    "changes": [
+      "4.2.0",
+      "5.0.0",
+      "6.0.0-beta1",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "search": {
+      "terms": []
+    },
+    "styles": [
+      "solid"
+    ],
+    "unicode": "f1fd",
+    "label": "Cake candles",
+    "voted": false,
+    "svg": {
+      "solid": {
+        "last_modified": 1660321790,
+        "raw": "<svg xmlns=\"http://www.w3.org/2000/svg\" vi

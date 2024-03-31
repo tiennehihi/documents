@@ -1,0 +1,1 @@
+= gs) {\n          parts.splice(gs, i - gs)\n        }\n      }\n      return parts\n    })\n  }\n\n  // get rid of adjascent ** and 

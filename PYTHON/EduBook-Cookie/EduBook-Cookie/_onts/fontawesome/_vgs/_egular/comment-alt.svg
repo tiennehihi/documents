@@ -1,0 +1,7 @@
+onvertCompilerOptionsForTelemetry: () => convertCompilerOptionsForTelemetry,
+  convertCompilerOptionsFromJson: () => convertCompilerOptionsFromJson,
+  convertJsonOption: () => convertJsonOption,
+  convertToBase64: () => convertToBase64,
+  convertToJson: () => convertToJson,
+  convertToObject: () => convertToObject,
+  convertToOptionsWithAbsolutePaths: () => co

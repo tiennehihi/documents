@@ -1,0 +1,44 @@
+ebug.assert(position >= 0);
+    pos = position;
+    fullStartPos = position;
+    tokenStart = position;
+    token = 0 /* Unknown */;
+    tokenValue = void 0;
+    tokenFlags = 0 /* None */;
+  }
+  function setInJSDocType(inType) {
+    inJSDocType += inType ? 1 : -1;
+  }
+}
+function codePointAt(s, i) {
+  return s.codePointAt(i);
+}
+function charSize(ch) {
+  if (ch >= 65536) {
+    return 2;
+  }
+  return 1;
+}
+function utf16EncodeAsStringFallback(codePoint) {
+  Debug.assert(0 <= codePoint && codePoint <= 1114111);
+  if (codePoint <= 65535) {
+    return String.fromCharCode(codePoint);
+  }
+  const codeUnit1 = Math.floor((codePoint - 65536) / 1024) + 55296;
+  const codeUnit2 = (codePoint - 65536) % 1024 + 56320;
+  return String.fromCharCode(codeUnit1, codeUnit2);
+}
+var utf16EncodeAsStringWorker = String.fromCodePoint ? (codePoint) => String.fromCodePoint(codePoint) : utf16EncodeAsStringFallback;
+function utf16EncodeAsString(codePoint) {
+  return utf16EncodeAsStringWorker(codePoint);
+}
+
+// src/compiler/utilitiesPublic.ts
+function isExternalModuleNameRelative(moduleName) {
+  return pathIsRelative(moduleName) || isRootedDiskPath(moduleName);
+}
+function sortAndDeduplicateDiagnostics(diagnostics) {
+  return sortAndDeduplicate(diagnostics, compareDiagnostics);
+}
+function getDefaultLibFileName(options) {
+  swi

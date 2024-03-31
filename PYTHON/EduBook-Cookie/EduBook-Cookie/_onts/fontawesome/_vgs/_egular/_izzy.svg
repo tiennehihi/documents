@@ -1,0 +1,33 @@
+asOwnProperty.call(right, key))
+        return false;
+      if (!equalityComparer(left[key], right[key]))
+        return false;
+    }
+  }
+  for (const key in right) {
+    if (hasOwnProperty.call(right, key)) {
+      if (!hasOwnProperty.call(left, key))
+        return false;
+    }
+  }
+  return true;
+}
+function arrayToMap(array, makeKey, makeValue = identity) {
+  const result = /* @__PURE__ */ new Map();
+  for (const value of array) {
+    const key = makeKey(value);
+    if (key !== void 0)
+      result.set(key, makeValue(value));
+  }
+  return result;
+}
+function arrayToNumericMap(array, makeKey, makeValue = identity) {
+  const result = [];
+  for (const value of array) {
+    result[makeKey(value)] = makeValue(value);
+  }
+  return result;
+}
+function arrayToMultiMap(values, makeKey, makeValue = identity) {
+  const result = createMultiMap();
+  for (const value of values) {

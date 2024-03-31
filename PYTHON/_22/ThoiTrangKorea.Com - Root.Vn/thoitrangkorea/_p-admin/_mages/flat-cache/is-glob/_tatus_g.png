@@ -1,0 +1,11 @@
+{
+	"name": "p-locate",
+	"version": "4.1.0",
+	"description": "Get the first fulfilled promise that satisfies the provided testing function",
+	"license": "MIT",
+	"repository": "sindresorhus/p-locate",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "sindresorhus.com"
+	},

@@ -1,0 +1,190 @@
+ ignoredPaths changes effective
+    this._userIgnored = undefined;
+  });
+
+  return this;
+}
+
+/**
+ * Close watchers and remove all listeners from watched paths.
+ * @returns {Promise<void>}.
+*/
+close() {
+  if (this.closed) return this._closePromise;
+  this.closed = true;
+
+  // Memory management.
+  this.removeAllListeners();
+  const closers = [];
+  this._closers.forEach(closerList => closerList.forEach(closer => {
+    const promise = closer();
+    if (promise instanceof Promise) closers.push(promise);
+  }));
+  this._streams.forEach(stream => stream.destroy());
+  this._userIgnored = undefined;
+  this._readyCount = 0;
+  this._readyEmitted = false;
+  this._watched.forEach(dirent => dirent.dispose());
+  ['closers', 'watched', 'streams', 'symlinkPaths', 'throttled'].forEach(key => {
+    this[`_${key}`].clear();
+  });
+
+  this._closePromise = closers.length ? Promise.all(closers).then(() => undefined) : Promise.resolve();
+  return this._closePromise;
+}
+
+/**
+ * Expose list of watched paths
+ * @returns {Object} for chaining
+*/
+getWatched() {
+  const watchList = {};
+  this._watched.forEach((entry, dir) => {
+    const key = this.options.cwd ? sysPath.relative(this.options.cwd, dir) : dir;
+    watchList[key || ONE_DOT] = entry.getChildren().sort();
+  });
+  return watchList;
+}
+
+emitWithAll(event, args) {
+  this.emit(...args);
+  if (event !== EV_ERROR) this.emit(EV_ALL, ...args);
+}
+
+// Common helpers
+// --------------
+
+/**
+ * Normalize and emit events.
+ * Calling _emit DOES NOT MEAN emit() would be called!
+ * @param {EventName} event Type of event
+ * @param {Path} path File or directory path
+ * @param {*=} val1 arguments to be passed with event
+ * @param {*=} val2
+ * @param {*=} val3
+ * @returns the error if defined, otherwise the value of the FSWatcher instance's `closed` flag
+ */
+async _emit(event, path, val1, val2, val3) {
+  if (this.closed) return;
+
+  const opts = this.options;
+  if (isWindows) path = sysPath.normalize(path);
+  if (opts.cwd) path = sysPath.relative(opts.cwd, path);
+  /** @type Array<any> */
+  const args = [event, path];
+  if (val3 !== undefined) args.push(val1, val2, val3);
+  else if (val2 !== undefined) args.push(val1, val2);
+  else if (val1 !== undefined) args.push(val1);
+
+  const awf = opts.awaitWriteFinish;
+  let pw;
+  if (awf && (pw = this._pendingWrites.get(path))) {
+    pw.lastChange = new Date();
+    return this;
+  }
+
+  if (opts.atomic) {
+    if (event === EV_UNLINK) {
+      this._pendingUnlinks.set(path, args);
+      setTimeout(() => {
+        this._pendingUnlinks.forEach((entry, path) => {
+          this.emit(...entry);
+          this.emit(EV_ALL, ...entry);
+          this._pendingUnlinks.delete(path);
+        });
+      }, typeof opts.atomic === 'number' ? opts.atomic : 100);
+      return this;
+    }
+    if (event === EV_ADD && this._pendingUnlinks.has(path)) {
+      event = args[0] = EV_CHANGE;
+      this._pendingUnlinks.delete(path);
+    }
+  }
+
+  if (awf && (event === EV_ADD || event === EV_CHANGE) && this._readyEmitted) {
+    const awfEmit = (err, stats) => {
+      if (err) {
+        event = args[0] = EV_ERROR;
+        args[1] = err;
+        this.emitWithAll(event, args);
+      } else if (stats) {
+        // if stats doesn't exist the file must have been deleted
+        if (args.length > 2) {
+          args[2] = stats;
+        } else {
+          args.push(stats);
+        }
+        this.emitWithAll(event, args);
+      }
+    };
+
+    this._awaitWriteFinish(path, awf.stabilityThreshold, event, awfEmit);
+    return this;
+  }
+
+  if (event === EV_CHANGE) {
+    const isThrottled = !this._throttle(EV_CHANGE, path, 50);
+    if (isThrottled) return this;
+  }
+
+  if (opts.alwaysStat && val1 === undefined &&
+    (event === EV_ADD || event === EV_ADD_DIR || event === EV_CHANGE)
+  ) {
+    const fullPath = opts.cwd ? sysPath.join(opts.cwd, path) : path;
+    let stats;
+    try {
+      stats = await stat(fullPath);
+    } catch (err) {}
+    // Suppress event when fs_stat fails, to avoid sending undefined 'stat'
+    if (!stats || this.closed) return;
+    args.push(stats);
+  }
+  this.emitWithAll(event, args);
+
+  return this;
+}
+
+/**
+ * Common handler for errors
+ * @param {Error} error
+ * @returns {Error|Boolean} The error if defined, otherwise the value of the FSWatcher instance's `closed` flag
+ */
+_handleError(error) {
+  const code = error && error.code;
+  if (error && code !== 'ENOENT' && code !== 'ENOTDIR' &&
+    (!this.options.ignorePermissionErrors || (code !== 'EPERM' && code !== 'EACCES'))
+  ) {
+    this.emit(EV_ERROR, error);
+  }
+  return error || this.closed;
+}
+
+/**
+ * Helper utility for throttling
+ * @param {ThrottleType} actionType type being throttled
+ * @param {Path} path being acted upon
+ * @param {Number} timeout duration of time to suppress duplicate actions
+ * @returns {Object|false} tracking object or false if action should be suppressed
+ */
+_throttle(actionType, path, timeout) {
+  if (!this._throttled.has(actionType)) {
+    this._throttled.set(actionType, new Map());
+  }
+
+  /** @type {Map<Path, Object>} */
+  const action = this._throttled.get(actionType);
+  /** @type {Object} */
+  const actionPath = action.get(path);
+
+  if (actionPath) {
+    actionPath.count++;
+    return false;
+  }
+
+  let timeoutObject;
+  const clear = () => {
+    const item = action.get(path);
+    const count = item ? item.count : 0;
+    action.delete(path);
+    clearTimeout(timeoutObject);
+    if (item) clearTimeout(

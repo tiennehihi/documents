@@ -1,0 +1,11 @@
+'use strict'
+
+const path = require('path')
+const fs = require('graceful-fs')
+const pathExists = require('../path-exists').pathExists
+
+/**
+ * Function that returns two types of paths, one relative to symlink, and one
+ * relative to the current working directory. Checks if path is absolute or
+ * relative. If the path is relative, this function checks if the path is
+ * relative to symlink or relative to c

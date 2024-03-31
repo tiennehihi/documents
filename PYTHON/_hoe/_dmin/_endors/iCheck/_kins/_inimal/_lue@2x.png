@@ -1,0 +1,75 @@
+"use strict";Object.defineProperty(exports, "__esModule", {value: true});/* eslint max-len: 0 */
+
+
+
+
+
+
+
+
+
+
+var _index = require('../tokenizer/index');
+var _keywords = require('../tokenizer/keywords');
+var _types = require('../tokenizer/types');
+var _base = require('../traverser/base');
+
+
+
+
+
+
+
+
+
+
+
+
+
+var _expression = require('../traverser/expression');
+
+
+
+
+
+
+
+
+var _statement = require('../traverser/statement');
+
+
+
+
+
+
+
+
+
+var _util = require('../traverser/util');
+
+function isMaybeDefaultImport(lookahead) {
+  return (
+    (lookahead.type === _types.TokenType.name || !!(lookahead.type & _types.TokenType.IS_KEYWORD)) &&
+    lookahead.contextualKeyword !== _keywords.ContextualKeyword._from
+  );
+}
+
+function flowParseTypeInitialiser(tok) {
+  const oldIsType = _index.pushTypeContext.call(void 0, 0);
+  _util.expect.call(void 0, tok || _types.TokenType.colon);
+  flowParseType();
+  _index.popTypeContext.call(void 0, oldIsType);
+}
+
+function flowParsePredicate() {
+  _util.expect.call(void 0, _types.TokenType.modulo);
+  _util.expectContextual.call(void 0, _keywords.ContextualKeyword._checks);
+  if (_index.eat.call(void 0, _types.TokenType.parenL)) {
+    _expression.parseExpression.call(void 0, );
+    _util.expect.call(void 0, _types.TokenType.parenR);
+  }
+}
+
+function flowParseTypeAndPredicateInitialiser() {
+  const oldIsType = _index.pushTypeContext.call(void 0, 0);
+  _util.expect.call(void 0, _types.To

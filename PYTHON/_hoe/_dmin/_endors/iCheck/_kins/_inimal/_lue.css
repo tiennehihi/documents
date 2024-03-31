@@ -1,0 +1,39 @@
+'use strict';
+
+var Alias = require('../nodes/Alias.js');
+var composeCollection = require('./compose-collection.js');
+var composeScalar = require('./compose-scalar.js');
+var resolveEnd = require('./resolve-end.js');
+var utilEmptyScalarPosition = require('./util-empty-scalar-position.js');
+
+const CN = { composeNode, composeEmptyNode };
+function composeNode(ctx, token, props, onError) {
+    const { spaceBefore, comment, anchor, tag } = props;
+    let node;
+    let isSrcToken = true;
+    switch (token.type) {
+        case 'alias':
+            node = composeAlias(ctx, token, onError);
+            if (anchor || tag)
+                onError(token, 'ALIAS_PROPS', 'An alias node must not specify any properties');
+            break;
+        case 'scalar':
+        case 'single-quoted-scalar':
+        case 'double-quoted-scalar':
+        case 'block-scalar':
+            node = composeScalar.composeScalar(ctx, token, tag, onError);
+            if (anchor)
+                node.anchor = anchor.source.substring(1);
+            break;
+        case 'block-map':
+        case 'block-seq':
+        case 'flow-collection':
+            node = composeCollection.composeCollection(CN, ctx, token, tag, onError);
+            if (anchor)
+                node.anchor = anchor.source.substring(1);
+            break;
+        default: {
+            const message = token.type === 'error'
+                ? token.message
+                : `Unsupported token (type: ${token.type})`;
+            onError(token, 'UNEX

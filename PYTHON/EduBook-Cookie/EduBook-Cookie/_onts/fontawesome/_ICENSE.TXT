@@ -1,0 +1,56 @@
+/**
+ * @fileoverview Main class using flat config
+ * @author Nicholas C. Zakas
+ */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+// Note: Node.js 12 does not support fs/promises.
+const fs = require("fs").promises;
+const { existsSync } = require("fs");
+const path = require("path");
+const findUp = require("find-up");
+const { version } = require("../../package.json");
+const { Linter } = require("../linter");
+const { getRuleFromConfig } = require("../config/flat-config-helpers");
+const {
+    Legacy: {
+        ConfigOps: {
+            getRuleSeverity
+        },
+        ModuleResolver,
+        naming
+    }
+} = require("@eslint/eslintrc");
+
+const {
+    findFiles,
+    getCacheFile,
+
+    isNonEmptyString,
+    isArrayOfNonEmptyString,
+
+    createIgnoreResult,
+    isErrorMessage,
+
+    processOptions
+} = require("./eslint-helpers");
+const { pathToFileURL } = require("url");
+const { FlatConfigArray } = require("../config/flat-config-array");
+const LintResultCache = require("../cli-engine/lint-result-cache");
+
+/*
+ * This is necessary to allow overwriting writeFile for testing purposes.
+ * We can just use fs/promises once we drop Node.js 12 support.
+ */
+
+//------------------------------------------------------------------------------
+// Typedefs
+//------------------------------------------------------------------------------
+
+// For VSCode IntelliSense
+/** @typedef {import("../shared/types")

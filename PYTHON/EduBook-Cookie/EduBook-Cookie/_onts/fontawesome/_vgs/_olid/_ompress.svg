@@ -1,0 +1,26 @@
+import * as pirates from "pirates";
+
+import { transform} from "./index";
+
+
+
+
+
+
+
+
+export function addHook(
+  extension,
+  sucraseOptions,
+  hookOptions,
+) {
+  let mergedSucraseOptions = sucraseOptions;
+  const sucraseOptionsEnvJSON = process.env.SUCRASE_OPTIONS;
+  if (sucraseOptionsEnvJSON) {
+    mergedSucraseOptions = {...mergedSucraseOptions, ...JSON.parse(sucraseOptionsEnvJSON)};
+  }
+  return pirates.addHook(
+    (code, filePath) => {
+      const {code: transformedCode, sourceMap} = transform(code, {
+        ...mergedSucraseOptions,
+        sourceMapOptions: {compiledFilename:

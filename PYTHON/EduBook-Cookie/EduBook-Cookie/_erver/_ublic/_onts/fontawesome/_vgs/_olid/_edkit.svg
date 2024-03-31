@@ -1,0 +1,35 @@
+       },
+        {
+          "family": "classic",
+          "style": "solid"
+        }
+      ],
+      "pro": [
+        {
+          "family": "classic",
+          "style": "solid"
+        },
+        {
+          "family": "classic",
+          "style": "regular"
+        }
+      ]
+    }
+  },
+  "face-grin-stars": {
+    "aliases": {
+      "names": [
+        "grin-stars"
+      ],
+      "unicodes": {
+        "composite": [
+          "1f929"
+        ],
+        "secondary": [
+          "10f587"
+        ]
+      }
+    },
+    "changes": [
+      "5.1.0",
+      "5.11.0

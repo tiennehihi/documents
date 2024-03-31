@@ -1,0 +1,17 @@
+::before {
+  content: "\f525"; }
+
+.fa-kiwi-bird::before {
+  content: "\f535"; }
+
+.fa-arrow-right-arrow-left::before {
+  content: "\f0ec"; }
+
+.fa-exchange::before {
+  content: "\f0ec"; }
+
+.fa-rotate-right::before {
+  content: "\f2f9"; }
+
+.fa-redo-alt::before {
+  content

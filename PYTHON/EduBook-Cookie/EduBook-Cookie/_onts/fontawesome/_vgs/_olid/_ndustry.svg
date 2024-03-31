@@ -1,0 +1,1 @@
+{"version":3,"names":["PluginPass","constructor","file","key","options","_map","Map","opts","cwd","filename","set","val","get","availableHelper","name","versionRange","addHelper","buildCodeFrameError","node","msg","_Error","exports","default","prototype","getModuleName","addImport"],"sources":["../../src/transformation/pl

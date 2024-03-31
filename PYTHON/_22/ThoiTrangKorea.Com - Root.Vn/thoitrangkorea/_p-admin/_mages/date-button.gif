@@ -1,0 +1,3 @@
+rn this._for(new ForRange(varKind, name, from, to), () => forBody(name));
+    }
+    // `for-of` statement (in e

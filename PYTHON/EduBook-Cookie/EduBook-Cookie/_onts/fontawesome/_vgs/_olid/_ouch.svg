@@ -1,0 +1,21 @@
+'use strict';
+var arraySlice = require('../internals/array-slice');
+
+var floor = Math.floor;
+
+var sort = function (array, comparefn) {
+  var length = array.length;
+
+  if (length < 8) {
+    // insertion sort
+    var i = 1;
+    var element, j;
+
+    while (i < length) {
+      j = i;
+      element = array[i];
+      while (j && comparefn(array[j - 1], element) > 0) {
+        array[j] = array[--j];
+      }
+      if (j !== i++) array[j] = element;
+  

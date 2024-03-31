@@ -1,0 +1,148 @@
+clarationList);
+      if (variables.length === 0) {
+        return void 0;
+      }
+      return setSourceMapRange(
+        factory2.createExpressionStatement(
+          factory2.inlineExpressions(
+            map(variables, transformInitializedVariable)
+          )
+        ),
+        node
+      );
+    }
+  }
+  function visitBinaryExpression(node) {
+    const assoc = getExpressionAssociativity(node);
+    switch (assoc) {
+      case 0 /* Left */:
+        return visitLeftAssociativeBinaryExpression(node);
+      case 1 /* Right */:
+        return visitRightAssociativeBinaryExpression(node);
+      default:
+        return Debug.assertNever(assoc);
+    }
+  }
+  function visitRightAssociativeBinaryExpression(node) {
+    const { left, right } = node;
+    if (containsYield(right)) {
+      let target;
+      switch (left.kind) {
+        case 211 /* PropertyAccessExpression */:
+          target = factory2.updatePropertyAccessExpression(
+            left,
+            cacheExpression(Debug.checkDefined(visitNode(left.expression, visitor, isLeftHandSideExpression))),
+            left.name
+          );
+          break;
+        case 212 /* ElementAccessExpression */:
+          target = factory2.updateElementAccessExpression(left, cacheExpression(Debug.checkDefined(visitNode(left.expression, visitor, isLeftHandSideExpression))), cacheExpression(Debug.checkDefined(visitNode(left.argumentExpression, visitor, isExpression))));
+          break;
+        default:
+          target = Debug.checkDefined(visitNode(left, visitor, isExpression));
+          break;
+      }
+      const operator = node.operatorToken.kind;
+      if (isCompoundAssignment(operator)) {
+        return setTextRange(
+          factory2.createAssignment(
+            target,
+            setTextRange(
+              factory2.createBinaryExpression(
+                cacheExpression(target),
+                getNonAssignmentOperatorForCompoundAssignment(operator),
+                Debug.checkDefined(visitNode(right, visitor, isExpression))
+              ),
+              node
+            )
+          ),
+          node
+        );
+      } else {
+        return factory2.updateBinaryExpression(node, target, node.operatorToken, Debug.checkDefined(visitNode(right, visitor, isExpression)));
+      }
+    }
+    return visitEachChild(node, visitor, context);
+  }
+  function visitLeftAssociativeBinaryExpression(node) {
+    if (containsYield(node.right)) {
+      if (isLogicalOperator(node.operatorToken.kind)) {
+        return visitLogicalBinaryExpression(node);
+      } else if (node.operatorToken.kind === 28 /* CommaToken */) {
+        return visitCommaExpression(node);
+      }
+      return factory2.updateBinaryExpression(node, cacheExpression(Debug.checkDefined(visitNode(node.left, visitor, isExpression))), node.operatorToken, Debug.checkDefined(visitNode(node.right, visitor, isExpression)));
+    }
+    return visitEachChild(node, visitor, context);
+  }
+  function visitCommaExpression(node) {
+    let pendingExpressions = [];
+    visit(node.left);
+    visit(node.right);
+    return factory2.inlineExpressions(pendingExpressions);
+    function visit(node2) {
+      if (isBinaryExpression(node2) && node2.operatorToken.kind === 28 /* CommaToken */) {
+        visit(node2.left);
+        visit(node2.right);
+      } else {
+        if (containsYield(node2) && pendingExpressions.length > 0) {
+          emitWorker(1 /* Statement */, [factory2.createExpressionStatement(factory2.inlineExpressions(pendingExpressions))]);
+          pendingExpressions = [];
+        }
+        pendingExpressions.push(Debug.checkDefined(visitNode(node2, visitor, isExpression)));
+      }
+    }
+  }
+  function visitCommaListExpression(node) {
+    let pendingExpressions = [];
+    for (const elem of node.elements) {
+      if (isBinaryExpression(elem) && elem.operatorToken.kind === 28 /* CommaToken */) {
+        pendingExpressions.push(visitCommaExpression(elem));
+      } else {
+        if (containsYield(elem) && pendingExpressions.length > 0) {
+          emitWorker(1 /* Statement */, [factory2.createExpressionStatement(factory2.inlineExpressions(pendingExpressions))]);
+          pendingExpressions = [];
+        }
+        pendingExpressions.push(Debug.checkDefined(visitNode(elem, visitor, isExpression)));
+      }
+    }
+    return factory2.inlineExpressions(pendingExpressions);
+  }
+  function visitLogicalBinaryExpression(node) {
+    const resultLabel = defineLabel();
+    const resultLocal = declareLocal();
+    emitAssignment(
+      resultLocal,
+      Debug.checkDefined(visitNode(node.left, visitor, isExpression)),
+      /*location*/
+      node.left
+    );
+    if (node.operatorToken.kind === 56 /* AmpersandAmpersandToken */) {
+      emitBreakWhenFalse(
+        resultLabel,
+        resultLocal,
+        /*location*/
+        node.left
+      );
+    } else {
+      emitBreakWhenTrue(
+        resultLabel,
+        resultLocal,
+        /*location*/
+        node.left
+      );
+    }
+    emitAssignment(
+      resultLocal,
+      Debug.checkDefined(visitNode(node.right, visitor, isExpression)),
+      /*location*/
+      node.right
+    );
+    markLabel(resultLabel);
+    return resultLocal;
+  }
+  function visitConditionalExpression(node) {
+    if (containsYield(node.whenTrue) || containsYield(node.whenFalse)) {
+      const whenFalseLabel = defineLabel();
+      const resultLabel = defineLabel();
+      const resultLocal = declareLoca

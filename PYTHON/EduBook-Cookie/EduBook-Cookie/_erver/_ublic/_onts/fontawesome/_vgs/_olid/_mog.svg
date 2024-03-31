@@ -1,0 +1,36 @@
+e: solid
+    pro:
+      - family: classic
+        style: solid
+  label: House Lock
+  unicode: e510
+  voted: false
+house-medical:
+  changes:
+    - 6.0.0-beta1
+    - 6.0.0-beta2
+    - 6.0.0-beta3
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  label: House Simple Medical
+  unicode: e3b2
+  voted: false
+house-medical-circle-check:
+  changes:
+    - 6.1.0
+    - 6.2.0
+  familyStylesByLicense:
+    free:
+      - family: classic
+        style: solid
+    pro:
+      - family: classic
+        style: solid
+  l

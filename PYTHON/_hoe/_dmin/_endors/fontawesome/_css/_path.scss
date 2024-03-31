@@ -1,0 +1,39 @@
+# object-inspect <sup>[![Version Badge][2]][1]</sup>
+
+string representations of objects in node and the browser
+
+[![github actions][actions-image]][actions-url]
+[![coverage][codecov-image]][codecov-url]
+[![dependency status][5]][6]
+[![dev dependency status][7]][8]
+[![License][license-image]][license-url]
+[![Downloads][downloads-image]][downloads-url]
+
+[![npm badge][11]][1]
+
+# example
+
+## circular
+
+``` js
+var inspect = require('object-inspect');
+var obj = { a: 1, b: [3,4] };
+obj.c = obj;
+console.log(inspect(obj));
+```
+
+## dom element
+
+``` js
+var inspect = require('object-inspect');
+
+var d = document.createElement('div');
+d.setAttribute('id', 'beep');
+d.innerHTML = '<b>wooo</b><i>iiiii</i>';
+
+console.log(inspect([ d, { a: 3, b : 4, c: [5,6,[7,[8,[9]]]] } ]));
+```
+
+output:
+
+`

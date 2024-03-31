@@ -1,0 +1,10 @@
+// animating icons
+// --------------------------
+
+.@{fa-css-prefix}-beat {
+  animation-name: ~'@{fa-css-prefix}-beat';
+  animation-delay: ~'var(--@{fa-css-prefix}-animation-delay, 0s)';
+  animation-direction: ~'var(--@{fa-css-prefix}-animation-direction, normal)';
+  animation-duration: ~'var(--@{fa-css-prefix}-animation-duration, 1s)';
+  animation-iteration-count: ~'var(--@{fa-css-prefix}-animation-iteration-count, infinite)';
+  animation-timing-function: ~'var(--@{fa-css-prefix}-animation-timing, ease-in-out)';

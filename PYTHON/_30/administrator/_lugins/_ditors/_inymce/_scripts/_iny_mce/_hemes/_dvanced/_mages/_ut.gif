@@ -1,0 +1,7 @@
+{
+              if (sealed) {
+                return;
+              }
+              sealed = true;
+              reject(promise2, reason);
+            }, 'Settle: ' + (promise2._label || 

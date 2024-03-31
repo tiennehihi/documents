@@ -1,0 +1,27 @@
+    * @since v8.4.0
+         */
+        readonly destroyed: boolean;
+        /**
+         * Value is `undefined` if the `Http2Session` session socket has not yet been
+         * connected, `true` if the `Http2Session` is connected with a `TLSSocket`,
+         * and `false` if the `Http2Session` is connected to any other kind of socket
+         * or stream.
+         * @since v9.4.0
+         */
+        readonly encrypted?: boolean | undefined;
+        /**
+         * A prototype-less object describing the current local settings of this`Http2Session`. The local settings are local to _this_`Http2Session` instance.
+         * @since v8.4.0
+         */
+        readonly localSettings: Settings;
+        /**
+         * If the `Http2Session` is connected to a `TLSSocket`, the `originSet` property
+         * will return an `Array` of origins for which the `Http2Session` may be
+         * considered authoritative.
+         *
+         * The `originSet` property is only available when using a secure TLS connection.
+         * @since v9.4.0
+         */
+        readonly originSet?: string[] | undefined;
+        /**
+         * Indicates whether the `Http2Session` is currently waiting for ack

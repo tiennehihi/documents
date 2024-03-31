@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="songForm">
+        <label for="songLink">Link nhạc:</label>
+        <input type="text" id="songLink" name="songLink" required>
+        <br>
+        <label for="artistName">Tên ca sĩ:</label>
+        <input type="text" id="artistName" name="artistName" required>
+        <br>
+        <label for="songImage">Ảnh:</label>
+        <input type="file" id="songImage" name="songImage" accept="image/*" required>
+        <br>
+        <button type="submit">Thêm bài hát</button>
+      </form>
+      
+      <ul id="songList"></ul>
+      <script>
+        // Lấy đối tượng form và danh sách bài hát từ HTML
+        const songForm = document.getElementById('songForm');
+        const songList = document.getElementById('songList');
+
+        // Xử lý sự kiện submit của form
+        songForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Ngăn chặn form submit mặc định
+        
+        // Lấy giá trị từ các trường input
+        const songLink = document.getElementById('songLink').value;
+        const artistName = document.getElementById('artistName').value;
+        const songImage = document.getElementById('songImage').files[0];
+
+        // Tạo một phần tử li để hiển thị thông tin bài hát
+        const listItem = document.createElement('li');
+        // listItem.innerHTML = `<img src="${URL.createObjectURL(songImage)}" alt="" width="200">`
+        console.log(listItem)
+        
+        // Tạo một thẻ img để hiển thị ảnh
+        const imageElement = document.createElement('img');
+        imageElement.src = URL.createObjectURL(songImage);
+        listItem.appendChild(imageElement);
+        
+        // Tạo một thẻ p để hiển thị thông tin bài hát
+        const songInfo = document.createElement('p');
+        songInfo.innerHTML = `Link nhạc: ${songLink}<br>Tên ca sĩ: ${artistName}`;
+        listItem.appendChild(songInfo);
+        
+        // Thêm phần tử li vào danh sách bài hát
+        songList.appendChild(listItem);
+        
+        // Đặt lại giá trị của các trường input
+        songForm.reset();
+        });
+
+      </script>
+</body>
+</html>

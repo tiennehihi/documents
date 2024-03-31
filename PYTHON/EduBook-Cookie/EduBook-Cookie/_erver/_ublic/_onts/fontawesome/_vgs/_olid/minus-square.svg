@@ -1,0 +1,19 @@
+{
+    "aliases": {
+      "unicodes": {
+        "secondary": [
+          "10f575"
+        ]
+      }
+    },
+    "changes": [
+      "5.1.0",
+      "6.0.0-beta1",
+      "6.0.0",
+      "6.2.0"
+    ],
+    "ligatures": [],
+    "unicode": "f575",
+    "label": "Fill",
+    "voted": false,
+    

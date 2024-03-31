@@ -1,0 +1,1 @@
+}\n    this.validationResult = true;\n\n    // fire validate event to eventually modify things before very validation\n    this._trigger('validate');\n\n    // Refresh form DOM options and form's fields that could have changed\n    this._refreshFields();\n\n   
